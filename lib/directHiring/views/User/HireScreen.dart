@@ -1,0 +1,1325 @@
+//
+// import 'dart:convert';
+// import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:http_parser/http_parser.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:path/path.dart' as p;
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:geolocator/geolocator.dart'; // ✅ Location ke liye
+// import 'package:geocoding/geocoding.dart'; // ✅ Address string ke liye
+// import '../../Consent/ApiEndpoint.dart';
+// import '../../Consent/app_constants.dart';
+// import '../../Widgets/AppColors.dart';
+// import '../Account/RazorpayScreen.dart';
+// class HireScreen extends StatefulWidget {
+//   final String firstProviderId;
+//   final String? categreyId; // Typo fix: categreyId -> categoryId
+//   final String? subcategreyId; // Typo fix: subcategreyId -> subcategoryId
+//
+//   const HireScreen({
+//     super.key,
+//     required this.firstProviderId,
+//     this.categreyId,
+//     this.subcategreyId,
+//   });
+//
+//   @override
+//   State<HireScreen> createState() => _HireScreenState();
+// }
+//
+// class _HireScreenState extends State<HireScreen> {
+//   final titleController = TextEditingController();
+//   final descriptionController = TextEditingController();
+//   final addressController = TextEditingController();
+//   DateTime? selectedDate;
+//   TimeOfDay? selectedTime; // ✅ Time picker ke liye
+//   List<XFile> selectedImages = [];
+//   int? platformFee;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchPlatformFee();
+//   }
+//
+//   // ✅ Platform fee fetch karne ka function
+//   Future<void> fetchPlatformFee() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('token');
+//
+//     if (token == null) {
+//       print("❌ No token found. User not logged in.");
+//       return;
+//     }
+//
+//     final url = Uri.parse('https://api.thebharatworks.com/api/get-fee/direct');
+//     try {
+//       final response = await http.get(
+//         url,
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Content-Type': 'application/json',
+//         },
+//       );
+//
+//       if (response.statusCode == 200) {
+//         final data = jsonDecode(response.body);
+//         if (data['status'] == true && data['data'] != null) {
+//           setState(() {
+//             platformFee = data['data']['fee'];
+//           });
+//         }
+//       } else {
+//         print("❌ Failed to fetch fee: ${response.statusCode}");
+//         print("📩 Body: ${response.body}");
+//       }
+//     } catch (e) {
+//       print("❗ Error fetching platform fee: $e");
+//     }
+//   }
+//
+//   // ✅ Date picker ke liye function
+//   Future<void> pickDate() async {
+//     final picked = await showDatePicker(
+//       context: context,
+//       initialDate: DateTime.now(),
+//       firstDate: DateTime.now(),
+//       lastDate: DateTime(2100),
+//     );
+//     if (picked != null) {
+//       setState(() => selectedDate = picked);
+//     }
+//   }
+//
+//   // ✅ Time picker ke liye function
+//   Future<void> pickTime() async {
+//     final picked = await showTimePicker(
+//       context: context,
+//       initialTime: TimeOfDay.now(),
+//     );
+//     if (picked != null) {
+//       setState(() => selectedTime = picked);
+//     }
+//   }
+//
+//   // ✅ Images select karne ka function
+//   Future<void> pickImages() async {
+//     final picker = ImagePicker();
+//     final pickedList = await picker.pickMultiImage();
+//     if (pickedList.isNotEmpty) {
+//       setState(() {
+//         if (selectedImages.length + pickedList.length <= 5) {
+//           selectedImages.addAll(pickedList);
+//         } else {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             const SnackBar(content: Text("Maximum 5 images allowed")),
+//           );
+//         }
+//       });
+//     }
+//   }
+//
+//
+//   Future<void> getCurrentLocation() async {
+//     try {
+//       // Check aur request location permission
+//       LocationPermission permission = await Geolocator.checkPermission();
+//       if (permission == LocationPermission.denied) {
+//         permission = await Geolocator.requestPermission();
+//         if (permission == LocationPermission.denied) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             const SnackBar(content: Text("Location permission denied")),
+//           );
+//           return;
+//         }
+//       }
+//       if (permission == LocationPermission.deniedForever) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Location permission permanently denied")),
+//         );
+//         return;
+//       }
+//
+//       // Current location fetch karo
+//       Position position = await Geolocator.getCurrentPosition(
+//         desiredAccuracy: LocationAccuracy.high,
+//       );
+//
+//       // Coordinates se address string banayo
+//       List<Placemark> placemarks = await placemarkFromCoordinates(
+//         position.latitude,
+//         position.longitude,
+//       );
+//       if (placemarks.isNotEmpty) {
+//         final placemark = placemarks.first;
+//         // Specific format: Plot Number, Area, City, State, Country
+//         final addressComponents = [
+//           placemark.street,
+//           placemark.subLocality,
+//           placemark.subThoroughfare, // Plot number ya house number
+//           placemark.thoroughfare, // Area ya street
+//           placemark.locality, // City
+//           placemark.administrativeArea, // State
+//           placemark.country, // Country
+//         ];
+//         // Null ya empty values hatao aur join karo
+//         final address = addressComponents
+//             .where((e) => e != null && e.isNotEmpty)
+//             .join(", ");
+//         setState(() {
+//           addressController.text = address;
+//         });
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Unable to fetch address")),
+//         );
+//       }
+//     } catch (e) {
+//       print("❗ Error fetching location: $e");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text("Error fetching location: $e")),
+//       );
+//     }
+//   }
+//
+//   // ✅ Confirmation dialog
+//   Future<bool> showConfirmationDialog() async {
+//     return await showDialog<bool>(
+//       context: context,
+//       barrierDismissible: false,
+//       builder: (context) {
+//         return AlertDialog(
+//           backgroundColor: Colors.white,
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(16),
+//           ),
+//           contentPadding: const EdgeInsets.all(20),
+//           content: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Image.asset(
+//                 'assets/images/success.png',
+//                 height: 120,
+//                 width: 120,
+//                 fit: BoxFit.cover,
+//               ),
+//               const SizedBox(height: 20),
+//               Text(
+//                 "Are you Sure want to hire?",
+//                 style: GoogleFonts.roboto(
+//                   fontSize: 16,
+//                   fontWeight: FontWeight.w500,
+//                 ),
+//                 textAlign: TextAlign.center,
+//               ),
+//               const SizedBox(height: 24),
+//               Row(
+//                 children: [
+//                   Expanded(
+//                     child: ElevatedButton(
+//                       style: ElevatedButton.styleFrom(
+//                         backgroundColor: Colors.green.shade700,
+//                         padding: const EdgeInsets.symmetric(vertical: 12),
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(8),
+//                         ),
+//                       ),
+//                       onPressed: () => Navigator.pop(context, true),
+//                       child: const Text(
+//                         "Okay",
+//                         style: TextStyle(color: Colors.white),
+//                       ),
+//                     ),
+//                   ),
+//                   const SizedBox(width: 12),
+//                   Expanded(
+//                     child: OutlinedButton(
+//                       style: OutlinedButton.styleFrom(
+//                         padding: const EdgeInsets.symmetric(vertical: 12),
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(8),
+//                         ),
+//                         side: BorderSide(color: Colors.green.shade700),
+//                       ),
+//                       onPressed: () => Navigator.pop(context, false),
+//                       child: Text(
+//                         "Cancel",
+//                         style: GoogleFonts.roboto(
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.green.shade700,
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         );
+//       },
+//     ) ??
+//         false;
+//   }
+//
+//   // ✅ Form submit karne ka function
+//   Future<void> submitForm() async {
+//
+//
+//
+//     final title = titleController.text.trim();
+//     final description = descriptionController.text.trim();
+//     final address = addressController.text.trim();
+//
+//     if (title.isEmpty ||
+//         description.isEmpty ||
+//         address.isEmpty ||
+//         selectedDate == null ||
+//         selectedTime == null || // ✅ Time bhi check karo
+//         selectedImages.isEmpty) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Please fill all fields')),
+//       );
+//       return;
+//     }
+//     final confirmed = await showConfirmationDialog();
+//     final prefs = await SharedPreferences.getInstance();
+//     final token = prefs.getString('token');
+//
+//     if (token == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('User not logged in')),
+//       );
+//       return;
+//     }
+//
+//     final request = http.MultipartRequest(
+//       'POST',
+//       Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.hireScreen}'),
+//     );
+//
+//     request.headers['Authorization'] = 'Bearer $token';
+//
+//     print("Abhi:- get date time :- ${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}");
+//
+//     final deadline =
+//         "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}:00";
+//
+//     request.fields['first_provider_id'] = widget.firstProviderId;
+//     request.fields['title'] = title;
+//     request.fields['description'] = description;
+//     request.fields['address'] = address;
+//     request.fields['deadline'] = deadline; // ✅ Deadline mein time bhi add kiya
+//
+//     print("📤 Fields being sent:");
+//     request.fields.forEach((key, value) {
+//       print(" - $key: $value");
+//     });
+//
+//     for (var image in selectedImages) {
+//       print("🖼️ Adding image: ${image.path}");
+//       request.files.add(
+//         await http.MultipartFile.fromPath(
+//           'images',
+//           image.path,
+//           contentType: MediaType('image', 'jpeg'),
+//           filename: p.basename(image.path),
+//         ),
+//       );
+//     }
+//
+//     print("🚀 Sending request...");
+//
+//     try {
+//       final response = await request.send();
+//       final respStr = await response.stream.bytesToString();
+//
+//       print("response hire Status: ${response.statusCode}");
+//       print("📩 Response: $respStr");
+//
+//       if (response.statusCode == 201) {
+//         final decoded = jsonDecode(respStr);
+//         final razorpayOrderId = decoded['razorpay_order']['id'];
+//         final amount = decoded['razorpay_order']['amount'];
+//
+//         final paymentSuccess = await Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => RazorpayScreen(
+//               razorpayOrderId: razorpayOrderId,
+//               amount: amount,
+//               providerId: widget.firstProviderId,
+//               // categoryId: widget.categoryId,
+//               // subcategoryId: widget.subcategoryId,
+//             ),
+//           ),
+//         );
+//
+//         if (paymentSuccess == true) {
+//           List<String> hiredProviders = prefs.getStringList('hiredProviders') ?? [];
+//           if (!hiredProviders.contains(widget.firstProviderId)) {
+//             hiredProviders.add(widget.firstProviderId);
+//             await prefs.setStringList('hiredProviders', hiredProviders);
+//           }
+//
+//           if (mounted) {
+//             Navigator.pop(context, widget.firstProviderId);
+//           }
+//         }
+//       } else {
+//         print("❌ Error Response: $respStr");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Failed: $respStr')),
+//         );
+//       }
+//     } catch (e) {
+//       print("❗ Exception: $e");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: $e')),
+//       );
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // print("Abhi:-fast provider id :- ${widget.firstProviderId}");
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: AppColors.primaryGreen,
+//         centerTitle: true,
+//         elevation: 0,
+//         toolbarHeight: 20,
+//         automaticallyImplyLeading: false,
+//       ),
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           padding: const EdgeInsets.all(16),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const SizedBox(height: 20),
+//               Row(
+//                 children: [
+//                   GestureDetector(
+//                     onTap: () => Navigator.pop(context),
+//                     child: const Icon(Icons.arrow_back_outlined),
+//                   ),
+//                   const SizedBox(width: 86),
+//                   Text(
+//                     "Direct hire",
+//                     style: GoogleFonts.roboto(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 20),
+//               buildLabel("Title"),
+//               const SizedBox(height: 6),
+//               buildTextField("Enter Title of work", titleController),
+//               const SizedBox(height: 14),
+//               buildLabel("Platform Fees"),
+//               const SizedBox(height: 6),
+//               buildPlatformFeeField(),
+//               const SizedBox(height: 14),
+//               buildLabel("Description"),
+//               const SizedBox(height: 6),
+//               buildDescriptionField(),
+//               const SizedBox(height: 14),
+//               buildLabel("Address"),
+//               const SizedBox(height: 6),
+//               buildAddressField(),
+//               const SizedBox(height: 14),
+//               buildLabel("Add deadline and time"),
+//               const SizedBox(height: 6),
+//               buildDatePicker(),
+//               const SizedBox(height: 14),
+//               buildLabel("Add time"),
+//               const SizedBox(height: 6),
+//               buildTimePicker(), // ✅ Time picker add kiya
+//               const SizedBox(height: 14),
+//               buildLabel("Upload Images"),
+//               const SizedBox(height: 6),
+//               buildImageUpload(),
+//               const SizedBox(height: 24),
+//               Center(
+//                 child: SizedBox(
+//                   width: 200,
+//                   child: ElevatedButton(
+//                     onPressed: submitForm,
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.green.shade700,
+//                       padding: const EdgeInsets.symmetric(vertical: 12),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(10),
+//                       ),
+//                     ),
+//                     child: Text(
+//                       "Hire",
+//                       style: GoogleFonts.roboto(
+//                         fontSize: 16,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   // ✅ Label widget
+//   Widget buildLabel(String label) {
+//     return Text(
+//       label,
+//       style: GoogleFonts.roboto(
+//         fontSize: 15,
+//         fontWeight: FontWeight.w500,
+//         color: Colors.black87,
+//       ),
+//     );
+//   }
+//
+//   // ✅ Text field widget
+//   Widget buildTextField(String hint, TextEditingController controller) {
+//     return TextField(
+//       controller: controller,
+//       decoration: InputDecoration(
+//         hintText: hint,
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//       ),
+//     );
+//   }
+//
+//   // ✅ Platform fee field
+//   Widget buildPlatformFeeField() {
+//     return TextField(
+//       enabled: false,
+//       decoration: InputDecoration(
+//         hintText: platformFee != null ? "Rs $platformFee.00" : "Loading...",
+//         hintStyle: GoogleFonts.roboto(
+//           fontWeight: FontWeight.w700,
+//           color: Colors.black,
+//           fontSize: 16,
+//         ),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//       ),
+//     );
+//   }
+//
+//   // ✅ Description field
+//   Widget buildDescriptionField() {
+//     return TextField(
+//       controller: descriptionController,
+//       maxLines: 4,
+//       decoration: InputDecoration(
+//         hintText: "Write description...",
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//       ),
+//     );
+//   }
+//
+//   // ✅ Address field with location icon tap
+//   Widget buildAddressField() {
+//     return TextField(
+//       controller: addressController,
+//       decoration: InputDecoration(
+//         hintText: "Enter Full Address",
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//         suffixIcon: GestureDetector(
+//           onTap: getCurrentLocation, // ✅ Location icon par tap se current location fetch
+//           child: const Icon(Icons.location_on, color: Colors.green),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   // ✅ Date picker field
+//   Widget buildDatePicker() {
+//     return TextField(
+//       readOnly: true,
+//       onTap: pickDate,
+//       decoration: InputDecoration(
+//         hintText: selectedDate == null
+//             ? "Select date"
+//             : "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}",
+//         prefixIcon: const Icon(Icons.calendar_today),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//       ),
+//     );
+//   }
+//
+//   // ✅ Time picker field
+//   Widget buildTimePicker() {
+//     return TextField(
+//       readOnly: true,
+//       onTap: pickTime,
+//       decoration: InputDecoration(
+//         hintText: selectedTime == null
+//             ? "Select time"
+//             : "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}",
+//         prefixIcon: const Icon(Icons.access_time),
+//         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+//         filled: true,
+//         fillColor: Colors.grey[100],
+//       ),
+//     );
+//   }
+//
+//   // ✅ Image upload widget
+//   Widget buildImageUpload() {
+//     return Container(
+//       height: 100,
+//       padding: const EdgeInsets.all(8),
+//       decoration: BoxDecoration(
+//         border: Border.all(color: Colors.grey.shade400),
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       child: selectedImages.isEmpty
+//           ? GestureDetector(
+//         onTap: pickImages,
+//         child: const Center(
+//           child: Text(
+//             "Upload Images",
+//             style: TextStyle(color: Colors.green),
+//           ),
+//         ),
+//       )
+//           : ListView.builder(
+//         scrollDirection: Axis.horizontal,
+//         itemCount: selectedImages.length + 1,
+//         itemBuilder: (context, index) {
+//           if (index == selectedImages.length) {
+//             return GestureDetector(
+//               onTap: pickImages,
+//               child: Container(
+//                 width: 100,
+//                 height: 100,
+//                 decoration: BoxDecoration(
+//                   color: Colors.blue[100],
+//                   border: Border.all(color: Colors.blue),
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//                 child: const Center(
+//                   child: Icon(
+//                     Icons.add,
+//                     color: Colors.blue,
+//                     size: 40,
+//                   ),
+//                 ),
+//               ),
+//             );
+//           }
+//           return Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 5),
+//             child: Stack(
+//               children: [
+//                 ClipRRect(
+//                   borderRadius: BorderRadius.circular(8),
+//                   child: Image.file(
+//                     File(selectedImages[index].path),
+//                     width: 100,
+//                     height: 100,
+//                     fit: BoxFit.cover,
+//                   ),
+//                 ),
+//                 Positioned(
+//                   top: 0,
+//                   right: 0,
+//                   child: IconButton(
+//                     icon: const Icon(Icons.delete, color: Colors.red),
+//                     onPressed: () {
+//                       setState(() {
+//                         selectedImages.removeAt(index);
+//                       });
+//                     },
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+//
+
+
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart'; // ✅ Location ke liye
+import 'package:geocoding/geocoding.dart'; // ✅ Address string ke liye
+import '../../Consent/ApiEndpoint.dart';
+import '../../Consent/app_constants.dart';
+import '../../../../Widgets/AppColors.dart';
+import '../Account/RazorpayScreen.dart';
+class HireScreen extends StatefulWidget {
+  final String firstProviderId;
+  final String? categreyId; // Typo fix: categreyId -> categoryId
+  final String? subcategreyId; // Typo fix: subcategreyId -> subcategoryId
+
+  const HireScreen({
+    super.key,
+    required this.firstProviderId,
+    this.categreyId,
+    this.subcategreyId,
+  });
+
+  @override
+  State<HireScreen> createState() => _HireScreenState();
+}
+
+class _HireScreenState extends State<HireScreen> {
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final addressController = TextEditingController();
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime; // ✅ Time picker ke liye
+  List<XFile> selectedImages = [];
+  int? platformFee;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPlatformFee();
+  }
+
+  // ✅ Platform fee fetch karne ka function
+  Future<void> fetchPlatformFee() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("❌ No token found. User not logged in.");
+      return;
+    }
+
+    final url = Uri.parse('https://api.thebharatworks.com/api/get-fee/direct');
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == true && data['data'] != null) {
+          setState(() {
+            platformFee = data['data']['fee'];
+          });
+        }
+      } else {
+        print("❌ Failed to fetch fee: ${response.statusCode}");
+        print("📩 Body: ${response.body}");
+      }
+    } catch (e) {
+      print("❗ Error fetching platform fee: $e");
+    }
+  }
+
+  // ✅ Date picker ke liye function
+  Future<void> pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() => selectedDate = picked);
+    }
+  }
+
+  // ✅ Time picker ke liye function
+  Future<void> pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() => selectedTime = picked);
+    }
+  }
+
+  // ✅ Images select karne ka function
+  Future<void> pickImages() async {
+    final picker = ImagePicker();
+    final pickedList = await picker.pickMultiImage();
+    if (pickedList.isNotEmpty) {
+      setState(() {
+        if (selectedImages.length + pickedList.length <= 5) {
+          selectedImages.addAll(pickedList);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Maximum 5 images allowed")),
+          );
+        }
+      });
+    }
+  }
+
+
+  Future<void> getCurrentLocation() async {
+    try {
+      // Check aur request location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Location permission denied")),
+          );
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Location permission permanently denied")),
+        );
+        return;
+      }
+
+      // Current location fetch karo
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Coordinates se address string banayo
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        final placemark = placemarks.first;
+        // Specific format: Plot Number, Area, City, State, Country
+        final addressComponents = [
+          placemark.street,
+          placemark.subLocality,
+          placemark.subThoroughfare, // Plot number ya house number
+          placemark.thoroughfare, // Area ya street
+          placemark.locality, // City
+          placemark.administrativeArea, // State
+          placemark.country, // Country
+        ];
+        // Null ya empty values hatao aur join karo
+        final address = addressComponents
+            .where((e) => e != null && e.isNotEmpty)
+            .join(", ");
+        setState(() {
+          addressController.text = address;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Unable to fetch address")),
+        );
+      }
+    } catch (e) {
+      print("❗ Error fetching location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching location: $e")),
+      );
+    }
+  }
+
+  // ✅ Confirmation dialog
+  Future<bool> showConfirmationDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/success.png',
+                height: 120,
+                width: 120,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Are you Sure want to hire?",
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text(
+                        "Okay",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        side: BorderSide(color: Colors.green.shade700),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(
+                        "Cancel",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    ) ??
+        false;
+  }
+
+  // ✅ Form submit karne ka function
+  Future<void> submitForm() async {
+    final confirmed = await showConfirmationDialog();
+    if (!mounted || !confirmed) return;
+
+    final title = titleController.text.trim();
+    final description = descriptionController.text.trim();
+    final address = addressController.text.trim();
+
+    if (title.isEmpty ||
+        description.isEmpty ||
+        address.isEmpty ||
+        selectedDate == null ||
+        selectedTime == null || // ✅ Time bhi check karo
+        selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in')),
+      );
+      return;
+    }
+
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.hireScreen}'),
+    );
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    print("Abhi:- get date time :- ${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}");
+
+    final deadline =
+        "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}:00";
+
+    request.fields['first_provider_id'] = widget.firstProviderId;
+    request.fields['title'] = title;
+    request.fields['description'] = description;
+    request.fields['address'] = address;
+    request.fields['deadline'] = deadline; // ✅ Deadline mein time bhi add kiya
+
+    print("📤 Fields being sent:");
+    request.fields.forEach((key, value) {
+      print(" - $key: $value");
+    });
+
+    for (var image in selectedImages) {
+      print("🖼️ Adding image: ${image.path}");
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'images',
+          image.path,
+          contentType: MediaType('image', 'jpeg'),
+          filename: p.basename(image.path),
+        ),
+      );
+    }
+
+    print("🚀 Sending request...");
+
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      print("response hire Status: ${response.statusCode}");
+      print("📩 Response: $respStr");
+
+      if (response.statusCode == 201) {
+        final decoded = jsonDecode(respStr);
+        final razorpayOrderId = decoded['razorpay_order']['id'];
+        final amount = decoded['razorpay_order']['amount'];
+
+        final paymentSuccess = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RazorpayScreen(
+              razorpayOrderId: razorpayOrderId,
+              amount: amount,
+              providerId: widget.firstProviderId,
+              // categoryId: widget.categoryId,
+              // subcategoryId: widget.subcategoryId,
+            ),
+          ),
+        );
+
+        if (paymentSuccess == true) {
+          List<String> hiredProviders = prefs.getStringList('hiredProviders') ?? [];
+          if (!hiredProviders.contains(widget.firstProviderId)) {
+            hiredProviders.add(widget.firstProviderId);
+            await prefs.setStringList('hiredProviders', hiredProviders);
+          }
+
+          if (mounted) {
+            Navigator.pop(context, widget.firstProviderId);
+          }
+        }
+      } else {
+        print("❌ Error Response: $respStr");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $respStr')),
+        );
+      }
+    } catch (e) {
+      print("❗ Exception: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // print("Abhi:-fast provider id :- ${widget.firstProviderId}");
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryGreen,
+        centerTitle: true,
+        elevation: 0,
+        toolbarHeight: 20,
+        automaticallyImplyLeading: false,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.arrow_back_outlined),
+                  ),
+                  const SizedBox(width: 86),
+                  Text(
+                    "Direct hire",
+                    style: GoogleFonts.roboto(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              buildLabel("Title"),
+              const SizedBox(height: 6),
+              buildTextField("Enter Title of work", titleController),
+              const SizedBox(height: 14),
+              buildLabel("Platform Fees"),
+              const SizedBox(height: 6),
+              buildPlatformFeeField(),
+              const SizedBox(height: 14),
+              buildLabel("Description"),
+              const SizedBox(height: 6),
+              buildDescriptionField(),
+              const SizedBox(height: 14),
+              buildLabel("Address"),
+              const SizedBox(height: 6),
+              buildAddressField(),
+              const SizedBox(height: 14),
+              buildLabel("Add deadline and time"),
+              const SizedBox(height: 6),
+              buildDatePicker(),
+              const SizedBox(height: 14),
+              buildLabel("Add time"),
+              const SizedBox(height: 6),
+              buildTimePicker(), // ✅ Time picker add kiya
+              const SizedBox(height: 14),
+              buildLabel("Upload Images"),
+              const SizedBox(height: 6),
+              buildImageUpload(),
+              const SizedBox(height: 24),
+              Center(
+                child: SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Hire",
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ✅ Label widget
+  Widget buildLabel(String label) {
+    return Text(
+      label,
+      style: GoogleFonts.roboto(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  // ✅ Text field widget
+  Widget buildTextField(String hint, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+
+  // ✅ Platform fee field
+  Widget buildPlatformFeeField() {
+    return TextField(
+      enabled: false,
+      decoration: InputDecoration(
+        hintText: platformFee != null ? "Rs $platformFee.00" : "Loading...",
+        hintStyle: GoogleFonts.roboto(
+          fontWeight: FontWeight.w700,
+          color: Colors.black,
+          fontSize: 16,
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+
+  // ✅ Description field
+  Widget buildDescriptionField() {
+    return TextField(
+      controller: descriptionController,
+      maxLines: 4,
+      decoration: InputDecoration(
+        hintText: "Write description...",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+
+  // ✅ Address field with location icon tap
+  Widget buildAddressField() {
+    return TextField(
+      controller: addressController,
+      decoration: InputDecoration(
+        hintText: "Enter Full Address",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+        suffixIcon: GestureDetector(
+          onTap: getCurrentLocation, // ✅ Location icon par tap se current location fetch
+          child: const Icon(Icons.location_on, color: Colors.green),
+        ),
+      ),
+    );
+  }
+
+  // ✅ Date picker field
+  Widget buildDatePicker() {
+    return TextField(
+      readOnly: true,
+      onTap: pickDate,
+      decoration: InputDecoration(
+        hintText: selectedDate == null
+            ? "Select date"
+            : "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}",
+        prefixIcon: const Icon(Icons.calendar_today),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+
+  // ✅ Time picker field
+  Widget buildTimePicker() {
+    return TextField(
+      readOnly: true,
+      onTap: pickTime,
+      decoration: InputDecoration(
+        hintText: selectedTime == null
+            ? "Select time"
+            : "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}",
+        prefixIcon: const Icon(Icons.access_time),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        filled: true,
+        fillColor: Colors.grey[100],
+      ),
+    );
+  }
+
+  // ✅ Image upload widget
+  Widget buildImageUpload() {
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: selectedImages.isEmpty
+          ? GestureDetector(
+        onTap: pickImages,
+        child: const Center(
+          child: Text(
+            "Upload Images",
+            style: TextStyle(color: Colors.green),
+          ),
+        ),
+      )
+          : ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: selectedImages.length + 1,
+        itemBuilder: (context, index) {
+          if (index == selectedImages.length) {
+            return GestureDetector(
+              onTap: pickImages,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.blue[100],
+                  border: Border.all(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.blue,
+                    size: 40,
+                  ),
+                ),
+              ),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    File(selectedImages[index].path),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        selectedImages.removeAt(index);
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
