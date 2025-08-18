@@ -569,16 +569,17 @@
 
 import 'dart:convert';
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
-import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/Emergency/User/screens/work_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Emergency/User/models/emergency_list_model.dart';
+import '../../../Widgets/AppColors.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
-import '../../../../Widgets/AppColors.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
 import 'DirecrViewScreen.dart';
 
@@ -741,16 +742,18 @@ class _MyHireScreenState extends State<MyHireScreen> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'cancelled':
+        return Color(0xffDB5757);
+
       case 'cancelleddispute':
         return Color(0xff9E9E9E);
       case 'accepted':
-        return Color(0xff2196F3);
+        return Color(0xff56DB56);
       case 'completed':
-        return Color(0xff4CAF50);
+        return Color(0xff56DB56);
       case 'pending':
         return /*Colors.orange*/Color(0xffFFC107);
       default:
-        return Color(0xffE53935);
+        return Color(0xffDB5757);
     }
   }
 
@@ -1046,6 +1049,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
+        border: Border.all(
+          color: AppColors.primaryGreen, // <-- primary color border
+          width: 1.5, // thickness
+        ),
       ),
       child: Row(
         children: [
@@ -1055,7 +1062,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             hasImage
                 ? Image.network(
               data.image, // Use data.image directly
-              height: 110,
+              height: 200,
               width: 110,
               fit: BoxFit.cover,
               errorBuilder:
@@ -1184,21 +1191,62 @@ class _MyHireScreenState extends State<MyHireScreen> {
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
+        border: Border.all(
+          color: AppColors.primaryGreen, // <-- primary color border
+          width: 1.5, // thickness
+        ),
       ),
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: hasImage
-                ? Image.network(
-              data.imageUrls!.first, // first image show karenge
-              height: 110,
-              width: 110,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Image.asset('assets/images/task.png', height: 110, width: 110, fit: BoxFit.cover),
-            )
-                : Image.asset('assets/images/task.png', height: 110, width: 110, fit: BoxFit.cover),
+            child: Stack(
+              children: [
+                hasImage
+                    ? Image.network(
+                  data.imageUrls!.first, // first image show karenge
+                  height: 200,
+                  width: 110,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if(loadingProgress ==null)return child;
+                    return Container(
+                      height: 200,
+                        width: 110,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                        strokeWidth: 2.5,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset('assets/images/task.png', height: 150, width: 110, fit: BoxFit.cover),
+                )
+                    : Image.asset('assets/images/task.png', height: 150, width: 110, fit: BoxFit.cover),
+                Positioned(
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(15), // corner circle
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: Text(
+                      "${data.projectId ?? 'N/A'}", // product id
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1206,59 +1254,169 @@ class _MyHireScreenState extends State<MyHireScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.projectId ?? "No Title",
+                  data.categoryId.name ?? "",
                   style: _cardTitle(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
                 Text(
-                  data.categoryId?.name ?? "No Category",
-                  style: _cardBody(),
+                  "₹${data.servicePayment.amount} "??"0",
+                  style: _cardBody().copyWith(color: AppColors.primaryGreen,fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Deadline: ${data.deadline != null ? data.deadline!.toLocal().toString().split('T').first : 'N/A'}",
-                  style: _cardDate(),
+                Container(
+                  height: 1, // thickness
+                  color: Colors.grey.shade200, // light color
+                  margin: const EdgeInsets.symmetric(vertical: 4),
                 ),
-                const SizedBox(height: 6),
                 Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(displayStatus),
-                        borderRadius: BorderRadius.circular(6),
+                    Expanded(
+                      child:
+                      Text(
+                        data.subCategoryIds.isNotEmpty
+                            ? data.subCategoryIds.take(2).map((e) => e.name).join(", ")
+                            : "",
+                        style: _cardDate(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                    ),
+                    const SizedBox(width: 8), // thoda gap de diya
+                    TextButton(
+                      onPressed: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (_) => DirectViewScreen(
+                        //       id: data.id ?? '',
+                        //       categreyId: data.categoryId?._id ?? '',
+                        //       subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
+                        //           ? data.subCategoryIds!.first._id!
+                        //           : '',
+                        //     ),
+                        //   ),
+                        // ).then((_) => fetchDirectOrders());
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xff353026),
+                        minimumSize: const Size(70, 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: Text(
-                        displayStatus.toUpperCase(),
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        "Review",
+                        style: GoogleFonts.roboto(color: Colors.white, fontSize: 12),
                       ),
                     ),
-                    const Spacer(),
+                  ],
+                ),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child:
+                      Text(
+                        "Date: ${data.deadline != null
+                            ? DateFormat('dd/MM/yyyy').format(data.deadline!.toLocal())
+                            : 'N/A'}",
+                        style: _cardDate(),
+                      ),
+
+                    ),
+                    const SizedBox(width: 8), // thoda gap de diya
+                    // TextButton(
+                    //   onPressed: () {
+                    //     // Navigator.push(
+                    //     //   context,
+                    //     // MaterialPageRoute(
+                    //     //   builder: (_) => DirectViewScreen(
+                    //     //     id: data.id ?? '',
+                    //     //     categreyId: data.categoryId?._id ?? '',
+                    //     //     subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
+                    //     //         ? data.subCategoryIds!.first._id!
+                    //     //         : '',
+                    //     //   ),
+                    //     // ),
+                    //     // ).then((_) => fetchDirectOrders());
+                    //   },
+                    //   style: TextButton.styleFrom(
+                    //     backgroundColor: _getStatusColor(data.hireStatus),
+                    //     minimumSize: const Size(70, 10),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     "${data.hireStatus[0].toUpperCase()}${data.hireStatus.substring(1)}",
+                    //     style: GoogleFonts.roboto(color: Colors.white, fontSize: 12),
+                    //   ),
+                    // ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(data.hireStatus),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "${data.hireStatus[0].toUpperCase()}${data.hireStatus.substring(1)}",
+                        style: GoogleFonts.roboto(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+
+
+
+
+                const SizedBox(height: 6),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Color(0xffF27773),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          data.googleAddress,
+                          maxLines: 1, //
+                          overflow: TextOverflow.ellipsis, // ... lag jayega
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8), // thoda gap de diya
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => DirectViewScreen(
-                              id: data.id ?? '',
-                              categreyId: data.categoryId?._id ?? '',
-                              subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
-                                  ? data.subCategoryIds!.first._id!
-                                  : '',
-                            ),
+                            builder: (_) =>WorkDetailPage(
+                              data
+                            )
                           ),
-                        ).then((_) => fetchDirectOrders());
+                        );
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.green.shade700,
-                        minimumSize: const Size(90, 36),
+                        minimumSize: const Size(70,20),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: Text(
@@ -1267,7 +1425,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       ),
                     ),
                   ],
-                ),
+                )
+
               ],
             ),
           ),
