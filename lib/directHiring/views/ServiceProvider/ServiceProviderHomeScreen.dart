@@ -564,8 +564,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -647,7 +649,42 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       );
     }
   }
+  /// Single Method for GET/Toggle (API handles automatically)
+  Future<void> _checkEmergencyTask() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final url = Uri.parse("https://api.thebharatworks.com/api/user/emergency");
 
+      final response = await http.post(   // ✅ bas post call karni hai
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      bwDebug("Emergency API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["success"] == true) {
+          setState(() {
+            _isSwitched = data["emergency_task"] ?? false;
+          });
+
+          // ✅ message show
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data["message"] ?? "Updated")),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      bwDebug("Error in Emergency API: $e");
+    }
+  }
   Future<String> getsaveLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final savedAddress = prefs.getString("address") ?? "Select Location";
@@ -821,19 +858,35 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                           child: Transform.scale(
                             scale: 0.6,
                             alignment: Alignment.centerLeft,
-                            child: Switch(
+                            child:
+                            // Switch(
+                            //   value: _isSwitched,
+                            //   onChanged: (bool value) {
+                            //     setState(() {
+                            //       _isSwitched = value;
+                            //     });
+                            //     if (value) {
+                            //       myController.enableFeature();   // API call when ON
+                            //     } else {
+                            //       myController.disableFeature();  // API call when OFF
+                            //     }
+                            //   },
+                            //   activeColor: Colors.red,
+                            //   inactiveThumbColor: Colors.white,
+                            //   inactiveTrackColor: Colors.grey.shade300,
+                            //   materialTapTargetSize:
+                            //   MaterialTapTargetSize.shrinkWrap,
+                            // ),
+                            Switch(
                               value: _isSwitched,
                               onChanged: (bool value) {
-                                setState(() {
-                                  _isSwitched = value;
-                                });
+                                _checkEmergencyTask(); // ✅ same method call
                               },
                               activeColor: Colors.red,
                               inactiveThumbColor: Colors.white,
                               inactiveTrackColor: Colors.grey.shade300,
-                              materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                            ),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            )
                           ),
                         ),
                       ],

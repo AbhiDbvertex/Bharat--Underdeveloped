@@ -803,7 +803,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             child: Builder(
               builder: (_) {
                 if (isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: AppColors.primaryGreen,));
                 }
 
                 if (selectedTab == 0) {
@@ -1407,10 +1407,16 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>WorkDetailPage(
-                              data
+                              data.id,isUser:true,
                             )
                           ),
-                        );
+                        ).then((_) async {
+                          final orders = await EmergencyServiceController().getEmergencyOrder();
+                          setState(() {
+                            emergencyOrders = orders;
+                          });
+
+                        },);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.green.shade700,
