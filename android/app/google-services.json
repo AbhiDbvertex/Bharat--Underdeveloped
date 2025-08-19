@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255771605949",
+    "project_id": "bharatapp-28243",
+    "storage_bucket": "bharatapp-28243.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255771605949:android:1b4bcc792dd8a3f68630d4",
+        "android_client_info": {
+          "package_name": "com.example.developer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEho4oIyH0mzBEhwbu5cWGFerNTtYJ7hI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
