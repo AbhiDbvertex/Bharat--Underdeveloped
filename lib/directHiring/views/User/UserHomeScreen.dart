@@ -1,13 +1,16 @@
+//
 // import 'dart:convert';
+// import 'dart:io';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_svg/svg.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:google_fonts/google_fonts.dart';
 // import 'package:http/http.dart' as http;
 // import 'package:shared_preferences/shared_preferences.dart';
-//
+// import '../../../Emergency/User/screens/emergency_services.dart';
 // import '../../models/userModel/WorkCategoryModel.dart';
 // import '../../models/userModel/Worker.dart';
-// import '../ServiceProvider/PostTaskScreen.dart';
+// import '../../../Bidding/PostTaskScreen.dart';
 // import '../comm/home_location_screens.dart';
 // import 'SubCategories.dart';
 // import 'UserNotificationScreen.dart';
@@ -47,7 +50,7 @@
 //       userLocation = savedLocation ?? 'Select Location';
 //       isLoading = false;
 //     });
-//     print("Loaded saved location: $userLocation");
+//     debugPrint("📍 Loaded saved location: $userLocation");
 //   }
 //
 //   Future<void> _fetchLocation() async {
@@ -63,6 +66,14 @@
 //         userLocation = 'Select Location';
 //         isLoading = false;
 //       });
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(
+//             content: Text('Authentication failed. Please log in again.'),
+//             duration: Duration(seconds: 2),
+//           ),
+//         );
+//       }
 //       return;
 //     }
 //
@@ -84,22 +95,33 @@
 //         final responseData = jsonDecode(response.body);
 //         if (responseData['status'] == true) {
 //           final data = responseData['data'];
-//           final location =
-//           data['current_location']?.isNotEmpty == true
-//               ? data['current_location']
-//               : data['location']?['address']?.isNotEmpty == true
-//               ? data['location']['address']
-//               : 'Select Location';
+//           // Prioritize full_address array, then location.address, then default
+//           String location;
+//           if (data['full_address'] != null && data['full_address'].isNotEmpty) {
+//             location = data['full_address'][0]['address'] ?? 'Select Location';
+//           } else if (data['location']?['address']?.isNotEmpty == true) {
+//             location = data['location']['address'];
+//           } else if (data['current_location']?.isNotEmpty == true) {
+//             location = data['current_location'];
+//           } else {
+//             location = 'Select Location';
+//           }
+//
 //           await prefs.setString('selected_location', location);
 //           await prefs.setString('address', location);
 //           await prefs.setDouble(
 //             'user_latitude',
-//             data['location']?['latitude'] ?? 0.0,
+//             data['full_address']?.isNotEmpty == true
+//                 ? data['full_address'][0]['latitude'] ?? 0.0
+//                 : data['location']?['latitude'] ?? 0.0,
 //           );
 //           await prefs.setDouble(
 //             'user_longitude',
-//             data['location']?['longitude'] ?? 0.0,
+//             data['full_address']?.isNotEmpty == true
+//                 ? data['full_address'][0]['longitude'] ?? 0.0
+//                 : data['location']?['longitude'] ?? 0.0,
 //           );
+//
 //           setState(() {
 //             userLocation = location;
 //             isLoading = false;
@@ -111,11 +133,14 @@
 //             isLoading = false;
 //           });
 //           debugPrint("❌ API error: ${responseData['message']}");
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(
-//               content: Text(responseData['message'] ?? 'Profile fetch failed'),
-//             ),
-//           );
+//           if (mounted) {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               SnackBar(
+//                 content: Text(responseData['message'] ?? 'Profile fetch failed'),
+//                 duration: const Duration(seconds: 2),
+//               ),
+//             );
+//           }
 //         }
 //       } else {
 //         setState(() {
@@ -123,6 +148,14 @@
 //           isLoading = false;
 //         });
 //         debugPrint("❌ API call failed: ${response.statusCode}");
+//         if (mounted) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             const SnackBar(
+//               content: Text('Failed to fetch profile data.'),
+//               duration: Duration(seconds: 2),
+//             ),
+//           );
+//         }
 //       }
 //     } catch (e) {
 //       debugPrint("❌ Error fetching location: $e");
@@ -130,71 +163,190 @@
 //         userLocation = 'Select Location';
 //         isLoading = false;
 //       });
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(SnackBar(content: Text('Error fetching location: $e')));
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('Error fetching location: $e'),
+//             duration: const Duration(seconds: 2),
+//           ),
+//         );
+//       }
 //     }
 //   }
 //
+//   // Future<void> updateLocationOnServer(
+//   //     String newAddress,
+//   //     double latitude,
+//   //     double longitude,
+//   //     ) async {
+//   //   final prefs = await SharedPreferences.getInstance();
+//   //   final token = prefs.getString('token') ?? '';
+//   //   final url = Uri.parse(
+//   //     'https://api.thebharatworks.com/api/user/updateUserProfile',
+//   //   );
+//   //
+//   //   try {
+//   //     final response = await http.post(
+//   //       url,
+//   //       headers: {
+//   //         'Authorization': 'Bearer $token',
+//   //         'Content-Type': 'application/json',
+//   //       },
+//   //       body: jsonEncode({
+//   //         'full_address': [
+//   //           {
+//   //             'address': newAddress,
+//   //             'latitude': latitude,
+//   //             'longitude': longitude,
+//   //             'title': 'Current Location', // Default title, adjust as needed
+//   //             'landmark': '', // Optional, adjust as needed
+//   //           }
+//   //         ],
+//   //         'location': {
+//   //           'latitude': latitude,
+//   //           'longitude': longitude,
+//   //           'address': newAddress,
+//   //         },
+//   //       }),
+//   //     );
+//   //
+//   //     debugPrint("📡 Update Location Response: ${response.statusCode} - ${response.body}");
+//   //
+//   //     if (response.statusCode == 200) {
+//   //       final data = jsonDecode(response.body);
+//   //       if (data['status'] == true) {
+//   //         await prefs.setString('selected_location', newAddress);
+//   //         await prefs.setString('address', newAddress);
+//   //         await prefs.setDouble('user_latitude', latitude);
+//   //         await prefs.setDouble('user_longitude', longitude);
+//   //         setState(() {
+//   //           userLocation = newAddress;
+//   //         });
+//   //         if (mounted) {
+//   //           ScaffoldMessenger.of(context).showSnackBar(
+//   //             SnackBar(
+//   //               content: Text("Location updated successfully: $newAddress"),
+//   //               duration: const Duration(seconds: 2),
+//   //             ),
+//   //           );
+//   //         }
+//   //         await _fetchLocation(); // Refresh to sync with server
+//   //       } else {
+//   //         if (mounted) {
+//   //           ScaffoldMessenger.of(context).showSnackBar(
+//   //             SnackBar(
+//   //               content: Text("Failed to update location: ${data['message']}"),
+//   //               duration: const Duration(seconds: 2),
+//   //             ),
+//   //           );
+//   //         }
+//   //       }
+//   //     } else {
+//   //       if (mounted) {
+//   //         ScaffoldMessenger.of(context).showSnackBar(
+//   //           const SnackBar(
+//   //             content: Text("Server error, location update failed!"),
+//   //             duration: Duration(seconds: 2),
+//   //           ),
+//   //         );
+//   //       }
+//   //     }
+//   //   } catch (e) {
+//   //     debugPrint("❌ Error updating location: $e");
+//   //     if (mounted) {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(
+//   //           content: Text("Error updating location: $e"),
+//   //           duration: const Duration(seconds: 2),
+//   //         ),
+//   //       );
+//   //     }
+//   //   }
+//   // }
 //   Future<void> updateLocationOnServer(
 //       String newAddress,
 //       double latitude,
 //       double longitude,
 //       ) async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final token = prefs.getString('token') ?? '';
-//     final url = Uri.parse(
-//       'https://api.thebharatworks.com/api/user/updateLocation',
-//     );
+//     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
+//       if (mounted) {
+//         Fluttertoast.showToast(msg: "Invalid location data!");
+//       }
+//       return;
+//     }
+//
 //     try {
-//       final response = await http.put(
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token') ?? '';
+//       final url = Uri.parse(
+//         "https://api.thebharatworks.com/api/user/updateUserProfile",
+//       );
+//       final response = await http.post(
 //         url,
 //         headers: {
-//           'Authorization': 'Bearer $token',
+//           HttpHeaders.authorizationHeader: 'Bearer $token',
 //           'Content-Type': 'application/json',
 //         },
 //         body: json.encode({
+//           'full_address': [
+//             {
+//               'address': newAddress,
+//               'latitude': latitude,
+//               'longitude': longitude,
+//               'title': 'Current Location',
+//               'landmark': '',
+//             },
+//           ],
 //           'location': {
 //             'latitude': latitude,
 //             'longitude': longitude,
 //             'address': newAddress,
 //           },
-//           'current_location': newAddress,
-//           'full_address': newAddress,
 //         }),
 //       );
+//
+//       print(
+//         "📡 Location update response: ${response.statusCode} - ${response.body}",
+//       );
+//
 //       if (response.statusCode == 200) {
-//         final data = jsonDecode(response.body);
+//         final data = json.decode(response.body);
 //         if (data['status'] == true) {
-//           await prefs.setString('selected_location', newAddress);
-//           await prefs.setString('address', newAddress);
-//           await prefs.setDouble('user_latitude', latitude);
-//           await prefs.setDouble('user_longitude', longitude);
+//           String? newAddressId = data['data']?['full_address']?.last?['_id'];
+//           await prefs.setString("selected_location", newAddress);
+//           await prefs.setString("address", newAddress);
+//           await prefs.setDouble("user_latitude", latitude);
+//           await prefs.setDouble("user_longitude", longitude);
+//           if (newAddressId != null) {
+//             await prefs.setString("selected_address_id", newAddressId);
+//           }
 //           setState(() {
 //             userLocation = newAddress;
+//             isLoading = false;
 //           });
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(content: Text("✅ Location set ho gaya: $newAddress")),
-//           );
-//           await _fetchLocation(); // Refresh to sync with server
+//           print("📍 Location updated: $newAddress (ID: $newAddressId)");
+//           if (mounted) {
+//             // Fluttertoast.showToast(msg: "Location updated: $newAddress");
+//           }
 //         } else {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(
-//               content: Text("❌ Location update nahi hua: ${data['message']}"),
-//             ),
-//           );
+//           if (mounted) {
+//             // Fluttertoast.showToast(
+//             //   msg: data["message"] ?? "Failed to update location",
+//             // );
+//           }
 //         }
 //       } else {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(
-//             content: Text("❌ Server error, location update failed!"),
-//           ),
-//         );
+//         if (mounted) {
+//           Fluttertoast.showToast(
+//             msg: "Server error, failed to update location!",
+//           );
+//         }
 //       }
 //     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text("⚠️ Kuch toh galat ho gaya!")),
-//       );
+//       print("❌ Error updating location: $e");
+//       if (mounted) {
+//         Fluttertoast.showToast(msg: "Error updating location!");
+//       }
 //     }
 //   }
 //
@@ -204,12 +356,13 @@
 //       MaterialPageRoute(
 //         builder:
 //             (context) => LocationSelectionScreen(
-//           onLocationSelected:(Map<String, dynamic> locationData) {
+//           onLocationSelected: (Map<String, dynamic> locationData) {
 //             setState(() {
 //               userLocation = locationData['address'] ?? 'Select Location';
-//               print("Abhi:- get user location : ${locationData['address']}");
+//               debugPrint(
+//                 "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
+//               );
 //             });
-//             print("Location selected: ${locationData['address']}");
 //           },
 //         ),
 //       ),
@@ -218,7 +371,29 @@
 //       String newAddress = result['address'] ?? 'Select Location';
 //       double latitude = result['latitude'] ?? 0.0;
 //       double longitude = result['longitude'] ?? 0.0;
-//       await updateLocationOnServer(newAddress, latitude, longitude);
+//       String? addressId = result['addressId'];
+//       if (newAddress != 'Select Location' &&
+//           latitude != 0.0 &&
+//           longitude != 0.0) {
+//         await updateLocationOnServer(newAddress, latitude, longitude);
+//         // Save addressId to SharedPreferences
+//         if (addressId != null) {
+//           final prefs = await SharedPreferences.getInstance();
+//           await prefs.setString('selected_address_id', addressId);
+//         }
+//         // Refresh location
+//         await _fetchLocation();
+//       } else {
+//         debugPrint("❌ Invalid location data received: $result");
+//         if (mounted) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             const SnackBar(
+//               content: Text("Invalid location data, please try again!"),
+//               duration: Duration(seconds: 2),
+//             ),
+//           );
+//         }
+//       }
 //     }
 //   }
 //
@@ -228,7 +403,7 @@
 //       final token = prefs.getString('token');
 //
 //       if (token == null) {
-//         print("❌ Token missing");
+//         debugPrint("❌ Token missing");
 //         setState(() => isLoading = false);
 //         return;
 //       }
@@ -246,28 +421,27 @@
 //         final jsonData = json.decode(response.body);
 //         if (jsonData["status"] == true && jsonData["data"] is List) {
 //           setState(() {
-//             allCategories =
-//                 (jsonData["data"] as List)
-//                     .map((item) => WorkCategoryModel.fromJson(item))
-//                     .toList();
+//             allCategories = (jsonData["data"] as List)
+//                 .map((item) => WorkCategoryModel.fromJson(item))
+//                 .toList();
 //             isLoading = false;
 //           });
 //         } else {
 //           setState(() => isLoading = false);
 //         }
 //       } else {
-//         print("❌ Error: ${response.statusCode}");
+//         debugPrint("❌ Error: ${response.statusCode}");
 //         setState(() => isLoading = false);
 //       }
 //     } catch (e) {
-//       print("❗ Exception: $e");
+//       debugPrint("❗ Exception: $e");
 //       setState(() => isLoading = false);
 //     }
 //   }
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     print("Abhi:- getsavedlocation for user ${userLocation}");
+//     debugPrint("📍 Current userLocation: $userLocation");
 //     final height = MediaQuery.of(context).size.height;
 //     final width = MediaQuery.of(context).size.width;
 //     return WillPopScope(
@@ -286,18 +460,20 @@
 //             children: [
 //               const SizedBox(height: 10),
 //               Padding(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 16,
-//                   vertical: 12,
-//                 ),
+//                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
 //                 child: Row(
 //                   children: [
-//                     GestureDetector(
-//                       onTap: _navigateToLocationScreen,
-//                       child: /*Image.asset('assets/images/loc.png'),*/  SvgPicture.asset('assets/svg_images/LocationIcon.svg',),
+//                     Container(
+//                       // color: Colors.red,
+//                       child: GestureDetector(
+//                         onTap: _navigateToLocationScreen,
+//                         child: SvgPicture.asset('assets/svg_images/LocationIcon.svg'),
+//                       ),
 //                     ),
-//                     SizedBox(width: 5),
-//                     Expanded(
+//                     const SizedBox(width: 5),
+//                     Container(
+//                       // color: Colors.blue,
+//                       width: width*0.17,
 //                       child: GestureDetector(
 //                         onTap: _navigateToLocationScreen,
 //                         child: Text(
@@ -311,28 +487,20 @@
 //                         ),
 //                       ),
 //                     ),
-//                     const Spacer(),
-//                     // Image.asset(
-//                     //   'assets/images/sin.png',
-//                     //   height: 34.9,
-//                     //   width: 100.25,
-//                     // ),
-//                     // const SizedBox(width: 5),
-//                     // Image.asset('assets/images/sin1.png'),
-//                   SvgPicture.asset('assets/svg_images/homepageLogo.svg',),
-//
+//                     // const Spacer(),
+//                      SizedBox(width: width*0.04),
+//                     Center(child: SvgPicture.asset('assets/svg_images/homepageLogo.svg')),
 //                     const Spacer(),
 //                     InkWell(
 //                       onTap: () {
 //                         Navigator.push(
 //                           context,
 //                           MaterialPageRoute(
-//                             builder: (context) => UserNotificationScreen(),
+//                             builder: (context) => const UserNotificationScreen(),
 //                           ),
 //                         );
 //                       },
-//                       child: /*Image.asset('assets/images/noti.png'),*/
-//                       SvgPicture.asset('assets/svg_images/notificationIcon.svg',),
+//                       child: SvgPicture.asset('assets/svg_images/notificationIcon.svg'),
 //                     ),
 //                   ],
 //                 ),
@@ -354,27 +522,22 @@
 //                   ),
 //                 ),
 //               ),
-//               SizedBox(height: 10),
+//               const SizedBox(height: 10),
 //               Padding(
 //                 padding: const EdgeInsets.symmetric(horizontal: 10),
-//                 child:
-//                 isLoading
+//                 child: isLoading
 //                     ? const Center(child: CircularProgressIndicator())
 //                     : Row(
 //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children:
-//                   allCategories.take(6).map((category) {
+//                   children: allCategories.take(6).map((category) {
 //                     return SizedBox(
-//                       width:
-//                       MediaQuery.of(context).size.width / 6 -
-//                           10,
+//                       width: MediaQuery.of(context).size.width / 6 - 10,
 //                       child: GestureDetector(
 //                         onTap: () {
 //                           Navigator.push(
 //                             context,
 //                             MaterialPageRoute(
-//                               builder:
-//                                   (_) => SubCategories(
+//                               builder: (_) => SubCategories(
 //                                 categoryId: category.id,
 //                                 categoryName: '',
 //                               ),
@@ -398,7 +561,7 @@
 //                   child: Text(
 //                     'By selecting category, you can find workers',
 //                     style: GoogleFonts.roboto(
-//                       color: Color(0xFFA7A7A7),
+//                       color: const Color(0xFFA7A7A7),
 //                       fontSize: 12,
 //                     ),
 //                   ),
@@ -411,7 +574,7 @@
 //                     Navigator.push(
 //                       context,
 //                       MaterialPageRoute(
-//                         builder: (context) => WorkerCategories(),
+//                         builder: (context) => const WorkerCategories(),
 //                       ),
 //                     );
 //                   },
@@ -422,7 +585,7 @@
 //                       borderRadius: BorderRadius.circular(10),
 //                       color: Colors.green.shade700,
 //                     ),
-//                     child: Center(
+//                     child: const Center(
 //                       child: Text(
 //                         'See All',
 //                         style: TextStyle(fontSize: 16, color: Colors.white),
@@ -432,36 +595,41 @@
 //                 ),
 //               ),
 //               const SizedBox(height: 10),
-//               Container(
-//                 width: double.infinity,
-//                 color: Colors.green.shade700,
-//                 padding: const EdgeInsets.symmetric(
-//                   vertical: 12,
-//                   horizontal: 10,
-//                 ),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.center,
-//                   children: [
-//                     Text(
-//                       "Emergency Task",
-//                       style: GoogleFonts.roboto(
-//                         color: Colors.white,
-//                         fontSize: 18,
-//                         fontWeight: FontWeight.w500,
+//               InkWell(
+//                 onTap:  () {
+//                   print("gadge: emergency task tap ::: ");
+//                   Navigator.push(
+//                     context,
+//                     MaterialPageRoute(builder: (context) =>  EmergencyScreen()),
+//                   );
+//                 },
+//                 child: Container(
+//                   width: double.infinity,
+//                   color: Colors.green.shade700,
+//                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       Text(
+//                         "Emergency Task",
+//                         style: GoogleFonts.roboto(
+//                           color: Colors.white,
+//                           fontSize: 18,
+//                           fontWeight: FontWeight.w500,
+//                         ),
 //                       ),
-//                     ),
-//                     const SizedBox(height: 5),
-//                     Text(
-//                       "Book emergency services for quick fixes",
-//                       style: GoogleFonts.roboto(
-//                         color: Colors.white,
-//                         fontSize: 12,
+//                       const SizedBox(height: 5),
+//                       Text(
+//                         "Book emergency services for quick fixes",
+//                         style: GoogleFonts.roboto(
+//                           color: Colors.white,
+//                           fontSize: 12,
+//                         ),
 //                       ),
-//                     ),
-//                     const SizedBox(height: 5),
-//                     // Image.asset('assets/images/Frame2.png'),
-//                     SvgPicture.asset('assets/svg_images/emergencytaskIcon.svg',),
-//                   ],
+//                       const SizedBox(height: 5),
+//                       SvgPicture.asset('assets/svg_images/emergencytaskIcon.svg'),
+//                     ],
+//                   ),
 //                 ),
 //               ),
 //               const SizedBox(height: 20),
@@ -477,7 +645,7 @@
 //                         fontSize: 14,
 //                       ),
 //                     ),
-//                     SizedBox(width: 70),
+//                     const SizedBox(width: 70),
 //                     Text(
 //                       "See All",
 //                       style: GoogleFonts.roboto(
@@ -486,7 +654,7 @@
 //                         color: Colors.grey,
 //                       ),
 //                     ),
-//                     Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+//                     const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
 //                   ],
 //                 ),
 //               ),
@@ -518,7 +686,7 @@
 //             onPressed: () {
 //               Navigator.push(
 //                 context,
-//                 MaterialPageRoute(builder: (context) => PostTaskScreen()),
+//                 MaterialPageRoute(builder: (context) => const PostTaskScreen()),
 //               );
 //             },
 //             backgroundColor: Colors.green.shade800,
@@ -527,7 +695,7 @@
 //             child: Column(
 //               mainAxisAlignment: MainAxisAlignment.center,
 //               children: [
-//                 SizedBox(height: 10),
+//                 const SizedBox(height: 10),
 //                 Container(
 //                   height: 26,
 //                   width: 26,
@@ -578,39 +746,6 @@
 //       height: 70,
 //       child: Column(
 //         children: [
-//          /* Container(
-//             height: 42,
-//             width: 42,
-//             decoration: BoxDecoration(
-//               color: isSelected ? Colors.green : Colors.green.shade100,
-//               shape: BoxShape.circle,
-//               border:
-//               isSelected ? Border.all(color: Colors.black, width: 1) : null,
-//             ),
-//             child: CircleAvatar(
-//               child: Center(
-//                 child:
-//                 imagePath.isNotEmpty
-//                     ? imagePath.startsWith('http')
-//                     ? Image.network(
-//                   imagePath,
-//                   height: 42,
-//                   width: 42,
-//                   fit: BoxFit.cover,
-//                   errorBuilder: (context, error, stackTrace) {
-//                     return const Icon(Icons.broken_image, size: 22);
-//                   },
-//                 )
-//                     : Image.asset(
-//                   'assets/images/$imagePath',
-//                   height: 42,
-//                   width: 42,
-//                   fit: BoxFit.cover,
-//                 )
-//                     : const Icon(Icons.person, size: 22),
-//               ),
-//             ),
-//           ),*/
 //           Container(
 //             height: 42,
 //             width: 42,
@@ -619,14 +754,14 @@
 //               shape: BoxShape.circle,
 //               border: isSelected ? Border.all(color: Colors.black, width: 1) : null,
 //             ),
-//             child: ClipOval( // 🟢 ye line important hai
+//             /*child: ClipOval(
 //               child: imagePath.isNotEmpty
 //                   ? imagePath.startsWith('http')
 //                   ? Image.network(
 //                 imagePath,
 //                 height: 42,
 //                 width: 42,
-//                 fit: BoxFit.cover,
+//                 // fit: BoxFit.fitHeight,
 //                 errorBuilder: (context, error, stackTrace) {
 //                   return const Icon(Icons.broken_image, size: 22);
 //                 },
@@ -635,10 +770,34 @@
 //                 'assets/images/$imagePath',
 //                 height: 42,
 //                 width: 42,
-//                 fit: BoxFit.cover,
+//                 // fit: BoxFit.cover,
+//               )
+//                   : const Icon(Icons.person, size: 22),
+//             ),*/
+//             child: ClipOval(
+//               child: imagePath.isNotEmpty
+//                   ? imagePath.startsWith('http')
+//                   ? Padding(
+//                     padding: const EdgeInsets.all(5.0),
+//                     child: Image.network(
+//                                     imagePath,
+//                                     height: 42,
+//                                     width: 42,
+//                                     // fit: BoxFit.cover, // 👈 yeh important
+//                                     errorBuilder: (context, error, stackTrace) {
+//                     return const Icon(Icons.broken_image, size: 22);
+//                                     },
+//                                   ),
+//                   )
+//                   : Image.asset(
+//                 'assets/images/$imagePath',
+//                 height: 42,
+//                 width: 42,
+//                 fit: BoxFit.cover, // 👈 local image bhi crop ke bina dikhegi
 //               )
 //                   : const Icon(Icons.person, size: 22),
 //             ),
+//
 //           ),
 //           const SizedBox(height: 5),
 //           Text(
@@ -723,16 +882,19 @@
 //   }
 // }
 
+
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../models/userModel/WorkCategoryModel.dart';
 import '../../models/userModel/Worker.dart';
-import '../ServiceProvider/PostTaskScreen.dart';
+import '../../../Bidding/PostTaskScreen.dart';
 import '../comm/home_location_screens.dart';
 import 'SubCategories.dart';
 import 'UserNotificationScreen.dart';
@@ -746,8 +908,423 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
+  // int _currentIndex = 0;
+  // String? userLocation = 'Select Location';
+  // List<Worker> workers = [
+  //   Worker(name: 'Dipak Sharma', role: 'Plumber', rating: 4.5),
+  //   Worker(name: 'Ravi Kumar', role: 'Electrician', rating: 4.2),
+  //   Worker(name: 'Sita Verma', role: 'Cleaner', rating: 4.8),
+  // ];
+  // List<WorkCategoryModel> allCategories = [];
+  // bool isLoading = true;
+  //
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   loadSavedLocation();
+  //   fetchCategories();
+  //   _fetchLocation();
+  // }
+  //
+  // Future<void> loadSavedLocation() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   String? savedLocation =
+  //       prefs.getString('selected_location') ?? prefs.getString('address');
+  //   setState(() {
+  //     userLocation = savedLocation ?? 'Select Location';
+  //     isLoading = false;
+  //   });
+  //   debugPrint("📍 Loaded saved location: $userLocation");
+  // }
+  //
+  // Future<void> _fetchLocation() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+  //   if (token == null || token.isEmpty) {
+  //     debugPrint("❌ No token found");
+  //     setState(() {
+  //       userLocation = 'Select Location';
+  //       isLoading = false;
+  //     });
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text('Authentication failed. Please log in again.'),
+  //           duration: Duration(seconds: 2),
+  //         ),
+  //       );
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final url = Uri.parse(
+  //       'https://api.thebharatworks.com/api/user/getUserProfileData',
+  //     );
+  //     final response = await http.get(
+  //       url,
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+  //
+  //     debugPrint("📡 API Response: ${response.statusCode} - ${response.body}");
+  //
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body);
+  //       if (responseData['status'] == true) {
+  //         final data = responseData['data'];
+  //         // Prioritize full_address array, then location.address, then default
+  //         String location;
+  //         if (data['full_address'] != null && data['full_address'].isNotEmpty) {
+  //           location = data['full_address'][0]['address'] ?? 'Select Location';
+  //         } else if (data['location']?['address']?.isNotEmpty == true) {
+  //           location = data['location']['address'];
+  //         } else if (data['current_location']?.isNotEmpty == true) {
+  //           location = data['current_location'];
+  //         } else {
+  //           location = 'Select Location';
+  //         }
+  //
+  //         await prefs.setString('selected_location', location);
+  //         await prefs.setString('address', location);
+  //         await prefs.setDouble(
+  //           'user_latitude',
+  //           data['full_address']?.isNotEmpty == true
+  //               ? data['full_address'][0]['latitude'] ?? 0.0
+  //               : data['location']?['latitude'] ?? 0.0,
+  //         );
+  //         await prefs.setDouble(
+  //           'user_longitude',
+  //           data['full_address']?.isNotEmpty == true
+  //               ? data['full_address'][0]['longitude'] ?? 0.0
+  //               : data['location']?['longitude'] ?? 0.0,
+  //         );
+  //
+  //         setState(() {
+  //           userLocation = location;
+  //           isLoading = false;
+  //         });
+  //         debugPrint("📍 Fetched location from API and saved: $userLocation");
+  //       } else {
+  //         setState(() {
+  //           userLocation = 'Select Location';
+  //           isLoading = false;
+  //         });
+  //         debugPrint("❌ API error: ${responseData['message']}");
+  //         if (mounted) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: Text(responseData['message'] ?? 'Profile fetch failed'),
+  //               duration: const Duration(seconds: 2),
+  //             ),
+  //           );
+  //         }
+  //       }
+  //     } else {
+  //       setState(() {
+  //         userLocation = 'Select Location';
+  //         isLoading = false;
+  //       });
+  //       debugPrint("❌ API call failed: ${response.statusCode}");
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(
+  //             content: Text('Failed to fetch profile data.'),
+  //             duration: Duration(seconds: 2),
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     debugPrint("❌ Error fetching location: $e");
+  //     setState(() {
+  //       userLocation = 'Select Location';
+  //       isLoading = false;
+  //     });
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Error fetching location: $e'),
+  //           duration: const Duration(seconds: 2),
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
+  //
+  // // Future<void> updateLocationOnServer(
+  // //     String newAddress,
+  // //     double latitude,
+  // //     double longitude,
+  // //     ) async {
+  // //   final prefs = await SharedPreferences.getInstance();
+  // //   final token = prefs.getString('token') ?? '';
+  // //   final url = Uri.parse(
+  // //     'https://api.thebharatworks.com/api/user/updateUserProfile',
+  // //   );
+  // //
+  // //   try {
+  // //     final response = await http.post(
+  // //       url,
+  // //       headers: {
+  // //         'Authorization': 'Bearer $token',
+  // //         'Content-Type': 'application/json',
+  // //       },
+  // //       body: jsonEncode({
+  // //         'full_address': [
+  // //           {
+  // //             'address': newAddress,
+  // //             'latitude': latitude,
+  // //             'longitude': longitude,
+  // //             'title': 'Current Location', // Default title, adjust as needed
+  // //             'landmark': '', // Optional, adjust as needed
+  // //           }
+  // //         ],
+  // //         'location': {
+  // //           'latitude': latitude,
+  // //           'longitude': longitude,
+  // //           'address': newAddress,
+  // //         },
+  // //       }),
+  // //     );
+  // //
+  // //     debugPrint("📡 Update Location Response: ${response.statusCode} - ${response.body}");
+  // //
+  // //     if (response.statusCode == 200) {
+  // //       final data = jsonDecode(response.body);
+  // //       if (data['status'] == true) {
+  // //         await prefs.setString('selected_location', newAddress);
+  // //         await prefs.setString('address', newAddress);
+  // //         await prefs.setDouble('user_latitude', latitude);
+  // //         await prefs.setDouble('user_longitude', longitude);
+  // //         setState(() {
+  // //           userLocation = newAddress;
+  // //         });
+  // //         if (mounted) {
+  // //           ScaffoldMessenger.of(context).showSnackBar(
+  // //             SnackBar(
+  // //               content: Text("Location updated successfully: $newAddress"),
+  // //               duration: const Duration(seconds: 2),
+  // //             ),
+  // //           );
+  // //         }
+  // //         await _fetchLocation(); // Refresh to sync with server
+  // //       } else {
+  // //         if (mounted) {
+  // //           ScaffoldMessenger.of(context).showSnackBar(
+  // //             SnackBar(
+  // //               content: Text("Failed to update location: ${data['message']}"),
+  // //               duration: const Duration(seconds: 2),
+  // //             ),
+  // //           );
+  // //         }
+  // //       }
+  // //     } else {
+  // //       if (mounted) {
+  // //         ScaffoldMessenger.of(context).showSnackBar(
+  // //           const SnackBar(
+  // //             content: Text("Server error, location update failed!"),
+  // //             duration: Duration(seconds: 2),
+  // //           ),
+  // //         );
+  // //       }
+  // //     }
+  // //   } catch (e) {
+  // //     debugPrint("❌ Error updating location: $e");
+  // //     if (mounted) {
+  // //       ScaffoldMessenger.of(context).showSnackBar(
+  // //         SnackBar(
+  // //           content: Text("Error updating location: $e"),
+  // //           duration: const Duration(seconds: 2),
+  // //         ),
+  // //       );
+  // //     }
+  // //   }
+  // // }
+  // Future<void> updateLocationOnServer(
+  //     String newAddress,
+  //     double latitude,
+  //     double longitude,
+  //     ) async {
+  //   if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
+  //     if (mounted) {
+  //       Fluttertoast.showToast(msg: "Invalid location data!");
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token') ?? '';
+  //     final url = Uri.parse(
+  //       "https://api.thebharatworks.com/api/user/updateUserProfile",
+  //     );
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         HttpHeaders.authorizationHeader: 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: json.encode({
+  //         'full_address': [
+  //           {
+  //             'address': newAddress,
+  //             'latitude': latitude,
+  //             'longitude': longitude,
+  //             'title': 'Current Location',
+  //             'landmark': '',
+  //           },
+  //         ],
+  //         'location': {
+  //           'latitude': latitude,
+  //           'longitude': longitude,
+  //           'address': newAddress,
+  //         },
+  //       }),
+  //     );
+  //
+  //     print(
+  //       "📡 Location update response: ${response.statusCode} - ${response.body}",
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       if (data['status'] == true) {
+  //         String? newAddressId = data['data']?['full_address']?.last?['_id'];
+  //         await prefs.setString("selected_location", newAddress);
+  //         await prefs.setString("address", newAddress);
+  //         await prefs.setDouble("user_latitude", latitude);
+  //         await prefs.setDouble("user_longitude", longitude);
+  //         if (newAddressId != null) {
+  //           await prefs.setString("selected_address_id", newAddressId);
+  //         }
+  //         setState(() {
+  //           userLocation = newAddress;
+  //           isLoading = false;
+  //         });
+  //         print("📍 Location updated: $newAddress (ID: $newAddressId)");
+  //         if (mounted) {
+  //           // Fluttertoast.showToast(msg: "Location updated: $newAddress");
+  //         }
+  //       } else {
+  //         if (mounted) {
+  //           // Fluttertoast.showToast(
+  //           //   msg: data["message"] ?? "Failed to update location",
+  //           // );
+  //         }
+  //       }
+  //     } else {
+  //       if (mounted) {
+  //         Fluttertoast.showToast(
+  //           msg: "Server error, failed to update location!",
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("❌ Error updating location: $e");
+  //     if (mounted) {
+  //       Fluttertoast.showToast(msg: "Error updating location!");
+  //     }
+  //   }
+  // }
+  //
+  // void _navigateToLocationScreen() async {
+  //   final result = await Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder:
+  //           (context) => LocationSelectionScreen(
+  //         onLocationSelected: (Map<String, dynamic> locationData) {
+  //           setState(() {
+  //             userLocation = locationData['address'] ?? 'Select Location';
+  //             debugPrint(
+  //               "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
+  //             );
+  //           });
+  //         },
+  //       ),
+  //     ),
+  //   );
+  //   if (result != null && result is Map<String, dynamic>) {
+  //     String newAddress = result['address'] ?? 'Select Location';
+  //     double latitude = result['latitude'] ?? 0.0;
+  //     double longitude = result['longitude'] ?? 0.0;
+  //     String? addressId = result['addressId'];
+  //     if (newAddress != 'Select Location' &&
+  //         latitude != 0.0 &&
+  //         longitude != 0.0) {
+  //       await updateLocationOnServer(newAddress, latitude, longitude);
+  //       // Save addressId to SharedPreferences
+  //       if (addressId != null) {
+  //         final prefs = await SharedPreferences.getInstance();
+  //         await prefs.setString('selected_address_id', addressId);
+  //       }
+  //       // Refresh location
+  //       await _fetchLocation();
+  //     } else {
+  //       debugPrint("❌ Invalid location data received: $result");
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(
+  //             content: Text("Invalid location data, please try again!"),
+  //             duration: Duration(seconds: 2),
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   }
+  // }
+  //
+  // Future<void> fetchCategories() async {
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token');
+  //
+  //     if (token == null) {
+  //       debugPrint("❌ Token missing");
+  //       setState(() => isLoading = false);
+  //       return;
+  //     }
+  //
+  //     final uri = Uri.parse('https://api.thebharatworks.com/api/work-category');
+  //     final response = await http.get(
+  //       uri,
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //         "Content-Type": "application/json",
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonData = json.decode(response.body);
+  //       if (jsonData["status"] == true && jsonData["data"] is List) {
+  //         setState(() {
+  //           allCategories = (jsonData["data"] as List)
+  //               .map((item) => WorkCategoryModel.fromJson(item))
+  //               .toList();
+  //           isLoading = false;
+  //         });
+  //       } else {
+  //         setState(() => isLoading = false);
+  //       }
+  //     } else {
+  //       debugPrint("❌ Error: ${response.statusCode}");
+  //       setState(() => isLoading = false);
+  //     }
+  //   } catch (e) {
+  //     debugPrint("❗ Exception: $e");
+  //     setState(() => isLoading = false);
+  //   }
+  // }
+
   int _currentIndex = 0;
-  String? userLocation = 'Select Location';
+  String? userLocation = 'Select Location'; // Default location
   List<Worker> workers = [
     Worker(name: 'Dipak Sharma', role: 'Plumber', rating: 4.5),
     Worker(name: 'Ravi Kumar', role: 'Electrician', rating: 4.2),
@@ -759,9 +1336,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadSavedLocation();
-    fetchCategories();
-    _fetchLocation();
+    loadSavedLocation(); // Load saved location first
+    fetchCategories(); // Fetch categories
+    _fetchLocation(); // Sync with API, but prioritize saved location
   }
 
   Future<void> loadSavedLocation() async {
@@ -776,22 +1353,41 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Future<void> _fetchLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedLocation =
+        prefs.getString('selected_location') ?? prefs.getString('address');
+    String? savedAddressId = prefs.getString('selected_address_id');
+
+    if (savedLocation != null &&
+        savedLocation != 'Select Location' &&
+        savedAddressId != null) {
+      setState(() {
+        userLocation = savedLocation;
+        isLoading = false;
+      });
+      debugPrint(
+        "📍 Prioritized saved location: $userLocation (ID: $savedAddressId)",
+      );
+      return;
+    }
+
+    // If no saved location, fetch from API
     setState(() {
       isLoading = true;
     });
 
-    final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token == null || token.isEmpty) {
-      debugPrint("❌ No token found");
+      debugPrint("❌ No token found!");
       setState(() {
-        userLocation = 'Select Location';
+        userLocation = savedLocation ?? 'Select Location';
         isLoading = false;
       });
+      debugPrint("📍 Using saved or default location: $userLocation");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Authentication failed. Please log in again.'),
+            content: Text('Authentication failed, please log in again!'),
             duration: Duration(seconds: 2),
           ),
         );
@@ -811,54 +1407,96 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         },
       );
 
-      debugPrint("📡 API Response: ${response.statusCode} - ${response.body}");
+      debugPrint(
+        "📡 API response received: ${response.statusCode} - ${response.body}",
+      );
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData['status'] == true) {
           final data = responseData['data'];
-          // Prioritize full_address array, then location.address, then default
-          String location;
-          if (data['full_address'] != null && data['full_address'].isNotEmpty) {
-            location = data['full_address'][0]['address'] ?? 'Select Location';
-          } else if (data['location']?['address']?.isNotEmpty == true) {
-            location = data['location']['address'];
-          } else if (data['current_location']?.isNotEmpty == true) {
-            location = data['current_location'];
-          } else {
-            location = 'Select Location';
+          String apiLocation = 'Select Location';
+          double latitude = 0.0;
+          double longitude = 0.0;
+          String? addressId;
+
+          // Check for matching address based on savedAddressId
+          if (savedAddressId != null && data['full_address'] != null) {
+            final matchingAddress = data['full_address'].firstWhere(
+                  (address) => address['_id'] == savedAddressId,
+              orElse: () => null,
+            );
+            if (matchingAddress != null) {
+              apiLocation = matchingAddress['address'] ?? 'Select Location';
+              latitude = matchingAddress['latitude']?.toDouble() ?? 0.0;
+              longitude = matchingAddress['longitude']?.toDouble() ?? 0.0;
+              addressId = matchingAddress['_id'];
+            }
           }
 
-          await prefs.setString('selected_location', location);
-          await prefs.setString('address', location);
-          await prefs.setDouble(
-            'user_latitude',
-            data['full_address']?.isNotEmpty == true
-                ? data['full_address'][0]['latitude'] ?? 0.0
-                : data['location']?['latitude'] ?? 0.0,
-          );
-          await prefs.setDouble(
-            'user_longitude',
-            data['full_address']?.isNotEmpty == true
-                ? data['full_address'][0]['longitude'] ?? 0.0
-                : data['location']?['longitude'] ?? 0.0,
+          // If no matching address or savedAddressId, use latest "Current Location" address
+          if (apiLocation == 'Select Location' &&
+              data['full_address'] != null &&
+              data['full_address'].isNotEmpty) {
+            final currentLocations =
+            data['full_address']
+                .where((address) => address['title'] == 'Current Location')
+                .toList();
+            if (currentLocations.isNotEmpty) {
+              // Use the latest "Current Location" address
+              final latestCurrentLocation = currentLocations.last;
+              apiLocation =
+                  latestCurrentLocation['address'] ?? 'Select Location';
+              latitude = latestCurrentLocation['latitude']?.toDouble() ?? 0.0;
+              longitude = latestCurrentLocation['longitude']?.toDouble() ?? 0.0;
+              addressId = latestCurrentLocation['_id'];
+            } else {
+              // Fallback to the last address
+              final latestAddress = data['full_address'].last;
+              apiLocation = latestAddress['address'] ?? 'Select Location';
+              latitude = latestAddress['latitude']?.toDouble() ?? 0.0;
+              longitude = latestAddress['longitude']?.toDouble() ?? 0.0;
+              addressId = latestAddress['_id'];
+            }
+          } else if (data['location']?['address']?.isNotEmpty == true) {
+            // Fallback to location.address
+            apiLocation = data['location']['address'];
+            latitude = data['location']['latitude']?.toDouble() ?? 0.0;
+            longitude = data['location']['longitude']?.toDouble() ?? 0.0;
+          }
+
+          debugPrint(
+            "📍 Location fetched from API: $apiLocation (ID: $addressId)",
           );
 
+          // Save API location to SharedPreferences
+          await prefs.setString('selected_location', apiLocation);
+          await prefs.setString('address', apiLocation);
+          await prefs.setDouble('user_latitude', latitude);
+          await prefs.setDouble('user_longitude', longitude);
+          if (addressId != null) {
+            await prefs.setString('selected_address_id', addressId);
+          }
+
           setState(() {
-            userLocation = location;
+            userLocation = apiLocation;
             isLoading = false;
           });
-          debugPrint("📍 Fetched location from API and saved: $userLocation");
+          debugPrint(
+            "📍 Saved API location and displayed in UI: $userLocation (ID: $addressId)",
+          );
         } else {
           setState(() {
-            userLocation = 'Select Location';
+            userLocation = savedLocation ?? 'Select Location';
             isLoading = false;
           });
           debugPrint("❌ API error: ${responseData['message']}");
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(responseData['message'] ?? 'Profile fetch failed'),
+                content: Text(
+                  responseData['message'] ?? 'Failed to fetch profile',
+                ),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -866,14 +1504,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         }
       } else {
         setState(() {
-          userLocation = 'Select Location';
+          userLocation = savedLocation ?? 'Select Location';
           isLoading = false;
         });
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to fetch profile data.'),
+              content: Text('Failed to fetch profile data!'),
               duration: Duration(seconds: 2),
             ),
           );
@@ -882,7 +1520,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     } catch (e) {
       debugPrint("❌ Error fetching location: $e");
       setState(() {
-        userLocation = 'Select Location';
+        userLocation = savedLocation ?? 'Select Location';
         isLoading = false;
       });
       if (mounted) {
@@ -901,6 +1539,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       double latitude,
       double longitude,
       ) async {
+    if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
+      debugPrint("❌ Invalid location data: $newAddress, $latitude, $longitude");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid location data"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final url = Uri.parse(
@@ -920,9 +1571,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               'address': newAddress,
               'latitude': latitude,
               'longitude': longitude,
-              'title': 'Current Location', // Default title, adjust as needed
-              'landmark': '', // Optional, adjust as needed
-            }
+              'title': 'Current Location', // Ensure title is set
+              'landmark': '',
+            },
           ],
           'location': {
             'latitude': latitude,
@@ -932,18 +1583,28 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         }),
       );
 
-      debugPrint("📡 Update Location Response: ${response.statusCode} - ${response.body}");
+      debugPrint(
+        "📡 Location update response: ${response.statusCode} - ${response.body}",
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['status'] == true) {
+          String? newAddressId = data['data']?['full_address']?.last?['_id'];
           await prefs.setString('selected_location', newAddress);
           await prefs.setString('address', newAddress);
           await prefs.setDouble('user_latitude', latitude);
           await prefs.setDouble('user_longitude', longitude);
+          if (newAddressId != null) {
+            await prefs.setString('selected_address_id', newAddressId);
+          }
           setState(() {
             userLocation = newAddress;
+            isLoading = false;
           });
+          debugPrint(
+            "📍 Saved new location and updated UI: $newAddress (ID: $newAddressId)",
+          );
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -952,12 +1613,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
             );
           }
-          await _fetchLocation(); // Refresh to sync with server
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text("Failed to update location: ${data['message']}"),
+                content: Text("Location update failed: ${data['message']}"),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -990,11 +1650,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LocationSelectionScreen(
+        builder:
+            (context) => LocationSelectionScreen(
           onLocationSelected: (Map<String, dynamic> locationData) {
             setState(() {
               userLocation = locationData['address'] ?? 'Select Location';
-              debugPrint("📍 Location selected: ${locationData['address']}");
+              debugPrint(
+                "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
+              );
             });
           },
         ),
@@ -1004,7 +1667,29 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       String newAddress = result['address'] ?? 'Select Location';
       double latitude = result['latitude'] ?? 0.0;
       double longitude = result['longitude'] ?? 0.0;
-      await updateLocationOnServer(newAddress, latitude, longitude);
+      String? addressId = result['addressId'];
+      if (newAddress != 'Select Location' &&
+          latitude != 0.0 &&
+          longitude != 0.0) {
+        await updateLocationOnServer(newAddress, latitude, longitude);
+        // Save addressId to SharedPreferences
+        if (addressId != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('selected_address_id', addressId);
+        }
+        // Refresh location
+        await _fetchLocation();
+      } else {
+        debugPrint("❌ Invalid location data received: $result");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Invalid location data, please try again!"),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -1014,7 +1699,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final token = prefs.getString('token');
 
       if (token == null) {
-        debugPrint("❌ Token missing");
+        debugPrint("❌ No token found");
         setState(() => isLoading = false);
         return;
       }
@@ -1032,9 +1717,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         final jsonData = json.decode(response.body);
         if (jsonData["status"] == true && jsonData["data"] is List) {
           setState(() {
-            allCategories = (jsonData["data"] as List)
-                .map((item) => WorkCategoryModel.fromJson(item))
-                .toList();
+            allCategories =
+                (jsonData["data"] as List)
+                    .map((item) => WorkCategoryModel.fromJson(item))
+                    .toList();
             isLoading = false;
           });
         } else {
@@ -1099,7 +1785,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ),
                     ),
                     // const Spacer(),
-                     SizedBox(width: width*0.04),
+                    SizedBox(width: width*0.04),
                     Center(child: SvgPicture.asset('assets/svg_images/homepageLogo.svg')),
                     const Spacer(),
                     InkWell(
@@ -1389,17 +2075,17 @@ class CategoryItemWidget extends StatelessWidget {
               child: imagePath.isNotEmpty
                   ? imagePath.startsWith('http')
                   ? Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Image.network(
-                                    imagePath,
-                                    height: 42,
-                                    width: 42,
-                                    // fit: BoxFit.cover, // 👈 yeh important
-                                    errorBuilder: (context, error, stackTrace) {
+                padding: const EdgeInsets.all(5.0),
+                child: Image.network(
+                  imagePath,
+                  height: 42,
+                  width: 42,
+                  // fit: BoxFit.cover, // 👈 yeh important
+                  errorBuilder: (context, error, stackTrace) {
                     return const Icon(Icons.broken_image, size: 22);
-                                    },
-                                  ),
-                  )
+                  },
+                ),
+              )
                   : Image.asset(
                 'assets/images/$imagePath',
                 height: 42,

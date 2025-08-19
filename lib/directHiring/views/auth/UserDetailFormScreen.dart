@@ -733,39 +733,6 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
     return _errorTexts.isEmpty;
   }
 
-  //Future<Map<String, dynamic>> submitUserProfile(BuildContext context) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token') ?? '';
-  //
-  //     final response = await http.post(
-  //       Uri.parse('YOUR_API_ENDPOINT_HERE'), // Replace with your actual API endpoint
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: jsonEncode({
-  //         'name': nameController.text.trim(),
-  //         'referral_code': referralController.text.trim(),
-  //         'role': roleController.text,
-  //       }),
-  //     );
-  //
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       return {'success': true, 'message': 'Profile updated successfully'};
-  //     } else {
-  //       return {
-  //         'success': false,
-  //         'message': 'Failed to update profile: ${response.body}',
-  //       };
-  //     }
-  //   } catch (e) {
-  //     return {
-  //       'success': false,
-  //       'message': 'Error occurred: $e',
-  //     };
-  //   }
-  // }
 
   void onSubmit() async {
     if (!validateForm()) {
@@ -780,15 +747,24 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
     }
 
     // final result = await submitUserProfile(context);
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (_) => AddressDetailScreen(
+    //       name: nameController.text,
+    //       refralCode: referralController.text,
+    //       role: widget.role,
+    //       initialAddress: null,
+    //       initialLocation: null,
+    //     ),
+    //   ),
+    // );
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => AddressDetailScreen(
-          name: nameController.text,
-          refralCode: referralController.text,
-          role: widget.role,
-          initialAddress: null,
-          initialLocation: null,
+          initialAddress: null, // Pass if available
+          initialLocation: null, // Pass if available
         ),
       ),
     );

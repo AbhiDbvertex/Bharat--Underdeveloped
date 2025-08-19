@@ -930,8 +930,6 @@ class _HireScreenState extends State<HireScreen> {
 
   // ✅ Form submit karne ka function
   Future<void> submitForm() async {
-    final confirmed = await showConfirmationDialog();
-    if (!mounted || !confirmed) return;
 
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
@@ -948,6 +946,8 @@ class _HireScreenState extends State<HireScreen> {
       );
       return;
     }
+    final confirmed = await showConfirmationDialog();
+    if (!mounted || !confirmed) return;
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
