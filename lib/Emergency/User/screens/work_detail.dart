@@ -1,4 +1,6 @@
+
 import 'package:carousel_slider/carousel_slider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,9 +11,12 @@ import '../controllers/work_detail_controller.dart';
 import '../models/emergency_list_model.dart';
 
 class WorkDetailPage extends StatefulWidget {
-  final EmergencyOrderData data;
 
-  WorkDetailPage(this.data);
+  final  data;
+  final bool isUser;
+
+  WorkDetailPage(this.data, {required this.isUser});
+
 
   @override
   State<WorkDetailPage> createState() => _WorkDetailPageState();
@@ -24,7 +29,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller = Get.put(WorkDetailController(widget.data));
+    controller = Get.put(WorkDetailController() );
+    controller.getEmergencyOrder(widget.data);
+
   }
 
   @override
@@ -52,7 +59,16 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
         ),
       ),
       body: Obx(
-        () => SingleChildScrollView(
+
+            ()  {
+      if (controller.isLoading.value) {
+        // loading true -> show loader
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+        );
+      } else {
+              return SingleChildScrollView(
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -90,22 +106,64 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
               Stack(
                 children: [
                   Obx(
-                    () => CarouselSlider(
+
+                        () => CarouselSlider(
+
                       options: CarouselOptions(
                         height: 200,
                         viewportFraction: 1.0,
                         enableInfiniteScroll: true,
                         autoPlay: true,
-                        autoPlayInterval: Duration(seconds: 2),
+
+                        autoPlayInterval: Duration(seconds: 3),
+
                         onPageChanged: (index, reason) {
                           controller.currentImageIndex.value = index;
                         },
                       ),
                       items: controller.imageUrls.map((url) {
-                        return Image.network(
-                          url,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ViewImage(
+                                    imageUrl: url,
+                                    title: "Product Image",
+                                  ),
+                                ));
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(0),
+                            child: Image.network(
+                              url,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  height: 200,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(color: AppColors.primaryGreen,),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  height: 200,
+                                  child: const Center(
+                                    child: Icon(Icons.broken_image,
+                                        size: 50, color: Colors.grey),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
                         );
                       }).toList(),
                     ),
@@ -161,77 +219,61 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                 ],
               ),
 
+              const SizedBox(height: 8),
+
+              Obx(
+                    () => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: controller.imageUrls.asMap().entries.map((entry) {
+                    int idx = entry.key;
+                    return Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: controller.currentImageIndex.value == idx
+                            ? AppColors.primaryGreen
+                            : AppColors.primaryGreen.withAlpha(100),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+
               /// BELOW IMAGE -> COLUMN
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Obx(
-                      () => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            controller.imageUrls.asMap().entries.map((entry) {
-                          int idx = entry.key;
-                          return Container(
-                            width: 8.0,
-                            height: 8.0,
-                            margin: const EdgeInsets.symmetric(horizontal: 3.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: controller.currentImageIndex.value == idx
-                                  ? AppColors.primaryGreen
-                                  : AppColors.primaryGreen.withAlpha(100),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
 
                     /// ROW 1
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 4,),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade100,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                controller.googleAddress.value,
-                                style: GoogleFonts.roboto(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              controller.detailedAddress.value,
-                              style: GoogleFonts.roboto(
-                                fontSize: 13,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Color(0xfff27773),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        controller.googleAddress.value,
+                        style: GoogleFonts.roboto(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
-                        Text(
-                          controller.detailedAddress.value,
-                          style: GoogleFonts.roboto(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      controller.detailedAddress.value,
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+
                     ),
 
                     const SizedBox(height: 10),
@@ -276,21 +318,39 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                     /// TASK DETAILS
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          controller.contact.value,
-                          style: GoogleFonts.roboto(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
+
+                      children: controller.subCategories.value
+                          .split(", ")
+                          .map((subName) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("• ", style: TextStyle(fontSize: 16)),
+                              // bullet
+                              Expanded(
+                                child: Text(
+                                  subName,
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ].toList(),
+                        );
+                      }).toList(),
                     ),
+
                     const SizedBox(height: 20),
 
                     /// CANCEL BUTTON
-                    Center(
+                    widget.isUser
+                        ? controller.hireStatus == "pending"
+                        ? Center(
+
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
@@ -299,40 +359,107 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {} /*controller.cancelTask()*/,
-                        icon: const Icon(Icons.cancel, color: Colors.white),
-                        label: Text(
+
+                        onPressed: () async {
+                          var orderId = "${controller.orderId}";
+                          String status = await controller
+                              .cancelEmergencyOrder(orderId);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("$status")),
+                          );
+
+
+                          // cancel logic
+                        },
+                        icon: const Icon(
+                            Icons.cancel_presentation_outlined,
+                            color: Colors.white),
+                        label: controller.isLoading.value
+                            ? CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                            : Text(
                           "Cancel Task",
                           style: GoogleFonts.roboto(
-                              color: Colors.white, fontSize: 14),
+                              color: Colors.white,
+                              fontSize: 14),
                         ),
                       ),
+                    )
+                        : controller.hireStatus == "cancelled"
+                        ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Cancelled",
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    )
+                        : SizedBox()
+                        : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGreen,
+                            minimumSize: const Size(140, 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            // accept logic
+                          },
+                          child: Text(
+                            "Accept",
+                            style: GoogleFonts.roboto(
+                                color: Colors.white, fontSize: 15),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            minimumSize: const Size(140, 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            // reject logic
+                          },
+                          child: Text(
+                            "Reject",
+                            style: GoogleFonts.roboto(
+                                color: Colors.white, fontSize: 15),
+                          ),
+                        ),
+                      ],
                     ),
+
+
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
+
+              RequestAcceptedSection()
             ],
           ),
-        ),
+        );}}
       ),
 
-      /// BOTTOM STATUS
-      bottomNavigationBar: Obx(
-        () => Container(
-          height: 45,
-          alignment: Alignment.center,
-          color: Colors.grey.shade300,
-          child: Text(
-            controller.hireStatus.value,
-            style: GoogleFonts.roboto(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
-            ),
-          ),
-        ),
-      ),
+
+
     );
   }
 }

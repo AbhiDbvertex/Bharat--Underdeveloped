@@ -467,7 +467,9 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
         if (responseData['expired'] == true) {
           await prefs.remove("auth_token");
           setState(() {
+
             errorMessage = "session expire. Login first!";
+
             isLoading = false;
           });
           Future.delayed(Duration(seconds: 2), () {

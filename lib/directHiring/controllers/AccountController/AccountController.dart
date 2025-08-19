@@ -30,7 +30,9 @@ class AccountController {
       case 'FAQ':
         Navigator.push(context, MaterialPageRoute(builder: (_) => FAQScreen()));
         break;
+
       case 'About Us':
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => AboutScreen()),
@@ -60,7 +62,9 @@ class AccountController {
           MaterialPageRoute(builder: (_) => const GetPremiumScreen()),
         );
         break;
+
       case 'Contact Us':
+
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => CustomerCare()),

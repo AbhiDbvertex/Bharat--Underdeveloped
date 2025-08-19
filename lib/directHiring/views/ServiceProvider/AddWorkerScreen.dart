@@ -382,6 +382,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       final date = DateTime.parse(value);
       final now = DateTime.now();
       final earliest = DateTime(1900);
+
       if (date.isAfter(now)) return 'future date accept';
       if (date.isBefore(earliest)) return 'Not use old date';
       final formatted =
@@ -390,6 +391,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
       return null;
     } catch (e) {
       return 'Please currect Date format';
+
     }
   }
 

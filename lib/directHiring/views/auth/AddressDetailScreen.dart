@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Widgets/AppColors.dart';
-import '../../../Widgets/Bottombar.dart';
-import '../../../Widgets/CustomButton.dart';
 import 'LoginScreen.dart';
 import 'RoleSelectionScreen.dart';
 
@@ -161,7 +159,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
       filled: true,
       contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 12),
       enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: AppColors.greyBorder, width: 1.5),
+        borderSide:  BorderSide(color: AppColors.greyBorder, width: 1.5),
         borderRadius: BorderRadius.circular(15),
       ),
       focusedBorder: OutlineInputBorder(

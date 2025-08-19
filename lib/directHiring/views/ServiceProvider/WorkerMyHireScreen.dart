@@ -553,7 +553,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     print(
                       '📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})',
                     );
+
                     return /*DirectOrder(
+
                       id: order.id,
                       title: order.title,
                       description: order.description,
@@ -562,6 +564,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                       image: order.image,
                       providerId: order.providerId,
                       user_id: order.user_id,
+
                     );*/
                       DirectOrder(
                         id: order.id,
@@ -575,6 +578,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                         user_id: order.user_id,
                         offer_history: order.offer_history, // original offers
                       );
+
 
 
                   }).toList();

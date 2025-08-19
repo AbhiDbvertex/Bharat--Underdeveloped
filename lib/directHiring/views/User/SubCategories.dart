@@ -181,6 +181,7 @@ class _SubCategoriesState extends State<SubCategories> {
               child: ClipOval(
                 child:
                     imagePath.isNotEmpty
+
                         ? Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Image.network(
@@ -192,6 +193,7 @@ class _SubCategoriesState extends State<SubCategories> {
                               return const Icon(Icons.broken_image, size: 22);
                             },
                           ),
+
                         )
                         : const Icon(Icons.image, size: 22),
               ),

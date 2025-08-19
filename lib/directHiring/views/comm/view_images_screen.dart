@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter/services.dart';
+
 import 'package:google_fonts/google_fonts.dart';
+import '../../../Widgets/AppColors.dart';
 
 class ViewImage extends StatelessWidget {
   final dynamic imageUrl; // Changed to dynamic to accept String or List<String>
+  final String? title ;
 
-  const ViewImage({super.key, required this.imageUrl});
+  const ViewImage({super.key, required this.imageUrl,this.title});
+
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +22,21 @@ class ViewImage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          "Profile Image",
+
+          title??"Profile Image",
+
           style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
+
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
+
       ),
       backgroundColor: Colors.black,
       body: Center(child: _buildImageView()),

@@ -99,9 +99,11 @@ class ServiceProviderModel {
   });
 
   factory ServiceProviderModel.fromJson(Map<String, dynamic> json) {
+
     // print(
     //   "📌 Worker: ${json['full_name'] ?? 'Unknown'}, profilePic: ${json['profilePic'] ?? json['profile_pic']}",
     // );
+
 
     double avgRating = 0.0;
     int reviewCount = 0;

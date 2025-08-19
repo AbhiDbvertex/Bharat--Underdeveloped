@@ -160,6 +160,7 @@ class _WorkerCategoriesState extends State<WorkerCategories> {
                                       child: ClipOval(
                                         child:
                                             imagePath.isNotEmpty
+
                                                 ? Padding(
                                                   padding: const EdgeInsets.all(6.0),
                                                   child: Image.network(
