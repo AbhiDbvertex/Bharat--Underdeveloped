@@ -586,7 +586,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
       isLoading
           ? const Center(child: CircularProgressIndicator())
           : order == null
-          ? const Center(child: Text("Koi data nahi mila!"))
+          ? const Center(child: Text("No data found!"))
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

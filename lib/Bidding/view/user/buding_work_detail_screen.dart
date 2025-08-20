@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Widgets/AppColors.dart';
+import '../../../Widgets/AppColors.dart';
 
 class BiddingWorkerDetailScreen extends StatefulWidget {
   const BiddingWorkerDetailScreen({super.key});
