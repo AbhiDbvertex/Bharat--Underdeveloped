@@ -1405,7 +1405,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             padding: const EdgeInsets.all(12.0),
             child: Center(
               child: Text(
-                "My Hire",
+                "My Work",
                 style: GoogleFonts.roboto(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
