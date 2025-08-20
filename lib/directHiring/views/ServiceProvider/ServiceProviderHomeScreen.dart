@@ -1,4 +1,3 @@
-
 //
 // import 'dart:async';
 // import 'dart:convert';
@@ -565,11 +564,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-
+import 'package:developer/Bidding/ServiceProvider/WorkerRecentPostedScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -587,14 +585,12 @@ class ServiceProviderHomeScreen extends StatefulWidget {
 }
 
 class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
-
-
   bool _isSwitched = false;
   String userLocation = "Select Location"; // Changed to single source of truth
   ServiceProviderProfileModel? profile;
   bool isLoading = true;
-bool _showReviews = true;
-String? address = "";
+  bool _showReviews = true;
+  String? address = "";
 
   @override
   void initState() {
@@ -624,8 +620,6 @@ String? address = "";
 
     // If no saved location, fetch from API
     await fetchProfile();
-
-
   }
 
   Future<void> fetchProfile() async {
@@ -663,8 +657,7 @@ String? address = "";
           if (data['data']?['full_address'] != null &&
               data['data']['full_address'].isNotEmpty) {
             final addresses = data['data']['full_address'] as List;
-            final currentLocations =
-            addresses
+            final currentLocations = addresses
                 .where((addr) => addr['title'] == 'Current Location')
                 .toList();
             if (currentLocations.isNotEmpty) {
@@ -723,10 +716,10 @@ String? address = "";
 
   // Update location on server
   Future<void> updateLocationOnServer(
-      String newAddress,
-      double latitude,
-      double longitude,
-      ) async {
+    String newAddress,
+    double latitude,
+    double longitude,
+  ) async {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
         Fluttertoast.showToast(msg: "Invalid location data!");
@@ -809,14 +802,11 @@ String? address = "";
     }
   }
 
-
   void _navigateToLocationScreen() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => LocationSelectionScreen(
-
+        builder: (context) => LocationSelectionScreen(
           onLocationSelected: (Map<String, dynamic> locationData) {
             setState(() {
               userLocation = locationData['address'] ?? 'Select Location';
@@ -929,7 +919,7 @@ String? address = "";
           // Check for matching address based on savedAddressId
           if (savedAddressId != null && data['full_address'] != null) {
             final matchingAddress = data['full_address'].firstWhere(
-                  (address) => address['_id'] == savedAddressId,
+              (address) => address['_id'] == savedAddressId,
               orElse: () => null,
             );
             if (matchingAddress != null) {
@@ -944,8 +934,7 @@ String? address = "";
           if (apiLocation == 'Select Location' &&
               data['full_address'] != null &&
               data['full_address'].isNotEmpty) {
-            final currentLocations =
-            data['full_address']
+            final currentLocations = data['full_address']
                 .where((address) => address['title'] == 'Current Location')
                 .toList();
             if (currentLocations.isNotEmpty) {
@@ -1040,7 +1029,6 @@ String? address = "";
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -1069,16 +1057,17 @@ String? address = "";
                   children: [
                     GestureDetector(
                       onTap: _navigateToLocationScreen,
-                      child: /*Image.asset('assets/images/loc.png'),*/ SvgPicture.asset('assets/svg_images/LocationIcon.svg',),
+                      child: /*Image.asset('assets/images/loc.png'),*/
+                          SvgPicture.asset(
+                        'assets/svg_images/LocationIcon.svg',
+                      ),
                     ),
                     SizedBox(width: 5),
                     Expanded(
                       child: GestureDetector(
                         onTap: _navigateToLocationScreen,
                         child: Text(
-
                           userLocation ?? 'Select Location',
-
                           style: GoogleFonts.roboto(
                             fontSize: 12,
                             color: Colors.black,
@@ -1096,7 +1085,9 @@ String? address = "";
                     // ),
                     // const SizedBox(width: 5),
                     // Image.asset('assets/images/sin1.png'),
-                    SvgPicture.asset('assets/svg_images/homepageLogo.svg',),
+                    SvgPicture.asset(
+                      'assets/svg_images/homepageLogo.svg',
+                    ),
                     const Spacer(),
                     InkWell(
                       onTap: () {
@@ -1107,7 +1098,10 @@ String? address = "";
                           ),
                         );
                       },
-                      child: /*Image.asset('assets/images/noti.png'),*/SvgPicture.asset('assets/svg_images/notificationIcon.svg',),
+                      child: /*Image.asset('assets/images/noti.png'),*/
+                          SvgPicture.asset(
+                        'assets/svg_images/notificationIcon.svg',
+                      ),
                     ),
                   ],
                 ),
@@ -1145,7 +1139,7 @@ String? address = "";
                           height: 24,
                           color: Colors.green.shade700,
                         ),
-                       /* Image.asset(
+                        /* Image.asset(
                           'assets/images/vec.png',
                           height: 24,
                           width: 24,
@@ -1353,9 +1347,8 @@ String? address = "";
   }
 
   Widget sectionHeader(String title) {
-    bool showPlus =
-        title.toUpperCase() == "RECENT POSTED WORK" ||
-            title.toUpperCase() == "EMERGENCY WORK";
+    bool showPlus = title.toUpperCase() == "RECENT POSTED WORK" ||
+        title.toUpperCase() == "EMERGENCY WORK";
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -1372,31 +1365,57 @@ String? address = "";
           if (showPlus)
             Padding(
               padding: const EdgeInsets.only(right: 65.0),
-              child: /*Image.asset('assets/images/plus.png', height: 20),*/ SvgPicture.asset(
+              child: /*Image.asset('assets/images/plus.png', height: 20),*/
+                  SvgPicture.asset(
                 'assets/svg_images/add-square.svg',
                 height: 20,
               ),
             )
           else
             const SizedBox(width: 20),
-          Row(
-            children: [
-              Text(
-                "See All",
-                style: GoogleFonts.roboto(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+          // Row(
+          //   children: [
+          //     Text(
+          //       "See All",
+          //       style: GoogleFonts.roboto(
+          //         fontSize: 14,
+          //         fontWeight: FontWeight.w500,
+          //         color: Colors.black38,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 6),
+          //     const Icon(
+          //       Icons.arrow_forward_ios,
+          //       size: 14,
+          //       color: Colors.black38,
+          //     ),
+          //   ],
+          // ),
+
+          GestureDetector(
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => WorkerRecentPostedScreen())),
+            child: Row(
+              children: [
+                Text(
+                  "See All",
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black38,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
                   color: Colors.black38,
                 ),
-              ),
-              const SizedBox(width: 6),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 14,
-                color: Colors.black38,
-              ),
-            ],
-          ),
+              ],
+            ),
+          )
         ],
       ),
     );
