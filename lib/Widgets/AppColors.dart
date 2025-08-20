@@ -17,8 +17,4 @@ class AppColors {
   static const Color lightGreenOverlay = Color(0x1A4CAF50);
   static const Color green = Color(0xFF388E3C);
 
-
-
-
-
 }

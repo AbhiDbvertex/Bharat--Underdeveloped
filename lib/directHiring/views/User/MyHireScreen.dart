@@ -1086,10 +1086,16 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (_) =>WorkDetailPage(
-                                  data, isUser: null,
+                                data.id,isUser:true,
                               )
                           ),
-                        );
+                        ).then((_) async {
+                          final orders = await EmergencyServiceController().getEmergencyOrder();
+                          setState(() {
+                            emergencyOrders = orders;
+                          });
+
+                        },);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.green.shade700,
