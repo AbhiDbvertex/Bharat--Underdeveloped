@@ -87,8 +87,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
   void _filterItems(String query) {
     setState(() {
       if (query.isEmpty) {
-        filteredItems = items; // Agar query khali hai, toh saari items dikhaye
-      } else {
+        filteredItems = items;
         filteredItems = items.where((item) {
           final title = item["title"].toString().toLowerCase();
           final desc = item["desc"].toString().toLowerCase();
@@ -258,7 +257,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              Biddingserviceproviderworkdetail(),
+                                              Biddingserviceproviderworkdetail(
+                                            orderId: '',
+                                          ),
                                         ),
                                       );
                                     },

@@ -98,8 +98,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   order['category_id'] == categoryId) ||
               (order['offer_history'] != null &&
                   (order['offer_history'] as List).any(
-                    (offer) =>
-                        offer['provider_id'] is Map &&
+                        (offer) =>
+                    offer['provider_id'] is Map &&
                         offer['provider_id']['category_id'] is Map &&
                         offer['provider_id']['category_id']['_id'] ==
                             categoryId,
@@ -109,11 +109,11 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   order['subcategory_id'] == subCategoryId) ||
               (order['offer_history'] != null &&
                   (order['offer_history'] as List).any(
-                    (offer) =>
-                        offer['provider_id'] is Map &&
+                        (offer) =>
+                    offer['provider_id'] is Map &&
                         offer['provider_id']['subcategory_ids'] is List &&
                         (offer['provider_id']['subcategory_ids'] as List).any(
-                          (sub) => sub['_id'] == subCategoryId,
+                              (sub) => sub['_id'] == subCategoryId,
                         ),
                   ));
 
@@ -334,7 +334,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            isSelected ? Colors.green.shade700 : Colors.green.shade100,
+        isSelected ? Colors.green.shade700 : Colors.green.shade100,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
@@ -1095,28 +1095,28 @@ class _MyHireScreenState extends State<MyHireScreen> {
               children: [
                 hasImage
                     ? Image.network(
-                        data.imageUrls!.first, // first image show karenge
-                        height: 200,
-                        width: 110,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 200,
-                            width: 110,
-                            alignment: Alignment.center,
-                            child: const CircularProgressIndicator(
-                              color: AppColors.primaryGreen,
-                              strokeWidth: 2.5,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset('assets/images/task.png',
-                                height: 150, width: 110, fit: BoxFit.cover),
-                      )
+                  data.imageUrls!.first, // first image show karenge
+                  height: 200,
+                  width: 110,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      width: 110,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                        strokeWidth: 2.5,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset('assets/images/task.png',
+                          height: 150, width: 110, fit: BoxFit.cover),
+                )
                     : Image.asset('assets/images/task.png',
-                        height: 150, width: 110, fit: BoxFit.cover),
+                    height: 150, width: 110, fit: BoxFit.cover),
                 Positioned(
                   bottom: 5,
                   left: 5,
@@ -1173,9 +1173,9 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       child: Text(
                         data.subCategoryIds.isNotEmpty
                             ? data.subCategoryIds
-                                .take(2)
-                                .map((e) => e.name)
-                                .join(", ")
+                            .take(2)
+                            .map((e) => e.name)
+                            .join(", ")
                             : "",
                         style: _cardDate(),
                         maxLines: 1,
@@ -1299,11 +1299,11 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (_) => WorkDetailPage(
-                                    data.id,
-                                    isUser: true,
-                                  )),
+                                data.id,
+                                isUser: true,
+                              )),
                         ).then(
-                          (_) async {
+                              (_) async {
                             final orders = await EmergencyServiceController()
                                 .getEmergencyOrder();
                             setState(() {
@@ -1338,10 +1338,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
 
   TextStyle _tabText({Color color = Colors.black}) => GoogleFonts.roboto(
-        color: color,
-        fontWeight: FontWeight.w500,
-        fontSize: 12,
-      );
+    color: color,
+    fontWeight: FontWeight.w500,
+    fontSize: 12,
+  );
 
   TextStyle _cardTitle() =>
       GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.bold);
