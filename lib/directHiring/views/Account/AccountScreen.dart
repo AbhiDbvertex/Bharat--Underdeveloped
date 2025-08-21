@@ -118,13 +118,24 @@ class _AccountScreenState extends State<AccountScreen> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),*/
+                  // Text(
+                  //   '${user.name[0].toUpperCase()}${user.name.substring(1).toLowerCase()}',
+                  //   style: GoogleFonts.roboto(
+                  //     fontSize: 22,
+                  //     fontWeight: FontWeight.w700,
+                  //   ),
+                  // ),
+
                   Text(
-                    '${user.name[0].toUpperCase()}${user.name.substring(1).toLowerCase()}',
+                    (user.name != null && user.name.isNotEmpty)
+                        ? '${user.name[0].toUpperCase()}${user.name.substring(1).toLowerCase()}'
+                        : "No Name",
                     style: GoogleFonts.roboto(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+
 
                   const SizedBox(height: 30),
                   ListView.separated(
