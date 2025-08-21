@@ -788,7 +788,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           const SizedBox(height: 20),
 
                           /// CANCEL BUTTON
-                          widget.isUser
+                         ! widget.isUser
                               ? controller.hireStatus == "pending"
                               ? Center(
                             child: ElevatedButton.icon(
@@ -855,7 +855,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
+                                  String status= await  controller.acceptUserOrder("6871f5b5ed31367eed8d2210");
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
+
                                   // accept logic
                                 },
                                 child: Text(
@@ -873,8 +876,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: () {
-                                  // reject logic
+                                onPressed: () async {
+                               String status=   await controller.rejectUserOrder("6871f5b5ed31367eed8d2210");
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
                                 },
                                 child: Text(
                                   "Reject",
@@ -889,7 +893,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                         ],
                       ),
                     ),
-                    RequestAcceptedSection()
+                    if(controller.hireStatus != "cancelled" && controller.hireStatus !="assigned")
+                    RequestAcceptedSection(orderId: controller.orderId.value)
+                    // if(controller.hireStatus == "assigned")
+                    //   HiredProviderSection();
                   ],
                 ),
               );}}

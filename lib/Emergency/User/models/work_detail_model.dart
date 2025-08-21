@@ -42,7 +42,8 @@ class Data {
   int? platformFee;
   String? razorOrderIdPlatform;
   ServicePayment? servicePayment;
-  List<dynamic>? acceptedByProviders;
+  // List<dynamic>? acceptedByProviders;
+  List<AcceptedByProvider>? acceptedByProviders;
   String? createdAt;
   String? updatedAt;
   int? v;
@@ -104,7 +105,17 @@ class Data {
     servicePayment = json['service_payment'] != null
         ? ServicePayment.fromJson(json['service_payment'])
         : null;
-    acceptedByProviders = json['accepted_by_providers'];
+    // acceptedByProviders = json['accepted_by_providers'];
+    // createdAt = json['createdAt'];
+    // updatedAt = json['updatedAt'];
+    // v = json['__v'];
+
+    if (json['accepted_by_providers'] != null) {
+      acceptedByProviders = <AcceptedByProvider>[];
+      json['accepted_by_providers'].forEach((v) {
+        acceptedByProviders!.add(AcceptedByProvider.fromJson(v));
+      });
+    }
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     v = json['__v'];
@@ -134,7 +145,11 @@ class Data {
     map['platform_fee'] = platformFee;
     map['razorOrderIdPlatform'] = razorOrderIdPlatform;
     if (servicePayment != null) map['service_payment'] = servicePayment!.toJson();
-    map['accepted_by_providers'] = acceptedByProviders;
+    // map['accepted_by_providers'] = acceptedByProviders;
+    if (acceptedByProviders != null) {
+      map['accepted_by_providers'] =
+          acceptedByProviders!.map((v) => v.toJson()).toList();
+    }
     map['createdAt'] = createdAt;
     map['updatedAt'] = updatedAt;
     map['__v'] = v;
@@ -147,13 +162,15 @@ class UserId {
   String? id;
   String? phone;
   String? fullName;
-
-  UserId({this.id, this.phone, this.fullName});
+  String? profilePic;
+  UserId({this.id, this.phone, this.fullName, this.profilePic});
 
   UserId.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
     fullName = json['full_name'];
+    profilePic = json['profile_pic'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -161,6 +178,8 @@ class UserId {
     map['_id'] = id;
     map['phone'] = phone;
     map['full_name'] = fullName;
+    map['profile_pic'] = profilePic;
+
     return map;
   }
 }
@@ -232,6 +251,27 @@ class ServicePayment {
     map['remaining_amount'] = remainingAmount;
     map['total_tax'] = totalTax;
     map['payment_history'] = paymentHistory;
+    return map;
+  }
+}
+class AcceptedByProvider {
+  String? provider;
+  String? status;
+  String? id;
+
+  AcceptedByProvider({this.provider, this.status, this.id});
+
+  AcceptedByProvider.fromJson(Map<String, dynamic> json) {
+    provider = json['provider'];
+    status = json['status'];
+    id = json['_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = {};
+    map['provider'] = provider;
+    map['status'] = status;
+    map['_id'] = id;
     return map;
   }
 }
