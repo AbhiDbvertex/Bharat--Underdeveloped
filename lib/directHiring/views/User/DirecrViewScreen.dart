@@ -342,7 +342,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
           print("⚠️ No providers in API response");
           if (mounted && _scaffoldMessenger != null) {
             _scaffoldMessenger!.showSnackBar(
-              const SnackBar(content: Text("Koi provider nahi mila")),
+              const SnackBar(content: Text("No provider found!")),
             );
           }
         }
@@ -985,7 +985,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          "Offer sent",
+                          "Send offer",
                           style: GoogleFonts.roboto(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -1380,7 +1380,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       }
                                     },
                                     child: Text(
-                                      "Sent Offer",
+                                      "Send Offer",
                                       style: GoogleFonts.roboto(
                                         fontSize: 12,
                                         color: Colors.white,

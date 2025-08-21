@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../models/userModel/WorkCategoryModel.dart';
 import '../../models/userModel/Worker.dart';
-import '../../../Bidding/PostTaskScreen.dart';
+import '../../../Bidding/view/user/BudingPostTaskScreen.dart';
 import '../comm/home_location_screens.dart';
 import 'SubCategories.dart';
 import 'UserNotificationScreen.dart';

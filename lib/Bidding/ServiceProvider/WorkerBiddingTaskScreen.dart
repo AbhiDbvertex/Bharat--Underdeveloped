@@ -534,7 +534,9 @@ class _WorkerbiddingtaskScreenState extends State<WorkerbiddingtaskScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                Biddingserviceproviderworkdetail(),
+                                                Biddingserviceproviderworkdetail(
+                                              orderId: '',
+                                            ),
                                           ),
                                         );
                                       },
