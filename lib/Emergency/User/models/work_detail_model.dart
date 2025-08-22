@@ -282,6 +282,7 @@ class AcceptedByProvider {
     return map;
   }
 }
+
 class ServiceProvider {
   String? id;
   String? phone;
@@ -306,3 +307,4 @@ class ServiceProvider {
     return map;
   }
 }
+

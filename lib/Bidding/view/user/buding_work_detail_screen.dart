@@ -855,17 +855,17 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             padding: EdgeInsets.only(top: height * 0.03),
                             child: relatedWorkers == null || relatedWorkers!.isEmpty
                                 ? Column(
-                                  children: [
-                                    Center(
-                                                                  child: SvgPicture.asset(
+                              children: [
+                                Center(
+                                  child: SvgPicture.asset(
                                     'assets/svg_images/norelatedworker.svg',
                                     height: height * 0.23,
-                                                                  ),
-                                                                ),
-                                    SizedBox(height: height * 0.023,),
-                                    Text("No related worker",style: TextStyle(color: Colors.grey),)
-                                  ],
-                                )
+                                  ),
+                                ),
+                                SizedBox(height: height * 0.023,),
+                                Text("No related worker",style: TextStyle(color: Colors.grey),)
+                              ],
+                            )
                                 : ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),

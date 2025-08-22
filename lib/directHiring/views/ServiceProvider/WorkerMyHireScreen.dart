@@ -26,7 +26,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     with RouteAware {
   bool isLoading = false;
   List<DirectOrder> directOrders = [];
-  List<BiddingOrder> biddingOrders = []; // Static biddingItems ke bajaye
+  List<BiddingOrder> biddingOrders = [];
   List<Map<String, dynamic>> emergencyItems = [
     {
       "title": "Fix plumbing issue",
@@ -47,7 +47,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       "address": "Bhopal M.P.",
     },
   ];
-  List<BiddingOrder> filteredBiddingOrders = []; // Updated to BiddingOrder
+  List<BiddingOrder> filteredBiddingOrders = [];
   List<DirectOrder> filteredDirectOrders = [];
   List<Map<String, dynamic>> filteredEmergencyItems = [];
   int selectedTab = 0; // 0 = Bidding, 1 = Direct Hiring, 2 = Emergency
@@ -81,8 +81,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     currentProviderId =
         prefs.getString('provider_id') ?? '685e244fb93a9a07a9fe41ee';
     print('🔑 Current Provider ID: $currentProviderId');
-    await fetchBiddingOrders(); // Bidding orders fetch karo
-    await fetchDirectOrders(); // Existing direct orders
+    await fetchBiddingOrders();
+    await fetchDirectOrders();
   }
 
   @override
@@ -94,9 +94,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
   @override
   void didPopNext() {
-    print(
-        "🔄 WorkerMyHireScreen: Screen pe wapas aaya, data refresh kar raha hoon!");
-    fetchBiddingOrders(); // Refresh bidding orders
+    print("🔄 Returned to WorkerMyHireScreen, refreshing data");
+    fetchBiddingOrders();
     fetchDirectOrders();
   }
 
@@ -111,8 +110,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   }
 
   // Fetch Bidding Orders
-// Inside WorkerMyHireScreen class
-
   Future<void> fetchBiddingOrders() async {
     setState(() => isLoading = true);
     try {
@@ -145,21 +142,21 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
               "Image URLs in Orders: ${biddingOrders.map((e) => e.imageUrls).toList()}");
         } else {
           print("❌ 'data' key missing or invalid: ${decoded['data']}");
-          _showSnackBar("Bidding orders data nahi mila!");
+          _showSnackBar("Bidding orders data not found!");
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        _showSnackBar("Bidding orders fetch nahi hue: ${res.statusCode}");
+        _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      _showSnackBar("Kuchh galat ho gaya: $e");
+      _showSnackBar("Something went wrong: $e");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-  // Fetch Direct Orders (Existing function, unchanged)
+  // Fetch Direct Orders
   Future<void> fetchDirectOrders() async {
     setState(() => isLoading = true);
     try {
@@ -230,11 +227,11 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        _showSnackBar("Direct orders fetch nahi hue: ${res.statusCode}");
+        _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      _showSnackBar("Kuchh galat ho gaya: $e");
+      _showSnackBar("Something went wrong: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -296,7 +293,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       case 'accepted':
         return Colors.green;
       case 'completed':
-        return Colors.green.shade800;
+        return Colors.green;
       case 'pending':
         return Colors.orange;
       case 'rejected':
@@ -668,7 +665,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   ) {
     print(
         "🛠 Building card for Task: ${data.title}, Status: ${data.hireStatus}");
-    print("Image URLs: ${data.imageUrls}"); // Debug image URLs
+    print("Image URLs: ${data.imageUrls}");
 
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
@@ -689,7 +686,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
               alignment: Alignment.topCenter,
               child: data.imageUrls.isNotEmpty
                   ? Image.network(
-                      data.imageUrls.first, // Use the first image URL
+                      data.imageUrls.first,
                       height: screenHeight * 0.16,
                       width: screenWidth * 0.32,
                       fit: BoxFit.cover,
@@ -794,6 +791,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -842,7 +840,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     );
   }
 
-  // Separate method for emergency tasks to maintain compatibility
   Widget _buildBiddingCardForEmergency(
     Map<String, dynamic> data,
     String? categreyId,
@@ -953,12 +950,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
-                        child: Text(
-                          data['address'],
-                          style: GoogleFonts.roboto(
-                            fontSize: screenWidth * 0.035,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            data['address'],
+                            style: GoogleFonts.roboto(
+                              fontSize: screenWidth * 0.035,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
@@ -976,8 +976,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                         ).then((_) {
                           print(
                               "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
-                          // Optional: Uncomment if fetchBiddingOrders is defined
-                          // fetchBiddingOrders();
+                          fetchBiddingOrders();
                         });
                       },
                       child: Container(

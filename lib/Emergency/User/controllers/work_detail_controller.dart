@@ -35,10 +35,12 @@ class WorkDetailController extends GetxController {
   var orderId="".obs;
   var acceptedByProviders = <Map<String, dynamic>>[].obs;
   var apiMessage = "".obs;
+
   var providerId = "".obs;
   var providerName = "".obs;
   var providerPhone = "".obs;
   var providerImage = "".obs;
+
 
   var tag="WorkDetailController";   // dots indicator ke liye
 
@@ -180,7 +182,9 @@ isLoading.value=false;
             ? dataModel.data?.hireStatus ?? ""
             : "";
         paymentAmount.value = dataModel.data?.servicePayment?.amount ?? 0;
+
         plateFormFee.value = dataModel.data?.platformFee ?? 0;
+
         orderId.value = dataModel.data?.id ?? "";
         acceptedByProviders.value =
             dataModel.data?.acceptedByProviders?.map((e) => {
@@ -190,7 +194,9 @@ isLoading.value=false;
             }).toList() ??
                 [];
         apiMessage.value = json["message"] ?? "";
+
         result=true;
+
       } else {
         bwDebug("❌ Error: ${response.statusCode} ${response.body}", tag: tag);
         result=false;
@@ -203,7 +209,9 @@ isLoading.value=false;
       isLoading.value=false;
 
     }
+
     return result;
+
   }
 
 

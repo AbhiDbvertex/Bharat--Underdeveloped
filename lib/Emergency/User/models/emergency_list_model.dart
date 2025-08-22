@@ -97,10 +97,12 @@ class EmergencyOrderData {
       hireStatus: json['hire_status'] ?? '',
       userStatus: json['user_status'],
       paymentStatus: json['payment_status'] ?? '',
+
       // serviceProviderId: json['service_provider_id'],
       serviceProviderId: json['service_provider_id'] != null
           ? ServiceProvider.fromJson(json['service_provider_id'])
           : null,
+
       platformFeePaid: json['platform_fee_paid'] ?? false,
       platformFee: json['platform_fee'] ?? 0,
       razorOrderIdPlatform: json['razorOrderIdPlatform'] ?? '',

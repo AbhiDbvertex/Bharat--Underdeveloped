@@ -448,21 +448,21 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         children: [
                           // left image
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: imageUrl.isNotEmpty
-                                ? Image.network(
-                              imageUrl,
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
-                            )
-                                : /*Image.asset(
+                              borderRadius: BorderRadius.circular(10),
+                              child: imageUrl.isNotEmpty
+                                  ? Image.network(
+                                imageUrl,
+                                height: 100,
+                                width: 100,
+                                fit: BoxFit.cover,
+                              )
+                                  : /*Image.asset(
                               "assets/images/Work.png",
                               height: 100,
                               width: 100,
                               fit: BoxFit.cover,
                             ),*/
-                            Icon(Icons.image_not_supported_outlined,size: 100,)
+                              Icon(Icons.image_not_supported_outlined,size: 100,)
                           ),
                           SizedBox(width: 10),
                           // right content
@@ -550,30 +550,30 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                       width: 110,
                                     ),
                                     Spacer(),
-                    InkWell(
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BiddingWorkerDetailScreen(
-                              buddingOderId: buddingOderId,
-                            ),
-                          ),
-                        );
+                                    InkWell(
+                                      onTap: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => BiddingWorkerDetailScreen(
+                                              buddingOderId: buddingOderId,
+                                            ),
+                                          ),
+                                        );
 
-                        if (result == true) {
-                          // 👈 refresh function call kar do
-                          _loadCategoryIdsAndFetchOrders();
-                          getEmergencyOrder();
-                          getBudingAllOders();
-                          setState(() {});
-                        }
-                      },
+                                        if (result == true) {
+                                          // 👈 refresh function call kar do
+                                          _loadCategoryIdsAndFetchOrders();
+                                          getEmergencyOrder();
+                                          getBudingAllOders();
+                                          setState(() {});
+                                        }
+                                      },
 
 
-                    //                   _loadCategoryIdsAndFetchOrders();
-                      //                   getEmergencyOrder();
-                      //                    getBudingAllOders();
+                                      //                   _loadCategoryIdsAndFetchOrders();
+                                      //                   getEmergencyOrder();
+                                      //                    getBudingAllOders();
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 10,

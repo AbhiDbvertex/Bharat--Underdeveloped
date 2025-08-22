@@ -789,7 +789,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           const SizedBox(height: 20),
 
                           /// CANCEL BUTTON
+
                          widget.isUser
+
                               ? controller.hireStatus == "pending"
                               ? Center(
                             child: ElevatedButton.icon(
@@ -895,6 +897,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       ),
                     ),
                     if(controller.hireStatus != "cancelled" && controller.hireStatus !="assigned")
+
                     RequestAcceptedSection(orderId: controller.orderId.value),
 
                     controller.hireStatus.value == "assigned" && controller.providerName.isNotEmpty
@@ -908,6 +911,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       isAssign: false,
                     )
                         : const SizedBox(),
+
                   ],
                 ),
               );}}
