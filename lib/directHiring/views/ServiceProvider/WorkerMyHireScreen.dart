@@ -3339,12 +3339,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(
-                        child: Text(
-                          data['address'],
-                          style: GoogleFonts.roboto(
-                            fontSize: screenWidth * 0.035,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            data['address'],
+                            style: GoogleFonts.roboto(
+                              fontSize: screenWidth * 0.035,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
