@@ -347,7 +347,7 @@ class _PostTaskScreenState extends State<PostTaskScreen> {
                     _submitTask();
                   }
                 },
-                child: const Text("Post Task", style: TextStyle(fontSize: 16)),
+                child: const Text("Post Task", style: TextStyle(fontSize: 16,color: Colors.white)),
               ),
             ],
           ),

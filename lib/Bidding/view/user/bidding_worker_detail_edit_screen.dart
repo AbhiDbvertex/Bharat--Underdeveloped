@@ -6,21 +6,25 @@ import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart' as mime;
 import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
+import '../../controller/bidding_postTask_controller.dart';
 import '../../controller/buding_postTask_controller.dart';
 
-class PostTaskScreen extends StatelessWidget {
-  const PostTaskScreen({super.key});
+class PostTaskEditScreen extends StatelessWidget {
+  final biddingOderId;
+  const PostTaskEditScreen({super.key, this.biddingOderId});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PostTaskController(), permanent: false); // Mark controller as non-permanent
+    final controller = Get.put(PostTaskEditController(biddingOderId), permanent: false);
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
+
 
     return WillPopScope(
       onWillPop: () async {
         controller.resetForm(); // Reset form before navigating back
-        Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance on re-entry
+        Get.delete<PostTaskEditController>(); // Delete controller to ensure fresh instance on re-entry
         return true; // Allow back navigation
       },
       child: Scaffold(
@@ -40,7 +44,7 @@ class PostTaskScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _pageHeader(context, controller),
-                  _buildLabel("Title"),
+                  _buildLabel("Title",),
                   _buildTextField(controller.titleController, "Enter Title of work"),
                   _buildLabel("Category"),
                   DropdownButtonFormField<String>(
@@ -166,27 +170,27 @@ class PostTaskScreen extends StatelessWidget {
     );
   }
 
-  Widget _pageHeader(BuildContext context, PostTaskController controller) {
+  Widget _pageHeader(BuildContext context, PostTaskEditController controller) {
     return Row(
       children: [
         GestureDetector(
           onTap: () {
             controller.resetForm(); // Reset form before navigating back
-            Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
+            Get.delete<PostTaskEditController>(); // Delete controller to ensure fresh instance
             Get.back();
           },
           child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
         ),
         const SizedBox(width: 86),
         Text(
-          "Post New Task",
+              "Edit Post Task",
           style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
 
-  Widget _googleLocationField(PostTaskController controller) {
+  Widget _googleLocationField(PostTaskEditController controller) {
     return GestureDetector(
       onTap: () async {
         final result = await Get.to(() => MapPickerScreen());
@@ -237,7 +241,7 @@ class PostTaskScreen extends StatelessWidget {
         validator: validator ?? (val) => val == null || val.isEmpty ? "This field is required" : null,
       );
 
-  Widget _subcategorySelector(PostTaskController controller) {
+  Widget _subcategorySelector(PostTaskEditController controller) {
     return GestureDetector(
       onTap: () {
         if (controller.selectedCategoryId.value != null) {
@@ -250,7 +254,7 @@ class PostTaskScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownTile(PostTaskController controller) => Container(
+  Widget _buildDropdownTile(PostTaskEditController controller) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
     decoration: BoxDecoration(
       border: Border.all(color: Colors.grey.shade400),
@@ -278,7 +282,7 @@ class PostTaskScreen extends StatelessWidget {
     ),
   );
 
-  Widget _buildImagePicker(PostTaskController controller) {
+  Widget _buildImagePicker(PostTaskEditController controller) {
     return Column(
       children: [
         if (controller.selectedImages.isEmpty)

@@ -389,6 +389,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     }
 
     final List dataList = BudingData['data'] ?? [];
+    // print("Abhi:- get bidding oderId : ${BudingData['data'] }");
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -425,12 +426,14 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
                   final title = item['category_id']?['name'] ?? "No Title";
                   final price = item['service_payment']?['amount']?.toString() ?? "0";
+                  final buddingOderId = item['_id'] ?? "0";
                   final address = item['google_address'] ?? "No Address";
                   final status = item['hire_status'] ?? "No Status";
                   final deadline = item['deadline']?.toString() ?? "";
                   final imageUrl = (item['image_urls'] != null && item['image_urls'].isNotEmpty)
                       ? item['image_urls'][0]
                       : "";
+                  print("Abhi:- get bidding oderId : ${buddingOderId }");
 
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -453,12 +456,13 @@ class _MyHireScreenState extends State<MyHireScreen> {
                               width: 100,
                               fit: BoxFit.cover,
                             )
-                                : Image.asset(
+                                : /*Image.asset(
                               "assets/images/Work.png",
                               height: 100,
                               width: 100,
                               fit: BoxFit.cover,
-                            ),
+                            ),*/
+                            Icon(Icons.image_not_supported_outlined,size: 100,)
                           ),
                           SizedBox(width: 10),
                           // right content
@@ -546,15 +550,30 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                       width: 110,
                                     ),
                                     Spacer(),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => BiddingWorkerDetailScreen(),
-                                          ),
-                                        );
-                                      },
+                    InkWell(
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BiddingWorkerDetailScreen(
+                              buddingOderId: buddingOderId,
+                            ),
+                          ),
+                        );
+
+                        if (result == true) {
+                          // 👈 refresh function call kar do
+                          _loadCategoryIdsAndFetchOrders();
+                          getEmergencyOrder();
+                          getBudingAllOders();
+                          setState(() {});
+                        }
+                      },
+
+
+                    //                   _loadCategoryIdsAndFetchOrders();
+                      //                   getEmergencyOrder();
+                      //                    getBudingAllOders();
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 10,
@@ -590,249 +609,6 @@ class _MyHireScreenState extends State<MyHireScreen> {
     );
   }
 
-  // Widget _buildHireCard(DirectOrder data) {
-  //   String displayStatus = data.status;
-  //   if (data.offer_history != null &&
-  //       data.offer_history!.isNotEmpty &&
-  //       data.status != 'cancelled' &&
-  //       data.status != 'completed') {
-  //     displayStatus = data.offer_history!.last.status ?? data.status;
-  //   }
-  //
-  //   // Check if provider image exists
-  //   final String? imageUrl = (data.offer_history != null &&
-  //       data.offer_history!.isNotEmpty &&
-  //       data.offer_history!.first.provider_id?.profile_pic != null)
-  //       ? data.offer_history!.first.provider_id!.profile_pic
-  //       : null;
-  //
-  //   final String? imageshow = data.image[0];
-  //   print("Abhi:- images list darect oder: $imageshow");
-  //
-  //   return Container(
-  //     margin: const EdgeInsets.only(bottom: 14),
-  //     padding: const EdgeInsets.all(12),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(16),
-  //       boxShadow: const [
-  //         BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 3)),
-  //       ],
-  //       border: Border.all(
-  //         color: AppColors.primaryGreen,
-  //         width: 1.2,
-  //       ),
-  //     ),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         // left side image
-  //         Center(
-  //           child: ClipRRect(
-  //             borderRadius: BorderRadius.circular(10),
-  //             child: imageUrl != null
-  //                 ? Image.network(
-  //               imageshow ?? "",
-  //               height: 180,
-  //               width: 100,
-  //               fit: BoxFit.cover,
-  //               errorBuilder: (context, error, stackTrace) => Image.asset(
-  //                 'assets/images/task.png',
-  //                 height: 180,
-  //                 width: 100,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             )
-  //                 : Image.asset(
-  //               'assets/images/task.png',
-  //               height: 100,
-  //               width: 100,
-  //               fit: BoxFit.cover,
-  //             ),
-  //           ),
-  //         ),
-  //
-  //         const SizedBox(width: 12),
-  //
-  //         // right side content
-  //         Expanded(
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               // title + chat button
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Expanded(
-  //                     child: Text(
-  //                       data.title,
-  //                       style: _cardTitle(),
-  //                       maxLines: 1,
-  //                       overflow: TextOverflow.ellipsis,
-  //                     ),
-  //                   ),
-  //                   CircleAvatar(
-  //                     radius: 16,
-  //                     backgroundColor: Colors.grey.shade200,
-  //                     child: SvgPicture.asset(
-  //                       "assets/svg_images/chat.svg",
-  //                       height: 18,
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //
-  //               const SizedBox(height: 6),
-  //
-  //               // description
-  //               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Expanded(
-  //                     child: Text(
-  //                       data.description,
-  //                       style: _cardBody(),
-  //                       maxLines: 2,
-  //                       overflow: TextOverflow.ellipsis,
-  //                     ),
-  //                   ),CircleAvatar(
-  //                     radius: 16,
-  //                     backgroundColor: Colors.grey.shade200,
-  //                     child: SvgPicture.asset(
-  //                       "assets/svg_images/call.svg",
-  //                       height: 18,
-  //                     ),
-  //                   )
-  //                 ],
-  //               ),
-  //
-  //               const SizedBox(height: 6),
-  //
-  //               // date + call button
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(
-  //                     "Date: ${data.date}",
-  //                     style: _cardDate(),
-  //                     maxLines: 1,
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                   Container(
-  //                     height: 25,
-  //                    width: 78,
-  //                     // padding:
-  //                     // const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  //                     decoration: BoxDecoration(
-  //                       color: Colors.black,
-  //                       borderRadius: BorderRadius.circular(8),
-  //                     ),
-  //                     child: Center(
-  //                       child: const Text(
-  //                         "Review",
-  //                         style: TextStyle(
-  //                           color: Colors.white,
-  //                           fontSize: 12,
-  //                           fontWeight: FontWeight.w500,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //
-  //               const SizedBox(height: 8),
-  //
-  //               // status + review
-  //               const SizedBox(width: 8),
-  //               Align(
-  //                 alignment: Alignment.topRight,
-  //                 child: Container(
-  //                   height: 25,
-  //                   width: 79,
-  //                   // padding:
-  //                   // const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  //                   decoration: BoxDecoration(
-  //                     color: _getStatusColor(displayStatus),
-  //                     borderRadius: BorderRadius.circular(8),
-  //                   ),
-  //                   child: Center(
-  //                     child: Text(
-  //                       displayStatus.toUpperCase(),
-  //                       style: const TextStyle(
-  //                         color: Colors.white,
-  //                         fontSize: 12,
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //
-  //               const SizedBox(height: 10),
-  //
-  //               // address + button
-  //               Row(
-  //                 children: [
-  //                   Expanded(
-  //                     child: Container(
-  //                       padding: const EdgeInsets.symmetric(
-  //                           horizontal: 6, vertical: 6),
-  //                       decoration: BoxDecoration(
-  //                         color: const Color(0xffF27773),
-  //                         borderRadius: BorderRadius.circular(8),
-  //                       ),
-  //                       child: Text(
-  //                         data.address ?? "",
-  //                         maxLines: 1,
-  //                         overflow: TextOverflow.ellipsis,
-  //                         style:
-  //                         const TextStyle(color: Colors.white, fontSize: 12),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   const SizedBox(width: 8),
-  //                   TextButton(
-  //                     onPressed: () {
-  //                       Navigator.push(
-  //                         context,
-  //                         MaterialPageRoute(
-  //                           builder: (_) => DirectViewScreen(
-  //                             id: data.id,
-  //                             categreyId:
-  //                             categoryId ?? '68443fdbf03868e7d6b74874',
-  //                             subcategreyId:
-  //                             subCategoryId ?? '684e7226962b4919ae932af5',
-  //                           ),
-  //                         ),
-  //                       ).then((_) {
-  //                         fetchDirectOrders();
-  //                       });
-  //                     },
-  //                     style: TextButton.styleFrom(
-  //                       backgroundColor: Colors.green.shade700,
-  //                       minimumSize: const Size(90, 36),
-  //                       shape: RoundedRectangleBorder(
-  //                         borderRadius: BorderRadius.circular(8),
-  //                       ),
-  //                     ),
-  //                     child: Text(
-  //                       "View Details",
-  //                       style: GoogleFonts.roboto(
-  //                         color: Colors.white,
-  //                         fontSize: 12,
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildHireCard(DirectOrder data) {
     String displayStatus = data.status;

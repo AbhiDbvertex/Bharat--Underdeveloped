@@ -1,3 +1,4 @@
+//
 // import 'dart:async';
 // import 'dart:convert';
 // import 'dart:io';
@@ -44,23 +45,66 @@
 //   List<Map<String, String>> subcategories = [];
 //   String? uploadedDocName;
 //
+//   // @override
+//   // void initState() {
+//   //   super.initState();
+//   //
+//   //   fullNameController.text = widget.fullName ?? '';
+//   //   skillController.text = widget.skill ?? '';
+//   //   selectedCategory = widget.categoryId;
+//   //   selectedSubCategories = widget.subCategoryIds ?? [];
+//   //   uploadedDocName = widget.documentUrl?.split('/').last;
+//   //
+//   //   fetchCategories().then((_) {
+//   //     if (selectedCategory != null) {
+//   //       fetchSubCategories(selectedCategory!);
+//   //     }
+//   //   });
+//   // }
+//
 //   @override
 //   void initState() {
 //     super.initState();
 //
 //     fullNameController.text = widget.fullName ?? '';
 //     skillController.text = widget.skill ?? '';
-//     selectedCategory = widget.categoryId;
 //     selectedSubCategories = widget.subCategoryIds ?? [];
 //     uploadedDocName = widget.documentUrl?.split('/').last;
 //
 //     fetchCategories().then((_) {
+//       bool isValidCategory = categories.any((cat) => cat['id'] == widget.categoryId);
+//       setState(() {
+//         selectedCategory = isValidCategory ? widget.categoryId : null;
+//       });
 //       if (selectedCategory != null) {
 //         fetchSubCategories(selectedCategory!);
 //       }
 //     });
 //   }
 //
+//   // Future<void> fetchCategories() async {
+//   //   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   //   final token = prefs.getString('token') ?? '';
+//   //
+//   //   final res = await http.get(
+//   //     Uri.parse('https://api.thebharatworks.com/api/work-category'),
+//   //     headers: {'Authorization': 'Bearer $token'},
+//   //   );
+//   //
+//   //   if (res.statusCode == 200) {
+//   //     final data = jsonDecode(res.body);
+//   //     setState(() {
+//   //       categories = List<Map<String, String>>.from(
+//   //         data['data'].map(
+//   //               (cat) => {
+//   //             'id': cat['_id'].toString(),
+//   //             'name': cat['name'].toString(),
+//   //           },
+//   //         ),
+//   //       );
+//   //     });
+//   //   }
+//   // }
 //   Future<void> fetchCategories() async {
 //     SharedPreferences prefs = await SharedPreferences.getInstance();
 //     final token = prefs.getString('token') ?? '';
@@ -72,18 +116,46 @@
 //
 //     if (res.statusCode == 200) {
 //       final data = jsonDecode(res.body);
+//       print("Fetched Categories: ${data['data']}"); // Debug: Full response print
 //       setState(() {
 //         categories = List<Map<String, String>>.from(
 //           data['data'].map(
-//             (cat) => {
+//                 (cat) => {
 //               'id': cat['_id'].toString(),
 //               'name': cat['name'].toString(),
 //             },
 //           ),
 //         );
+//         print("Processed Categories IDs: ${categories.map((c) => c['id']).toList()}"); // Debug: IDs list
 //       });
+//     } else {
+//       print("Failed to fetch categories: ${res.statusCode} - ${res.body}");
 //     }
 //   }
+//
+//   // Future<void> fetchSubCategories(String categoryId) async {
+//   //   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   //   final token = prefs.getString('token') ?? '';
+//   //
+//   //   final res = await http.get(
+//   //     Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
+//   //     headers: {'Authorization': 'Bearer $token'},
+//   //   );
+//   //
+//   //   if (res.statusCode == 200) {
+//   //     final data = jsonDecode(res.body);
+//   //     setState(() {
+//   //       subcategories = List<Map<String, String>>.from(
+//   //         data['data'].map(
+//   //               (sub) => {
+//   //             'id': sub['_id'].toString(),
+//   //             'name': sub['name'].toString(),
+//   //           },
+//   //         ),
+//   //       );
+//   //     });
+//   //   }
+//   // }
 //
 //   Future<void> fetchSubCategories(String categoryId) async {
 //     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -99,12 +171,14 @@
 //       setState(() {
 //         subcategories = List<Map<String, String>>.from(
 //           data['data'].map(
-//             (sub) => {
+//                 (sub) => {
 //               'id': sub['_id'].toString(),
 //               'name': sub['name'].toString(),
 //             },
 //           ),
 //         );
+//         // Validate selectedSubCategories
+//         selectedSubCategories = selectedSubCategories.where((id) => subcategories.any((sub) => sub['id'] == id)).toList();
 //       });
 //     }
 //   }
@@ -255,12 +329,48 @@
 //     );
 //   }
 //
+//   // Widget buildSimpleDropdown({
+//   //   required String? value,
+//   //   required String hint,
+//   //   required List<Map<String, String>> items,
+//   //   required void Function(String?) onChanged,
+//   // }) {
+//   //   return Container(
+//   //     margin: const EdgeInsets.only(bottom: 12),
+//   //     padding: const EdgeInsets.symmetric(horizontal: 12),
+//   //     decoration: BoxDecoration(
+//   //       color: Colors.white,
+//   //       borderRadius: BorderRadius.circular(10),
+//   //       border: Border.all(color: Colors.grey.shade400),
+//   //     ),
+//   //     child: DropdownButtonFormField<String>(
+//   //       value: value,
+//   //       isExpanded: true,
+//   //       decoration: const InputDecoration(border: InputBorder.none),
+//   //       hint: Text(hint, style: const TextStyle(color: Colors.grey)),
+//   //       items:
+//   //       items
+//   //           .map(
+//   //             (item) => DropdownMenuItem(
+//   //           value: item['id'],
+//   //           child: Text(item['name'] ?? ''),
+//   //         ),
+//   //       )
+//   //           .toList(),
+//   //       onChanged: onChanged,
+//   //     ),
+//   //   );
+//   // }
+//
 //   Widget buildSimpleDropdown({
 //     required String? value,
 //     required String hint,
 //     required List<Map<String, String>> items,
 //     required void Function(String?) onChanged,
 //   }) {
+//     // Safety: Agar value items mein nahi hai, to null set kar do
+//     String? validValue = items.any((item) => item['id'] == value) ? value : null;
+//
 //     return Container(
 //       margin: const EdgeInsets.only(bottom: 12),
 //       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -270,19 +380,18 @@
 //         border: Border.all(color: Colors.grey.shade400),
 //       ),
 //       child: DropdownButtonFormField<String>(
-//         value: value,
+//         value: validValue,
 //         isExpanded: true,
 //         decoration: const InputDecoration(border: InputBorder.none),
 //         hint: Text(hint, style: const TextStyle(color: Colors.grey)),
-//         items:
-//             items
-//                 .map(
-//                   (item) => DropdownMenuItem(
-//                     value: item['id'],
-//                     child: Text(item['name'] ?? ''),
-//                   ),
-//                 )
-//                 .toList(),
+//         items: items
+//             .map(
+//               (item) => DropdownMenuItem(
+//             value: item['id'],
+//             child: Text(item['name'] ?? ''),
+//           ),
+//         )
+//             .toList(),
 //         onChanged: onChanged,
 //       ),
 //     );
@@ -383,13 +492,13 @@
 //                           selectedSubCategories.isEmpty
 //                               ? 'Select Subcategories'
 //                               : subcategories
-//                                   .where(
-//                                     (sub) => selectedSubCategories.contains(
-//                                       sub['id'],
-//                                     ),
-//                                   )
-//                                   .map((sub) => sub['name'])
-//                                   .join(', '),
+//                               .where(
+//                                 (sub) => selectedSubCategories.contains(
+//                               sub['id'],
+//                             ),
+//                           )
+//                               .map((sub) => sub['name'])
+//                               .join(', '),
 //                           style: const TextStyle(color: Colors.black),
 //                         ),
 //                       ),
@@ -431,14 +540,14 @@
 //                         ),
 //                       ),
 //                       child:
-//                           isLoading
-//                               ? const CircularProgressIndicator(
-//                                 color: Colors.white,
-//                               )
-//                               : const Text(
-//                                 "UPDATE",
-//                                 style: TextStyle(color: Colors.white),
-//                               ),
+//                       isLoading
+//                           ? const CircularProgressIndicator(
+//                         color: Colors.white,
+//                       )
+//                           : const Text(
+//                         "UPDATE",
+//                         style: TextStyle(color: Colors.white),
+//                       ),
 //                     ),
 //                   ],
 //                 ),
@@ -460,6 +569,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 import '../../../../Widgets/AppColors.dart';
 
@@ -469,7 +579,6 @@ class EditProfileScreen extends StatefulWidget {
   final String? categoryId;
   final List<String>? subCategoryIds;
   final String? documentUrl;
-
 
   const EditProfileScreen({
     super.key,
@@ -497,23 +606,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List<Map<String, String>> subcategories = [];
   String? uploadedDocName;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   fullNameController.text = widget.fullName ?? '';
-  //   skillController.text = widget.skill ?? '';
-  //   selectedCategory = widget.categoryId;
-  //   selectedSubCategories = widget.subCategoryIds ?? [];
-  //   uploadedDocName = widget.documentUrl?.split('/').last;
-  //
-  //   fetchCategories().then((_) {
-  //     if (selectedCategory != null) {
-  //       fetchSubCategories(selectedCategory!);
-  //     }
-  //   });
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -534,29 +626,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  // Future<void> fetchCategories() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   final res = await http.get(
-  //     Uri.parse('https://api.thebharatworks.com/api/work-category'),
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-  //
-  //   if (res.statusCode == 200) {
-  //     final data = jsonDecode(res.body);
-  //     setState(() {
-  //       categories = List<Map<String, String>>.from(
-  //         data['data'].map(
-  //               (cat) => {
-  //             'id': cat['_id'].toString(),
-  //             'name': cat['name'].toString(),
-  //           },
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
   Future<void> fetchCategories() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -584,30 +653,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print("Failed to fetch categories: ${res.statusCode} - ${res.body}");
     }
   }
-
-  // Future<void> fetchSubCategories(String categoryId) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   final res = await http.get(
-  //     Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-  //
-  //   if (res.statusCode == 200) {
-  //     final data = jsonDecode(res.body);
-  //     setState(() {
-  //       subcategories = List<Map<String, String>>.from(
-  //         data['data'].map(
-  //               (sub) => {
-  //             'id': sub['_id'].toString(),
-  //             'name': sub['name'].toString(),
-  //           },
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
 
   Future<void> fetchSubCategories(String categoryId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -654,11 +699,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         skillController.text.isEmpty ||
         fullNameController.text.isEmpty ||
         (selectedFile == null && uploadedDocName == null)) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("⚠️ Please fill all fields and upload document"),
-        ),
+      Get.snackbar(
+        'Warning',
+        'Please fill all fields and upload document',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
       return;
     }
@@ -699,27 +747,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (!mounted) return;
 
       if (res.statusCode == 200) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("✅ Upload successful")));
-          await Future.delayed(const Duration(milliseconds: 500));
-          if (mounted) Navigator.pop(context, true);
-        }
+        Get.snackbar(
+          'Success',
+          'Upload successful',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+        );
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) Navigator.pop(context, true);
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("❌ Failed: ${res.body}")));
-        }
+        Get.snackbar(
+          'Error',
+          'Failed: ${res.body}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+        );
       }
     } catch (e) {
       print("Abhi:- update serviceprovider profile $e");
-      // if (mounted) {
-      //   ScaffoldMessenger.of(
-      //     context,
-      //   ).showSnackBar(SnackBar(content: Text("❌ Error: $e")));
-      // }
+      Get.snackbar(
+        'Error',
+        'Error: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+      );
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -780,39 +840,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
     );
   }
-
-  // Widget buildSimpleDropdown({
-  //   required String? value,
-  //   required String hint,
-  //   required List<Map<String, String>> items,
-  //   required void Function(String?) onChanged,
-  // }) {
-  //   return Container(
-  //     margin: const EdgeInsets.only(bottom: 12),
-  //     padding: const EdgeInsets.symmetric(horizontal: 12),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(10),
-  //       border: Border.all(color: Colors.grey.shade400),
-  //     ),
-  //     child: DropdownButtonFormField<String>(
-  //       value: value,
-  //       isExpanded: true,
-  //       decoration: const InputDecoration(border: InputBorder.none),
-  //       hint: Text(hint, style: const TextStyle(color: Colors.grey)),
-  //       items:
-  //       items
-  //           .map(
-  //             (item) => DropdownMenuItem(
-  //           value: item['id'],
-  //           child: Text(item['name'] ?? ''),
-  //         ),
-  //       )
-  //           .toList(),
-  //       onChanged: onChanged,
-  //     ),
-  //   );
-  // }
 
   Widget buildSimpleDropdown({
     required String? value,
@@ -921,10 +948,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         if (selectedCategory != null) {
                           showSubcategoryDialog();
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("⚠️ Please select category first"),
-                            ),
+                          Get.snackbar(
+                            'Warning',
+                            'Please select category first',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.orange,
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
                           );
                         }
                       },
@@ -991,8 +1022,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           vertical: 16,
                         ),
                       ),
-                      child:
-                      isLoading
+                      child: isLoading
                           ? const CircularProgressIndicator(
                         color: Colors.white,
                       )

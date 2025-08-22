@@ -707,8 +707,9 @@ import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
+/*
 
-class PostTaskController extends GetxController {
+class PostTaskEditController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final dateController = TextEditingController();
   final titleController = TextEditingController();
@@ -716,6 +717,10 @@ class PostTaskController extends GetxController {
   final googleAddressController = TextEditingController();
   final descriptionController = TextEditingController();
   final costController = TextEditingController();
+  final String biddingOderId; // value store karne ke liye
+
+  // yeh constructor zaroori hai
+  PostTaskEditController(this.biddingOderId);
 
   var selectedImages = <File>[].obs;
   var selectedDate = Rxn<DateTime>();
@@ -736,7 +741,52 @@ class PostTaskController extends GetxController {
     resetForm(); // Reset form on initialization to ensure fresh state
     fetchCategories();
     initializeLocation();
+    OderIdCotroller.text = biddingOderId; // textfield me direct set
     // Sync addressController with userLocation
+    ever(userLocation, (String? newLocation) {
+      addressController.text = newLocation ?? 'Select Location';
+    });
+  }
+*/
+
+class PostTaskEditController extends GetxController {
+  final formKey = GlobalKey<FormState>();
+  final dateController = TextEditingController();
+  final titleController = TextEditingController();
+  final addressController = TextEditingController();
+  final googleAddressController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final costController = TextEditingController();
+  final oderIdController = TextEditingController(); // yeh declare karna jaruri tha ✅
+
+  final String biddingOderId; // value store karne ke liye
+
+  // constructor
+  PostTaskEditController(this.biddingOderId);
+
+  var selectedImages = <File>[].obs;
+  var selectedDate = Rxn<DateTime>();
+  var selectedCategoryId = Rxn<String>();
+  var categories = <Map<String, String>>[].obs;
+  var allSubCategories = <Map<String, String>>[].obs;
+  var selectedSubCategoryIds = <String>[].obs;
+  var isSwitched = false.obs;
+  var userLocation = "Select Location".obs;
+  var profile = Rxn<ServiceProviderProfileModel>();
+  var isLoading = true.obs;
+  var showReviews = true.obs;
+  var address = "".obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    resetForm();
+    fetchCategories();
+    initializeLocation();
+
+    // ab error nahi aayega
+    oderIdController.text = biddingOderId;
+
     ever(userLocation, (String? newLocation) {
       addressController.text = newLocation ?? 'Select Location';
     });
@@ -1290,73 +1340,6 @@ class PostTaskController extends GetxController {
     }
   }
 
-  // Future<void> submitTask(BuildContext context) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token') ?? '';
-  //
-  //     String formattedDeadline = selectedDate.value != null
-  //         ? "${selectedDate.value!.year}-${selectedDate.value!.month.toString().padLeft(2, '0')}-${selectedDate.value!.day.toString().padLeft(2, '0')}"
-  //         : "2025-08-01";
-  //
-  //     List<String> base64Images = [];
-  //     for (var image in selectedImages) {
-  //       final bytes = await image.readAsBytes();
-  //       final mimeType = mime.lookupMimeType(image.path) ?? 'image/jpeg';
-  //       base64Images.add("data:$mimeType;base64,${base64Encode(bytes)}");
-  //     }
-  //
-  //     String addressToSend = addressController.text.trim().isNotEmpty
-  //         ? addressController.text.trim()
-  //         : userLocation.value.trim();
-  //     if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
-  //       showSnackbar("Error", "Please provide a valid address.", context: context);
-  //       return;
-  //     }
-  //
-  //     final body = {
-  //       "title": titleController.text.trim(),
-  //       "category_id": selectedCategoryId.value,
-  //       "sub_category_ids": selectedSubCategoryIds.join(','),
-  //       "address": addressToSend,
-  //       "google_address": googleAddressController.text.trim(),
-  //       "description": descriptionController.text.trim(),
-  //       "cost": costController.text.trim(),
-  //       "deadline": formattedDeadline,
-  //       if (base64Images.isNotEmpty) "images": base64Images,
-  //     };
-  //
-  //     print("📩 Sending task with address: $addressToSend");
-  //
-  //     final response = await http.post(
-  //       Uri.parse("https://api.thebharatworks.com/api/bidding-order/create"),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: jsonEncode(body),
-  //     );
-  //
-  //     print("📡 Post Task response: ${response.body}");
-  //     print("📡 Post Task status: ${response.statusCode}");
-  //
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       showSnackbar("Success", "Task posted successfully.", context: context);
-  //       resetForm(); // Reset form after successful submission
-  //       // Add a slight delay to ensure snackbar is visible
-  //       await Future.delayed(const Duration(seconds: 1));
-  //       Get.delete<PostTaskController>(); // Delete controller before navigation
-  //       Get.back();
-  //     } else if (response.statusCode == 401) {
-  //       showSnackbar("Error", "Session expired. Please log in again.", context: context);
-  //       Get.offAllNamed('/login');
-  //     } else {
-  //       showSnackbar("Error", "Failed to post task. Please try again.", context: context);
-  //     }
-  //   } catch (e) {
-  //     showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
-  //   }
-  // }
 
   Future<void> submitTask(BuildContext context) async {
     try {
@@ -1375,12 +1358,13 @@ class PostTaskController extends GetxController {
         return;
       }
 
-      var uri = Uri.parse("https://api.thebharatworks.com/api/bidding-order/create");
-      var request = http.MultipartRequest('POST', uri);
+      var uri = Uri.parse("https://api.thebharatworks.com/api/bidding-order/edit");
+      var request = http.MultipartRequest('PUT', uri);
 
       request.headers['Authorization'] = 'Bearer $token';
 
       request.fields['title'] = titleController.text.trim();
+      request.fields['order_id'] = biddingOderId;
       request.fields['category_id'] = selectedCategoryId.value.toString();
       request.fields['sub_category_ids'] = selectedSubCategoryIds.join(',');
       request.fields['address'] = addressToSend;
@@ -1389,6 +1373,7 @@ class PostTaskController extends GetxController {
       request.fields['cost'] = costController.text.trim();
       request.fields['deadline'] = formattedDeadline;
 
+      print("Abhi:- get bidding oderId ${biddingOderId}");
       // images add karna
       for (var image in selectedImages) {
         request.files.add(await http.MultipartFile.fromPath('images', image.path));
@@ -1404,8 +1389,9 @@ class PostTaskController extends GetxController {
         showSnackbar("Success", "Task posted successfully.", context: context);
         resetForm();
         Get.back();
+        Get.back();
         await Future.delayed(const Duration(seconds: 1));
-        Get.delete<PostTaskController>();
+        Get.delete<PostTaskEditController>();
         Get.back();
       } else if (response.statusCode == 401) {
         showSnackbar("Error", "Session expired. Please log in again.", context: context);
