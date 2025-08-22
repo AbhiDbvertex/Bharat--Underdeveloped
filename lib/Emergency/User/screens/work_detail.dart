@@ -1,5 +1,3 @@
-import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
-import 'package:developer/Emergency/utils/logger.dart';
 // import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 // import 'package:flutter/material.dart';
@@ -455,6 +453,9 @@ import 'package:developer/Emergency/utils/logger.dart';
 //   }
 // }
 /////////////////////////////
+import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
+import 'package:developer/Emergency/User/screens/task_view.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
@@ -788,7 +789,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           const SizedBox(height: 20),
 
                           /// CANCEL BUTTON
-                         ! widget.isUser
+                         widget.isUser
                               ? controller.hireStatus == "pending"
                               ? Center(
                             child: ElevatedButton.icon(
@@ -894,9 +895,19 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       ),
                     ),
                     if(controller.hireStatus != "cancelled" && controller.hireStatus !="assigned")
-                    RequestAcceptedSection(orderId: controller.orderId.value)
-                    // if(controller.hireStatus == "assigned")
-                    //   HiredProviderSection();
+                    RequestAcceptedSection(orderId: controller.orderId.value),
+
+                    controller.hireStatus.value == "assigned" && controller.providerName.isNotEmpty
+                        ? TaskView(
+                      orderId: controller.orderId.value,
+                      providerId:controller.providerId.value,
+                      providerName: controller.providerName.value,
+                      providerPhone: controller.providerPhone.value,
+                      providerImage: controller.providerImage.value,
+                      platFormFee:controller.plateFormFee.value,
+                      isAssign: false,
+                    )
+                        : const SizedBox(),
                   ],
                 ),
               );}}

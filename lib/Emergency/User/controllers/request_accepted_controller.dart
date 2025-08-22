@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:developer/Emergency/User/controllers/work_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,8 +17,7 @@ class RequestController extends GetxController {
   var errorMessage = ''.obs;
 
   var assignOrderResponse = AssignOrderResponse(status: false, message: "").obs;
-
-
+  final workDetailController=Get.put(WorkDetailController());
   Future<void>  getRequestAccepted(String id) async {
     bwDebug("[getRequestAccept] call orderId:$id",tag: tag);
 
@@ -141,6 +141,7 @@ class RequestController extends GetxController {
         } else {
           errorMessage.value = assignOrderResponse.value.message;
         }
+await workDetailController.getEmergencyOrder(orderId);
       } else {
         bwDebug("Error: ${response.body}");
         errorMessage.value =

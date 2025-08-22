@@ -37,7 +37,8 @@ class Data {
   String? hireStatus;
   String? userStatus;
   String? paymentStatus;
-  dynamic serviceProviderId;
+  // dynamic serviceProviderId;
+  ServiceProvider? serviceProvider;
   bool? platformFeePaid;
   int? platformFee;
   String? razorOrderIdPlatform;
@@ -63,7 +64,7 @@ class Data {
         this.hireStatus,
         this.userStatus,
         this.paymentStatus,
-        this.serviceProviderId,
+        this.serviceProvider,
         this.platformFeePaid,
         this.platformFee,
         this.razorOrderIdPlatform,
@@ -98,7 +99,10 @@ class Data {
     hireStatus = json['hire_status'];
     userStatus = json['user_status'];
     paymentStatus = json['payment_status'];
-    serviceProviderId = json['service_provider_id'];
+    // serviceProviderId = json['service_provider_id'];
+    serviceProvider = json['service_provider_id'] != null
+        ? ServiceProvider.fromJson(json['service_provider_id'])
+        : null;
     platformFeePaid = json['platform_fee_paid'];
     platformFee = json['platform_fee'];
     razorOrderIdPlatform = json['razorOrderIdPlatform'];
@@ -140,7 +144,10 @@ class Data {
     map['hire_status'] = hireStatus;
     map['user_status'] = userStatus;
     map['payment_status'] = paymentStatus;
-    map['service_provider_id'] = serviceProviderId;
+    // map['service_provider_id'] = serviceProviderId;
+    if (serviceProvider != null) {
+      map['service_provider_id'] = serviceProvider!.toJson();
+    }
     map['platform_fee_paid'] = platformFeePaid;
     map['platform_fee'] = platformFee;
     map['razorOrderIdPlatform'] = razorOrderIdPlatform;
@@ -272,6 +279,30 @@ class AcceptedByProvider {
     map['provider'] = provider;
     map['status'] = status;
     map['_id'] = id;
+    return map;
+  }
+}
+class ServiceProvider {
+  String? id;
+  String? phone;
+  String? fullName;
+  String? profilePic;
+
+  ServiceProvider({this.id, this.phone, this.fullName, this.profilePic});
+
+  ServiceProvider.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    phone = json['phone'];
+    fullName = json['full_name'];
+    profilePic = json['profile_pic'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = {};
+    map['_id'] = id;
+    map['phone'] = phone;
+    map['full_name'] = fullName;
+    map['profile_pic'] = profilePic;
     return map;
   }
 }
