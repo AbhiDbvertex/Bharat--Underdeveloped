@@ -22,6 +22,9 @@ class AddressDetailScreen extends StatefulWidget {
   final String? initialTitle;
   final String? initialLandmark;
   final String? editlocationId;
+  final name;
+  final refralCode;
+  final role;
 
   const AddressDetailScreen({
     super.key,
@@ -29,7 +32,7 @@ class AddressDetailScreen extends StatefulWidget {
     this.initialLocation,
     this.initialTitle,
     this.initialLandmark,
-    this.editlocationId,
+    this.editlocationId, this.name, this.refralCode, this.role,
   });
 
   @override
@@ -247,7 +250,26 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
           },
-          body: jsonEncode(payload),
+          // body: jsonEncode(payload),
+          body: {
+            "full_name": widget.name,
+            "role": widget.role,
+
+            "location": {
+              "latitude": 28.6139,
+              "longitude": 77.2090,
+              "address": "New Delhi, India"
+            },
+            "full_address":[{
+              '_id': widget.editlocationId,
+              'title': titleController.text,
+              'address': addressController.text,
+              'landmark': landmarkController.text,
+              'latitude': _initialPosition.latitude,
+              'longitude': _initialPosition.longitude,
+            }],
+            "referral_code": widget.refralCode
+          }
         );
 
         print("Debug: updateLocation response: ${response.body}");
@@ -397,6 +419,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     print(
       "Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}",
     );
+    print("Abhi:- get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -586,7 +609,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                       const SizedBox(height: 15),
                       CustomButton(
                         label: 'Submit',
-                        onPressed: () async {
+                        /*onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             try {
                               final prefs =
@@ -641,10 +664,29 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                                   'Content-Type': 'application/json',
                                   'Authorization': 'Bearer $token',
                                 },
-                                body: jsonEncode(payload),
+                                // body: jsonEncode(payload),
+                                  body: {
+                                    "full_name": widget.name ?? "",
+                                    "role": widget.role ?? "",
+                                    "location": {
+                                      "latitude": 28.6139,
+                                      "longitude": 77.2090,
+                                      "address": "New Delhi, India"
+                                    },
+                                    "full_address": [
+                                      {
+                                        "_id": widget.editlocationId ?? "",
+                                        "title": titleController.text.isNotEmpty ? titleController.text : "",
+                                        "address": addressController.text.isNotEmpty ? addressController.text : "",
+                                        "landmark": landmarkController.text.isNotEmpty ? landmarkController.text : "",
+                                        "latitude": _initialPosition.latitude,
+                                        "longitude": _initialPosition.longitude,
+                                      }
+                                    ],
+                                    "referral_code": widget.refralCode ?? ""
+                                  },
                               );
-
-                              print("🔍 API Response: ${response.body}");
+                                  // print("🔍 API Response: ${response.body}");
 
                               if (!mounted) return;
 
@@ -690,7 +732,109 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                           } else {
                             _showMessage('Please fill all fields correctly.');
                           }
-                        },
+                        },*/
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                final prefs = await SharedPreferences.getInstance();
+                                final token = prefs.getString('token');
+                                final role = prefs.getString('role');
+                                print(
+                                  "🔍 Before API Call - Token: $token, Role: $role, ProfileComplete: ${prefs.getBool('isProfileComplete')}",
+                                );
+
+                                if (token == null || token.isEmpty) {
+                                  if (mounted) {
+                                    _showMessage('Token not found. Please log in.');
+                                    await Future.delayed(const Duration(seconds: 2));
+                                    if (mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                            (route) => false,
+                                      );
+                                    }
+                                  }
+                                  return;
+                                }
+
+                                const String apiUrl =
+                                    'https://api.thebharatworks.com/api/user/updateUserProfile';
+
+                                final Map<String, dynamic> payload = {
+                                  "full_name": widget.name ?? "",
+                                  "role": widget.role ?? "",
+                                  "location": {
+                                    "latitude": _initialPosition.latitude,
+                                    "longitude": _initialPosition.longitude,
+                                    "address": "New Delhi, India"
+                                  },
+                                  "full_address": [
+                                    {
+                                      "_id": widget.editlocationId ?? "",
+                                      "title":
+                                      titleController.text.isNotEmpty ? titleController.text : "",
+                                      "address":
+                                      addressController.text.isNotEmpty ? addressController.text : "",
+                                      "landmark": landmarkController.text.isNotEmpty
+                                          ? landmarkController.text
+                                          : "",
+                                      "latitude": _initialPosition.latitude,
+                                      "longitude": _initialPosition.longitude,
+                                    }
+                                  ],
+                                  "referral_code": widget.refralCode ?? ""
+                                };
+
+                                final response = await http.post(
+                                  Uri.parse(apiUrl),
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer $token',
+                                  },
+                                  body: jsonEncode(payload),
+                                );
+
+                                if (!mounted) return;
+
+                                final responseData = jsonDecode(response.body);
+                                print("🔍 API Response: $responseData");
+
+                                if (response.statusCode == 200 && responseData['status'] == true) {
+                                  await prefs.setBool('isProfileComplete', true);
+                                  if (mounted) {
+                                    _showMessage('Address saved successfully.');
+                                    await Future.delayed(const Duration(seconds: 2));
+                                    if (mounted) {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => (role == 'user' || role == 'service_provider')
+                                              ? const Bottombar()
+                                              : const RoleSelectionScreen(),
+                                        ),
+                                            (route) => false,
+                                      );
+                                    }
+                                  }
+                                } else {
+                                  if (mounted) {
+                                    _showMessage(
+                                      'API error: ${responseData['message'] ?? 'Unknown error'}',
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  _showMessage('Error calling API: $e');
+                                  print("❌ Error: $e");
+                                }
+                              }
+                            } else {
+                              _showMessage('Please fill all fields correctly.');
+                            }
+                          }
+
                       ),
                     ],
                   ),

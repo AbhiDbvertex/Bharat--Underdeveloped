@@ -304,7 +304,6 @@
 //     );
 //   }
 // }
-
 import 'dart:convert';
 
 import 'package:developer/Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
@@ -315,7 +314,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Widgets/AppColors.dart';
 
-// Your BiddingOrder and UserId models (unchanged)
 class UserId {
   final String id;
   final String fullName;
@@ -482,16 +480,16 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
         } else {
           print("❌ 'data' key missing or invalid: ${decoded['data']}");
           setState(() {
-            errorMessage = "Bidding orders data nahi mila!";
+            errorMessage = "Bidding orders data not found";
           });
-          _showSnackBar("Bidding orders data nahi mila!");
+          _showSnackBar("Bidding orders data not found");
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
         setState(() {
-          errorMessage = "Bidding orders fetch nahi hue: ${res.statusCode}";
+          errorMessage = "Failed to fetch bidding orders: ${res.statusCode}";
         });
-        _showSnackBar("Bidding orders fetch nahi hue: ${res.statusCode}");
+        _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
         if (res.statusCode == 401) {
           Navigator.pushReplacementNamed(context, '/login');
         }
@@ -499,9 +497,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
     } catch (e) {
       print("❌ API Exception: $e");
       setState(() {
-        errorMessage = "Kuchh galat ho gaya: $e";
+        errorMessage = "Something went wrong: $e";
       });
-      _showSnackBar("Kuchh galat ho gaya: $e");
+      _showSnackBar("Something went wrong: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -514,11 +512,11 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
       case 'accepted':
         return Colors.green;
       case 'completed':
-        return Colors.green.shade800;
+        return Colors.green;
       case 'review':
         return Colors.brown;
       case 'pending':
-        return Colors.grey;
+        return Colors.orange;
       default:
         return Colors.transparent;
     }
@@ -541,7 +539,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
   }
 
   Widget buildNetworkImage(String? url,
-      {double width = 100, double height = 100}) {
+      {required double width, required double height}) {
     print('Trying to load image: $url');
     return url != null &&
             url.isNotEmpty &&
@@ -583,13 +581,16 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     print('Building WorkerRecentPostedScreen');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
+        toolbarHeight: screenHeight * 0.05,
         automaticallyImplyLeading: false,
       ),
       body: isLoading
@@ -599,49 +600,60 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: 20),
+                      SizedBox(height: screenHeight * 0.05),
                       Row(
                         children: [
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
-                            child: const Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Icon(Icons.arrow_back, size: 25),
+                            child: Padding(
+                              padding:
+                                  EdgeInsets.only(left: screenWidth * 0.02),
+                              child: Icon(Icons.arrow_back,
+                                  size: screenWidth * 0.06),
                             ),
                           ),
-                          const SizedBox(width: 50),
+                          SizedBox(width: screenWidth * 0.13),
                           Text(
                             "Recent Posted Work",
                             style: GoogleFonts.roboto(
-                              fontSize: 18,
+                              fontSize: screenWidth * 0.045,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
-                          SizedBox(width: 50),
-                          Image.asset("assets/images/vec1.png"),
+                          SizedBox(width: screenWidth * 0.13),
+                          Image.asset(
+                            "assets/images/vec1.png",
+                            width: screenWidth * 0.1,
+                            height: screenHeight * 0.05,
+                          ),
                         ],
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: screenHeight * 0.025),
                       Card(
                         child: Container(
-                          height: 50,
+                          height: screenHeight * 0.07,
                           padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 13),
+                              horizontal: screenWidth * 0.025,
+                              vertical: screenHeight * 0.015),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius:
+                                BorderRadius.circular(screenWidth * 0.025),
                             color: Colors.white,
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.search_rounded, color: Colors.grey),
-                              SizedBox(width: 10),
+                              Icon(Icons.search_rounded,
+                                  color: Colors.grey, size: screenWidth * 0.06),
+                              SizedBox(width: screenWidth * 0.025),
                               Expanded(
                                 child: TextField(
                                   controller: _searchController,
                                   decoration: InputDecoration(
                                     hintText: 'Search for services',
-                                    hintStyle: TextStyle(color: Colors.grey),
+                                    hintStyle: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: screenWidth * 0.04),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -650,9 +662,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: screenHeight * 0.025),
                       filteredBiddingOrders.isEmpty
-                          ? Center(child: Text("Koi orders nahi mile"))
+                          ? Center(child: Text("No orders found"))
                           : Column(
                               children: filteredBiddingOrders
                                   .asMap()
@@ -663,33 +675,35 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                 return Card(
                                   color: Colors.white,
                                   margin: EdgeInsets.symmetric(
-                                      vertical: 6.0, horizontal: 8.0),
+                                      vertical: screenHeight * 0.015,
+                                      horizontal: screenWidth * 0.02),
                                   elevation: 4,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(
+                                        screenWidth * 0.025),
                                     side: BorderSide(
                                       color: Colors.green,
-                                      width: 1.0,
+                                      width: screenWidth * 0.0025,
                                     ),
                                   ),
                                   child: Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                    padding: EdgeInsets.all(screenWidth * 0.02),
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                              screenWidth * 0.025),
                                           child: buildNetworkImage(
                                             item.imageUrls.isNotEmpty
                                                 ? item.imageUrls[0]
                                                 : null,
-                                            width: 100,
-                                            height: 100,
+                                            width: screenWidth * 0.25,
+                                            height: screenHeight * 0.15,
                                           ),
                                         ),
-                                        SizedBox(width: 10),
+                                        SizedBox(width: screenWidth * 0.025),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
@@ -698,14 +712,14 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                               Text(
                                                 item.title,
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: screenWidth * 0.045,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               Text(
                                                 "₹${item.cost.toStringAsFixed(0)}",
                                                 style: TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: screenWidth * 0.04,
                                                   color: Colors.green,
                                                 ),
                                               ),
@@ -713,9 +727,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                 children: [
                                                   Expanded(
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 12.0),
+                                                      padding: EdgeInsets.only(
+                                                          top: screenHeight *
+                                                              0.015),
                                                       child: Text(
                                                           item.description),
                                                     ),
@@ -723,8 +737,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                   if (item
                                                       .hireStatus.isNotEmpty)
                                                     SizedBox(
-                                                      width: 80,
-                                                      height: 30,
+                                                      width: screenWidth * 0.2,
+                                                      height:
+                                                          screenHeight * 0.04,
                                                       child: Container(
                                                         decoration:
                                                             BoxDecoration(
@@ -732,7 +747,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                               item.hireStatus),
                                                           borderRadius:
                                                               BorderRadius
-                                                                  .circular(8),
+                                                                  .circular(
+                                                                      screenWidth *
+                                                                          0.02),
                                                         ),
                                                         child: Center(
                                                           child: Text(
@@ -740,7 +757,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                             style: TextStyle(
                                                               color:
                                                                   Colors.white,
-                                                              fontSize: 12,
+                                                              fontSize:
+                                                                  screenWidth *
+                                                                      0.03,
                                                             ),
                                                           ),
                                                         ),
@@ -749,17 +768,19 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                 ],
                                               ),
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment
-                                                    .spaceBetween, // Button ko right side par move karega
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Expanded(
-                                                    // Text ko wrap kiya taaki overflow na ho
                                                     child: Text(
                                                       "Date: ${item.deadline.split('T')[0]}",
                                                       style: TextStyle(
-                                                          fontSize: 14),
-                                                      overflow: TextOverflow
-                                                          .ellipsis, // Agar text lamba ho to cut ho
+                                                          fontSize:
+                                                              screenWidth *
+                                                                  0.035),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ),
                                                   GestureDetector(
@@ -777,20 +798,23 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                       );
                                                     },
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 8.0),
+                                                      padding: EdgeInsets.only(
+                                                          top: screenHeight *
+                                                              0.01),
                                                       child: SizedBox(
-                                                        width: 80,
-                                                        height: 30,
+                                                        width:
+                                                            screenWidth * 0.2,
+                                                        height:
+                                                            screenHeight * 0.04,
                                                         child: Container(
                                                           decoration:
                                                               BoxDecoration(
-                                                            color: Colors.green,
+                                                            color: Colors
+                                                                .green.shade700,
                                                             borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
+                                                                BorderRadius.circular(
+                                                                    screenWidth *
+                                                                        0.02),
                                                           ),
                                                           child: Center(
                                                             child: Text(
@@ -798,7 +822,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                               style: TextStyle(
                                                                 color: Colors
                                                                     .white,
-                                                                fontSize: 12,
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.03,
                                                               ),
                                                             ),
                                                           ),

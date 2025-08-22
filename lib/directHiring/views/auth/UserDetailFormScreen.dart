@@ -747,29 +747,20 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
     }
 
     // final result = await submitUserProfile(context);
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (_) => AddressDetailScreen(
-    //       name: nameController.text,
-    //       refralCode: referralController.text,
-    //       role: widget.role,
-    //       initialAddress: null,
-    //       initialLocation: null,
-    //     ),
-    //   ),
-    // );
-
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => AddressDetailScreen(
-          initialAddress: null, // Pass if available
-          initialLocation: null, // Pass if available
-
+          name: nameController.text,
+          refralCode: referralController.text,
+          role: widget.role,
+          initialAddress: null,
+          initialLocation: null,
         ),
       ),
     );
+
+
     // if (mounted) {
     //   if (result['success']) {
     //

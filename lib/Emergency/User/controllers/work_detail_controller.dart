@@ -33,6 +33,8 @@ class WorkDetailController extends GetxController {
 
   var currentImageIndex = 0.obs;
   var orderId="".obs;
+  var acceptedByProviders = <Map<String, dynamic>>[].obs;
+  var apiMessage = "".obs;
 
   var tag="WorkDetailController";   // dots indicator ke liye
 
@@ -82,10 +84,10 @@ class WorkDetailController extends GetxController {
       Uri.parse(url),
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer $token", // token bhejna h
+        "Authorization": "Bearer $token",
       },
       body: jsonEncode({
-        "order_id": orderId, // order_id bhejna h
+        "order_id": orderId,
       }),
     );
     isLoading.value=false;
@@ -143,6 +145,7 @@ isLoading.value=false;
           "Content-Type": "application/json",
         },
       );
+      bwDebug("[getEmergencyOrder]: response: ${response.body}",tag: tag );
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -165,14 +168,114 @@ isLoading.value=false;
             ? dataModel.data?.hireStatus ?? ""
             : "";
         paymentAmount.value = dataModel.data?.servicePayment?.amount ?? 0;
-        orderId.value = dataModel.data?.id ?? ""; // yaha class wala orderId use hoga
+        orderId.value = dataModel.data?.id ?? "";
+        acceptedByProviders.value =
+            dataModel.data?.acceptedByProviders?.map((e) => {
+              "provider": e.provider,
+              "status": e.status,
+              "id": e.id,
+            }).toList() ??
+                [];
+        apiMessage.value = json["message"] ?? "";
       } else {
         bwDebug("❌ Error: ${response.statusCode} ${response.body}", tag: tag);
       }
     } catch (e) {
       bwDebug("⚠️ Exception: $e", tag: tag);
+    }finally{
+      isLoading.value=false;
+
     }
-    isLoading.value=false;
   }
 
+
+
+  ///////////////////////////////Service Provider/////////////////////////
+  Future<String> acceptUserOrder(String orderId) async {
+
+
+    try {
+      isLoading.value=true;
+      bwDebug("[acceptUserOrder] call orderId:$orderId",tag: tag);
+      var url = "${ApiUrl.acceptUserOrder}/$orderId";
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final message = json['message'] ?? "Success";
+//        final dataModel = WorkDetailModel.fromJson(json);
+        bwDebug("[acceptUserOrder]response:  ${response.statusCode} ${response.body}", tag: tag);
+        return message;
+      } else {
+        bwDebug("[acceptUserOrder]❌ Error: ${response.statusCode} ${response.body}", tag: tag);
+        try {
+          final json = jsonDecode(response.body);
+          return json['message'] ?? "Something went wrong";
+        } catch (_) {
+          return "Something went wrong";
+        }
+      }
+    } catch (e) {
+
+      bwDebug("[acceptUserOrder]⚠️ Exception: $e", tag: tag);
+      return "Exception: $e";
+    }finally{
+      isLoading.value=false;
+
+    }
+  }
+  Future<String> rejectUserOrder(String orderId) async {
+    try {
+      isLoading.value = true;
+      bwDebug("[rejectUserOrder] call orderId:$orderId", tag: tag);
+
+      var url = "${ApiUrl.rejectUserOrder}/$orderId";
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+
+        // get message from response
+        final message = json['message'] ?? "Success";
+
+        bwDebug("[rejectUserOrder] ✅ response: ${response.statusCode} ${response.body}", tag: tag);
+
+        return message; // return message here
+      } else {
+        bwDebug("[rejectUserOrder] ❌ Error: ${response.statusCode} ${response.body}", tag: tag);
+
+        // try to extract message if present
+        try {
+          final json = jsonDecode(response.body);
+          return json['message'] ?? "Something went wrong";
+        } catch (_) {
+          return "Something went wrong";
+        }
+      }
+    } catch (e) {
+      bwDebug("[rejectUserOrder] ⚠️ Exception: $e", tag: tag);
+      return "Exception: $e";
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }
