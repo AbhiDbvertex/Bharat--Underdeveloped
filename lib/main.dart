@@ -1,3 +1,4 @@
+import 'package:developer/Widgets/AppColors.dart';
 import 'package:developer/Widgets/Bottombar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryGreen,
+    ),),
+    debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
       home: SplashScreen(),
     );

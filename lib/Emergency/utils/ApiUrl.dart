@@ -18,6 +18,7 @@ class ApiUrl {
   static String emergencyOrderById = path("emergency-order/getEmergencyOrder"); //GET
   static String requestAcceptById = path("emergency-order/getAcceptedServiceProviders"); //GET
   static String assignEmergencyOrder = path("emergency-order/assignEmergencyOrder"); //POST
+  static String completeOrderUser = path("emergency-order/completeOrderUser"); //POST
 
 
 

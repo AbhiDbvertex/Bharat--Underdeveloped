@@ -41,7 +41,7 @@ class EmergencyOrderData {
   String hireStatus;
   String? userStatus;
   String paymentStatus;
-  String? serviceProviderId;
+  ServiceProvider? serviceProviderId;
   bool platformFeePaid;
   int platformFee;
   String razorOrderIdPlatform;
@@ -97,7 +97,10 @@ class EmergencyOrderData {
       hireStatus: json['hire_status'] ?? '',
       userStatus: json['user_status'],
       paymentStatus: json['payment_status'] ?? '',
-      serviceProviderId: json['service_provider_id'],
+      // serviceProviderId: json['service_provider_id'],
+      serviceProviderId: json['service_provider_id'] != null
+          ? ServiceProvider.fromJson(json['service_provider_id'])
+          : null,
       platformFeePaid: json['platform_fee_paid'] ?? false,
       platformFee: json['platform_fee'] ?? 0,
       razorOrderIdPlatform: json['razorOrderIdPlatform'] ?? '',
@@ -131,7 +134,7 @@ class EmergencyOrderData {
     'hire_status': hireStatus,
     'user_status': userStatus,
     'payment_status': paymentStatus,
-    'service_provider_id': serviceProviderId,
+    'service_provider_id': serviceProviderId?.toJson(),
     'platform_fee_paid': platformFeePaid,
     'platform_fee': platformFee,
     'razorOrderIdPlatform': razorOrderIdPlatform,
@@ -281,5 +284,34 @@ class AcceptedByProvider {
     'provider': provider,
     'status': status,
     '_id': id,
+  };
+}
+class ServiceProvider {
+  String id;
+  String phone;
+  String fullName;
+  String? profilePic;
+
+  ServiceProvider({
+    required this.id,
+    required this.phone,
+    required this.fullName,
+    this.profilePic,
+  });
+
+  factory ServiceProvider.fromJson(Map<String, dynamic> json) {
+    return ServiceProvider(
+      id: json['_id'] ?? '',
+      phone: json['phone'] ?? '',
+      fullName: json['full_name'] ?? '',
+      profilePic: json['profile_pic'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    '_id': id,
+    'phone': phone,
+    'full_name': fullName,
+    'profile_pic': profilePic,
   };
 }

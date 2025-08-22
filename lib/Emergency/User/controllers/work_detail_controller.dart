@@ -30,11 +30,15 @@ class WorkDetailController extends GetxController {
   var deadline = "".obs;
   var hireStatus = "".obs;
   var paymentAmount = 0.obs;
-
+  var plateFormFee=0.obs;
   var currentImageIndex = 0.obs;
   var orderId="".obs;
   var acceptedByProviders = <Map<String, dynamic>>[].obs;
   var apiMessage = "".obs;
+  var providerId = "".obs;
+  var providerName = "".obs;
+  var providerPhone = "".obs;
+  var providerImage = "".obs;
 
   var tag="WorkDetailController";   // dots indicator ke liye
 
@@ -130,7 +134,8 @@ isLoading.value=false;
   //     bwDebug("⚠️ Exception: $e");
   //   }
   // }
-  Future<void> getEmergencyOrder(String id) async {
+  Future<bool> getEmergencyOrder(String id) async {
+    var result=false;
     isLoading.value=true;
     bwDebug("[getEmergencyOrder] call orderId:$id",tag: tag);
     var url = "${ApiUrl.emergencyOrderById}/$id";
@@ -148,8 +153,10 @@ isLoading.value=false;
       bwDebug("[getEmergencyOrder]: response: ${response.body}",tag: tag );
 
       if (response.statusCode == 200) {
+
         final json = jsonDecode(response.body);
         final dataModel = WorkDetailModel.fromJson(json);
+        final serviceProvider=dataModel.data?.serviceProvider;
 
         imageUrls.value = dataModel.data?.imageUrls ?? [];
         projectId.value = dataModel.data?.projectId ?? "";
@@ -160,6 +167,11 @@ isLoading.value=false;
         googleAddress.value = dataModel.data?.googleAddress ?? "";
         detailedAddress.value = dataModel.data?.detailedAddress ?? "";
         contact.value = dataModel.data?.contact ?? "";
+        providerId.value = serviceProvider?.id ?? "";
+        providerName.value = serviceProvider?.fullName ?? "";
+        providerPhone.value = serviceProvider?.phone ?? "";
+        providerImage.value = serviceProvider?.profilePic ?? "";
+
         deadline.value = (dataModel.data?.deadline != null && dataModel.data!.deadline!.isNotEmpty)
             ? DateFormat('dd/MM/yyyy').format(DateTime.parse(dataModel.data!.deadline!))
             : "";
@@ -168,6 +180,7 @@ isLoading.value=false;
             ? dataModel.data?.hireStatus ?? ""
             : "";
         paymentAmount.value = dataModel.data?.servicePayment?.amount ?? 0;
+        plateFormFee.value = dataModel.data?.platformFee ?? 0;
         orderId.value = dataModel.data?.id ?? "";
         acceptedByProviders.value =
             dataModel.data?.acceptedByProviders?.map((e) => {
@@ -177,15 +190,20 @@ isLoading.value=false;
             }).toList() ??
                 [];
         apiMessage.value = json["message"] ?? "";
+        result=true;
       } else {
         bwDebug("❌ Error: ${response.statusCode} ${response.body}", tag: tag);
+        result=false;
       }
     } catch (e) {
+
+      result=false;
       bwDebug("⚠️ Exception: $e", tag: tag);
     }finally{
       isLoading.value=false;
 
     }
+    return result;
   }
 
 

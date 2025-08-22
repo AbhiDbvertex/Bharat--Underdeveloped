@@ -292,7 +292,6 @@ class EmergencyServiceController extends GetxController {
       return EmergencyListModel.fromJson(decoded);
 
     } else {
-      bwDebug("[getEmergencyOrder] Error: ${res.statusCode}", tag: tag);
       isLoading.value=false;
       return null;
     }
