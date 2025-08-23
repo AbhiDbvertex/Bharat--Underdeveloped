@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:developer/Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
@@ -319,7 +318,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         toolbarHeight: screenHeight * 0.05,
         automaticallyImplyLeading: false,
       ),
-
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -333,7 +331,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     fontSize: screenWidth * 0.045,
                     fontWeight: FontWeight.bold,
                   ),
-
                 ),
               ),
             ),
