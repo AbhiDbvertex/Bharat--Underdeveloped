@@ -308,6 +308,7 @@ import 'dart:convert';
 
 import 'package:developer/Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -590,7 +591,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: screenHeight * 0.05,
+        toolbarHeight: screenHeight * 0.02,
         automaticallyImplyLeading: false,
       ),
       body: isLoading
@@ -600,14 +601,14 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: screenHeight * 0.05),
+                      SizedBox(height: screenHeight * 0.02),
                       Row(
                         children: [
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Padding(
                               padding:
-                                  EdgeInsets.only(left: screenWidth * 0.02),
+                                  EdgeInsets.only(left: screenWidth * 0.03),
                               child: Icon(Icons.arrow_back,
                                   size: screenWidth * 0.06),
                             ),
@@ -622,19 +623,20 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                             ),
                           ),
                           SizedBox(width: screenWidth * 0.13),
-                          Image.asset(
-                            "assets/images/vec1.png",
-                            width: screenWidth * 0.1,
-                            height: screenHeight * 0.05,
+                          SvgPicture.asset(
+                            'assets/svg_images/Vector1.svg',
                           ),
                         ],
                       ),
-                      SizedBox(height: screenHeight * 0.025),
+                      SizedBox(height: screenHeight * 0.010),
                       Card(
                         child: Container(
+                          width: screenWidth *
+                              0.95, // 👈 यहां width control करो (80% of screen)
+
                           height: screenHeight * 0.07,
                           padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.025,
+                              horizontal: screenWidth * 0.010,
                               vertical: screenHeight * 0.015),
                           decoration: BoxDecoration(
                             borderRadius:
@@ -662,7 +664,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.025),
+                      SizedBox(height: screenHeight * 0.0),
                       filteredBiddingOrders.isEmpty
                           ? Center(child: Text("No orders found"))
                           : Column(
