@@ -218,9 +218,7 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
 
   void _openCheckout() {
     var options = {
-
       'key': 'rzp_test_R7z5O0bqmRXuiH',
-
       'amount': widget.amount,
       'name': 'The Bharat Works',
       'description': 'Platform Fee',
