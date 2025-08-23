@@ -12,20 +12,22 @@ import '../models/request_accepted_model.dart';
 
 class RequestController extends GetxController {
   final tag ="RequestController";
+  var isFetchingRequests = false.obs;
+  var isHiring = false.obs;
 
-  var isLoading = false.obs;
   var requestAcceptedModel = Rxn<RequestAcceptedModel>();
   var errorMessage = ''.obs;
 
   var assignOrderResponse = AssignOrderResponse(status: false, message: "").obs;
 
-  final workDetailController=Get.put(WorkDetailController());
+  final workDetailController = Get.find<WorkDetailController>();
 
   Future<void>  getRequestAccepted(String id) async {
     bwDebug("[getRequestAccept] call orderId:$id",tag: tag);
 
     try {
-    isLoading.value=true;
+      isFetchingRequests.value = true;
+      //workDetailController.isLoading.value=true;
     var url = "${ApiUrl.requestAcceptById}/$id";
 
     final prefs = await SharedPreferences.getInstance();
@@ -58,7 +60,8 @@ class RequestController extends GetxController {
 
     }
     finally {
-      isLoading.value = false;
+      // workDetailController.isLoading.value = false;
+      isFetchingRequests.value = false;
     }  }
 
       // Future<void> fetchRequests() async {
@@ -113,7 +116,8 @@ class RequestController extends GetxController {
     bwDebug("[assignEmergencyOrder] call orderId:$orderId, serviceProvider:$serviceProviderId", tag: tag);
 
     try {
-      isLoading.value = true;
+      isHiring.value = true;
+      // workDetailController.isLoading.value = true;
       var url = "${ApiUrl.assignEmergencyOrder}/$orderId";
 
       final prefs = await SharedPreferences.getInstance();
@@ -142,24 +146,26 @@ class RequestController extends GetxController {
 
         if (assignOrderResponse.value.status) {
           bwDebug("[assignEmergencyOrder] SUCCESS: ${assignOrderResponse.value.message}", tag: tag);
+         await workDetailController.getEmergencyOrder(orderId);
         } else {
           errorMessage.value = assignOrderResponse.value.message;
         }
 
- await workDetailController.getEmergencyOrder(orderId);
 
       } else {
         bwDebug("Error: ${response.body}");
         errorMessage.value =
         "Error: ${response.statusCode} - ${response.reasonPhrase}";
       }
+
+
     } catch (e) {
       bwDebug("[assignEmergencyOrder] error : $e", tag: tag);
       errorMessage.value = "Exception: $e";
     } finally {
-      isLoading.value = false;
+      // workDetailController.isLoading.value = false;
+      isHiring.value = false;
     }
   }
-
-
 }
+

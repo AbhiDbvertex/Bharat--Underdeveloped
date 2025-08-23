@@ -2,7 +2,7 @@ class WorkDetailModel {
   bool? status;
   String? message;
   Data? data;
-  dynamic assignedWorker;
+  AssignedWorker? assignedWorker;
 
   WorkDetailModel({this.status, this.message, this.data, this.assignedWorker});
 
@@ -10,7 +10,10 @@ class WorkDetailModel {
     status = json['status'];
     message = json['message'];
     data = json['data'] != null ? Data.fromJson(json['data']) : null;
-    assignedWorker = json['assignedWorker'];
+    // assignedWorker = json['assignedWorker'];
+    assignedWorker = json['assignedWorker'] != null
+        ? AssignedWorker.fromJson(json['assignedWorker'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -18,7 +21,34 @@ class WorkDetailModel {
     map['status'] = status;
     map['message'] = message;
     if (data != null) map['data'] = data!.toJson();
-    map['assignedWorker'] = assignedWorker;
+    // map['assignedWorker'] = assignedWorker;
+    if (assignedWorker != null) map['assignedWorker'] = assignedWorker!.toJson();
+
+    return map;
+  }
+}
+
+class AssignedWorker {
+  String? id;
+  String? phone;
+  String? fullName;
+  String? profilePic;
+
+  AssignedWorker({this.id, this.phone, this.fullName, this.profilePic});
+
+  AssignedWorker.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
+    phone = json['phone'];
+    fullName = json['full_name'];
+    profilePic = json['profile_pic'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = {};
+    map['_id'] = id;
+    map['phone'] = phone;
+    map['full_name'] = fullName;
+    map['profile_pic'] = profilePic;
     return map;
   }
 }
@@ -49,6 +79,8 @@ class Data {
   String? updatedAt;
   int? v;
   String? razorPaymentIdPlatform;
+  WarningMessage? warningMessage; // Added WarningMessage
+
 
   Data(
       {this.id,
@@ -73,7 +105,9 @@ class Data {
         this.createdAt,
         this.updatedAt,
         this.v,
-        this.razorPaymentIdPlatform});
+        this.razorPaymentIdPlatform,
+        this.warningMessage});
+
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
@@ -124,6 +158,9 @@ class Data {
     updatedAt = json['updatedAt'];
     v = json['__v'];
     razorPaymentIdPlatform = json['razorPaymentIdPlatform'];
+    warningMessage = json['warningMessage'] != null
+        ? WarningMessage.fromJson(json['warningMessage'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -161,6 +198,8 @@ class Data {
     map['updatedAt'] = updatedAt;
     map['__v'] = v;
     map['razorPaymentIdPlatform'] = razorPaymentIdPlatform;
+    if (warningMessage != null) map['warningMessage'] = warningMessage!.toJson();
+
     return map;
   }
 }
@@ -234,7 +273,7 @@ class ServicePayment {
   int? totalExpected;
   int? remainingAmount;
   int? totalTax;
-  List<dynamic>? paymentHistory;
+  List<PaymentHistory>? paymentHistory;
 
   ServicePayment(
       {this.amount,
@@ -248,7 +287,13 @@ class ServicePayment {
     totalExpected = json['total_expected'];
     remainingAmount = json['remaining_amount'];
     totalTax = json['total_tax'];
-    paymentHistory = json['payment_history'];
+    // paymentHistory = json['payment_history'];
+    if (json['payment_history'] != null) {
+      paymentHistory = <PaymentHistory>[];
+      json['payment_history'].forEach((v) {
+        paymentHistory!.add(PaymentHistory.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -257,8 +302,65 @@ class ServicePayment {
     map['total_expected'] = totalExpected;
     map['remaining_amount'] = remainingAmount;
     map['total_tax'] = totalTax;
-    map['payment_history'] = paymentHistory;
+    // map['payment_history'] = paymentHistory;
+    if (paymentHistory != null) {
+      map['payment_history'] = paymentHistory!.map((v) => v.toJson()).toList();
+    }
     return map;
+  }
+}
+
+class PaymentHistory {
+  int? amount;
+  int? tax;
+  String? paymentId;
+  String? description;
+  String? method;
+  String? status;
+  String? releaseStatus;
+  bool? isCollected;
+  String? id;
+  String? date;
+
+  PaymentHistory({
+    this.amount,
+    this.tax,
+    this.paymentId,
+    this.description,
+    this.method,
+    this.status,
+    this.releaseStatus,
+    this.isCollected,
+    this.id,
+    this.date,
+  });
+
+  PaymentHistory.fromJson(Map<String, dynamic> json) {
+    amount = json['amount'];
+    tax = json['tax'];
+    paymentId = json['payment_id'];
+    description = json['description'];
+    method = json['method'];
+    status = json['status'];
+    releaseStatus = json['release_status'];
+    isCollected = json['is_collected'];
+    id = json['_id'];
+    date = json['date'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['amount'] = amount;
+    data['tax'] = tax;
+    data['payment_id'] = paymentId;
+    data['description'] = description;
+    data['method'] = method;
+    data['status'] = status;
+    data['release_status'] = releaseStatus;
+    data['is_collected'] = isCollected;
+    data['_id'] = id;
+    data['date'] = date;
+    return data;
   }
 }
 class AcceptedByProvider {
@@ -308,3 +410,21 @@ class ServiceProvider {
   }
 }
 
+// WarningMessage class
+class WarningMessage {
+  final String message;
+
+  WarningMessage({required this.message});
+
+  factory WarningMessage.fromJson(Map<String, dynamic> json) {
+    return WarningMessage(
+      message: json['message'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = {};
+    map['message'] = message;
+    return map;
+  }
+}

@@ -518,7 +518,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
             if (controller.isLoading.value) {
               // loading true -> show loader
               return const Center(
-                child: CircularProgressIndicator(color: AppColors.primaryGreen),
+                child: CircularProgressIndicator(),
               );
             } else {
               return SingleChildScrollView(
@@ -791,8 +791,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           /// CANCEL BUTTON
 
                          widget.isUser
-
-                              ? controller.hireStatus == "pending"
+                             ? controller.hireStatus == "pending"
                               ? Center(
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
@@ -803,6 +802,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                 ),
                               ),
                               onPressed: () async {
+                                controller.isLoading.value = true;
                                 var orderId = "${controller.orderId}";
                                 String status = await controller
                                     .cancelEmergencyOrder(orderId);
@@ -810,7 +810,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                   SnackBar(content: Text("$status")),
                                 );
 
-
+                                controller.isLoading.value = false;
                                 // cancel logic
                               },
                               icon: const Icon(
@@ -859,9 +859,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  String status= await  controller.acceptUserOrder("6871f5b5ed31367eed8d2210");
+                                  controller.isLoading.value = true;
+                                  String status= await  controller.acceptUserOrder(controller.orderId.value);
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
-
+                                  controller.isLoading.value = false;
                                   // accept logic
                                 },
                                 child: Text(
@@ -880,8 +881,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                   ),
                                 ),
                                 onPressed: () async {
+                                  controller.isLoading.value = true;
                                String status=   await controller.rejectUserOrder("6871f5b5ed31367eed8d2210");
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
+                                  controller.isLoading.value = false;
                                 },
                                 child: Text(
                                   "Reject",
@@ -903,12 +906,12 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                     controller.hireStatus.value == "assigned" && controller.providerName.isNotEmpty
                         ? TaskView(
                       orderId: controller.orderId.value,
-                      providerId:controller.providerId.value,
-                      providerName: controller.providerName.value,
-                      providerPhone: controller.providerPhone.value,
-                      providerImage: controller.providerImage.value,
-                      platFormFee:controller.plateFormFee.value,
-                      isAssign: false,
+                      // providerId:controller.providerId.value,
+                      // providerName: controller.providerName.value,
+                      // providerPhone: controller.providerPhone.value,
+                      // providerImage: controller.providerImage.value,
+                      // platFormFee:controller.plateFormFee.value,
+                      // isAssign: false,
                     )
                         : const SizedBox(),
 

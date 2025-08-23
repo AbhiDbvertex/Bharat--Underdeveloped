@@ -20,6 +20,8 @@ class ApiUrl {
   static String assignEmergencyOrder = path("emergency-order/assignEmergencyOrder"); //POST
 
   static String completeOrderUser = path("emergency-order/completeOrderUser"); //POST
+  static String addPaymentStage = path("emergency-order/addPaymentStage"); //POST
+  static String requestRelease = path("emergency-order/user/request-release"); //POST
 
 
 

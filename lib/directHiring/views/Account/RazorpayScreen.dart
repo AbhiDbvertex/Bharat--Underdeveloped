@@ -160,7 +160,11 @@
 import 'dart:convert';
 
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
+import 'package:developer/Emergency/User/controllers/work_detail_controller.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -174,14 +178,23 @@ class RazorpayScreen extends StatefulWidget {
   final categreyId;
   final subcategreyId;
   final String? from;
+  final int?enteredAmount;
+  final int? taxAmount;
+  final String? description;
+  final String? orderId;
 
   const RazorpayScreen({
     super.key,
     required this.razorpayOrderId,
     required this.amount,
     this.categreyId,
-    this.subcategreyId, this.providerId,
-    this.from
+    this.subcategreyId,
+    this.providerId,
+    this.from,
+    this.enteredAmount,
+    this.taxAmount,
+    this.description,
+    this.orderId,
   });
 
   @override
@@ -193,6 +206,8 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
 
   @override
   void initState() {
+    bwDebug("\nrazorpayOrderId: ${widget.razorpayOrderId}.\n providerId: ${widget.providerId}, \namount: ${widget.amount}, \n from: ${widget.from},"
+        " \n enteredAmount: ${widget.enteredAmount}, \n taxAmount: ${widget.taxAmount}, \n description: ${widget.description},orderId: ${widget.orderId} ");
     super.initState();
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handleSuccess);
@@ -203,11 +218,13 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
 
   void _openCheckout() {
     var options = {
+
       'key': 'rzp_test_R7z5O0bqmRXuiH',
+
       'amount': widget.amount,
       'name': 'The Bharat Works',
       'description': 'Platform Fee',
-      'order_id': widget.razorpayOrderId,
+      // 'order_id': widget.razorpayOrderId,
       'prefill': {'contact': '9876543210', 'email': 'example@email.com'},
     };
 
@@ -237,7 +254,13 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
       return;
     }
     if(widget.from =="Emergency"){
+
       EmergencyServiceController().paymentProcess(context,token,razorpayOrderId: razorpayOrderId,razorPayPaymentId: razorPayPaymentId,razorpaySignatureId: razorpaySignatureId,);
+    }else if(widget.from =="emergencyWorkDetail"){
+
+      final workDetailController = Get.find<WorkDetailController>();
+      workDetailController.addPaymentStage(razorPayPaymentId: razorPayPaymentId,razorpaySignatureId: razorpaySignatureId,amount: widget.enteredAmount,tax: widget.taxAmount, description: widget. description, orderId:widget.orderId!);
+      Navigator.pop(context);
     }
     else
     {

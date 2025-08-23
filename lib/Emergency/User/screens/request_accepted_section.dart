@@ -5,12 +5,15 @@ import 'package:get/get.dart';
 
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
 import '../controllers/request_accepted_controller.dart';
+import '../controllers/work_detail_controller.dart';
 import '../models/request_accepted_model.dart';
 
 class RequestAcceptedSection extends StatelessWidget {
 
   final orderId;
   final RequestController controller = Get.put(RequestController());
+  // final workController = Get.find<WorkDetailController>();
+  final workController = Get.put(WorkDetailController());
 
   RequestAcceptedSection({super.key, required this.orderId});
 final tag="RequestAcceptedSection";
@@ -39,7 +42,7 @@ final tag="RequestAcceptedSection";
 
         // Dynamic List from Controller
         Obx(() {
-          if (controller.isLoading.value) {
+          if (controller.isFetchingRequests.value) {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(20.0),
@@ -552,20 +555,26 @@ final tag="RequestAcceptedSection";
                                   ),
                                   child: const Text("View Profile"),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    bwDebug(" [HIRE BUTTON]: press",tag: tag);
-                                   await controller.assignEmergencyOrder(orderId:orderId , serviceProviderId: item.providersId);
+                                Obx(
+                                   () {
+                                    return ElevatedButton(
+                                      onPressed:controller.isHiring.value
+                                          ? null
+                                          : () async {
+                                        bwDebug(" [HIRE BUTTON]: press",tag: tag);
+                                       await controller.assignEmergencyOrder(orderId:orderId , serviceProviderId: item.providersId);
 
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryGreen,
-                                    minimumSize: const Size(70, 32),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text("Hire",style: TextStyle(color: Colors.white),),
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primaryGreen,
+                                        minimumSize: const Size(70, 32),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: const Text("Hire",style: TextStyle(color: Colors.white),),
+                                    );
+                                  }
                                 ),
                               ],
                             ),

@@ -1518,6 +1518,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Emergency/utils/logger.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../User/UserNotificationScreen.dart';
 import '../comm/home_location_screens.dart';
@@ -1555,6 +1556,7 @@ class ServiceProviderHomeScreen extends StatefulWidget {
 
 class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
   bool _isSwitched = false;
+  bool _isToggling = false;
   String userLocation = "Select Location";
   ServiceProviderProfileModel? profile;
   bool isLoading = true;
@@ -1837,7 +1839,66 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       }
     }
   }
+  Future<void> _checkEmergencyTask() async {
+    setState(() {
+      _isToggling = true;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final url = Uri.parse("https://api.thebharatworks.com/api/user/emergency");
 
+      final response = await http.post(   // ✅ bas post call karni hai
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      bwDebug("Emergency API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["success"] == true) {
+          setState(() {
+            _isSwitched = data["emergency_task"] ?? false;
+          });
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data["message"] ?? "Updated")),
+            );
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(data["message"] ?? "Failed to update")),
+              );
+            }
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error: ${response.statusCode}")),
+            );
+          }
+
+        }
+      }
+    } catch (e) {
+      bwDebug("Error in Emergency API: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
+        );
+      }
+    }
+    finally {
+      setState(() {
+        _isToggling = false;
+      });
+    }
+  }
   Future<void> _fetchLocation() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedLocation =
@@ -2094,6 +2155,54 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                             overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        SizedBox(
+                          width: 40,
+                          height: 20,
+                          child: Transform.scale(
+                              scale: 0.6,
+                              alignment: Alignment.centerLeft,
+                              child:
+                              // Switch(
+                              //   value: _isSwitched,
+                              //   onChanged: (bool value) {
+                              //     setState(() {
+                              //       _isSwitched = value;
+                              //     });
+                              //     if (value) {
+                              //       myController.enableFeature();   // API call when ON
+                              //     } else {
+                              //       myController.disableFeature();  // API call when OFF
+                              //     }
+                              //   },
+                              //   activeColor: Colors.red,
+                              //   inactiveThumbColor: Colors.white,
+                              //   inactiveTrackColor: Colors.grey.shade300,
+                              //   materialTapTargetSize:
+                              //   MaterialTapTargetSize.shrinkWrap,
+                              // ),
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Switch(
+                                    value: _isSwitched,
+                                    onChanged: _isToggling ? null : (bool value){
+                                      _checkEmergencyTask();
+                                    },
+                                    activeColor: Colors.red,
+                                    inactiveThumbColor: Colors.white,
+                                    inactiveTrackColor: Colors.grey.shade300,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  if (_isToggling)
+                                    const CircularProgressIndicator(
+                                     // strokeWidth: 2.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                    ),
+                                ],
+                              )
                           ),
                         ),
                       ],
