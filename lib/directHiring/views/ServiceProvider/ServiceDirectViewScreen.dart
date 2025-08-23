@@ -398,7 +398,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
         },
         body: json.encode({
           "category_id": categoryId,
-          "subcategory_id": subCategoryId,
+          "subcategory_ids": [subCategoryId],
         }),
       );
 
@@ -695,14 +695,170 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
               style: GoogleFonts.roboto(fontSize: 14),
             ),
             const SizedBox(height: 20),
-            if (!_isOrderAccepted) ...[
+            
+            //        status maintain by Abhishek 
+
+            order!['hire_status'] == 'cancelled'
+                ? Center(
+              child: Container(
+                height: 35,
+                width: 300,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.red),
+                    Text("The order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                  ],
+                ),
+              ),
+            )
+                : SizedBox(),
+            order!['hire_status'] == 'completed'
+                ? Center(
+              child: Container(
+                height: 35,
+                width: 300,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle_outline, color: Colors.green),
+                    Text("  The order has been completed",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+                  ],
+                ),
+              ),
+            )
+                : SizedBox(),
+            order!['hire_status'] == 'rejected'
+                ? Center(
+              child: Container(
+                height: 35,
+                width: 300,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.block, color: Colors.grey),
+                    Text("The order is rejected"),
+                  ],
+                ),
+              ),
+            )
+                : SizedBox(),
+            
+            
+            order?['hire_status']?.toLowerCase() == 'pending' ?
               GestureDetector(
                 onTap:
                 _isProcessing || _isOrderAccepted
                     ? null
                     : () {
                   if (order == null || order!['_id'] == null) {
-                    print("❌ Order ya orderId nahi mila!");
+                    print("❌ Oder not found!");
+                    _showSnackBar(
+                      "Oder Data not found!",
+                    );
+                    return;
+                  }
+                  String orderId = order!['_id'].toString();
+                  print(
+                    "✅ OrderId $orderId ke liye Accept dabaya!",
+                  );
+                  acceptOffer(orderId);
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color:
+                    _isOrderAccepted
+                        ? Colors.grey.shade400
+                        : Colors.green.shade700,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child:
+                    _isProcessing
+                        ? const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    )
+                        : Text(
+                      "Accept",
+                      style: GoogleFonts.roboto(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ) : SizedBox(),
+              if (_isOrderAccepted) ...[
+                const SizedBox(height: 8),
+                Text(
+                  "Oder is allredy accepted!",
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            order?['hire_status']?.toLowerCase() == 'pending' ? SizedBox(height: 10,) : SizedBox(),
+            order?['hire_status']?.toLowerCase() == 'pending' ?
+                Container(
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEE2121),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: TextButton(
+                    onPressed: () async {
+                      await _clearHiredProviders();
+                    },
+                    child: Text(
+                      "Reject",
+                      style: GoogleFonts.roboto(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ) : SizedBox(),
+
+
+            /*if (!_isOrderAccepted) ...[
+              GestureDetector(
+                onTap:
+                _isProcessing || _isOrderAccepted
+                    ? null
+                    : () {
+                  if (order == null || order!['_id'] == null) {
+                    print("❌ Oder not found!");
                     _showSnackBar(
                       "Oder Data not found!",
                     );
@@ -764,7 +920,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
               ],
               if (order != null &&
                   order!['hire_status']?.toString().toLowerCase() !=
-                      'accepted') ...[
+                      'pending') ...[
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -796,7 +952,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                   ),
                 ),
               ],
-            ],
+            ],*/
             if (_isOrderAccepted) ...[
               Container(
                 height: 120,

@@ -678,13 +678,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../Bidding/Models/bidding_order.dart';
+import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../models/userModel/UserViewWorkerDetailsModel.dart';
+import '../comm/home_location_screens.dart';
 import '../comm/view_images_screen.dart';
 import 'HireScreen.dart';
 
@@ -709,6 +713,385 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
   File? _pickedImage;
   ServiceProviderDetailModel? workerData;
   bool isLoading = true;
+  //        this code is add by abhishek for location according
+
+  bool _isSwitched = false;
+  String userLocation = "Select Location";
+  ServiceProviderProfileModel? profile;
+  List<BiddingOrder> biddingOrders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeLocation();
+    fetchWorkerDetails();
+  }
+
+  Future<void> _initializeLocation() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    String? savedLocation =
+        prefs.getString("selected_location") ?? prefs.getString("address");
+
+    if (savedLocation != null && savedLocation != "Select Location") {
+      setState(() {
+        userLocation = savedLocation;
+        isLoading = false;
+      });
+      print("📍 Loaded saved location: $savedLocation");
+      return;
+    }
+
+    await fetchProfile();
+  }
+
+  Future<void> fetchProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      if (token.isEmpty) {
+        if (mounted) {
+          Fluttertoast.showToast(msg: "No token found, please log in again!");
+        }
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final url = Uri.parse(
+        "https://api.thebharatworks.com/api/user/getUserProfileData",
+      );
+      final response = await http.get(
+        url,
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          String apiLocation = 'Select Location';
+          String? addressId;
+
+          if (data['data']?['full_address'] != null &&
+              data['data']['full_address'].isNotEmpty) {
+            final addresses = data['data']['full_address'] as List;
+            final currentLocations = addresses
+                .where((addr) => addr['title'] == 'Current Location')
+                .toList();
+            if (currentLocations.isNotEmpty) {
+              final latestLocation = currentLocations.last;
+              apiLocation = latestLocation['address'] ?? 'Select Location';
+              addressId = latestLocation['_id'];
+            } else {
+              final latestAddress = addresses.last;
+              apiLocation = latestAddress['address'] ?? 'Select Location';
+              addressId = latestAddress['_id'];
+            }
+          }
+
+          await prefs.setString("address", apiLocation);
+          if (addressId != null) {
+            await prefs.setString("selected_address_id", addressId);
+          }
+
+          setState(() {
+            profile = ServiceProviderProfileModel.fromJson(data['data']);
+            userLocation = apiLocation;
+            isLoading = false;
+          });
+        } else {
+          if (mounted) {
+            Fluttertoast.showToast(
+              msg: data["message"] ?? "Profile fetch failed",
+            );
+          }
+          setState(() {
+            isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          Fluttertoast.showToast(msg: "Server error, profile fetch failed!");
+        }
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("❌ Error fetching profile: $e");
+      if (mounted) {
+        Fluttertoast.showToast(msg: "Something went wrong, try again!");
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> updateLocationOnServer(
+      String newAddress,
+      double latitude,
+      double longitude,
+      ) async {
+    if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
+      if (mounted) {
+        Fluttertoast.showToast(msg: "Invalid location data!");
+      }
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final url = Uri.parse(
+        "https://api.thebharatworks.com/api/user/updateUserProfile",
+      );
+      final response = await http.post(
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'full_address': [
+            {
+              'address': newAddress,
+              'latitude': latitude,
+              'longitude': longitude,
+              'title': 'Current Location',
+              'landmark': '',
+            },
+          ],
+          'location': {
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': newAddress,
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          String? newAddressId = data['data']?['full_address']?.last?['_id'];
+          await prefs.setString("selected_location", newAddress);
+          await prefs.setString("address", newAddress);
+          await prefs.setDouble("user_latitude", latitude);
+          await prefs.setDouble("user_longitude", longitude);
+          if (newAddressId != null) {
+            await prefs.setString("selected_address_id", newAddressId);
+          }
+          setState(() {
+            userLocation = newAddress;
+            isLoading = false;
+          });
+        } else {
+          if (mounted) {
+            Fluttertoast.showToast(
+              msg: data["message"] ?? "Failed to update location",
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          Fluttertoast.showToast(
+            msg: "Server error, failed to update location!",
+          );
+        }
+      }
+    } catch (e) {
+      print("❌ Error updating location: $e");
+      if (mounted) {
+        Fluttertoast.showToast(msg: "Error updating location!");
+      }
+    }
+  }
+
+  void _navigateToLocationScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocationSelectionScreen(
+          onLocationSelected: (Map<String, dynamic> locationData) {
+            setState(() {
+              userLocation = locationData['address'] ?? 'Select Location';
+            });
+          },
+        ),
+      ),
+    );
+    if (result != null && result is Map<String, dynamic>) {
+      String newAddress = result['address'] ?? 'Select Location';
+      double latitude = result['latitude'] ?? 0.0;
+      double longitude = result['longitude'] ?? 0.0;
+      String? addressId = result['addressId'];
+      if (newAddress != 'Select Location' &&
+          latitude != 0.0 &&
+          longitude != 0.0) {
+        await updateLocationOnServer(newAddress, latitude, longitude);
+        if (addressId != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('selected_address_id', addressId);
+        }
+        await _fetchLocation();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Invalid location data, please try again!"),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _fetchLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedLocation =
+        prefs.getString('selected_location') ?? prefs.getString('address');
+    String? savedAddressId = prefs.getString('selected_address_id');
+
+    if (savedLocation != null &&
+        savedLocation != 'Select Location' &&
+        savedAddressId != null) {
+      setState(() {
+        userLocation = savedLocation;
+        isLoading = false;
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final token = prefs.getString('token');
+    if (token == null || token.isEmpty) {
+      setState(() {
+        userLocation = savedLocation ?? 'Select Location';
+        isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Authentication failed, please log in again!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      final url = Uri.parse(
+        'https://api.thebharatworks.com/api/user/getUserProfileData',
+      );
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == true) {
+          final data = responseData['data'];
+          String apiLocation = 'Select Location';
+          String? addressId;
+
+          if (savedAddressId != null && data['full_address'] != null) {
+            final matchingAddress = data['full_address'].firstWhere(
+                  (address) => address['_id'] == savedAddressId,
+              orElse: () => null,
+            );
+            if (matchingAddress != null) {
+              apiLocation = matchingAddress['address'] ?? 'Select Location';
+              addressId = matchingAddress['_id'];
+            }
+          }
+
+          if (apiLocation == 'Select Location' &&
+              data['full_address'] != null &&
+              data['full_address'].isNotEmpty) {
+            final currentLocations = data['full_address']
+                .where((address) => address['title'] == 'Current Location')
+                .toList();
+            if (currentLocations.isNotEmpty) {
+              final latestCurrentLocation = currentLocations.last;
+              apiLocation =
+                  latestCurrentLocation['address'] ?? 'Select Location';
+              addressId = latestCurrentLocation['_id'];
+            } else {
+              final latestAddress = data['full_address'].last;
+              apiLocation = latestAddress['address'] ?? 'Select Location';
+              addressId = latestAddress['_id'];
+            }
+          }
+
+          await prefs.setString('selected_location', apiLocation);
+          await prefs.setString('address', apiLocation);
+          if (addressId != null) {
+            await prefs.setString('selected_address_id', addressId);
+          }
+
+          setState(() {
+            userLocation = apiLocation;
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            userLocation = savedLocation ?? 'Select Location';
+            isLoading = false;
+          });
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  responseData['message'] ?? 'Failed to fetch profile',
+                ),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        }
+      } else {
+        setState(() {
+          userLocation = savedLocation ?? 'Select Location';
+          isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to fetch profile data!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        userLocation = savedLocation ?? 'Select Location';
+        isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching location: $e'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
 
   // Helper to fix image path
   String getFullImageUrl(String path) {
@@ -727,12 +1110,13 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
       });
     }
   }
+  ///////////////////////////////////////////////////////////////////////////////
 
-  @override
-  void initState() {
-    super.initState();
-    fetchWorkerDetails();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  // }
 
   Future<void> fetchWorkerDetails() async {
     try {
@@ -976,7 +1360,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      workerData?.currentLocation ?? 'Location not available',
+                      userLocation ?? 'Location not available',
                       style: GoogleFonts.roboto(
                         fontSize: 13,
                         color: Colors.black,

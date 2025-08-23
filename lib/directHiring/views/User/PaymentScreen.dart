@@ -628,7 +628,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             // Razorpay ke liye logic
                             int razorpayAmount = (int.parse(_amount) * 1.18 * 100).toInt(); // 18% GST add karke paise me convert
                             var options = {
-                              'key': 'rzp_test_yds44ayQjStCiB',
+                              'key': 'rzp_test_R7z5O0bqmRXuiH',
                               'amount': razorpayAmount,
                               'name': 'The Bharat Work',
                               'description': 'Payment for order ${widget.orderId}',

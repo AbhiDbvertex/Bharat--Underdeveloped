@@ -16,6 +16,7 @@ class PostTaskScreen extends StatelessWidget {
     final controller = Get.put(PostTaskController(), permanent: false); // Mark controller as non-permanent
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+    print("");
 
     return WillPopScope(
       onWillPop: () async {

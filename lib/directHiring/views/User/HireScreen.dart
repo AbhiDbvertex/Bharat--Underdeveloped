@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -9,10 +10,12 @@ import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart'; // ✅ Location ke liye
 import 'package:geocoding/geocoding.dart'; // ✅ Address string ke liye
+import '../../../Bidding/controller/buding_postTask_controller.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../Account/RazorpayScreen.dart';
+import 'package:get/get.dart';
 class HireScreen extends StatefulWidget {
   final String firstProviderId;
   final String? categreyId; // Typo fix: categreyId -> categoryId
@@ -37,7 +40,7 @@ class _HireScreenState extends State<HireScreen> {
   TimeOfDay? selectedTime; // ✅ Time picker ke liye
   List<XFile> selectedImages = [];
   int? platformFee;
-
+  final controller = Get.put(PostTaskController(), permanent: false);
   @override
   void initState() {
     super.initState();
@@ -266,16 +269,13 @@ class _HireScreenState extends State<HireScreen> {
   // ✅ Form submit karne ka function
   Future<void> submitForm() async {
 
-
-
-
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
     final address = addressController.text.trim();
 
     if (title.isEmpty ||
         description.isEmpty ||
-        address.isEmpty ||
+        // address.isEmpty ||
         selectedDate == null ||
         selectedTime == null || // ✅ Time bhi check karo
         selectedImages.isEmpty) {
@@ -311,10 +311,12 @@ class _HireScreenState extends State<HireScreen> {
     final deadline =
         "${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')} ${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}:00";
 
+    print("Abhi:- get address by controller value : ${controller.addressController.text}");
+
     request.fields['first_provider_id'] = widget.firstProviderId;
     request.fields['title'] = title;
     request.fields['description'] = description;
-    request.fields['address'] = address;
+    request.fields['address'] = controller.addressController.text;
     request.fields['deadline'] = deadline; // ✅ Deadline mein time bhi add kiya
 
     print("📤 Fields being sent:");
@@ -389,6 +391,8 @@ class _HireScreenState extends State<HireScreen> {
   @override
   Widget build(BuildContext context) {
     // print("Abhi:-fast provider id :- ${widget.firstProviderId}");
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
@@ -433,9 +437,44 @@ class _HireScreenState extends State<HireScreen> {
               const SizedBox(height: 6),
               buildDescriptionField(),
               const SizedBox(height: 14),
-              buildLabel("Address"),
+              // buildLabel("Address"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Location"),
+                  InkWell(
+                    onTap: controller.navigateToLocationScreen,
+                    child: Container(
+                      width: width * 0.35,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Change location",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 6),
-              buildAddressField(),
+              // buildAddressField(),
+              TextFormField(
+                enabled: false,
+                controller: controller.addressController,
+                decoration: _inputDecoration(controller.userLocation.value).copyWith(
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.my_location),
+                    onPressed: controller.getCurrentLocation,
+                  ),
+                ),
+                validator: (val) => val == null || val.isEmpty || val == 'Select Location'
+                    ? "Please enter a valid address"
+                    : null,
+              ),
               const SizedBox(height: 14),
               buildLabel("Add deadline and time"),
               const SizedBox(height: 6),
@@ -537,8 +576,9 @@ class _HireScreenState extends State<HireScreen> {
 
   // ✅ Address field with location icon tap
   Widget buildAddressField() {
+
     return TextField(
-      controller: addressController,
+      controller:  addressController,
       decoration: InputDecoration(
         hintText: "Enter Full Address",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -599,9 +639,14 @@ class _HireScreenState extends State<HireScreen> {
           ? GestureDetector(
         onTap: pickImages,
         child: const Center(
-          child: Text(
-            "Upload Images",
-            style: TextStyle(color: Colors.green),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Upload Images ",
+                style: TextStyle(color: Colors.green),
+              ),Icon(Icons.add,color: Colors.green,)
+            ],
           ),
         ),
       )
@@ -662,4 +707,13 @@ class _HireScreenState extends State<HireScreen> {
       ),
     );
   }
+  InputDecoration _inputDecoration(String hint, {IconData? icon}) => InputDecoration(
+    hintText: hint,
+    prefixIcon: icon != null ? Icon(icon) : null,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+    contentPadding: const EdgeInsets.symmetric(
+      vertical: 14,
+      horizontal: 12,
+    ),
+  );
 }
