@@ -414,7 +414,7 @@ class BottombarState extends State<Bottombar> {
     ];
 
     _serviceProviderScreens = [
-      const ServiceProviderHomeScreen(),
+       ServiceProviderHomeScreen(),
       const PlaceholderScreen(label: 'My Hire'),
       WorkerMyHireScreen(
         categreyId: 'default_category_id',

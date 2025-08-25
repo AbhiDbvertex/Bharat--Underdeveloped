@@ -1511,13 +1511,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:developer/Bidding/ServiceProvider/WorkerRecentPostedScreen.dart';
+import 'package:developer/Emergency/Service_Provider/Screens/sp_emergency_work_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
+import '../../../Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import '../../../Emergency/utils/logger.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../User/UserNotificationScreen.dart';
@@ -1561,14 +1566,24 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
   ServiceProviderProfileModel? profile;
   bool isLoading = true;
   List<BiddingOrder> biddingOrders = [];
+  final controller = Get.put(SpEmergencyServiceController());
 
   @override
   void initState() {
     super.initState();
+    _loadEmergencyTask();
     _initializeLocation();
     _fetchBiddingOrders();
-  }
+    controller.getEmergencySpOrderList();
 
+  }
+  Future<void> _loadEmergencyTask() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool saved = prefs.getBool("emergency_task") ?? false;
+    setState(() {
+      _isSwitched = saved;
+    });
+  }
   Future<void> _initializeLocation() async {
     setState(() {
       isLoading = true;
@@ -1864,7 +1879,8 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           setState(() {
             _isSwitched = data["emergency_task"] ?? false;
           });
-
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool("emergency_task", _isSwitched);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(data["message"] ?? "Updated")),
@@ -2258,7 +2274,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                 () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EmergencyPostedScreen(),
+                    builder: (context) => SpEmergencyWorkPage(),
                   ),
                 ),
               ),
@@ -2270,31 +2286,38 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                 padding: EdgeInsets.symmetric(
                   horizontal: width * 0.04,
                   vertical: height * 0.015,
+
                 ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: const [
-                      EmergencyCard(
-                        name: "Furniture",
-                        role: "Make Chair...",
-                        imagePath: 'assets/images/Fur.png',
-                      ),
-                      SizedBox(width: 12),
-                      EmergencyCard(
-                        name: "Furniture",
-                        role: "Make Chair...",
-                        imagePath: 'assets/images/Fur2.png',
-                      ),
-                      SizedBox(width: 12),
-                      EmergencyCard(
-                        name: "Furniture",
-                        role: "Make Chair...",
-                        imagePath: 'assets/images/Fur.png',
-                      ),
-                    ],
-                  ),
-                ),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (controller.orders.isEmpty) {
+                    return const Center(child: Text("No data found"));
+                  }
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: controller.orders.map((order) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: EmergencyCard(
+                                name: order.categoryId.name, // category ka name
+                                role: order.subCategoryIds.isNotEmpty
+                                    ? order.subCategoryIds.first.name
+                                    : "No SubCategory",
+                                imagePath: order.imageUrls.isNotEmpty
+                                    ? order.imageUrls.first
+                                    : 'assets/images/Fur.png',
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                  ;
+                })
+
+
               ),
               SizedBox(height: height * 0.025),
               sectionHeader("FEATURE WORKER", false, () {}),
@@ -2509,11 +2532,17 @@ class EmergencyCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
+            Image.network(
               imagePath,
               width: screenWidth * 0.3,
               height: screenHeight * 0.12,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                'assets/images/Fur.png',
+                width: screenWidth * 0.3,
+                height: screenHeight * 0.12,
+                fit: BoxFit.cover,
+              ),
             ),
             SizedBox(height: screenHeight * 0.005),
             Text(
@@ -2537,20 +2566,6 @@ class EmergencyCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class EmergencyPostedScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Emergency Posted Work"),
-      ),
-      body: Center(
-        child: Text("Emergency Work Screen Under Construction"),
       ),
     );
   }

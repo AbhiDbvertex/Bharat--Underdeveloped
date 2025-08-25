@@ -36,6 +36,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -133,7 +134,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Contact"),
-                    customTextField(hint: "0123456789", keyboardType: TextInputType.phone,controller: controller.contactController,maxLength: 10),
+                    customTextField(hint: "+ 91", keyboardType: TextInputType.phone,controller: controller.contactController,maxLength: 10),
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Task Completed by(Date & Time)"),
@@ -147,7 +148,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                     customImagePicker(
                       images: controller.images,
                       onPick: () async {
-                        controller.pickImages();
+                        // controller.pickImages();
+                        _showImageSourceSheet(context);
+
                         bwDebug("select image: call ");
                         // file picker logic
                       },
@@ -178,7 +181,6 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
               SizedBox(height: 20),
 
-              // Pay Button
               Padding(
                 padding: const EdgeInsets.all(25),
                 child: Obx(() => customButton(
@@ -226,7 +228,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       maxLength: maxLength,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: fieldHintStyle, // <-- yahi add kiya
+        hintStyle: fieldHintStyle,
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
@@ -316,7 +318,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
           trailing: Icon(Icons.calendar_month, color: AppColors.primaryGreen),
           onTap: () async {
-            // pehle date pick
+
             DateTime? pickedDate = await showDatePicker(
               context: context,
               initialDate: DateTime.now(),
@@ -325,7 +327,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             );
 
             if (pickedDate != null) {
-              // ab time pick
+
               TimeOfDay? pickedTime = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.now(),
@@ -583,6 +585,43 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       );
     });
   }
+
+  void _showImageSourceSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+                title: Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.pickImageFromCamera(context);
+                },
+              ),
+              Divider(),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: AppColors.primaryGreen),
+                title: Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.pickImagesFromGallery(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
 
 }

@@ -1,20 +1,20 @@
-class EmergencyListModel {
+class  SpEmergencyListModel {
   bool status;
   String message;
-  List<EmergencyOrderData> data;
+  List<SpEmergencyOrderData> data;
 
-  EmergencyListModel({
+  SpEmergencyListModel({
     required this.status,
     required this.message,
     required this.data,
   });
 
-  factory EmergencyListModel.fromJson(Map<String, dynamic> json) {
-    return EmergencyListModel(
+  factory SpEmergencyListModel.fromJson(Map<String, dynamic> json) {
+    return SpEmergencyListModel(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
       data: json['data'] != null
-          ? List<EmergencyOrderData>.from(json['data'].map((x) => EmergencyOrderData.fromJson(x)))
+          ? List<SpEmergencyOrderData>.from(json['data'].map((x) => SpEmergencyOrderData.fromJson(x)))
           : [],
     );
   }
@@ -26,13 +26,13 @@ class EmergencyListModel {
   };
 }
 
-class EmergencyOrderData {
-  ServicePayment servicePayment;
+class SpEmergencyOrderData {
+  SpServicePayment servicePayment;
   String id;
-  UserModel userId;
+  SpUserModel userId;
   String projectId;
-  Category categoryId;
-  List<SubCategory> subCategoryIds;
+  SpCategory categoryId;
+  List<SpSubCategory> subCategoryIds;
   String googleAddress;
   String detailedAddress;
   String contact;
@@ -41,19 +41,19 @@ class EmergencyOrderData {
   String hireStatus;
   String? userStatus;
   String paymentStatus;
-  ServiceProvider? serviceProviderId;
+  SpServiceProvider? serviceProviderId;
   bool platformFeePaid;
   int platformFee;
   String razorOrderIdPlatform;
   // List<dynamic> acceptedByProviders;
-  List<AcceptedByProvider> acceptedByProviders;
+  List<SpAcceptedByProvider> acceptedByProviders;
 
   DateTime createdAt;
   DateTime updatedAt;
   int v;
   String? razorPaymentIdPlatform;
 
-  EmergencyOrderData({
+  SpEmergencyOrderData({
     required this.servicePayment,
     required this.id,
     required this.userId,
@@ -79,12 +79,12 @@ class EmergencyOrderData {
     this.razorPaymentIdPlatform,
   });
 
-  factory EmergencyOrderData.fromJson(Map<String, dynamic> json) {
+  factory SpEmergencyOrderData.fromJson(Map<String, dynamic> json) {
     dynamic userJson = json['user_id'];
-    UserModel parsedUser;
+    SpUserModel parsedUser;
 
     if (userJson is String) {
-      parsedUser = UserModel(
+      parsedUser = SpUserModel(
         id: userJson,
         phone: "",
         fullName: "",
@@ -93,9 +93,9 @@ class EmergencyOrderData {
         rating: 0,
       );
     } else if (userJson is Map<String, dynamic>) {
-      parsedUser = UserModel.fromJson(userJson);
+      parsedUser = SpUserModel.fromJson(userJson);
     } else {
-      parsedUser = UserModel(
+      parsedUser = SpUserModel(
         id: "",
         phone: "",
         fullName: "",
@@ -106,15 +106,15 @@ class EmergencyOrderData {
     }
 
 
-    return EmergencyOrderData(
-      servicePayment: ServicePayment.fromJson(json['service_payment'] ?? {}),
+    return SpEmergencyOrderData(
+      servicePayment: SpServicePayment.fromJson(json['service_payment'] ?? {}),
       id: json['_id'] ?? '',
       // userId: UserModel.fromJson(json['user_id'] ?? {}),
       userId: parsedUser,
       projectId: json['project_id'] ?? '',
-      categoryId: Category.fromJson(json['category_id'] ?? {}),
+      categoryId: SpCategory.fromJson(json['category_id'] ?? {}),
       subCategoryIds: json['sub_category_ids'] != null
-          ? List<SubCategory>.from(json['sub_category_ids'].map((x) => SubCategory.fromJson(x)))
+          ? List<SpSubCategory>.from(json['sub_category_ids'].map((x) => SpSubCategory.fromJson(x)))
           : [],
       googleAddress: json['google_address'] ?? '',
       detailedAddress: json['detailed_address'] ?? '',
@@ -127,7 +127,7 @@ class EmergencyOrderData {
 
       // serviceProviderId: json['service_provider_id'],
       serviceProviderId: json['service_provider_id'] != null
-          ? ServiceProvider.fromJson(json['service_provider_id'])
+          ? SpServiceProvider.fromJson(json['service_provider_id'])
           : null,
 
       platformFeePaid: json['platform_fee_paid'] ?? false,
@@ -138,7 +138,7 @@ class EmergencyOrderData {
       //     : [],
       // acceptedByProviders: List<dynamic>.from(json['accepted_by_providers']),
       acceptedByProviders: (json['accepted_by_providers'] as List<dynamic>?)
-          ?.map((e) => AcceptedByProvider.fromJson(e))
+          ?.map((e) => SpAcceptedByProvider.fromJson(e))
           .toList() ??
           [],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
@@ -178,7 +178,7 @@ class EmergencyOrderData {
   };
 }
 
-class UserModel {
+class SpUserModel {
   String id;
   String phone;
   String fullName;
@@ -186,7 +186,7 @@ class UserModel {
   int totalReview;
   int rating;
 
-  UserModel({
+  SpUserModel({
     required this.id,
     required this.phone,
     required this.fullName,
@@ -195,8 +195,8 @@ class UserModel {
     required this.rating,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
+  factory SpUserModel.fromJson(Map<String, dynamic> json) {
+    return SpUserModel(
       id: json['_id'] ?? json['id'] ?? '', // Fallback for id
       phone: json['phone'] ?? '',
       fullName: json['full_name'] ?? '',
@@ -216,14 +216,14 @@ class UserModel {
   };
 }
 
-class ServicePayment {
+class SpServicePayment {
   int amount;
   int totalExpected;
   int remainingAmount;
   int totalTax;
   List<dynamic> paymentHistory;
 
-  ServicePayment({
+  SpServicePayment({
     required this.amount,
     required this.totalExpected,
     required this.remainingAmount,
@@ -231,8 +231,8 @@ class ServicePayment {
     required this.paymentHistory,
   });
 
-  factory ServicePayment.fromJson(Map<String, dynamic> json) {
-    return ServicePayment(
+  factory SpServicePayment.fromJson(Map<String, dynamic> json) {
+    return SpServicePayment(
       amount: json['amount'] ?? 0,
       totalExpected: json['total_expected'] ?? 0,
       remainingAmount: json['remaining_amount'] ?? 0,
@@ -252,14 +252,14 @@ class ServicePayment {
   };
 }
 
-class Category {
+class SpCategory {
   String id;
   String name;
 
-  Category({required this.id, required this.name});
+  SpCategory({required this.id, required this.name});
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
+  factory SpCategory.fromJson(Map<String, dynamic> json) {
+    return SpCategory(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
     );
@@ -271,14 +271,14 @@ class Category {
   };
 }
 
-class SubCategory {
+class SpSubCategory {
   String id;
   String name;
 
-  SubCategory({required this.id, required this.name});
+  SpSubCategory({required this.id, required this.name});
 
-  factory SubCategory.fromJson(Map<String, dynamic> json) {
-    return SubCategory(
+  factory SpSubCategory.fromJson(Map<String, dynamic> json) {
+    return SpSubCategory(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
     );
@@ -290,19 +290,19 @@ class SubCategory {
   };
 }
 
-class AcceptedByProvider {
+class SpAcceptedByProvider {
   String provider;
   String status;
   String id;
 
-  AcceptedByProvider({
+  SpAcceptedByProvider({
     required this.provider,
     required this.status,
     required this.id,
   });
 
-  factory AcceptedByProvider.fromJson(Map<String, dynamic> json) {
-    return AcceptedByProvider(
+  factory SpAcceptedByProvider.fromJson(Map<String, dynamic> json) {
+    return SpAcceptedByProvider(
       provider: json['provider'] ?? '',
       status: json['status'] ?? '',
       id: json['_id'] ?? '',
@@ -315,21 +315,21 @@ class AcceptedByProvider {
     '_id': id,
   };
 }
-class ServiceProvider {
+class SpServiceProvider {
   String id;
   String phone;
   String fullName;
   String? profilePic;
 
-  ServiceProvider({
+  SpServiceProvider({
     required this.id,
     required this.phone,
     required this.fullName,
     this.profilePic,
   });
 
-  factory ServiceProvider.fromJson(Map<String, dynamic> json) {
-    return ServiceProvider(
+  factory SpServiceProvider.fromJson(Map<String, dynamic> json) {
+    return SpServiceProvider(
       id: json['_id'] ?? '',
       phone: json['phone'] ?? '',
       fullName: json['full_name'] ?? '',

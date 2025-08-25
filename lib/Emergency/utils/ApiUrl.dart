@@ -15,6 +15,9 @@ class ApiUrl {
 
   static String path(String endpoint) => "$base/$endpoint";
 
+  static String getAllOrder = path("emergency-order/getAllEmergencyOrdersByRole"); //POST
+  static String createOrder = path("emergency-order/create"); //POST
+  static String workCategory = path("work-category"); //GET
   static String emergencyOrderById = path("emergency-order/getEmergencyOrder"); //GET
   static String requestAcceptById = path("emergency-order/getAcceptedServiceProviders"); //GET
   static String assignEmergencyOrder = path("emergency-order/assignEmergencyOrder"); //POST
@@ -30,5 +33,8 @@ class ApiUrl {
 //////////////////////Service Provider///////////////////////////
   static String acceptUserOrder = path("emergency-order/accept-order"); //POST
   static String rejectUserOrder = path("emergency-order/reject-order"); //POST
+  static String getAllSPOrderList = path("emergency-order/filtered-emergency-orders"); //GET
+  static String getAllSpOrders = path("emergency-order/getAllEmergencyOrdersByRole"); //GET
+  static String getSpEmergencyOrderById = path("emergency-order/getEmergencyOrder"); //GET
 
 }
