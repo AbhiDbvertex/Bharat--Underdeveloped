@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:developer/Bidding/view/user/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart'; // For formatting dates
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../directHiring/views/User/PaymentScreen.dart';
 import '../../controller/bidding_postTask_controller.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
@@ -1104,6 +1106,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                     ],
                   ),
                   SizedBox(height: height * 0.05),
+                  BiddingPaymentScreen(orderId: widget.buddingOderId ?? "",),
                 ],
               ),
             ),

@@ -8,26 +8,30 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../../Consent/ApiEndpoint.dart';
-import '../../Consent/app_constants.dart';
-import '../ServiceProvider/ServiceDisputeScreen.dart';
+import '../../../directHiring/Consent/ApiEndpoint.dart';
+import '../../../directHiring/Consent/app_constants.dart';
+import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
 
-class PaymentScreen extends StatefulWidget {
+// import '../../Consent/ApiEndpoint.dart';
+// import '../../Consent/app_constants.dart';
+// import '../ServiceProvider/ServiceDisputeScreen.dart';
+
+class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
   final orderProviderId;
   final List<dynamic>? paymentHistory;
 
-  const PaymentScreen({
+  const BiddingPaymentScreen({
     super.key,
     required this.orderId,
     this.paymentHistory, this.orderProviderId,
   });
 
   @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
+  State<BiddingPaymentScreen> createState() => _BiddingPaymentScreenState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
+class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   bool _showForm = false;
   String _description = '';
   String _amount = '';
@@ -161,8 +165,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String? _currentPaymentMethod;
 
   Future<void> postPaymentRequest (payId) async{
-    final String url = 'https://api.thebharatworks.com/api/direct-order/user/request-release/${widget.orderId}/${payId}';
-    // final String url = 'https://api.thebharatworks.com/api/direct-order/user/request-release/6877ae8442c5eb3a0a8ff0eb/689064980de39e91960f54c7';
+    // final String url = 'https://api.thebharatworks.com/api/direct-order/user/request-release/${widget.orderId}/${payId}';
+    print("Abhi:- postPaymentRequest oderId: ${widget.orderId} payId: ${payId}");
+    final String url = 'https://api.thebharatworks.com/api/bidding-order/user/request-release/${widget.orderId}/${payId}';
+
 
     print('Abhi:- postPaymentRequest oderId ${widget.orderId}');
     print("Abhi:- postPaymentRequest url : $url");
@@ -422,12 +428,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 const SizedBox(width: 5),
                                 payment['release_status'] == 'release' ? SizedBox() : GestureDetector(
                                   onTap: () {
-                                  //  Payment ID aur method pass karo
-                                  //   makePayment(
-                                  //     payment['_id'] ?? '',
-                                  //     payment['amount'] ?? '0',
-                                  //    // payment['method'] ?? 'cod',
-                                  //   );
+                                    //  Payment ID aur method pass karo
+                                    //   makePayment(
+                                    //     payment['_id'] ?? '',
+                                    //     payment['amount'] ?? '0',
+                                    //    // payment['method'] ?? 'cod',
+                                    //   );
                                     postPaymentRequest (payment['_id'] ?? '');
                                     print("Abhi:- payment releaseId : ${payment['_id']}");
                                   },
@@ -504,7 +510,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ServiceDisputeScreen(
-                    flowType: 'direct',
+                    flowType: 'bidding',
                     orderId: widget.orderId,
                   ),
                 ),
@@ -779,7 +785,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     final url = Uri.parse(
-      'https://api.thebharatworks.com/api/direct-order/order/payment-stage/${widget.orderId}',
+      // 'https://api.thebharatworks.com/api/direct-order/order/payment-stage/${widget.orderId}',
+      'https://api.thebharatworks.com/api/bidding-order/addPaymentStage/${widget.orderId}',
     );
 
     SharedPreferences prefs = await SharedPreferences.getInstance();

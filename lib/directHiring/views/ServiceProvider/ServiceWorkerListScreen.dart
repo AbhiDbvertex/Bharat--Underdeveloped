@@ -1,16 +1,16 @@
 //
+//
 // import 'dart:convert';
 //
 // import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:developer/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 // import 'package:flutter/material.dart';
 // import 'package:google_fonts/google_fonts.dart';
 // import 'package:http/http.dart' as http;
 // import 'package:shared_preferences/shared_preferences.dart';
+// import '../../../../Widgets/AppColors.dart';
+// import 'WorkerListViewProfileScreen.dart'; // Worker profile wala screen
 //
-// import '../../Widgets/AppColors.dart'; // Replace with your own AppColors file
-//
-// // Model
+// // Worker ka Model
 // class ServiceWorkerListModel {
 //   final String id;
 //   final String name;
@@ -31,8 +31,8 @@
 //     final fullImageUrl =
 //     rawImage.startsWith('http')
 //         ? rawImage.replaceFirst('http://', 'https://')
-//         : 'https://via.placeholder.com/150'; // Placeholder for missing images
-//     print('Processing image URL for ${json['name']}: $fullImageUrl'); // Log URL
+//         : 'https://via.placeholder.com/150'; // Default image agar nahi mila
+//     print('Bhai, ${json['name']} ka image URL: $fullImageUrl');
 //
 //     return ServiceWorkerListModel(
 //       id: json['_id'] ?? '',
@@ -46,6 +46,11 @@
 //
 // // Screen
 // class ServiceWorkerListScreen extends StatefulWidget {
+//   final String orderId; // Dynamic order ID yaha se aayega
+//
+//   const ServiceWorkerListScreen({Key? key, required this.orderId})
+//       : super(key: key);
+//
 //   @override
 //   _ServiceWorkerListScreenState createState() =>
 //       _ServiceWorkerListScreenState();
@@ -59,14 +64,14 @@
 //   @override
 //   void initState() {
 //     super.initState();
-//     PaintingBinding.instance.imageCache.clear(); // Clear image cache
+//     PaintingBinding.instance.imageCache.clear(); // Image cache saaf karo
 //     fetchWorkers();
 //   }
 //
 //   Future<void> fetchWorkers() async {
 //     final prefs = await SharedPreferences.getInstance();
 //     final token = prefs.getString('token') ?? '';
-//     print("🟢 Token: $token");
+//     print("🟢 Token mil gaya: $token");
 //
 //     final url = Uri.parse("https://api.thebharatworks.com/api/worker/all");
 //
@@ -97,7 +102,9 @@
 //         if (responseData['expired'] == true) {
 //           await prefs.remove("auth_token");
 //           setState(() {
-//             errorMessage = "Session expired. Please login again.";
+//
+//             errorMessage = "session expire. Login first!";
+//
 //             isLoading = false;
 //           });
 //           Future.delayed(Duration(seconds: 2), () {
@@ -108,13 +115,15 @@
 //       } else {
 //         setState(() {
 //           isLoading = false;
-//           errorMessage = json.decode(response.body)['message'];
+//           errorMessage =
+//               json.decode(response.body)['message'] ??
+//                   'Workers fetch nahi huye!';
 //         });
 //       }
 //     } catch (e) {
 //       setState(() {
 //         isLoading = false;
-//         errorMessage = 'Error: ${e.toString()}';
+//         errorMessage = 'Error aa gaya: ${e.toString()}';
 //       });
 //     }
 //   }
@@ -129,8 +138,7 @@
 //
 //     final body = {
 //       "worker_id": workerId,
-//       "order_id":
-//       "685d2849b93a9a07a9fe3d84", // TODO: Replace with dynamic order ID if needed
+//       "order_id": widget.orderId,
 //       "type": "direct",
 //     };
 //
@@ -144,18 +152,18 @@
 //         body: jsonEncode(body),
 //       );
 //
-//       print(" anjali  Assign Status: ${response.statusCode}");
+//       print("📤 Assign Status: ${response.statusCode}");
 //       print("📤 Assign Body: ${response.body}");
 //
 //       if (response.statusCode == 200) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text("✅ Worker assigned successfully!")),
-//         );
+//         ScaffoldMessenger.of(
+//           context,
+//         ).showSnackBar(SnackBar(content: Text("✅ Worker assign ")));
 //       } else {
 //         final data = json.decode(response.body);
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(
-//             content: Text("❌ ${data['message'] ?? 'Assignment failed'}"),
+//             content: Text("❌ ${data['message'] ?? 'Assignment fail ho gaya!'}"),
 //           ),
 //         );
 //       }
@@ -306,13 +314,10 @@
 //                                   context,
 //                                   MaterialPageRoute(
 //                                     builder:
-//                                         (
-//                                         context,
-//                                         ) => WorkerListViewProfileScreen(
-//                                       workerId:
-//                                       worker
-//                                           .id, // ✅ Correct workerId passed
-//                                     ),
+//                                         (context) =>
+//                                         WorkerListViewProfileScreen(
+//                                           workerId: worker.id,
+//                                         ),
 //                                   ),
 //                                 );
 //                               },
@@ -327,6 +332,18 @@
 //                             SizedBox(height: 4),
 //                             InkWell(
 //                               onTap: () {
+//                                 if (widget.orderId.isEmpty) {
+//                                   ScaffoldMessenger.of(
+//                                     context,
+//                                   ).showSnackBar(
+//                                     SnackBar(
+//                                       content: Text(
+//                                         "❌ Order ID nahi hai, bhai!",
+//                                       ),
+//                                     ),
+//                                   );
+//                                   return;
+//                                 }
 //                                 assignOrderToWorker(worker.id);
 //                               },
 //                               child: Container(
@@ -366,9 +383,9 @@
 // }
 
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // GetX import kiya
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -393,8 +410,7 @@ class ServiceWorkerListModel {
 
   factory ServiceWorkerListModel.fromJson(Map<String, dynamic> json) {
     final rawImage = json['image'] ?? '';
-    final fullImageUrl =
-    rawImage.startsWith('http')
+    final fullImageUrl = rawImage.startsWith('http')
         ? rawImage.replaceFirst('http://', 'https://')
         : 'https://via.placeholder.com/150'; // Default image agar nahi mila
     print('Bhai, ${json['name']} ka image URL: $fullImageUrl');
@@ -456,10 +472,9 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
         final data = json.decode(response.body);
         final List workerList = data['workers'];
         setState(() {
-          workers =
-              workerList
-                  .map((e) => ServiceWorkerListModel.fromJson(e))
-                  .toList();
+          workers = workerList
+              .map((e) => ServiceWorkerListModel.fromJson(e))
+              .toList();
           isLoading = false;
         });
       } else if (response.statusCode == 401) {
@@ -467,11 +482,19 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
         if (responseData['expired'] == true) {
           await prefs.remove("auth_token");
           setState(() {
-
-            errorMessage = "session expire. Login first!";
-
+            errorMessage = "Session expired. Please login again!";
             isLoading = false;
           });
+          Get.snackbar(
+            "Session Expired",
+            errorMessage!,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            margin: EdgeInsets.all(10),
+            borderRadius: 8,
+            duration: Duration(seconds: 2),
+          );
           Future.delayed(Duration(seconds: 2), () {
             Navigator.pushReplacementNamed(context, '/login');
           });
@@ -480,16 +503,33 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
       } else {
         setState(() {
           isLoading = false;
-          errorMessage =
-              json.decode(response.body)['message'] ??
-                  'Workers fetch nahi huye!';
+          errorMessage = json.decode(response.body)['message'] ??
+              'Workers fetch nahi huye!';
         });
+        Get.snackbar(
+          "Error",
+          errorMessage!,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          borderRadius: 8,
+        );
       }
     } catch (e) {
       setState(() {
         isLoading = false;
         errorMessage = 'Error aa gaya: ${e.toString()}';
       });
+      Get.snackbar(
+        "Error",
+        errorMessage!,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        borderRadius: 8,
+      );
     }
   }
 
@@ -521,21 +561,47 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
       print("📤 Assign Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("✅ Worker assign ")));
+        final data = json.decode(response.body);
+        final message = data['message'] ?? 'Worker assigned successfully';
+        Get.snackbar(
+          "Success",
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          borderRadius: 8,
+          duration: Duration(seconds: 2),
+        );
+
+        if (message == "Worker assigned successfully") {
+          Future.delayed(Duration(seconds: 2), () {
+            Get.back(); // Back navigate karo
+          });
+        }
       } else {
         final data = json.decode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("❌ ${data['message'] ?? 'Assignment fail ho gaya!'}"),
-          ),
+        final message = data['message'] ?? 'Assignment fail ho gaya!';
+        Get.snackbar(
+          "Error",
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          borderRadius: 8,
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("❌ Error: ${e.toString()}")));
+      Get.snackbar(
+        "Error",
+        "Error: ${e.toString()}",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        borderRadius: 8,
+      );
     }
   }
 
@@ -574,8 +640,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
 
           // Worker List
           Expanded(
-            child:
-            isLoading
+            child: isLoading
                 ? Center(child: CircularProgressIndicator())
                 : errorMessage != null
                 ? Center(child: Text(errorMessage!))
@@ -608,8 +673,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                             child: CachedNetworkImage(
                               imageUrl: worker.image,
                               fit: BoxFit.cover,
-                              placeholder:
-                                  (context, url) =>
+                              placeholder: (context, url) =>
                                   CircularProgressIndicator(),
                               errorWidget: (context, url, error) {
                                 print(
@@ -654,9 +718,8 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.red,
-                                  borderRadius: BorderRadius.circular(
-                                    11,
-                                  ),
+                                  borderRadius:
+                                  BorderRadius.circular(11),
                                 ),
                                 child: Text(
                                   worker.date,
@@ -678,8 +741,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (context) =>
+                                    builder: (context) =>
                                         WorkerListViewProfileScreen(
                                           workerId: worker.id,
                                         ),
@@ -698,14 +760,15 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                             InkWell(
                               onTap: () {
                                 if (widget.orderId.isEmpty) {
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "❌ Order ID nahi hai, bhai!",
-                                      ),
-                                    ),
+                                  Get.snackbar(
+                                    "Error",
+                                    "Order ID nahi hai, bhai!",
+                                    snackPosition:
+                                    SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    colorText: Colors.white,
+                                    margin: EdgeInsets.all(10),
+                                    borderRadius: 8,
                                   );
                                   return;
                                 }
@@ -716,9 +779,8 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                                 width: 70,
                                 decoration: BoxDecoration(
                                   color: Colors.green.shade700,
-                                  borderRadius: BorderRadius.circular(
-                                    8,
-                                  ),
+                                  borderRadius:
+                                  BorderRadius.circular(8),
                                 ),
                                 child: Center(
                                   child: Text(

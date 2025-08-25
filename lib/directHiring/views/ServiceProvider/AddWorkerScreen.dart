@@ -16,11 +16,16 @@
 //
 // class _AddWorkerScreenState extends State<AddWorkerScreen> {
 //   final controller = AddWorkerController();
+//   bool _isSubmitting = false;
+//
+//   static const _textFieldBorder = OutlineInputBorder(
+//     borderRadius: BorderRadius.all(Radius.circular(10)),
+//     borderSide: BorderSide(color: Colors.grey, width: 1),
+//   );
 //
 //   @override
 //   void initState() {
 //     super.initState();
-//     // Set today's date for Date of Joining field on initialization
 //     controller.dojController.text = _formatTodayDate();
 //   }
 //
@@ -33,13 +38,6 @@
 //   void dispose() {
 //     controller.dispose();
 //     super.dispose();
-//   }
-//
-//   OutlineInputBorder _customBorder() {
-//     return OutlineInputBorder(
-//       borderRadius: BorderRadius.circular(10),
-//       borderSide: const BorderSide(color: Colors.grey, width: 1),
-//     );
 //   }
 //
 //   void _selectDate(TextEditingController dateController) async {
@@ -57,9 +55,72 @@
 //     }
 //   }
 //
+//   Widget _buildPlaceholder() {
+//     return Container(
+//       color: Colors.grey.shade200,
+//       child: const Icon(Icons.person, size: 80, color: Colors.grey),
+//     );
+//   }
+//
+//   String? _validateDate(String? value) {
+//     if (value == null || value.isEmpty) return 'Enter Date!';
+//     if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+//       return 'Date format galat hai, YYYY-MM-DD daal';
+//     }
+//     try {
+//       final date = DateTime.parse(value);
+//       final now = DateTime.now();
+//       final earliest = DateTime(1900);
+//
+//       if (date.isAfter(now)) return 'future date accept';
+//       if (date.isBefore(earliest)) return 'Not use old date';
+//       final formatted =
+//           '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+//       if (formatted != value) return 'Please check date';
+//       return null;
+//     } catch (e) {
+//       return 'Please currect Date format';
+//
+//     }
+//   }
+//
+//   Widget _buildFormField({
+//     required TextEditingController controller,
+//     required String hint,
+//     required String? Function(String?) validator,
+//     TextInputType keyboardType = TextInputType.text,
+//     List<TextInputFormatter>? inputFormatters,
+//     bool isDateField = false,
+//   }) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 8),
+//       child: TextFormField(
+//         controller: controller,
+//         keyboardType: keyboardType,
+//         validator: validator,
+//         inputFormatters: inputFormatters,
+//         decoration: InputDecoration(
+//           hintText: hint,
+//           hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+//           border: _textFieldBorder,
+//           enabledBorder: _textFieldBorder,
+//           focusedBorder: _textFieldBorder,
+//           suffixIcon:
+//           isDateField
+//               ? IconButton(
+//             icon: const Icon(Icons.calendar_today, color: Colors.grey),
+//             onPressed: () => _selectDate(controller),
+//           )
+//               : null,
+//         ),
+//       ),
+//     );
+//   }
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
+//       backgroundColor: Colors.white,
 //       appBar: AppBar(
 //         backgroundColor: AppColors.primaryGreen,
 //         centerTitle: true,
@@ -106,8 +167,8 @@
 //                       decoration: BoxDecoration(
 //                         shape: BoxShape.circle,
 //                         border: Border.all(
-//                           color: Colors.grey.shade400,
-//                           width: 2,
+//                           color: Colors.green.shade700,
+//                           width: 2.7,
 //                         ),
 //                       ),
 //                       child: ClipOval(
@@ -116,11 +177,11 @@
 //                             ? Image.file(
 //                           controller.selectedImage!,
 //                           fit: BoxFit.cover,
+//                           errorBuilder:
+//                               (context, error, stackTrace) =>
+//                               _buildPlaceholder(),
 //                         )
-//                             : Image.asset(
-//                           'assets/images/vhaccoy1.png',
-//                           fit: BoxFit.cover,
-//                         ),
+//                             : _buildPlaceholder(),
 //                       ),
 //                     ),
 //                     Positioned(
@@ -136,6 +197,9 @@
 //                           'assets/images/edit1.png',
 //                           width: 24,
 //                           height: 24,
+//                           errorBuilder:
+//                               (context, error, stackTrace) =>
+//                           const Icon(Icons.edit, size: 24),
 //                         ),
 //                       ),
 //                     ),
@@ -143,79 +207,108 @@
 //                 ),
 //               ),
 //               const SizedBox(height: 20),
-//               _buildTextField(controller.nameController, 'Name', (value) {
-//                 if (value!.trim().isEmpty) return 'Name is required';
-//                 return null;
-//               }),
-//               IntlPhoneField(
-//                 decoration: InputDecoration(
-//                   hintText: 'Phone Number',
-//                   border: _customBorder(),
-//                   enabledBorder: _customBorder(),
-//                   focusedBorder: _customBorder(),
+//               _buildFormField(
+//                 inputFormatters: [
+//                   FilteringTextInputFormatter.allow(RegExp(r'[a-z A-Z]')),
+//                 ],
+//                 controller: controller.nameController,
+//                 hint: 'Name',
+//                 validator:
+//                     (value) => value!.trim().isEmpty ? ' Enter Name' : null,
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 8),
+//                 child: IntlPhoneField(
+//                   decoration: const InputDecoration(
+//                     hintText: 'Phone Number',
+//                     hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+//                     border: _textFieldBorder,
+//                     enabledBorder: _textFieldBorder,
+//                     focusedBorder: _textFieldBorder,
+//                   ),
+//                   initialCountryCode: 'IN',
+//                   disableLengthCheck: true,
+//                   keyboardType: TextInputType.number,
+//                   inputFormatters: [
+//                     FilteringTextInputFormatter.digitsOnly,
+//                     LengthLimitingTextInputFormatter(10),
+//                   ],
+//                   onChanged: (phone) => controller.phone = phone.number,
+//                   validator: (phone) {
+//                     final number = phone?.number ?? '';
+//                     if (number.trim().isEmpty)
+//                       return 'Enter your phone  number!';
+//                     if (!RegExp(r'^\d{10}$').hasMatch(number)) {
+//                       return 'Please enter 10 digit number';
+//                     }
+//                     return null;
+//                   },
 //                 ),
-//                 initialCountryCode: 'IN',
-//                 disableLengthCheck: true,
+//               ),
+//               _buildFormField(
+//                 controller: controller.aadhaarController,
+//                 hint: 'Aadhaar Number',
+//                 validator: (value) {
+//                   if (value!.isEmpty) return ' Enter Aadhaar number ';
+//                   if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
+//                     return '12 digit  Aadhaar  Number';
+//                   }
+//                   return null;
+//                 },
 //                 keyboardType: TextInputType.number,
 //                 inputFormatters: [
-//                   FilteringTextInputFormatter.digitsOnly,
-//                   LengthLimitingTextInputFormatter(10),
-//                 ],
-//                 onChanged: (phone) => controller.phone = phone.number,
-//                 validator: (phone) {
-//                   final number = phone?.number ?? '';
-//                   if (number.trim().isEmpty) return 'Phone number is required';
-//                   if (!RegExp(r'^\d{10}$').hasMatch(number)) {
-//                     return 'Enter 10-digit phone number';
-//                   }
-//                   return null;
-//                 },
-//               ),
-//               _buildTextField(
-//                 controller.aadhaarController,
-//                 'Aadhaar Number',
-//                     (value) {
-//                   if (value!.isEmpty) return 'Aadhaar required';
-//                   if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
-//                     return 'Must be 12 digits';
-//                   }
-//                   return null;
-//                 },
-//                 TextInputType.number,
-//                 [
 //                   FilteringTextInputFormatter.digitsOnly,
 //                   LengthLimitingTextInputFormatter(12),
 //                 ],
 //               ),
-//               // DOB TextFormField
-//               _buildDateField(
-//                 controller.dobController,
-//                 'Date of Birth (YYYY-MM-DD)',
-//                 'DOB required',
+//               _buildFormField(
+//                 controller: controller.dobController,
+//                 hint: 'Date of Birth (YYYY-MM-DD)',
+//                 validator: _validateDate,
+//                 keyboardType: TextInputType.datetime,
+//                 inputFormatters: [
+//                   FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
+//                   DateInputFormatter(),
+//                   LengthLimitingTextInputFormatter(10),
+//                 ],
+//                 isDateField: true,
 //               ),
-//               _buildTextField(
-//                 controller.addressController,
-//                 'Address',
-//                     (value) => value!.isEmpty ? 'Address required' : null,
+//               _buildFormField(
+//                 inputFormatters: [
+//                   FilteringTextInputFormatter.allow(RegExp(r'[a-z,/.0-9A-Z]')),
+//                 ],
+//                 controller: controller.addressController,
+//                 hint: 'Address',
+//                 validator: (value) => value!.isEmpty ? ' Enter Address!' : null,
 //               ),
-//               // Date of Joining TextFormField
-//               _buildDateField(
-//                 controller.dojController,
-//                 'Date of Joining (YYYY-MM-DD)',
-//                 'Date of Joining required',
-//               ),
+//               // _buildFormField(
+//               //   controller: controller.dojController,
+//               //   hint: 'Date of Joining (YYYY-MM-DD)',
+//               //   validator: _validateDate,
+//               //   keyboardType: TextInputType.datetime,
+//               //   inputFormatters: [
+//               //     FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
+//               //     DateInputFormatter(),
+//               //     LengthLimitingTextInputFormatter(10),
+//               //   ],
+//               //   isDateField: true,
+//               // ),
 //               const SizedBox(height: 30),
 //               SizedBox(
 //                 height: 50,
 //                 width: double.infinity,
 //                 child: ElevatedButton(
-//                   onPressed: () async {
+//                   onPressed:
+//                   _isSubmitting
+//                       ? null
+//                       : () async {
 //                     if (controller.validateInputs()) {
-//                       final success = await controller.submitWorkerToAPI(
-//                         context,
-//                       );
+//                       setState(() => _isSubmitting = true);
+//                       final success = await controller
+//                           .submitWorkerToAPI(context);
+//                       setState(() => _isSubmitting = false);
 //                       if (success) {
-//                         Navigator.pop(context, true); // For refresh
+//                         Navigator.pop(context, true);
 //                       }
 //                     }
 //                   },
@@ -225,7 +318,17 @@
 //                       borderRadius: BorderRadius.circular(8),
 //                     ),
 //                   ),
-//                   child: const Text(
+//                   child:
+//                   _isSubmitting
+//                       ? const SizedBox(
+//                     height: 20,
+//                     width: 20,
+//                     child: CircularProgressIndicator(
+//                       strokeWidth: 2,
+//                       valueColor: AlwaysStoppedAnimation(Colors.white),
+//                     ),
+//                   )
+//                       : const Text(
 //                     'Add',
 //                     style: TextStyle(fontSize: 15, color: Colors.white),
 //                   ),
@@ -237,75 +340,30 @@
 //       ),
 //     );
 //   }
+// }
 //
-//   Widget _buildTextField(
-//       TextEditingController controller,
-//       String hint,
-//       String? Function(String?) validator, [
-//         TextInputType type = TextInputType.text,
-//         List<TextInputFormatter>? inputFormatters,
-//       ]) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 8),
-//       child: TextFormField(
-//         controller: controller,
-//         keyboardType: type,
-//         validator: validator,
-//         inputFormatters: inputFormatters,
-//         decoration: InputDecoration(
-//           hintText: hint,
-//           hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-//           border: _customBorder(),
-//           enabledBorder: _customBorder(),
-//           focusedBorder: _customBorder(),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildDateField(
-//       TextEditingController controller,
-//       String hint,
-//       String errorMessage,
+// class DateInputFormatter extends TextInputFormatter {
+//   @override
+//   TextEditingValue formatEditUpdate(
+//       TextEditingValue oldValue,
+//       TextEditingValue newValue,
 //       ) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 8),
-//       child: TextFormField(
-//         controller: controller,
-//         keyboardType: TextInputType.datetime,
-//         validator: (value) {
-//           if (value!.isEmpty) return errorMessage;
-//           if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
-//             return 'Enter valid date (YYYY-MM-DD)';
-//           }
-//           try {
-//             final date = DateTime.parse(value);
-//             final now = DateTime.now();
-//             final earliest = DateTime(1900);
-//             if (date.isAfter(now) || date.isBefore(earliest)) {
-//               return 'Date out of range';
-//             }
-//           } catch (e) {
-//             return 'Invalid date format';
-//           }
-//           return null;
-//         },
-//         inputFormatters: [
-//           FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
-//           LengthLimitingTextInputFormatter(10), // YYYY-MM-DD
-//         ],
-//         decoration: InputDecoration(
-//           hintText: hint,
-//           hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-//           border: _customBorder(),
-//           enabledBorder: _customBorder(),
-//           focusedBorder: _customBorder(),
-//           suffixIcon: IconButton(
-//             icon: const Icon(Icons.calendar_today, color: Colors.grey),
-//             onPressed: () => _selectDate(controller),
-//           ),
-//         ),
-//       ),
+//     String text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+//     if (text.length > 8) text = text.substring(0, 8);
+//     String formatted = '';
+//     if (text.isNotEmpty) {
+//       formatted += text.substring(0, text.length >= 4 ? 4 : text.length);
+//       if (text.length > 4) {
+//         formatted +=
+//             '-' + text.substring(4, text.length >= 6 ? 6 : text.length);
+//       }
+//       if (text.length > 6) {
+//         formatted += '-' + text.substring(6);
+//       }
+//     }
+//     return newValue.copyWith(
+//       text: formatted,
+//       selection: TextSelection.collapsed(offset: formatted.length),
 //     );
 //   }
 // }
@@ -374,24 +432,23 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   }
 
   String? _validateDate(String? value) {
-    if (value == null || value.isEmpty) return 'Enter Date!';
+    if (value == null || value.isEmpty) return 'Please enter a date!';
     if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
-      return 'Date format galat hai, YYYY-MM-DD daal';
+      return 'Date format should be YYYY-MM-DD';
     }
     try {
       final date = DateTime.parse(value);
       final now = DateTime.now();
       final earliest = DateTime(1900);
 
-      if (date.isAfter(now)) return 'future date accept';
-      if (date.isBefore(earliest)) return 'Not use old date';
+      if (date.isAfter(now)) return 'Future dates are not allowed';
+      if (date.isBefore(earliest)) return 'Date is too old';
       final formatted =
           '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-      if (formatted != value) return 'Please check date';
+      if (formatted != value) return 'Invalid date format';
       return null;
     } catch (e) {
-      return 'Please currect Date format';
-
+      return 'Please enter a valid date';
     }
   }
 
@@ -416,8 +473,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
           border: _textFieldBorder,
           enabledBorder: _textFieldBorder,
           focusedBorder: _textFieldBorder,
-          suffixIcon:
-          isDateField
+          suffixIcon: isDateField
               ? IconButton(
             icon: const Icon(Icons.calendar_today, color: Colors.grey),
             onPressed: () => _selectDate(controller),
@@ -483,14 +539,11 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                         ),
                       ),
                       child: ClipOval(
-                        child:
-                        controller.selectedImage != null
+                        child: controller.selectedImage != null
                             ? Image.file(
                           controller.selectedImage!,
                           fit: BoxFit.cover,
-                          errorBuilder:
-                              (context, error, stackTrace) =>
-                              _buildPlaceholder(),
+                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
                         )
                             : _buildPlaceholder(),
                       ),
@@ -508,9 +561,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                           'assets/images/edit1.png',
                           width: 24,
                           height: 24,
-                          errorBuilder:
-                              (context, error, stackTrace) =>
-                          const Icon(Icons.edit, size: 24),
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.edit, size: 24),
                         ),
                       ),
                     ),
@@ -519,14 +570,17 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
               ),
               const SizedBox(height: 20),
               _buildFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-z A-Z]')),
+                ],
                 controller: controller.nameController,
                 hint: 'Name',
-                validator:
-                    (value) => value!.trim().isEmpty ? ' Enter Name' : null,
+                validator: (value) => value!.trim().isEmpty ? 'Please enter a name' : null,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: IntlPhoneField(
+                  controller: controller.phoneController, // New controller for phone
                   decoration: const InputDecoration(
                     hintText: 'Phone Number',
                     hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
@@ -541,13 +595,20 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(10),
                   ],
-                  onChanged: (phone) => controller.phone = phone.number,
+                  onChanged: (phone) {
+                    controller.phone = phone.number;
+                    // Trigger validation on change
+                    if (controller.formKey.currentState != null) {
+                      controller.formKey.currentState!.validate();
+                    }
+                  },
                   validator: (phone) {
                     final number = phone?.number ?? '';
-                    if (number.trim().isEmpty)
-                      return 'Enter your phone  number!';
+                    if (number.trim().isEmpty) {
+                      return 'Please enter a phone number';
+                    }
                     if (!RegExp(r'^\d{10}$').hasMatch(number)) {
-                      return 'Please enter 10 digit number';
+                      return 'Please enter a valid 10-digit phone number';
                     }
                     return null;
                   },
@@ -557,9 +618,9 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 controller: controller.aadhaarController,
                 hint: 'Aadhaar Number',
                 validator: (value) {
-                  if (value!.isEmpty) return ' Enter Aadhaar number ';
+                  if (value!.isEmpty) return 'Please enter Aadhaar number';
                   if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
-                    return '12 digit  Aadhaar  Number';
+                    return 'Please enter a valid 12-digit Aadhaar number';
                   }
                   return null;
                 },
@@ -582,40 +643,33 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 isDateField: true,
               ),
               _buildFormField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-z,/.0-9A-Z]')),
+                ],
                 controller: controller.addressController,
                 hint: 'Address',
-                validator: (value) => value!.isEmpty ? ' Enter Address!' : null,
-              ),
-              _buildFormField(
-                controller: controller.dojController,
-                hint: 'Date of Joining (YYYY-MM-DD)',
-                validator: _validateDate,
-                keyboardType: TextInputType.datetime,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
-                  DateInputFormatter(),
-                  LengthLimitingTextInputFormatter(10),
-                ],
-                isDateField: true,
+                validator: (value) => value!.isEmpty ? 'Please enter an address' : null,
               ),
               const SizedBox(height: 30),
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed:
-                  _isSubmitting
+                  onPressed: _isSubmitting
                       ? null
                       : () async {
+                    setState(() => _isSubmitting = true);
                     if (controller.validateInputs()) {
-                      setState(() => _isSubmitting = true);
-                      final success = await controller
-                          .submitWorkerToAPI(context);
-                      setState(() => _isSubmitting = false);
+                      final success = await controller.submitWorkerToAPI(context);
                       if (success) {
                         Navigator.pop(context, true);
                       }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please file all required filed")),
+                      );
                     }
+                    setState(() => _isSubmitting = false);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade700,
@@ -623,8 +677,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child:
-                  _isSubmitting
+                  child: _isSubmitting
                       ? const SizedBox(
                     height: 20,
                     width: 20,
@@ -659,8 +712,7 @@ class DateInputFormatter extends TextInputFormatter {
     if (text.isNotEmpty) {
       formatted += text.substring(0, text.length >= 4 ? 4 : text.length);
       if (text.length > 4) {
-        formatted +=
-            '-' + text.substring(4, text.length >= 6 ? 6 : text.length);
+        formatted += '-' + text.substring(4, text.length >= 6 ? 6 : text.length);
       }
       if (text.length > 6) {
         formatted += '-' + text.substring(6);
