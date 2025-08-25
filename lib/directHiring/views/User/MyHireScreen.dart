@@ -958,7 +958,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 8), // thoda gap de diya
+                    const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
                         // Navigator.push(
@@ -1000,7 +1000,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // thoda gap de diya
+
                     // TextButton(
                     //   onPressed: () {
                     //     // Navigator.push(

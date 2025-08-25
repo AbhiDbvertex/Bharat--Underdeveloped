@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:developer/Emergency/User/models/create_order_model.dart';
 import 'package:developer/Emergency/User/models/emergency_list_model.dart';
 import 'package:developer/Emergency/User/screens/PaymentConformation.dart';
+import 'package:developer/Emergency/utils/ApiUrl.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class EmergencyServiceController extends GetxController {
     final token = prefs.getString('token') ?? '';
 
     final res = await http.get(
-      Uri.parse('https://api.thebharatworks.com/api/work-category'),
+      Uri.parse(ApiUrl.workCategory),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -93,12 +94,43 @@ class EmergencyServiceController extends GetxController {
   }
 
   /// ------------------ PICK IMAGE -------------------
-  Future<void> pickImages() async {
-    final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      images.addAll(pickedFiles.map((e) => File(e.path)));
+///////////////change 25-08-25//////////YG///////
+  // Future<void> pickImages() async {
+  //   final pickedFiles = await _picker.pickMultiImage();
+  //   if (pickedFiles != null && pickedFiles.isNotEmpty) {
+  //     images.addAll(pickedFiles.map((e) => File(e.path)));
+  //   }
+  // }
+  Future<void> pickImageFromCamera(BuildContext context) async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked != null) {
+      if (images.length < 5) {
+        images.add(File(picked.path));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Max 5 images allowed")),
+        );
+      }
     }
   }
+
+  Future<void> pickImagesFromGallery(BuildContext context) async {
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      if (images.length + pickedFiles.length > 5) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("You can upload max 5 images")),
+        );
+        return;
+      }
+      images.addAll(pickedFiles.map((e) => File(e.path)));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("${pickedFiles.length} images selected")),
+      );
+    }
+  }
+
 
 
   void removeImage(File file) {
@@ -154,7 +186,7 @@ class EmergencyServiceController extends GetxController {
       return;
     }
     isLoading.value=true;
-    var uri = Uri.parse("https://api.thebharatworks.com/api/emergency-order/create");
+    var uri = Uri.parse(ApiUrl.createOrder);
 
     var request = http.MultipartRequest("POST", uri);
     request.headers['Authorization'] = "Bearer $token";
@@ -194,7 +226,7 @@ class EmergencyServiceController extends GetxController {
         final razorOrder = jsonResponse['razorpay_order'];
         final orderId = razorOrder['id'];
         final amount = razorOrder['amount'];
-        Get.snackbar("Success", "Request submitted successfully!");
+       // Get.snackbar("Success", "Request submitted successfully!");
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>  PaymentConformationScreen(
@@ -270,12 +302,12 @@ class EmergencyServiceController extends GetxController {
 
   Future<EmergencyListModel?> getEmergencyOrder() async {
     isLoading.value=true;
-    bwDebug("[getEmergencyOrder] call: ",tag:tag);
+    bwDebug("[getEmergencyOrderUser] call: ",tag:tag);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
     final res = await http.get(
-      Uri.parse('https://api.thebharatworks.com/api/emergency-order/getAllEmergencyOrdersByRole'),
+      Uri.parse(ApiUrl.getAllOrder),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -287,7 +319,6 @@ class EmergencyServiceController extends GetxController {
       final decoded = json.decode(res.body);
       bwDebug("[getEmergencyOrder] data : ${res.body}", tag: tag);
 
-      // Model me convert kar ke return kar rahe hai
       isLoading.value=false;
       return EmergencyListModel.fromJson(decoded);
 

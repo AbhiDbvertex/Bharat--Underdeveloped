@@ -1,13 +1,17 @@
 import 'dart:convert';
 
 import 'package:developer/Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
+import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
 import '../../../Bidding/Models/bidding_order.dart';
+import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
+import '../../../Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
 import 'ServiceDirectViewScreen.dart';
 
@@ -56,6 +60,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   final TextEditingController _directSearchController = TextEditingController();
   final TextEditingController _emergencySearchController =
       TextEditingController();
+  SpEmergencyListModel? spEmergencyOrders;
 
   @override
   void initState() {
@@ -401,7 +406,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                       ? _buildBiddingTasksList(screenWidth, screenHeight)
                       : selectedTab == 1
                           ? _buildDirectHiringList(screenWidth, screenHeight)
-                          : _buildEmergencyTasksList(screenWidth, screenHeight),
+                          : _buildEmergencyList(),
             ),
           ],
         ),
@@ -412,7 +417,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   Widget _buildTabButton(String title, int tabIndex, double screenWidth) {
     final isSelected = selectedTab == tabIndex;
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         setState(() {
           selectedTab = tabIndex;
           _biddingSearchController.clear();
@@ -422,6 +427,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           filteredDirectOrders = directOrders;
           filteredEmergencyItems = emergencyItems;
         });
+        if (selectedTab == 2) {
+          final orders = await SpEmergencyServiceController().getEmergencySpOrderByRole();
+          setState(() {
+            spEmergencyOrders = orders;
+            isLoading = false;
+          });
+        } else {
+          setState(() => isLoading = false);
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor:
@@ -488,28 +502,41 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     );
   }
 
-  Widget _buildEmergencyTasksList(double screenWidth, double screenHeight) {
-    if (filteredEmergencyItems.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Center(child: Text("No Emergency Tasks Found")),
-      );
+  // Widget _buildEmergencyTasksList(double screenWidth, double screenHeight) {
+  //   if (filteredEmergencyItems.isEmpty) {
+  //     return const Padding(
+  //       padding: EdgeInsets.all(16.0),
+  //       child: Center(child: Text("No Emergency Tasks Found")),
+  //     );
+  //   }
+  //
+  //   return Column(
+  //     children: List.generate(
+  //       filteredEmergencyItems.length,
+  //       (index) => _buildBiddingCardForEmergency(
+  //         filteredEmergencyItems[index],
+  //         widget.categreyId,
+  //         widget.subcategreyId,
+  //         screenWidth,
+  //         screenHeight,
+  //       ),
+  //     ),
+  //   );
+  // }
+  Widget _buildEmergencyList() {
+    if ( spEmergencyOrders== null || spEmergencyOrders!.data.isEmpty) {
+      return const Center(child: Text("No Emergency Orders Found"));
     }
 
-    return Column(
-      children: List.generate(
-        filteredEmergencyItems.length,
-        (index) => _buildBiddingCardForEmergency(
-          filteredEmergencyItems[index],
-          widget.categreyId,
-          widget.subcategreyId,
-          screenWidth,
-          screenHeight,
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: ListView.builder(
+        itemCount: spEmergencyOrders!.data.length,
+        itemBuilder: (context, index) =>
+            _buildEmergencyCard(spEmergencyOrders!.data[index]),
       ),
     );
   }
-
   Widget _buildHireCard(
     DirectOrder data,
     String? categreyId,
@@ -837,166 +864,443 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     );
   }
 
-  Widget _buildBiddingCardForEmergency(
-    Map<String, dynamic> data,
-    String? categreyId,
-    String? subcategreyId,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    print(
-        "🛠 Building card for Emergency Task: ${data['title']}, Status: ${data['status']}");
+  // Widget _buildBiddingCardForEmergency(
+  //   Map<String, dynamic> data,
+  //   String? categreyId,
+  //   String? subcategreyId,
+  //   double screenWidth,
+  //   double screenHeight,
+  // ) {
+  //   print(
+  //       "🛠 Building card for Emergency Task: ${data['title']}, Status: ${data['status']}");
+  //
+  //   return Container(
+  //     margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+  //     padding: EdgeInsets.all(screenWidth * 0.025),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(screenWidth * 0.035),
+  //       boxShadow: const [
+  //         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(screenWidth * 0.02),
+  //           child: Container(
+  //             alignment: Alignment.topCenter,
+  //             child: Image.asset(
+  //               'assets/images/chair.png',
+  //               height: screenHeight * 0.16,
+  //               width: screenWidth * 0.32,
+  //               fit: BoxFit.cover,
+  //             ),
+  //           ),
+  //         ),
+  //         SizedBox(width: screenWidth * 0.025),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 data['title'],
+  //                 style: _cardTitle(fontSize: screenWidth * 0.04),
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 data['price'],
+  //                 style: GoogleFonts.roboto(
+  //                   fontSize: screenWidth * 0.035,
+  //                   color: Colors.green,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 data['desc'],
+  //                 style: _cardBody(fontSize: screenWidth * 0.035),
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     "Date: ${data['date']}",
+  //                     style: _cardDate(fontSize: screenWidth * 0.03),
+  //                   ),
+  //                   if (data['status'] != "")
+  //                     Padding(
+  //                       padding: EdgeInsets.only(left: screenWidth * 0.05),
+  //                       child: Container(
+  //                         height: 25,
+  //                         width: 80,
+  //                         decoration: BoxDecoration(
+  //                           color: _getStatusColor(data['status']),
+  //                           borderRadius:
+  //                               BorderRadius.circular(screenWidth * 0.015),
+  //                         ),
+  //                         child: Center(
+  //                           child: Text(
+  //                             data['status'].isEmpty
+  //                                 ? 'Pending'
+  //                                 : data['status'][0].toUpperCase() +
+  //                                     data['status'].substring(1),
+  //                             style: TextStyle(
+  //                               color: Colors.white,
+  //                               fontSize: screenWidth * 0.03,
+  //                             ),
+  //                             textAlign: TextAlign.center,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Container(
+  //                     height: 20,
+  //                     width: 100,
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.red.shade300,
+  //                       borderRadius: BorderRadius.circular(10),
+  //                     ),
+  //                     child: Center(
+  //                       child: Padding(
+  //                         padding: const EdgeInsets.all(8.0),
+  //                         child: Text(
+  //                           data['address'],
+  //                           style: GoogleFonts.roboto(
+  //                             fontSize: screenWidth * 0.035,
+  //                             color: Colors.white,
+  //                             fontWeight: FontWeight.w500,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   GestureDetector(
+  //                     onTap: () {
+  //                       print(
+  //                           "🔍 Navigating to Biddingserviceproviderworkdetail for Task: ${data['title']}");
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                           builder: (_) => Biddingserviceproviderworkdetail(
+  //                               orderId: data['_id'] ?? ''),
+  //                         ),
+  //                       ).then((_) {
+  //                         print(
+  //                             "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
+  //                         fetchBiddingOrders();
+  //                       });
+  //                     },
+  //                     child: Container(
+  //                       height: 25,
+  //                       width: 80,
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.green.shade700,
+  //                         borderRadius:
+  //                             BorderRadius.circular(screenWidth * 0.015),
+  //                       ),
+  //                       child: Center(
+  //                         child: Text(
+  //                           "View Details",
+  //                           style: GoogleFonts.roboto(
+  //                             color: Colors.white,
+  //                             fontSize: screenWidth * 0.03,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  Widget _buildEmergencyCard(data) {
+    //   bwDebug("[_buildEmergencyCard] call ",tag:"myHireScreen ");
+
+    String displayStatus = data.hireStatus ?? "pending";
+
+    // Last accepted status check karna
+    if (data.acceptedByProviders != null &&
+        data.acceptedByProviders!.isNotEmpty &&
+        displayStatus != 'cancelled' &&
+        displayStatus != 'completed') {
+      displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
+    }
+
+    // Image check
+    final bool hasImage = data.imageUrls != null && data.imageUrls!.isNotEmpty;
 
     return Container(
-      margin: EdgeInsets.only(bottom: screenHeight * 0.015),
-      padding: EdgeInsets.all(screenWidth * 0.025),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.035),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
+        border: Border.all(
+          color: AppColors.primaryGreen, // <-- primary color border
+          width: 1.5, // thickness
+        ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(screenWidth * 0.02),
-            child: Container(
-              alignment: Alignment.topCenter,
-              child: Image.asset(
-                'assets/images/chair.png',
-                height: screenHeight * 0.16,
-                width: screenWidth * 0.32,
-                fit: BoxFit.cover,
-              ),
+            borderRadius: BorderRadius.circular(8),
+            child: Stack(
+              children: [
+                hasImage
+                    ? Image.network(
+                  data.imageUrls!.first, // first image show karenge
+                  height: 200,
+                  width: 110,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      width: 110,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                        strokeWidth: 2.5,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset('assets/images/task.png',
+                          height: 150, width: 110, fit: BoxFit.cover),
+                )
+                    : Image.asset('assets/images/task.png',
+                    height: 150, width: 110, fit: BoxFit.cover),
+                Positioned(
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(15), // corner circle
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    child: Text(
+                      "${data.projectId ?? 'N/A'}", // product id
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(width: screenWidth * 0.025),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data['title'],
-                  style: _cardTitle(fontSize: screenWidth * 0.04),
+                  data.categoryId.name ?? "",
+                  style: _cardTitle(fontSize: 15),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: screenHeight * 0.005),
                 Text(
-                  data['price'],
-                  style: GoogleFonts.roboto(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.005),
-                Text(
-                  data['desc'],
-                  style: _cardBody(fontSize: screenWidth * 0.035),
-                  maxLines: 2,
+                  "₹${data.servicePayment.amount} " ?? "0",
+                  style: _cardBody(fontSize: 13).copyWith(
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.bold),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: screenHeight * 0.005),
+                Container(
+                  height: 1, // thickness
+                  color: Colors.grey.shade200, // light color
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      "Date: ${data['date']}",
-                      style: _cardDate(fontSize: screenWidth * 0.03),
+                    Expanded(
+                      child: Text(
+                        data.subCategoryIds.isNotEmpty
+                            ? data.subCategoryIds
+                            .take(2)
+                            .map((e) => e.name)
+                            .join(", ")
+                            : "",
+                        style: _cardDate(fontSize: 11),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    if (data['status'] != "")
-                      Padding(
-                        padding: EdgeInsets.only(left: screenWidth * 0.05),
-                        child: Container(
-                          height: 25,
-                          width: 80,
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(data['status']),
-                            borderRadius:
-                                BorderRadius.circular(screenWidth * 0.015),
-                          ),
-                          child: Center(
-                            child: Text(
-                              data['status'].isEmpty
-                                  ? 'Pending'
-                                  : data['status'][0].toUpperCase() +
-                                      data['status'].substring(1),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenWidth * 0.03,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (_) => DirectViewScreen(
+                        //       id: data.id ?? '',
+                        //       categreyId: data.categoryId?._id ?? '',
+                        //       subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
+                        //           ? data.subCategoryIds!.first._id!
+                        //           : '',
+                        //     ),
+                        //   ),
+                        // ).then((_) => fetchDirectOrders());
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xff353026),
+                        minimumSize: const Size(70, 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: Text(
+                        "Review",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white, fontSize: 12),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.005),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Expanded(
+                      child: Text(
+                        "Date: ${data.deadline != null ? DateFormat('dd/MM/yyyy').format(data.deadline!.toLocal()) : 'N/A'}",
+                        style: _cardDate(fontSize: 11),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // TextButton(
+                    //   onPressed: () {
+                    //     // Navigator.push(
+                    //     //   context,
+                    //     // MaterialPageRoute(
+                    //     //   builder: (_) => DirectViewScreen(
+                    //     //     id: data.id ?? '',
+                    //     //     categreyId: data.categoryId?._id ?? '',
+                    //     //     subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
+                    //     //         ? data.subCategoryIds!.first._id!
+                    //     //         : '',
+                    //     //   ),
+                    //     // ),
+                    //     // ).then((_) => fetchDirectOrders());
+                    //   },
+                    //   style: TextButton.styleFrom(
+                    //     backgroundColor: _getStatusColor(data.hireStatus),
+                    //     minimumSize: const Size(70, 10),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     "${data.hireStatus[0].toUpperCase()}${data.hireStatus.substring(1)}",
+                    //     style: GoogleFonts.roboto(color: Colors.white, fontSize: 12),
+                    //   ),
+                    // ),
                     Container(
-                      height: 20,
-                      width: 100,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.red.shade300,
+                        color: _getStatusColor(data.hireStatus),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            data['address'],
-                            style: GoogleFonts.roboto(
-                              fontSize: screenWidth * 0.035,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                      child: Text(
+                        "${data.hireStatus[0].toUpperCase()}${data.hireStatus.substring(1)}",
+                        style: GoogleFonts.roboto(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Color(0xffF27773),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          data.googleAddress,
+                          maxLines: 1, //
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 12),
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        print(
-                            "🔍 Navigating to Biddingserviceproviderworkdetail for Task: ${data['title']}");
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => Biddingserviceproviderworkdetail(
-                                orderId: data['_id'] ?? ''),
-                          ),
-                        ).then((_) {
-                          print(
-                              "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
-                          fetchBiddingOrders();
-                        });
+                              builder: (_) => SpWorkDetail(
+                                data.id,
+                                isUser: true,
+                              )),
+                        ).then(
+                              (_) async {
+                            final orders = await SpEmergencyServiceController()
+                                .getEmergencySpOrderByRole();
+                            setState(() {
+                               spEmergencyOrders = orders;
+                            });
+                          },
+                        );
                       },
-                      child: Container(
-                        height: 25,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade700,
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.015),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        minimumSize: const Size(70, 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Center(
-                          child: Text(
-                            "View Details",
-                            style: GoogleFonts.roboto(
-                              color: Colors.white,
-                              fontSize: screenWidth * 0.03,
-                            ),
-                          ),
-                        ),
+                      ),
+                      child: Text(
+                        "View Details",
+                        style: GoogleFonts.roboto(
+                            color: Colors.white, fontSize: 12),
                       ),
                     ),
                   ],
-                ),
+                )
               ],
             ),
           ),
