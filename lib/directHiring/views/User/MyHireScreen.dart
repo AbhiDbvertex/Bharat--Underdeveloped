@@ -227,7 +227,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
       case 'cancelled':
         return const Color(0xFFFF3B30); // Vibrant Apple Red
 
-      case 'cancelleddispute':
+      case 'cancelledDispute':
         return const Color(0xFF5D6D7E); // Steel Gray
 
       case 'accepted':
@@ -267,7 +267,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             padding: const EdgeInsets.all(12.0),
             child: Center(
               child: Text(
-                "My Work",
+                "My Hire",
                 style: GoogleFonts.roboto(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -434,6 +434,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       ? item['image_urls'][0]
                       : "";
                   print("Abhi:- get bidding oderId : ${buddingOderId }");
+                  print("Abhi:- get bidding oderId status : ${status}");
 
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -612,15 +613,16 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
   Widget _buildHireCard(DirectOrder data) {
     String displayStatus = data.status;
-    if (data.offer_history != null &&
-        data.offer_history!.isNotEmpty &&
-        data.status != 'cancelled' &&
-        data.status != 'completed') {
-      displayStatus = data.offer_history!.last.status ?? data.status;
-    }
+    // if (data.offer_history != null &&
+    //     data.offer_history!.isNotEmpty &&
+    //     data.status != 'cancelled' &&
+    //     data.status != 'completed') {
+    //   displayStatus = data.offer_history!.last.status ?? data.status;
+    // }
 
     // Use the first image from image_url directly
     final String? imageshow = data.image; // This is already the first image URL
+    print("Abhi:- get darect oder status : ${data.status}");
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -728,7 +730,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     ),
                     Container(
                       height: 25,
-                      width: 78,
+                      width: 105,
                       decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(8),
@@ -752,7 +754,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   alignment: Alignment.topRight,
                   child: Container(
                     height: 25,
-                    width: 79,
+                    width: 105,
                     decoration: BoxDecoration(
                       color: _getStatusColor(displayStatus),
                       borderRadius: BorderRadius.circular(8),
@@ -762,7 +764,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         displayStatus.toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: 10,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

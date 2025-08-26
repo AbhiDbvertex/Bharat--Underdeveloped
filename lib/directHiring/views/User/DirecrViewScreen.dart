@@ -1732,7 +1732,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
   }
   String? getcategoryId;
   List<String> getsubCategoryIds = [];
-
+  String? workerName;
+  String? workerAddress;
+  String? workerImageUrl;
+  String? workerId;
   Future<void> fetchOrderDetail() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1797,11 +1800,22 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
           ));
         }
 
+        // setState(() {
+        //   order = decoded['data']['order'];
+        //   orderProviderId = providerId;
+        //   providerslist = tempProviders; // Initially set with assignedWorker
+        //   isLoading = false;
+        // });
+
         setState(() {
           order = decoded['data']['order'];
           orderProviderId = providerId;
           providerslist = tempProviders; // Initially set with assignedWorker
           isLoading = false;
+          workerName = decoded['data']['assignedWorker']?['name']?.toString() ?? 'Unknown';
+          workerAddress = decoded['data']['assignedWorker']?['address']?.toString() ?? 'No address';
+          workerImageUrl = decoded['data']['assignedWorker']?['image']?.toString();
+          workerId = decoded['data']['assignedWorker']?['_id']?.toString();
         });
 
         print("️ No provider_id found in offer_history id : ${orderProviderId} ${providerId}");
@@ -2203,7 +2217,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       } else {
         print("❌ API Error: ${response.statusCode}");
         Get.snackbar(
-          'API Error',
+          '',
           'Error ${response.statusCode}',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
@@ -2347,7 +2361,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         final err = json.decode(response.body);
         print("❗ API Error: ${response.statusCode} - ${err['message']}");
         Get.snackbar(
-          'API Error',
+          'Error',
           '${err['message']}',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
@@ -2381,9 +2395,6 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       );
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -2818,8 +2829,275 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               },
             )
                 : SizedBox(),
+           /* order!['hire_status'] == 'accepted' && workerName != null ?
+            Card(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Assigned Person",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 12),
 
-            //  this is show on assignedWorker time
+                    workerImageUrl != null
+                        ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(workerImageUrl!),
+                          onBackgroundImageError: (_, __) {},
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                workerName ?? '',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Text(
+                                workerAddress ?? 'Loading...',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                             SizedBox(height: 4,),
+                             Container(child: TextButton(onPressed: (){
+                               Navigator.push(context, MaterialPageRoute(builder: (context)=>WorkerListViewProfileScreen(
+                                 workerId: workerId ?? "",
+                               )));
+                             }, child: Text("View profile",style: TextStyle(color: Colors.white),)),height: 35,
+                               decoration: BoxDecoration(color: AppColors.primaryGreen,borderRadius: BorderRadius.circular(8)),),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                        : Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey[200],
+                          child: Icon(Icons.person, color: Colors.grey),
+                        ),
+                        SizedBox(width: 12),
+                        Text("No worker assigned"),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ) :SizedBox(),*/
+
+            order != null && order?['hire_status'] == 'accepted' && workerId != null
+                ? Card(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Assigned Person",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        workerImageUrl != null
+                            ? CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(workerImageUrl!),
+                          onBackgroundImageError: (_, __) => Icon(Icons.person, color: Colors.grey),
+                        )
+                            : CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.grey[200],
+                          child: Icon(Icons.person, color: Colors.grey),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                workerName ?? 'Unknown',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Text(
+                                workerAddress ?? 'No address',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Container(
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryGreen,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => WorkerListViewProfileScreen(
+                                          workerId: workerId!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "View profile",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+                : Container(), // Empty container if conditions are not met
+
+            // Card(
+            //   color: Colors.white,
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(12),
+            //   ),
+            //   elevation: 3,
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(12.0),
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         Text(
+            //           "Assigned Person",
+            //           style: TextStyle(
+            //             fontWeight: FontWeight.w600,
+            //             fontSize: 16,
+            //           ),
+            //         ),
+            //         SizedBox(height: 12),
+            //         workerImageUrl != null && workerId != null // Added workerId check
+            //             ? Row(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             CircleAvatar(
+            //               radius: 40,
+            //               backgroundImage: NetworkImage(workerImageUrl!),
+            //               onBackgroundImageError: (_, __) => Text('Image not available'),
+            //             ),
+            //             SizedBox(width: 12),
+            //             Expanded(
+            //               child: Column(
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //                 children: [
+            //                   Text(
+            //                     workerName ?? 'Unknown',
+            //                     style: TextStyle(
+            //                       fontSize: 16,
+            //                       fontWeight: FontWeight.bold,
+            //                     ),
+            //                   ),
+            //                   SizedBox(height: 3),
+            //                   Text(
+            //                     workerAddress ?? 'No address',
+            //                     style: TextStyle(
+            //                       fontSize: 14,
+            //                       color: Colors.grey[700],
+            //                     ),
+            //                   ),
+            //                   SizedBox(height: 6),
+            //                   Container(
+            //                     height: 35,
+            //                     decoration: BoxDecoration(
+            //                       color: AppColors.primaryGreen,
+            //                       borderRadius: BorderRadius.circular(8),
+            //                     ),
+            //                     child: TextButton(
+            //                       onPressed: () {
+            //                         Navigator.push(
+            //                           context,
+            //                           MaterialPageRoute(
+            //                             builder: (context) => WorkerListViewProfileScreen(
+            //                               workerId: workerId!, // Safe to use since we checked null
+            //                             ),
+            //                           ),
+            //                         );
+            //                       },
+            //                       child: Text(
+            //                         "View profile",
+            //                         style: TextStyle(color: Colors.white),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ],
+            //               ),
+            //             ),
+            //           ],
+            //         )
+            //             : Row(
+            //           children: [
+            //             CircleAvatar(
+            //               radius: 30,
+            //               backgroundColor: Colors.grey[200],
+            //               child: Icon(Icons.person, color: Colors.grey),
+            //             ),
+            //             SizedBox(width: 12),
+            //             Text(
+            //               "No worker assigned",
+            //               style: TextStyle(
+            //                 fontSize: 14,
+            //                 color: Colors.grey[700],
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+
+
+
+    //  this is show on assignedWorker time
             // order!['hire_status'] == 'accepted' && order!['assignedWorker'] != null && order!['assignedWorker'].isNotEmpty
             //     ? Center(
             //   child: Card(
@@ -3402,6 +3680,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 ],
               ),
             ) :SizedBox(),
+
             order!['hire_status'] == 'cancelled'
                 ? Center(
               child: Container(
@@ -3418,7 +3697,24 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 ),
               ),
             )
+                : SizedBox(),order!['hire_status'] == 'cancelledDispute'
+                ? Center(
+              child: Container(
+                height: 35,
+                width: 300,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.red),
+                    Text("The order is dispute Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                  ],
+                ),
+              ),
+            )
                 : SizedBox(),
+
             order!['hire_status'] == 'completed'
                 ? Center(
               child: Container(
@@ -3499,8 +3795,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                 ? Center(
                               child: Image.network(
                                 imageUrl,
-                                height: 120,
-                                width: 120,
+                                height: 100,
+                                width: 80,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) => const Icon(
                                   Icons.broken_image,

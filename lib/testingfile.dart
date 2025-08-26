@@ -24,7 +24,7 @@ class PaymentScreen extends StatelessWidget {
 
   Future<void> launchUPI(String amount) async {
     final upiId = ""; // apna UPI ID yaha daal
-    final name = "Abhishek Patel"; // apna naam ya app ka naam
+    final name = ""; // apna naam ya app ka naam
     final note = "Payment from app"; // payment note
 
     final uri = Uri.parse(
