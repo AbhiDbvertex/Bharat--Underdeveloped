@@ -122,8 +122,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       print('🔐 Token: $token');
 
       final res = await http.get(
+        // Uri.parse('https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         Uri.parse(
-            'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
+            'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -428,7 +429,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           filteredEmergencyItems = emergencyItems;
         });
         if (selectedTab == 2) {
-          final orders = await SpEmergencyServiceController().getEmergencySpOrderByRole();
+          final orders =
+              await SpEmergencyServiceController().getEmergencySpOrderByRole();
           setState(() {
             spEmergencyOrders = orders;
             isLoading = false;
@@ -524,7 +526,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   //   );
   // }
   Widget _buildEmergencyList() {
-    if ( spEmergencyOrders== null || spEmergencyOrders!.data.isEmpty) {
+    if (spEmergencyOrders == null || spEmergencyOrders!.data.isEmpty) {
       return const Center(child: Text("No Emergency Orders Found"));
     }
 
@@ -537,6 +539,149 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       ),
     );
   }
+  // Widget _buildHireCard(
+  //   DirectOrder data,
+  //   String? categreyId,
+  //   String? subcategreyId,
+  //   double screenWidth,
+  //   double screenHeight,
+  // ) {
+  //   final bool hasProfilePic = data.user_id != null &&
+  //       data.user_id!.profile_pic != null &&
+  //       (data.user_id!.profile_pic?.isNotEmpty ?? false) &&
+  //       data.user_id!.profile_pic != 'local';
+  //   print("🛠 Building card for Order ID: ${data.id}, Status: ${data.status}");
+  //
+  //   return Container(
+  //     margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+  //     padding: EdgeInsets.all(screenWidth * 0.025),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(screenWidth * 0.035),
+  //       boxShadow: const [
+  //         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(screenWidth * 0.02),
+  //           child: hasProfilePic
+  //               ? Image.network(
+  //                   data.user_id!.profile_pic!,
+  //                   height: screenHeight * 0.15,
+  //                   width: screenWidth * 0.3,
+  //                   fit: BoxFit.cover,
+  //                   errorBuilder: (context, error, stackTrace) => Image.asset(
+  //                     'assets/images/task.png',
+  //                     height: screenHeight * 0.15,
+  //                     width: screenWidth * 0.3,
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 )
+  //               : Image.asset(
+  //                   'assets/images/task.png',
+  //                   height: screenHeight * 0.15,
+  //                   width: screenWidth * 0.3,
+  //                   fit: BoxFit.cover,
+  //                 ),
+  //         ),
+  //         SizedBox(width: screenWidth * 0.025),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 data.title,
+  //                 style: _cardTitle(fontSize: screenWidth * 0.04),
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 data.description,
+  //                 style: _cardBody(fontSize: screenWidth * 0.035),
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 "Posted Date: ${data.date}",
+  //                 style: _cardDate(fontSize: screenWidth * 0.03),
+  //               ),
+  //               SizedBox(height: screenHeight * 0.008),
+  //               Row(
+  //                 children: [
+  //                   Container(
+  //                     padding: EdgeInsets.symmetric(
+  //                       horizontal: screenWidth * 0.02,
+  //                       vertical: screenHeight * 0.005,
+  //                     ),
+  //                     decoration: BoxDecoration(
+  //                       color: _getStatusColor(data.status),
+  //                       borderRadius:
+  //                           BorderRadius.circular(screenWidth * 0.015),
+  //                     ),
+  //                     child: Text(
+  //                       data.status.isEmpty
+  //                           ? 'Pending'
+  //                           : data.status[0].toUpperCase() +
+  //                               data.status.substring(1),
+  //                       style: TextStyle(
+  //                         color: Colors.white,
+  //                         fontSize: screenWidth * 0.03,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const Spacer(),
+  //                   TextButton(
+  //                     onPressed: () {
+  //                       print(
+  //                         "🔍 Navigating to ServiceDirectViewScreen for Order ID: ${data.id}",
+  //                       );
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                           builder: (_) => ServiceDirectViewScreen(
+  //                             id: data.id,
+  //                             categreyId: categreyId,
+  //                             subcategreyId: subcategreyId,
+  //                           ),
+  //                         ),
+  //                       ).then((_) {
+  //                         print(
+  //                           "🔄 Returned to WorkerMyHireScreen, refreshing orders",
+  //                         );
+  //                         fetchDirectOrders();
+  //                       });
+  //                     },
+  //                     style: TextButton.styleFrom(
+  //                       backgroundColor: Colors.green.shade700,
+  //                       minimumSize:
+  //                           Size(screenWidth * 0.25, screenHeight * 0.05),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius:
+  //                             BorderRadius.circular(screenWidth * 0.015),
+  //                       ),
+  //                     ),
+  //                     child: Text(
+  //                       "View Details",
+  //                       style: GoogleFonts.roboto(
+  //                         color: Colors.white,
+  //                         fontSize: screenWidth * 0.03,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _buildHireCard(
     DirectOrder data,
     String? categreyId,
@@ -544,11 +689,10 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     double screenWidth,
     double screenHeight,
   ) {
-    final bool hasProfilePic = data.user_id != null &&
-        data.user_id!.profile_pic != null &&
-        (data.user_id!.profile_pic?.isNotEmpty ?? false) &&
-        data.user_id!.profile_pic != 'local';
-    print("🛠 Building card for Order ID: ${data.id}, Status: ${data.status}");
+    // Check karo ki image field khali toh nahi
+    final bool hasImage = data.image.isNotEmpty;
+    print(
+        "🛠 Card ban raha hai, Order ID: ${data.id}, Status: ${data.status}, Image: ${data.image}, Address: ${data.address}");
 
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
@@ -564,18 +708,22 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(screenWidth * 0.02),
-            child: hasProfilePic
+            child: hasImage
                 ? Image.network(
-                    data.user_id!.profile_pic!,
+                    data.image, // API se aayi image use karo
                     height: screenHeight * 0.15,
                     width: screenWidth * 0.3,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/task.png',
-                      height: screenHeight * 0.15,
-                      width: screenWidth * 0.3,
-                      fit: BoxFit.cover,
-                    ),
+                    errorBuilder: (context, error, stackTrace) {
+                      print(
+                          'Image load nahi hui: ${data.image}, Error: $error');
+                      return Image.asset(
+                        'assets/images/task.png',
+                        height: screenHeight * 0.15,
+                        width: screenWidth * 0.3,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   )
                 : Image.asset(
                     'assets/images/task.png',
@@ -607,6 +755,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                   "Posted Date: ${data.date}",
                   style: _cardDate(fontSize: screenWidth * 0.03),
                 ),
+                SizedBox(height: screenHeight * 0.005),
                 SizedBox(height: screenHeight * 0.008),
                 Row(
                   children: [
@@ -635,8 +784,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     TextButton(
                       onPressed: () {
                         print(
-                          "🔍 Navigating to ServiceDirectViewScreen for Order ID: ${data.id}",
-                        );
+                            "🔍 ServiceDirectViewScreen pe ja raha hai, Order ID: ${data.id}");
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -648,8 +796,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                           ),
                         ).then((_) {
                           print(
-                            "🔄 Returned to WorkerMyHireScreen, refreshing orders",
-                          );
+                              "🔄 Wapas aaya WorkerMyHireScreen pe, orders refresh kar raha hai");
                           fetchDirectOrders();
                         });
                       },
@@ -1069,28 +1216,28 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
               children: [
                 hasImage
                     ? Image.network(
-                  data.imageUrls!.first, // first image show karenge
-                  height: 200,
-                  width: 110,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 200,
-                      width: 110,
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(
-                        color: AppColors.primaryGreen,
-                        strokeWidth: 2.5,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) =>
-                      Image.asset('assets/images/task.png',
-                          height: 150, width: 110, fit: BoxFit.cover),
-                )
+                        data.imageUrls!.first, // first image show karenge
+                        height: 200,
+                        width: 110,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 200,
+                            width: 110,
+                            alignment: Alignment.center,
+                            child: const CircularProgressIndicator(
+                              color: AppColors.primaryGreen,
+                              strokeWidth: 2.5,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset('assets/images/task.png',
+                                height: 150, width: 110, fit: BoxFit.cover),
+                      )
                     : Image.asset('assets/images/task.png',
-                    height: 150, width: 110, fit: BoxFit.cover),
+                        height: 150, width: 110, fit: BoxFit.cover),
                 Positioned(
                   bottom: 5,
                   left: 5,
@@ -1147,9 +1294,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                       child: Text(
                         data.subCategoryIds.isNotEmpty
                             ? data.subCategoryIds
-                            .take(2)
-                            .map((e) => e.name)
-                            .join(", ")
+                                .take(2)
+                                .map((e) => e.name)
+                                .join(", ")
                             : "",
                         style: _cardDate(fontSize: 11),
                         maxLines: 1,
@@ -1273,15 +1420,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                           context,
                           MaterialPageRoute(
                               builder: (_) => SpWorkDetail(
-                                data.id,
-                                isUser: true,
-                              )),
+                                    data.id,
+                                    isUser: true,
+                                  )),
                         ).then(
-                              (_) async {
+                          (_) async {
                             final orders = await SpEmergencyServiceController()
                                 .getEmergencySpOrderByRole();
                             setState(() {
-                               spEmergencyOrders = orders;
+                              spEmergencyOrders = orders;
                             });
                           },
                         );
