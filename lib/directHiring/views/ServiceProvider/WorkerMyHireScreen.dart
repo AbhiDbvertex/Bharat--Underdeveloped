@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:developer/Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
 import '../../../Bidding/Models/bidding_order.dart';
+import '../../../Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
 import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
 import '../../../Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
@@ -124,7 +124,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       final res = await http.get(
         // Uri.parse('https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         Uri.parse(
-            'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
+            'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -214,11 +214,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 description: order.description,
                 date: order.date,
                 status: finalStatus,
-                image: (order.offer_history != null &&
-                        order.offer_history!.isNotEmpty)
-                    ? order.offer_history!.first.provider_id?.profile_pic ??
-                        order.image
-                    : order.image,
+                image: order
+                    .image, // Yeh line change hui, direct order.image use karo
                 user_id: order.user_id,
                 offer_history: order.offer_history,
               );
@@ -710,7 +707,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
             borderRadius: BorderRadius.circular(screenWidth * 0.02),
             child: hasImage
                 ? Image.network(
-                    data.image, // API se aayi image use karo
+                    data.image,
                     height: screenHeight * 0.15,
                     width: screenWidth * 0.3,
                     fit: BoxFit.cover,
@@ -826,6 +823,192 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       ),
     );
   }
+
+  // Widget _buildBiddingCard(
+  //   BiddingOrder data,
+  //   String? categoryId,
+  //   String? subcategoryId,
+  //   double screenWidth,
+  //   double screenHeight,
+  // ) {
+  //   print(
+  //       "🛠 Building card for Task: ${data.title}, Status: ${data.hireStatus}");
+  //   print("Image URLs: ${data.imageUrls}");
+  //
+  //   return Container(
+  //     margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+  //     padding: EdgeInsets.all(screenWidth * 0.025),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(screenWidth * 0.035),
+  //       boxShadow: const [
+  //         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(screenWidth * 0.02),
+  //           child: Container(
+  //             alignment: Alignment.topCenter,
+  //             child: data.imageUrls.isNotEmpty
+  //                 ? Image.network(
+  //                     data.imageUrls.first,
+  //                     height: screenHeight * 0.16,
+  //                     width: screenWidth * 0.32,
+  //                     fit: BoxFit.cover,
+  //                     errorBuilder: (context, error, stackTrace) {
+  //                       print(
+  //                           'Error loading image: ${data.imageUrls.first}, Error: $error');
+  //                       return Image.asset(
+  //                         'assets/images/chair.png',
+  //                         height: screenHeight * 0.16,
+  //                         width: screenWidth * 0.32,
+  //                         fit: BoxFit.cover,
+  //                       );
+  //                     },
+  //                   )
+  //                 : Image.asset(
+  //                     'assets/images/chair.png',
+  //                     height: screenHeight * 0.16,
+  //                     width: screenWidth * 0.32,
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //           ),
+  //         ),
+  //         SizedBox(width: screenWidth * 0.025),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 data.title,
+  //                 style: _cardTitle(fontSize: screenWidth * 0.04),
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 '₹${data.cost.toStringAsFixed(0)}',
+  //                 style: GoogleFonts.roboto(
+  //                   fontSize: screenWidth * 0.035,
+  //                   color: Colors.green,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Text(
+  //                 data.description,
+  //                 style: _cardBody(fontSize: screenWidth * 0.035),
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(
+  //                     "Date: ${data.deadline.split('T').first}",
+  //                     style: _cardDate(fontSize: screenWidth * 0.03),
+  //                   ),
+  //                   if (data.hireStatus != "")
+  //                     Padding(
+  //                       padding: EdgeInsets.only(left: screenWidth * 0.05),
+  //                       child: Container(
+  //                         height: 25,
+  //                         width: 80,
+  //                         decoration: BoxDecoration(
+  //                           color: _getStatusColor(data.hireStatus),
+  //                           borderRadius:
+  //                               BorderRadius.circular(screenWidth * 0.015),
+  //                         ),
+  //                         child: Center(
+  //                           child: Text(
+  //                             data.hireStatus.isEmpty
+  //                                 ? 'Pending'
+  //                                 : data.hireStatus[0].toUpperCase() +
+  //                                     data.hireStatus.substring(1),
+  //                             style: TextStyle(
+  //                               color: Colors.white,
+  //                               fontSize: screenWidth * 0.03,
+  //                             ),
+  //                             textAlign: TextAlign.center,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //               SizedBox(height: screenHeight * 0.005),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Container(
+  //                     height: 20,
+  //                     width: 100,
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.red.shade300,
+  //                       borderRadius: BorderRadius.circular(10),
+  //                     ),
+  //                     child: Center(
+  //                       child: Text(
+  //                         data.address,
+  //                         style: GoogleFonts.roboto(
+  //                           fontSize: screenWidth * 0.035,
+  //                           color: Colors.white,
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                         textAlign: TextAlign.center,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   GestureDetector(
+  //                     onTap: () {
+  //                       print(
+  //                           "🔍 Navigating to Biddingserviceproviderworkdetail for Task: ${data.title}");
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                           builder: (_) => Biddingserviceproviderworkdetail(
+  //                             orderId: data.id,
+  //                             hireStatus: '',
+  //                           ),
+  //                         ),
+  //                       ).then((_) {
+  //                         print(
+  //                             "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
+  //                         fetchBiddingOrders();
+  //                       });
+  //                     },
+  //                     child: Container(
+  //                       height: 25,
+  //                       width: 80,
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.green.shade700,
+  //                         borderRadius:
+  //                             BorderRadius.circular(screenWidth * 0.015),
+  //                       ),
+  //                       child: Center(
+  //                         child: Text(
+  //                           "View Details",
+  //                           style: GoogleFonts.roboto(
+  //                             color: Colors.white,
+  //                             fontSize: screenWidth * 0.03,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildBiddingCard(
     BiddingOrder data,
@@ -969,12 +1152,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     GestureDetector(
                       onTap: () {
                         print(
-                            "🔍 Navigating to Biddingserviceproviderworkdetail for Task: ${data.title}");
+                            'Navigating to details with orderId: ${data.id}, status: ${data.hireStatus}');
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => Biddingserviceproviderworkdetail(
-                                orderId: data.id),
+                            builder: (context) =>
+                                Biddingserviceproviderworkdetail(
+                              orderId: data.id,
+                              hireStatus: data.hireStatus, // Pass hireStatus
+                            ),
                           ),
                         ).then((_) {
                           print(
@@ -982,20 +1168,25 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                           fetchBiddingOrders();
                         });
                       },
-                      child: Container(
-                        height: 25,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade700,
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.015),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "View Details",
-                            style: GoogleFonts.roboto(
-                              color: Colors.white,
-                              fontSize: screenWidth * 0.03,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: screenHeight * 0.01),
+                        child: SizedBox(
+                          width: screenWidth * 0.2,
+                          height: screenHeight * 0.04,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade700,
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.02),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "View Details",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: screenWidth * 0.03,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -1011,173 +1202,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     );
   }
 
-  // Widget _buildBiddingCardForEmergency(
-  //   Map<String, dynamic> data,
-  //   String? categreyId,
-  //   String? subcategreyId,
-  //   double screenWidth,
-  //   double screenHeight,
-  // ) {
-  //   print(
-  //       "🛠 Building card for Emergency Task: ${data['title']}, Status: ${data['status']}");
-  //
-  //   return Container(
-  //     margin: EdgeInsets.only(bottom: screenHeight * 0.015),
-  //     padding: EdgeInsets.all(screenWidth * 0.025),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(screenWidth * 0.035),
-  //       boxShadow: const [
-  //         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-  //       ],
-  //     ),
-  //     child: Row(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         ClipRRect(
-  //           borderRadius: BorderRadius.circular(screenWidth * 0.02),
-  //           child: Container(
-  //             alignment: Alignment.topCenter,
-  //             child: Image.asset(
-  //               'assets/images/chair.png',
-  //               height: screenHeight * 0.16,
-  //               width: screenWidth * 0.32,
-  //               fit: BoxFit.cover,
-  //             ),
-  //           ),
-  //         ),
-  //         SizedBox(width: screenWidth * 0.025),
-  //         Expanded(
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 data['title'],
-  //                 style: _cardTitle(fontSize: screenWidth * 0.04),
-  //                 maxLines: 1,
-  //                 overflow: TextOverflow.ellipsis,
-  //               ),
-  //               SizedBox(height: screenHeight * 0.005),
-  //               Text(
-  //                 data['price'],
-  //                 style: GoogleFonts.roboto(
-  //                   fontSize: screenWidth * 0.035,
-  //                   color: Colors.green,
-  //                   fontWeight: FontWeight.w500,
-  //                 ),
-  //               ),
-  //               SizedBox(height: screenHeight * 0.005),
-  //               Text(
-  //                 data['desc'],
-  //                 style: _cardBody(fontSize: screenWidth * 0.035),
-  //                 maxLines: 2,
-  //                 overflow: TextOverflow.ellipsis,
-  //               ),
-  //               SizedBox(height: screenHeight * 0.005),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(
-  //                     "Date: ${data['date']}",
-  //                     style: _cardDate(fontSize: screenWidth * 0.03),
-  //                   ),
-  //                   if (data['status'] != "")
-  //                     Padding(
-  //                       padding: EdgeInsets.only(left: screenWidth * 0.05),
-  //                       child: Container(
-  //                         height: 25,
-  //                         width: 80,
-  //                         decoration: BoxDecoration(
-  //                           color: _getStatusColor(data['status']),
-  //                           borderRadius:
-  //                               BorderRadius.circular(screenWidth * 0.015),
-  //                         ),
-  //                         child: Center(
-  //                           child: Text(
-  //                             data['status'].isEmpty
-  //                                 ? 'Pending'
-  //                                 : data['status'][0].toUpperCase() +
-  //                                     data['status'].substring(1),
-  //                             style: TextStyle(
-  //                               color: Colors.white,
-  //                               fontSize: screenWidth * 0.03,
-  //                             ),
-  //                             textAlign: TextAlign.center,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                 ],
-  //               ),
-  //               SizedBox(height: screenHeight * 0.005),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Container(
-  //                     height: 20,
-  //                     width: 100,
-  //                     decoration: BoxDecoration(
-  //                       color: Colors.red.shade300,
-  //                       borderRadius: BorderRadius.circular(10),
-  //                     ),
-  //                     child: Center(
-  //                       child: Padding(
-  //                         padding: const EdgeInsets.all(8.0),
-  //                         child: Text(
-  //                           data['address'],
-  //                           style: GoogleFonts.roboto(
-  //                             fontSize: screenWidth * 0.035,
-  //                             color: Colors.white,
-  //                             fontWeight: FontWeight.w500,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   GestureDetector(
-  //                     onTap: () {
-  //                       print(
-  //                           "🔍 Navigating to Biddingserviceproviderworkdetail for Task: ${data['title']}");
-  //                       Navigator.push(
-  //                         context,
-  //                         MaterialPageRoute(
-  //                           builder: (_) => Biddingserviceproviderworkdetail(
-  //                               orderId: data['_id'] ?? ''),
-  //                         ),
-  //                       ).then((_) {
-  //                         print(
-  //                             "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
-  //                         fetchBiddingOrders();
-  //                       });
-  //                     },
-  //                     child: Container(
-  //                       height: 25,
-  //                       width: 80,
-  //                       decoration: BoxDecoration(
-  //                         color: Colors.green.shade700,
-  //                         borderRadius:
-  //                             BorderRadius.circular(screenWidth * 0.015),
-  //                       ),
-  //                       child: Center(
-  //                         child: Text(
-  //                           "View Details",
-  //                           style: GoogleFonts.roboto(
-  //                             color: Colors.white,
-  //                             fontSize: screenWidth * 0.03,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget _buildEmergencyCard(data) {
     //   bwDebug("[_buildEmergencyCard] call ",tag:"myHireScreen ");
 
