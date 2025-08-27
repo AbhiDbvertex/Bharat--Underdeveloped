@@ -9,7 +9,8 @@ import '../../../../Widgets/AppColors.dart';
 
 class ViewUserProfileScreen extends StatefulWidget {
   final String userId;
-  const ViewUserProfileScreen({super.key, required this.userId});
+  final profileImage;
+  const ViewUserProfileScreen({super.key, required this.userId, this.profileImage});
 
   @override
   State<ViewUserProfileScreen> createState() => _ViewUserProfileScreenState();
@@ -134,9 +135,12 @@ class _ViewUserProfileScreenState extends State<ViewUserProfileScreen> {
             radius: 50,
             backgroundColor: Colors.grey.shade300,
             backgroundImage:
-            profilePicUrl != null && profilePicUrl!.isNotEmpty
-                ? NetworkImage(profilePicUrl!)
-                : null,
+            // profilePicUrl != null && profilePicUrl!.isNotEmpty
+            //     ? NetworkImage(profilePicUrl!)
+            //     : null,
+    widget.profileImage != null && widget.profileImage.isNotEmpty
+             ? NetworkImage(widget.profileImage)
+             : null,
             child:
             profilePicUrl == null || profilePicUrl!.isEmpty
                 ? const Text(
@@ -146,11 +150,11 @@ class _ViewUserProfileScreenState extends State<ViewUserProfileScreen> {
                 : null,
           ),
         ),
-        Positioned(
-          bottom: 14,
-          right: 4,
-          child: const Icon(Icons.camera_alt, color: Colors.black, size: 18),
-        ),
+        // Positioned(
+        //   bottom: 14,
+        //   right: 4,
+        //   child: const Icon(Icons.camera_alt, color: Colors.black, size: 18),
+        // ),
       ],
     );
   }
@@ -188,8 +192,8 @@ class _ViewUserProfileScreenState extends State<ViewUserProfileScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 5),
-            Center(child: _buildRoleSwitcher(context)),
+            // const SizedBox(height: 5),
+           // Center(child: _buildRoleSwitcher(context)),
           ],
         ),
       ),

@@ -389,7 +389,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     }
 
     final List dataList = BudingData['data'] ?? [];
-    // print("Abhi:- get bidding oderId : ${BudingData['data'] }");
+    print("Abhi:- get bidding oderId : ${BudingData['data'] }");
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -426,15 +426,27 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
                   final title = item['category_id']?['name'] ?? "No Title";
                   final price = item['service_payment']?['amount']?.toString() ?? "0";
+                  // final userId = item?['user_id']['_id'] ?? "";
                   final buddingOderId = item['_id'] ?? "0";
                   final address = item['google_address'] ?? "No Address";
                   final status = item['hire_status'] ?? "No Status";
                   final deadline = item['deadline']?.toString() ?? "";
-                  final imageUrl = (item['image_urls'] != null && item['image_urls'].isNotEmpty)
-                      ? item['image_urls'][0]
+                  final imageUrl = (item['image_url'] != null && item['image_url'].isNotEmpty)
+                      ? item['image_url'][0]
                       : "";
+                  var user = item?['user_id'];
+                  String userId = "";
+
+                  if (user is Map) {
+                    userId = user['_id']?.toString() ?? "";
+                  } else if (user is String) {
+                    userId = user;
+                  }
+
                   print("Abhi:- get bidding oderId : ${buddingOderId }");
                   print("Abhi:- get bidding oderId status : ${status}");
+                  print("Abhi:- get bidding images : ${imageUrl}");
+                  print("Abhi:- get bidding userId : ${userId}");
 
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -456,6 +468,9 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                 height: 100,
                                 width: 100,
                                 fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.image_not_supported_outlined,size: 100,);
+                              },
                               )
                                   : /*Image.asset(
                               "assets/images/Work.png",
@@ -558,6 +573,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                           MaterialPageRoute(
                                             builder: (context) => BiddingWorkerDetailScreen(
                                               buddingOderId: buddingOderId,
+                                              userId: userId,
                                             ),
                                           ),
                                         );

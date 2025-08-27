@@ -3606,7 +3606,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         print("📸 Profile Pic URL: $profilePic");
                         return profilePic != null
                             ? Image.network(
-                          'https://api.thebharatworks.com$profilePic',
+                          '$profilePic',
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
@@ -3654,8 +3654,8 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               Expanded(
                                 child: () {
                                   final fullName = order != null && order!['user_id'] != null
-                                      ? order!['user_id']['full_name'] ?? 'Unknown Bhai'
-                                      : 'Unknown Bhai';
+                                      ? order!['user_id']['full_name'] ?? 'Unknown '
+                                      : 'Unknown ';
                                   print("📛 User Full Name: $fullName");
                                   return Text(
                                     fullName,
@@ -3710,12 +3710,13 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         SizedBox(height: 6),
                         GestureDetector(
                           onTap: () {
-                            final userId = order != null && order!['user_id'] != null ? order!['user_id']['_id'] ?? 'Unknown Bhai' : 'Unknown Bhai';
+                            final userId = order != null && order!['user_id'] != null ? order!['user_id']['_id'] ?? 'Unknown ' : 'Unknown ';
+                            final profilephot = order != null && order!['user_id'] != null ? order!['user_id']['profile_pic'] ?? 'Unknown ' : 'Unknown ';
                             print("👤 Navigating to Profile with User ID: $userId");
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ViewUserProfileScreen(userId: userId),
+                                builder: (context) => ViewUserProfileScreen(userId: userId,profileImage: profilephot,),
                               ),
                             );
                           },
