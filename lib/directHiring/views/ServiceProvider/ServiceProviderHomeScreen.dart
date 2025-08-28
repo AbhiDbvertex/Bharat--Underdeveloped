@@ -1516,13 +1516,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
-import '../../../Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import '../../../Emergency/utils/logger.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../User/UserNotificationScreen.dart';
@@ -1575,8 +1573,8 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     _initializeLocation();
     _fetchBiddingOrders();
     controller.getEmergencySpOrderList();
-
   }
+
   Future<void> _loadEmergencyTask() async {
     final prefs = await SharedPreferences.getInstance();
     bool saved = prefs.getBool("emergency_task") ?? false;
@@ -1584,6 +1582,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       _isSwitched = saved;
     });
   }
+
   Future<void> _initializeLocation() async {
     setState(() {
       isLoading = true;
@@ -1854,6 +1853,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       }
     }
   }
+
   Future<void> _checkEmergencyTask() async {
     setState(() {
       _isToggling = true;
@@ -1861,9 +1861,11 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
-      final url = Uri.parse("https://api.thebharatworks.com/api/user/emergency");
+      final url =
+          Uri.parse("https://api.thebharatworks.com/api/user/emergency");
 
-      final response = await http.post(   // ✅ bas post call karni hai
+      final response = await http.post(
+        // ✅ bas post call karni hai
         url,
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -1898,7 +1900,6 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
               SnackBar(content: Text("Error: ${response.statusCode}")),
             );
           }
-
         }
       }
     } catch (e) {
@@ -1908,13 +1909,13 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           SnackBar(content: Text("An error occurred: $e")),
         );
       }
-    }
-    finally {
+    } finally {
       setState(() {
         _isToggling = false;
       });
     }
   }
+
   Future<void> _fetchLocation() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedLocation =
@@ -2181,45 +2182,48 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                               scale: 0.6,
                               alignment: Alignment.centerLeft,
                               child:
-                              // Switch(
-                              //   value: _isSwitched,
-                              //   onChanged: (bool value) {
-                              //     setState(() {
-                              //       _isSwitched = value;
-                              //     });
-                              //     if (value) {
-                              //       myController.enableFeature();   // API call when ON
-                              //     } else {
-                              //       myController.disableFeature();  // API call when OFF
-                              //     }
-                              //   },
-                              //   activeColor: Colors.red,
-                              //   inactiveThumbColor: Colors.white,
-                              //   inactiveTrackColor: Colors.grey.shade300,
-                              //   materialTapTargetSize:
-                              //   MaterialTapTargetSize.shrinkWrap,
-                              // ),
-                              Stack(
+                                  // Switch(
+                                  //   value: _isSwitched,
+                                  //   onChanged: (bool value) {
+                                  //     setState(() {
+                                  //       _isSwitched = value;
+                                  //     });
+                                  //     if (value) {
+                                  //       myController.enableFeature();   // API call when ON
+                                  //     } else {
+                                  //       myController.disableFeature();  // API call when OFF
+                                  //     }
+                                  //   },
+                                  //   activeColor: Colors.red,
+                                  //   inactiveThumbColor: Colors.white,
+                                  //   inactiveTrackColor: Colors.grey.shade300,
+                                  //   materialTapTargetSize:
+                                  //   MaterialTapTargetSize.shrinkWrap,
+                                  // ),
+                                  Stack(
                                 alignment: Alignment.center,
                                 children: [
                                   Switch(
                                     value: _isSwitched,
-                                    onChanged: _isToggling ? null : (bool value){
-                                      _checkEmergencyTask();
-                                    },
+                                    onChanged: _isToggling
+                                        ? null
+                                        : (bool value) {
+                                            _checkEmergencyTask();
+                                          },
                                     activeColor: Colors.red,
                                     inactiveThumbColor: Colors.white,
                                     inactiveTrackColor: Colors.grey.shade300,
-                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
                                   if (_isToggling)
                                     const CircularProgressIndicator(
-                                     // strokeWidth: 2.0,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                      // strokeWidth: 2.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.red),
                                     ),
                                 ],
-                              )
-                          ),
+                              )),
                         ),
                       ],
                     ),
@@ -2280,45 +2284,41 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
               ),
               SizedBox(height: height * 0.015),
               Container(
-                height: height * 0.25,
-                width: double.infinity,
-                color: Colors.green.shade50,
-                padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.04,
-                  vertical: height * 0.015,
-
-                ),
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (controller.orders.isEmpty) {
-                    return const Center(child: Text("No data found"));
-                  }
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: controller.orders.map((order) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: EmergencyCard(
-                                name: order.categoryId.name, // category ka name
-                                role: order.subCategoryIds.isNotEmpty
-                                    ? order.subCategoryIds.first.name
-                                    : "No SubCategory",
-                                imagePath: order.imageUrls.isNotEmpty
-                                    ? order.imageUrls.first
-                                    : 'assets/images/Fur.png',
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                  ;
-                })
-
-
-              ),
+                  height: height * 0.25,
+                  width: double.infinity,
+                  color: Colors.green.shade50,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.04,
+                    vertical: height * 0.015,
+                  ),
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.orders.isEmpty) {
+                      return const Center(child: Text("No data found"));
+                    }
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: controller.orders.map((order) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: EmergencyCard(
+                              name: order.categoryId.name, // category ka name
+                              role: order.subCategoryIds.isNotEmpty
+                                  ? order.subCategoryIds.first.name
+                                  : "No SubCategory",
+                              imagePath: order.imageUrls.isNotEmpty
+                                  ? order.imageUrls.first
+                                  : 'assets/images/Fur.png',
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                    ;
+                  })),
               SizedBox(height: height * 0.025),
               sectionHeader("FEATURE WORKER", false, () {}),
               SizedBox(height: height * 0.015),
