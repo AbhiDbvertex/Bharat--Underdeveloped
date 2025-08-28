@@ -1005,6 +1005,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
 
       final res = await http.get(
         Uri.parse(
+            // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
             'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -1054,20 +1055,41 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
     }
   }
 
-  Color getStatusColor(String status) {
+  // Color getStatusColor(String status) {
+  //   switch (status.toLowerCase()) {
+  //     case 'cancelled':
+  //       return Colors.red;
+  //     case 'accepted':
+  //       return Colors.green;
+  //     case 'completed':
+  //       return Colors.green;
+  //     case 'review':
+  //       return Colors.brown;
+  //     case 'pending':
+  //       return Colors.orange;
+  //     default:
+  //       return Colors.transparent;
+  //   }
+  // }
+
+  Color _getStatusColor(String status) {
+    print("🎨 Checking status color for: $status");
     switch (status.toLowerCase()) {
       case 'cancelled':
+      case 'cancelleddispute':
         return Colors.red;
       case 'accepted':
         return Colors.green;
       case 'completed':
         return Colors.green;
-      case 'review':
-        return Colors.brown;
       case 'pending':
         return Colors.orange;
+      case 'rejected':
+        return Colors.red;
+      case 'review':
+        return Colors.brown;
       default:
-        return Colors.transparent;
+        return Colors.grey;
     }
   }
 
@@ -1291,7 +1313,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                       child: Container(
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: getStatusColor(
+                                                          color: _getStatusColor(
                                                               item.hireStatus),
                                                           borderRadius:
                                                               BorderRadius
@@ -1302,13 +1324,15 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                         child: Center(
                                                           child: Text(
                                                             item.hireStatus,
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize:
-                                                                  screenWidth *
-                                                                      0.03,
-                                                            ),
+                                                            style: GoogleFonts.roboto(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.022,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
                                                           ),
                                                         ),
                                                       ),
