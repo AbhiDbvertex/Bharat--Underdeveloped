@@ -30,6 +30,8 @@ class _AccountScreenState extends State<AccountScreen> {
     'FAQ',
     'Referral',
     'Contact Us',
+    'Disputes',
+    'promotion'
   ];
 
   @override

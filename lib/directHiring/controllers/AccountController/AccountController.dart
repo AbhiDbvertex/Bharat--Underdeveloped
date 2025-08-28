@@ -16,6 +16,8 @@ import '../../views/Account/GetPremiumScreen.dart';
 import '../../views/Account/PrivacyScreen.dart';
 import '../../views/Account/ReferralScreen.dart';
 import '../../views/Account/TermsScreen.dart';
+import '../../views/Account/dispute/screens/disputes_screen.dart';
+import '../../views/Account/promotion/screens/promotion_banner_screen.dart';
 import '../../views/Account/service_provider_profile/ServiceProviderProfileScreen.dart';
 
 class AccountController {
@@ -74,6 +76,16 @@ class AccountController {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => Privacyscreen()),
+        );
+        case 'Disputes':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DisputeScreen()),
+        );
+        case 'promotion':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => PromotionBannerScreen()),
         );
         break;
       default:

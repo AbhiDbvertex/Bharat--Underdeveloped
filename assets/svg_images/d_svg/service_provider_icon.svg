@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" aria-hidden="true" role="img">
+    <!-- Background circle -->
+    <circle cx="12" cy="12" r="12" fill="#28A745"/>
+
+    <!-- Person (service provider) -->
+    <circle cx="12" cy="9" r="2.5" stroke="white" stroke-width="1.7"/>
+    <path d="M8.5 16c0-2 1.5-3.5 3.5-3.5s3.5 1.5 3.5 3.5"
+        stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+
+    <!-- Gear / settings icon (provider service) -->
+    <circle cx="17.5" cy="17.5" r="2" stroke="white" stroke-width="1.4"/>
+    <path d="M17.5 15.5v-1M17.5 19.5v1M19.5 17.5h1M15.5 17.5h-1"
+        stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

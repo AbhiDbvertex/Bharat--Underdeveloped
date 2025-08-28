@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" aria-hidden="true" role="img">
+    <!-- Background circle -->
+    <circle cx="12" cy="12" r="12" fill="#28A745"/>
+
+    <!-- User head -->
+    <circle cx="12" cy="9" r="2.5" stroke="white" stroke-width="1.7"/>
+
+    <!-- User shoulders -->
+    <path d="M7.5 17c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5"
+        stroke="white" stroke-width="1.7" stroke-linecap="round"/>
+</svg>
