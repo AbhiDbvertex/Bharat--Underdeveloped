@@ -62,6 +62,8 @@ dependencies:
   firebase_core: ^3.15.1
   flutter_local_notifications: ^19.3.1
   firebase_messaging: ^15.2.10
+  photo_view: ^0.15.0
+  smooth_page_indicator: ^1.2.1
   fluttertoast:
   just_audio:
 
@@ -103,6 +105,8 @@ flutter:
     - assets/svg_images/bottombar/
     - assets/svg_images/bottombar/task2.svg
     - assets/images/emergency_services/
+    - assets/svg_images/d_svg/
+    - assets/images/d_png/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

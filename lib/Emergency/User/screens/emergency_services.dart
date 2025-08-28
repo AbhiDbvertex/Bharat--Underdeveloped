@@ -373,37 +373,60 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             height: 120,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: images.length,
+              itemCount: images.length+1,
               separatorBuilder: (c, i) => SizedBox(width: 10),
               itemBuilder: (c, i) {
-                final file = images[i];
-                return Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        file,
+
+                if(i == images.length){
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: InkWell(
+                      onTap: onPick,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: Colors.green
+                            )
+                        ),
                         width: 120,
                         height: 120,
-                        fit: BoxFit.cover,
+                        child: Icon(Icons.add,color: Colors.green,size: 50,),
                       ),
                     ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: InkWell(
-                        onTap: () => images.remove(file),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.close, color: Colors.red),
+                  );
+                }else{
+                  final file = images[i];
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          file,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
-                  ],
-                );
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: InkWell(
+                          onTap: () => images.remove(file),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.close, color: Colors.red),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12,),
+                    ],
+                  );
+                }
               },
             ),
           ),
