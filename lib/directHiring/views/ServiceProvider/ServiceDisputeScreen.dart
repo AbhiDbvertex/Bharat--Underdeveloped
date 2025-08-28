@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -106,24 +108,27 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
       print("Abhi:- dispure respone ${res.body}");
       print("Abhi:- dispure respone ${res.statusCode}");
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? "Dispute created successfully"),
-            ),
-          );
-          Navigator.pop(context);
-        }
+        // if (mounted) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //       content: Text(data['message'] ?? "Dispute created successfully"),
+        //     ),
+        //   );
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Get.snackbar("Success","${data['message'] ?? 'Dispute'}",snackPosition: SnackPosition.BOTTOM , colorText: Colors.white,backgroundColor: Colors.green.shade700);
+
+
       } else {
         print("Abhi:- dispure respone ${res.body}");
         print("Abhi:- dispure respone ${res.statusCode}");
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? "Failed to create dispute"),
-            ),
-          );
-        }
+        // if (mounted) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //       content: Text(data['message'] ?? "Failed to create dispute"),
+        //     ),
+        //   );
+        Get.snackbar("Success","${data['message'] ?? 'Dispute'}",snackPosition: SnackPosition.BOTTOM , colorText: Colors.white,backgroundColor: Colors.red.shade700);
       }
     } catch (e) {
       print("Abhi:- dispure respone ${e}");

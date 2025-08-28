@@ -1401,9 +1401,11 @@ class PostTaskController extends GetxController {
       print("📡 Response Body: $responseBody");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        showSnackbar("Success", "Task posted successfully.", context: context);
-        resetForm();
+        // showSnackbar("Success", "Task posted successfully.", context: context);
         Get.back();
+        Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
+        resetForm();
+
         await Future.delayed(const Duration(seconds: 1));
         Get.delete<PostTaskController>();
         Get.back();

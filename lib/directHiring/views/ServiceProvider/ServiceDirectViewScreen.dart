@@ -3736,7 +3736,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                   print("📸 Profile Pic URL: $profilePic");
                                   return profilePic != null
                                       ? Image.network(
-                                          'https://api.thebharatworks.com$profilePic',
+                                          '$profilePic',
                                           width: 80,
                                           height: 80,
                                           fit: BoxFit.cover,
@@ -3789,8 +3789,8 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                                     order!['user_id'] != null
                                                 ? order!['user_id']
                                                         ['full_name'] ??
-                                                    'Unknown Bhai'
-                                                : 'Unknown Bhai';
+                                                    'Unknown '
+                                                : 'Unknown ';
                                             print(
                                                 "📛 User Full Name: $fullName");
                                             return Text(
@@ -3849,8 +3849,8 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                       final userId = order != null &&
                                               order!['user_id'] != null
                                           ? order!['user_id']['_id'] ??
-                                              'Unknown Bhai'
-                                          : 'Unknown Bhai';
+                                              'Unknown '
+                                          : 'Unknown ';
                                       print(
                                           "👤 Navigating to Profile with User ID: $userId");
                                       Navigator.push(
@@ -3858,6 +3858,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               ViewUserProfileScreen(
+                                                profileImage: order?['user_id']['profile_pic'] ?? "",
                                                   userId: userId),
                                         ),
                                       );

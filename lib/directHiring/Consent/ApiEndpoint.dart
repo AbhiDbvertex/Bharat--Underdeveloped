@@ -18,5 +18,6 @@ class ApiEndpoint {
   static const String getworker = '/worker/all';
   static const String darectCanceloffer = '/direct-order/cancelOrderByUser';
   static const String darectMarkComplete = '/direct-order/completeOrderUser';
+  static const String biddingMarkComplete = '/bidding-order/completeOrderUser';
   static const String postRatingDarect = '/user/add-review';
 }

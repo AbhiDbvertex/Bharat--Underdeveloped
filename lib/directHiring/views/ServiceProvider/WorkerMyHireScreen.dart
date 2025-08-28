@@ -151,11 +151,11 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
+        // _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      _showSnackBar("Something went wrong: $e");
+      // _showSnackBar("Something went wrong: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -229,11 +229,11 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
+        // _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      _showSnackBar("Something went wrong: $e");
+      // _showSnackBar("Something went wrong: $e");
     } finally {
       setState(() => isLoading = false);
     }

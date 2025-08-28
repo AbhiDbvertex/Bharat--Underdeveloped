@@ -2273,7 +2273,113 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: height * 0.02),
+                  SizedBox(height: height*0.03,),
+                  //             This is accepted time show this filed
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 3,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Image
+                        CircleAvatar(
+                          radius: height * 0.05,
+                          backgroundImage: data?['service_provider_id']?['profile_pic'] != null
+                              ? NetworkImage(data!['service_provider_id']!['profile_pic'])
+                              : null,
+                          child: data?['service_provider_id']?['profile_pic'] == null
+                              ? Icon(Icons.person, size: height * 0.05)
+                              : null,
+                        ),
+                        SizedBox(width: 12),
+
+                        // Details + Actions
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Name + Message icon
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      data?['service_provider_id']?['full_name'] ?? "No data",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.message,
+                                      size: 18,
+                                      color: Colors.green.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 6),
+
+                              // Phone + Call icon
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    data?['service_provider_id']?['phone'] ?? "No data",
+                                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                  ),
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.call,
+                                      size: 18,
+                                      color: Colors.green.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+
+                              // View profile link
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>UserViewWorkerDetails(
+                                    workerId: data?['service_provider_id']?['_id'],
+                                    hirebuttonhide: "hide",
+                                    UserId: widget.userId,
+                                    // oderId: OderId,
+                                    // biddingOfferId: biddingofferId,
+                                  ),));
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    "View profile",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.green,
+                                      //decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: height * 0.02),
                   Padding(
                     padding:
                     EdgeInsets.symmetric(horizontal: width * 0.05),

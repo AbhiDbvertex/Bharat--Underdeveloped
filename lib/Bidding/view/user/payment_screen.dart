@@ -7,15 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-
 import '../../../directHiring/Consent/ApiEndpoint.dart';
 import '../../../directHiring/Consent/app_constants.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
-
-// import '../../Consent/ApiEndpoint.dart';
-// import '../../Consent/app_constants.dart';
-// import '../ServiceProvider/ServiceDisputeScreen.dart';
-
 class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
   final orderProviderId;
@@ -129,9 +123,9 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
     }
   }
 
-  Future<void> marCompleteDarectHire() async {
+  Future<void> marCompletebiddingHire() async {
     print("Abhi:- darect cancelOder order id ${widget.orderId}");
-    final String url = '${AppConstants.baseUrl}${ApiEndpoint.darectMarkComplete}';
+    final String url = '${AppConstants.baseUrl}${ApiEndpoint.biddingMarkComplete}';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     print("Abhi:- Mark as Complete token: $token");
@@ -531,7 +525,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
           const SizedBox(height: 12),
           ElevatedButton(
             onPressed: () {
-              marCompleteDarectHire();
+              marCompletebiddingHire();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -690,7 +684,8 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   Future<void> submitPayment() async {
     final url = Uri.parse(
-      'https://api.thebharatworks.com/api/direct-order/order/payment-stage/${widget.orderId}',
+      // 'https://api.thebharatworks.com/api/direct-order/order/payment-stage/${widget.orderId}',
+      'https://api.thebharatworks.com/api/bidding-order/addPaymentStage/${widget.orderId}',
     );
 
     SharedPreferences prefs = await SharedPreferences.getInstance();

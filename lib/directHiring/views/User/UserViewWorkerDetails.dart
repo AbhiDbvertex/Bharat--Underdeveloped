@@ -874,7 +874,12 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 ),
 
                 // Hire Button
-             widget.hirebuttonhide == 'hide' ?  SizedBox(): GestureDetector(
+             widget.hirebuttonhide == 'hide' ?   NegotiationCardUser(
+               workerId: widget.workerId,
+               biddingOfferId: widget.biddingOfferId,
+               oderId: widget.oderId,
+               UserId: widget.UserId,
+             ) : GestureDetector(
                   onTap: () {
                     if (widget.workerId != null &&
                         widget.workerId!.isNotEmpty) {
@@ -914,12 +919,12 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                   ),
                 ) ,
                 const SizedBox(height: 40),
-                NegotiationCardUser(
-                  workerId: widget.workerId,
-                  biddingOfferId: widget.biddingOfferId,
-                  oderId: widget.oderId,
-                  UserId: widget.UserId,
-                ),
+                // NegotiationCardUser(
+                //   workerId: widget.workerId,
+                //   biddingOfferId: widget.biddingOfferId,
+                //   oderId: widget.oderId,
+                //   UserId: widget.UserId,
+                // ),
               ],
             ),
           ),

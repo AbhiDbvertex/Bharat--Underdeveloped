@@ -33,51 +33,11 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController acceptAmountController =
   TextEditingController(); // Naya controller for accept
+  var getCurrentBiddingAmmount;
+  var getCurrentBiddingId;
 
-  // Future<void> postNegotiate () async {
-  //   final String url = "https://api.thebharatworks.com/api/negotiations/start";
-  //   print("Abhi:- postnegotiate url : $url");
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //   print("Abhi:- print ammount : ${amountController.text.trim()}");
-  //
-  //   try {
-  //     var response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {
-  //         'Authorization': 'Bearer $token',
-  //         'Content-Type': 'application/json',
-  //       },body: jsonEncode({
-  //       "order_id": widget.oderId,
-  //       "bidding_offer_id": widget.biddingOfferId,
-  //       "service_provider": widget.workerId,
-  //       "user": widget.workerId,
-  //       "initiator": "user", // or "service_provider"
-  //       "offer_amount": amountController.text.trim(),
-  //       "message": "Can you do it for 5300?"
-  //     }),
-  //       /*{
-  //       "order_id": widget.oderId,
-  //       "bidding_offer_id": widget.biddingOfferId,
-  //       "service_provider": widget.workerId,
-  //       "user": widget.workerId,
-  //       "initiator": "user", // or "service_provider"
-  //       "offer_amount": amountController.text.trim(),
-  //       "message": "Can you do it for 5300?"
-  //     }*/);
-  //
-  //     if(response.statusCode == 200 || response.statusCode ==201){
-  //       print("Abhi:- postNegotiate statusCode : ${response.statusCode}");
-  //       print("Abhi:- postNegotiate response : ${response.body}");
-  //     }else{
-  //       print("Abhi:- else postNegotiate statusCode : ${response.statusCode}");
-  //       print("Abhi:- else postNegotiate response : ${response.body}");
-  //     }
-  //
-  //   }catch(e){
-  //     print("Abhi:- postNegotiate Exception : $e");
-  //   }
-  // }
+
+
   Future<void> postNegotiate(String amount) async {
     final String url = "https://api.thebharatworks.com/api/negotiations/start";
     print("Abhi:- postnegotiate url : $url");
@@ -107,7 +67,9 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postNegotiate statusCode : ${response.statusCode}");
         print("Abhi:- postNegotiate response : ${response.body}");
-        Get.snackbar("Succes", "${responseData['message']}");
+        Get.back();
+        Get.snackbar("Succes", "${responseData['message']}",snackPosition:SnackPosition.BOTTOM,backgroundColor: Colors.green,colorText: Colors.white);
+
       } else {
         print("Abhi:- else postNegotiate statusCode : ${response.statusCode}");
         print("Abhi:- else postNegotiate response : ${response.body}");
@@ -115,6 +77,85 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
     } catch (e) {
       print("Abhi:- postNegotiate Exception : $e");
     }
+  }
+
+  Future<void> getNegotiation () async {
+    // final String url = 'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/68afe536d57712243b253706';
+    final String url = 'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.oderId}';
+    print("Abhi:- getNegotiation url : $url");
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    var response = await http.get(Uri.parse(url),
+    headers: {
+    'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json',
+    },
+    );
+
+    try {
+      var responseData = jsonDecode(response.body);
+      if(response.statusCode == 200 || response.statusCode == 201){
+        print("Abhi:- getNegotiation statusCode : ${response.statusCode}");
+        print("Abhi:- getNegotiation response : ${response.body}");
+        setState(() {
+          getCurrentBiddingAmmount = responseData['offer_amount'];
+          getCurrentBiddingId = responseData['_id'];
+        });
+        print('Abhi:- postNegotiate amount : $getCurrentBiddingAmmount id : $getCurrentBiddingId');
+      }else {
+        print("Abhi:- else getNegotiation statusCode : ${response.statusCode}");
+        print("Abhi:- else getNegotiation response : ${response.body}");
+      }
+    }catch(e){
+      print("Abhi:- getNegotiation Exception");
+    }
+  }
+
+  //        Accept amount api
+  Future<void> AcceptNegotiation () async {
+    final String url = "https://api.thebharatworks.com/api/negotiations/accept/$getCurrentBiddingId";
+
+    print("Abhi:- getNegotiation url : $url");
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    var response = await http.put(Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+          "role":"user"
+        }),
+    );
+
+    try{
+
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode ==200 || response.statusCode == 201){
+        print("Abhi:- AcceptNegotiation statusCode : ${response.statusCode}");
+        print("Abhi:- AcceptNegotiation response : ${response.body}");
+        Get.back();
+        Get.back();
+        Get.snackbar("Success", responseData['message'],backgroundColor: Colors.green,colorText: Colors.white,snackPosition: SnackPosition.BOTTOM);
+      }
+      print("Abhi:- else AcceptNegotiation statusCode : ${response.statusCode}");
+      print("Abhi:- else AcceptNegotiation response : ${response.body}");
+
+    }catch(e){
+      print("Abhi:- acceptNegotiation : $e");
+    }
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getNegotiation ();
   }
 
 
@@ -158,7 +199,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                         color: Colors.white,
                       ),
                       child: Text(
-                        "Offer Price",
+                        "Offer Price(${getCurrentBiddingAmmount ?? 0})",
                         style: TextStyle(
                           color: Colors.green,
                           fontSize: width * 0.04,
@@ -340,6 +381,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                     isAccepting = true;
                     isNegotiating =
                     false; // Accept click hone pe negotiate band
+                    AcceptNegotiation ();
                   });
                 },
                 child: Container(
