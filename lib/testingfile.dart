@@ -393,3 +393,38 @@
 //     );
 //   }
 // }
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class Testingfile extends StatefulWidget {
+  const Testingfile({Key? key}) : super(key: key);
+
+  @override
+  State<Testingfile> createState() => _TestingfileState();
+}
+
+class _TestingfileState extends State<Testingfile> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          //Image.network("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fprofile-image&psig=AOvVaw1LeAxeRzMzpwgD8_j3lhHM&ust=1756549668246000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDgz8znr48DFQAAAAAdAAAAABAE")
+        CircleAvatar(
+          radius: 45,
+          backgroundImage: NetworkImage("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fphotos%2Fprofile-image&psig=AOvVaw1LeAxeRzMzpwgD8_j3lhHM&ust=1756549668246000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDgz8znr48DFQAAAAAdAAAAABAE"),)
+
+        ],
+      ),
+    );
+  }
+  Widget CustomTextFormfiled () {
+    return Column(
+      children: [
+
+      ],
+    );
+  }
+}
+

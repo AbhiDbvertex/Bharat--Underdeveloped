@@ -40,6 +40,7 @@ class _BiddingViewWorkDetailsState extends State<BiddingViewWorkDetails> {
       } else {
         setState(() {
           errorMessage = 'Bhai, bidding order ya category ID nahi mila!';
+          errorMessage = 'Bhai, bidding order ya category ID nahi mila!';
           isLoading = false;
         });
         print('❌ Order ya category ID mein kuch gadbad hai');
