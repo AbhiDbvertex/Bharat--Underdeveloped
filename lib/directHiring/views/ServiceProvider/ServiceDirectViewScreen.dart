@@ -3477,82 +3477,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         order!['description'] ?? 'No description available.',
                         style: GoogleFonts.roboto(fontSize: 14),
                       ),
-// <<<<<<< HEAD
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               SizedBox(height: 10),
-//               Container(
-//                 width: double.infinity,
-//                 height: 50,
-//                 decoration: BoxDecoration(
-//                   color: const Color(0xFFEE2121),
-//                   borderRadius: BorderRadius.circular(12),
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.grey.withOpacity(0.1),
-//                       spreadRadius: 1,
-//                       blurRadius: 6,
-//                       offset: const Offset(0, 2),
-//                     ),
-//                   ],
-//                 ),
-//                 child: TextButton(
-//                   onPressed: () async {
-//                     await _clearHiredProviders();
-//                   },
-//                   child: Text(
-//                     "Reject",
-//                     style: GoogleFonts.roboto(
-//                       fontSize: 14,
-//                       fontWeight: FontWeight.w500,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//             if (_isOrderAccepted) ...[
-//               Container(
-//                 height: 120,
-//                 width: double.infinity,
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(10),
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.black.withOpacity(0.05),
-//                       blurRadius: 5,
-//                       offset: Offset(0, 2),
-//                     ),
-//                   ],
-//                 ),
-//                 padding: EdgeInsets.all(10),
-//                 child: Row(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     ClipRRect(
-//                       borderRadius: BorderRadius.circular(70),
-//                       child: () {
-//                         final profilePic = order != null && order!['user_id'] != null ? order!['user_id']['profile_pic'] : null;
-//                         print("📸 Profile Pic URL: $profilePic");
-//                         return profilePic != null
-//                             ? Image.network(
-//                           '$profilePic',
-//                           width: 80,
-//                           height: 80,
-//                           fit: BoxFit.cover,
-//                           errorBuilder: (context, error, stackTrace) {
-//                             print("📸 Profile pic load me lafda: $error");
-//                             return Container(
-//                               width: 80,
-//                               height: 80,
-//                               color: Colors.grey[300],
-//                               child: Center(
-//                                 child: Text(
-//                                   "No Pic",
-// =======
                       const SizedBox(height: 20),
                       // Status Containers
                       if (order!['hire_status'] == 'cancelled')
@@ -3571,7 +3495,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                 Icon(Icons.warning_amber, color: Colors.red),
                                 Text(
                                   "The order is Cancelled",
-
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.red),
@@ -3579,7 +3502,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               ],
                             ),
                           ),
-
                         ),
                       if (order!['hire_status'] == 'completed')
                         Center(
@@ -3628,7 +3550,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       if (order?['hire_status']?.toLowerCase() ==
                           'pending') ...[
                         GestureDetector(
-
                           onTap: _isProcessing || _isOrderAccepted
                               ? null
                               : () {
@@ -3858,7 +3779,10 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               ViewUserProfileScreen(
-                                                profileImage: order?['user_id']['profile_pic'] ?? "",
+                                                  profileImage:
+                                                      order?['user_id']
+                                                              ['profile_pic'] ??
+                                                          "",
                                                   userId: userId),
                                         ),
                                       );
