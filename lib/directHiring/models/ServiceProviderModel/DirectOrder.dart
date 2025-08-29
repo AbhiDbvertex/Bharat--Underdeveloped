@@ -1,4 +1,3 @@
-
 class DirectOrder {
   final String id;
   final String title;
@@ -17,7 +16,7 @@ class DirectOrder {
     required this.date,
     required this.status,
     required this.image,
-    this.address,   // <-- yeh add kiya
+    this.address, // <-- yeh add kiya
     this.user_id,
     this.offer_history,
   });
@@ -31,15 +30,16 @@ class DirectOrder {
           ? json['deadline'].toString().substring(0, 10)
           : '',
       status: json['hire_status'] ?? 'pending',
-      image: (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
-          ? json['image_url'][0]
-          : '',
+      image:
+          (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
+              ? json['image_url'][0]
+              : '',
       address: json['address'] ?? '', // <-- yaha se address pick karega
       user_id: json['user_id'] != null ? User.fromJson(json['user_id']) : null,
       offer_history: json['offer_history'] != null
           ? (json['offer_history'] as List)
-          .map((e) => Offer.fromJson(e))
-          .toList()
+              .map((e) => Offer.fromJson(e))
+              .toList()
           : null,
     );
   }
@@ -107,8 +107,8 @@ class Provider {
           : null,
       subcategory_ids: json['subcategory_ids'] != null
           ? (json['subcategory_ids'] as List)
-          .map((e) => Subcategory.fromJson(e))
-          .toList()
+              .map((e) => Subcategory.fromJson(e))
+              .toList()
           : null,
     );
   }
