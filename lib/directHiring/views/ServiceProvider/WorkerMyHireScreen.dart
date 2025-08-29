@@ -1151,6 +1151,7 @@
 import 'dart:convert';
 
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1692,12 +1693,16 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       return const Center(child: Text("No Emergency Orders Found"));
     }
 
-    return SizedBox(
-      height: screenHeight * 0.5,
-      child: ListView.builder(
-        itemCount: spEmergencyOrders!.data.length,
-        itemBuilder: (context, index) => _buildEmergencyCard(
-            spEmergencyOrders!.data[index], screenWidth, screenHeight),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: SizedBox(
+        height: 1000,
+        width: 1.toWidthPercent(),
+        child: ListView.builder(
+          itemCount: spEmergencyOrders!.data.length,
+          itemBuilder: (context, index) =>
+              _buildEmergencyCard(spEmergencyOrders!.data[index],screenWidth, screenHeight),
+        ),
       ),
     );
   }

@@ -163,7 +163,7 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 50),
             _buildLabel("Enter Amount"),
@@ -180,7 +180,7 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
                 width: 320,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey, width: 1.4),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: Text(
@@ -270,15 +270,18 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
   }
 
   // 🔤 LABEL builder
-  Widget _buildLabel(String text) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        text,
-        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      const SizedBox(height: 10),
-    ],
+  Widget _buildLabel(String text) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 32),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+      ],
+    ),
   );
 
   // 🧾 Input TextField
@@ -289,7 +292,7 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey, width: 1.4),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
         controller: controller,

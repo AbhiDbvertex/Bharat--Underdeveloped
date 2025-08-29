@@ -5,13 +5,10 @@ import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/Widgets/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerScreen.dart';
-import '../../../directHiring/views/User/user_feedback.dart';
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
-import '../../User/models/work_detail_model.dart';
 
 class SpTaskView extends StatelessWidget {
   final String orderId;
@@ -43,7 +40,7 @@ class SpTaskView extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               _buildWorkerDetails(
                   controller.providerId.value,
                   controller.providerImage.value,
@@ -85,7 +82,65 @@ class SpTaskView extends StatelessWidget {
           ),
         );
       },
-      child: Container(
+      child: Card(
+        color: Colors.white,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Bada Circular Avatar
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.grey.shade200,
+              child: ClipOval(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  width: 120,
+                  height: 120,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.person, size: 60);
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+
+            // Name + Fees
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 8),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Emergency Fees - ₹$fee/-',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xff334247),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    )
+
+
+
+    /*child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -135,7 +190,7 @@ class SpTaskView extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),*/
     );
   }
 
