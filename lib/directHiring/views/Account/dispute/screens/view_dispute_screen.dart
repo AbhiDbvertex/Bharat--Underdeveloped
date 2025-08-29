@@ -1,6 +1,3 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -132,7 +129,7 @@ class ViewDispute extends StatelessWidget {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => ViewCarosuleImage(imagePath: dispute.image)));
                         },
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(12),
                             child: Image.network(
                               dispute.image,
                               height: 200,
@@ -197,20 +194,23 @@ class ViewDispute extends StatelessWidget {
             radius: 20,
             backgroundColor: Colors.grey[200],
             child: user.profilePic.isNotEmpty
-                ? Image.network(
-              user.profilePic,
-              fit: BoxFit.cover,
-              width: 60,
-              height: 60,
-              errorBuilder: (context, error, stackTrace) {
-                return SvgPicture.asset(
-                  "assets/svg_images/d_svg/user_icon.svg",
-                  fit: BoxFit.cover,
-                  width: 60,
-                  height: 60,
-                );
-              },
-            )
+                ? ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+                  child: Image.network(
+                                user.profilePic,
+                                fit: BoxFit.cover,
+                                width: 70,
+                                height: 70,
+                                errorBuilder: (context, error, stackTrace) {
+                  return SvgPicture.asset(
+                    "assets/svg_images/d_svg/user_icon.svg",
+                    fit: BoxFit.cover,
+                    width: 60,
+                    height: 60,
+                  );
+                                },
+                              ),
+                )
                 : SvgPicture.asset(
               "assets/svg_images/d_svg/user_icon.svg",
               fit: BoxFit.cover,

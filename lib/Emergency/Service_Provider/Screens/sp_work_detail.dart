@@ -479,7 +479,7 @@ class SpWorkDetail extends StatefulWidget {
 
 class _WorkDetailPageState extends State<SpWorkDetail> {
   late SpWorkDetailController controller;
-
+  late bool isAccepted;
   @override
   void initState() {
     // TODO: implement initState
@@ -487,6 +487,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
     bwDebug("data : ${widget.data}");
     controller = Get.put(SpWorkDetailController() );
     controller.getEmergencyOrder(widget.data);
+    isAccepted = controller.hireStatus.value == "assigned";
   }
 
   @override
@@ -828,7 +829,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               ),
                             ),
                           )
-                              :*/ controller.hireStatus == "cancelled"
+                              :*/ controller.hireStatus.value == "cancelled"
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
@@ -847,7 +848,10 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                             ),
                           )
                               // : SizedBox()
-                              : Row(
+
+                          : (controller.hireStatus.value == "assigned" && controller.providerName.isNotEmpty) ?
+                              SizedBox()
+                          :Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               ElevatedButton(
@@ -894,8 +898,6 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               ),
                             ],
                           ),
-
-                          const SizedBox(height: 20),
                         ],
                       ),
                     ),

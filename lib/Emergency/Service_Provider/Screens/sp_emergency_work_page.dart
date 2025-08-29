@@ -2,7 +2,6 @@ import 'package:developer/Emergency/Service_Provider/controllers/sp_emergency_se
 import 'package:developer/Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:developer/Widgets/AppColors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -48,9 +47,9 @@ class _SpEmergencyWorkPageState extends State<SpEmergencyWorkPage> {
         filteredOrders = controller.orders;
       } else {
         filteredOrders = controller.orders.where((order) {
-          final categoryName = order.categoryId.name?.toLowerCase() ?? '';
+          final categoryName = order.categoryId.name.toLowerCase() ?? '';
           final subCategoryName = order.subCategoryIds.isNotEmpty
-              ? order.subCategoryIds.first.name?.toLowerCase() ?? ''
+              ? order.subCategoryIds.first.name.toLowerCase() ?? ''
               : '';
           final address = order.googleAddress.toLowerCase();
           return categoryName.contains(query) ||
