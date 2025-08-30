@@ -419,12 +419,22 @@ class _TestingfileState extends State<Testingfile> {
       ),
     );
   }
+  // It is immutable its once build , can not change data in runtime
+  // It is mutable its data change in runtime
   Widget CustomTextFormfiled () {
     return Column(
       children: [
+        TextFormField(
+          decoration: InputDecoration(
+            hintText: 'Please inter ',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(strokeAlign: double.infinity))
+          ),
 
+        )
       ],
     );
   }
 }
 
+// It is immutable once its build, cannot be change data in runtime
+//It is immutable → once it’s built, it cannot change its internal data during runtime.

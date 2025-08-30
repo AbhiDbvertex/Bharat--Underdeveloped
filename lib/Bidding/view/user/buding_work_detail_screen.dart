@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Widgets/AppColors.dart';
+import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
@@ -827,234 +828,124 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                   ),
                 ) : SizedBox(),
 
-                  //             This is show to assign person
-                //   data?['hire_status'] == 'accepted' ?
-                //   Card(
-                //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                //   elevation: 3,
-                //   child: Padding(
-                //     padding: EdgeInsets.all(12),
-                //     child: Column(
-                //       children: [
-                //         Text("Assigned Person"),
-                //         Row(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             // Profile Image
-                //             CircleAvatar(
-                //               radius: height * 0.05,
-                //               backgroundImage: data?['assignedWorker']?['image'] != null
-                //                   ? NetworkImage(data!['assignedWorker']!['image'])
-                //                   : null,
-                //               child: data?['assignedWorker']?['image'] == null
-                //                   ? Icon(Icons.person, size: height * 0.05)
-                //                   : null,
-                //             ),
-                //             SizedBox(width: 12),
-                //
-                //             // Details + Actions
-                //             Expanded(
-                //               child: Column(
-                //                 crossAxisAlignment: CrossAxisAlignment.start,
-                //                 children: [
-                //                   // Name + Message icon
-                //                   Row(
-                //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                     children: [
-                //                       Expanded(
-                //                         child: Text(
-                //                           data?['assignedWorker']?['name'] ?? "No data",
-                //                           style: TextStyle(
-                //                             fontSize: 16,
-                //                             fontWeight: FontWeight.bold,
-                //                           ),
-                //                           overflow: TextOverflow.ellipsis,
-                //                         ),
-                //                       ),
-                //                       CircleAvatar(
-                //                         radius: 15,
-                //                         backgroundColor: Colors.grey.shade200,
-                //                         child: Icon(
-                //                           Icons.message,
-                //                           size: 18,
-                //                           color: Colors.green.shade600,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   SizedBox(height: 6),
-                //
-                //                   // Phone + Call icon
-                //                   Row(
-                //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                     children: [
-                //                       Text(
-                //                         data?['assignedWorker']?['phone'] ?? "No data",
-                //                         style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                //                       ),
-                //                       CircleAvatar(
-                //                         radius: 15,
-                //                         backgroundColor: Colors.grey.shade200,
-                //                         child: Icon(
-                //                           Icons.call,
-                //                           size: 18,
-                //                           color: Colors.green.shade600,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   SizedBox(height: 8),
-                //
-                //                   // View profile link
-                //                   GestureDetector(
-                //                     onTap: (){
-                //                       Navigator.push(context, MaterialPageRoute(builder: (context)=>UserViewWorkerDetails(
-                //                         workerId: data?['assignedWorker']?['_id'],
-                //                         hirebuttonhide: "hide",
-                //                         UserId: widget.userId,
-                //                         // oderId: OderId,
-                //                         // biddingOfferId: biddingofferId,
-                //                       ),));
-                //                     },
-                //                     child: Align(
-                //                       alignment: Alignment.centerRight,
-                //                       child: Text(
-                //                         "View profile",
-                //                         style: TextStyle(
-                //                           fontSize: 14,
-                //                           fontWeight: FontWeight.w600,
-                //                           color: Colors.green,
-                //                           //decoration: TextDecoration.underline,
-                //                         ),
-                //                       ),
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ) : SizedBox(),
 
-                //  buildAssignedWorkerCard(),
-                //   data?['hire_status'] == 'accepted' && assignedWorker?['name'] != null ?
-                //   Card(
-                //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                //     elevation: 3,
-                //     child: Padding(
-                //       padding: EdgeInsets.all(12),
-                //       child: Column(
-                //         children: [
-                //           Text(
-                //             "Assigned Person",
-                //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                //           ),
-                //           SizedBox(height: 8),
-                //           Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               // Profile Image
-                //               CircleAvatar(
-                //                 radius: MediaQuery.of(context).size.height * 0.05,
-                //                 backgroundImage: assignedWorker?['image'] != null
-                //                     ? NetworkImage(assignedWorker?['image'])
-                //                     : null,
-                //                 child: assignedWorker?['image'] == null
-                //                     ? Icon(Icons.person,
-                //                     size: MediaQuery.of(context).size.height * 0.05)
-                //                     : null,
-                //               ),
-                //               SizedBox(width: 12),
-                //               // Details + Actions
-                //               Expanded(
-                //                 child: Column(
-                //                   crossAxisAlignment: CrossAxisAlignment.start,
-                //                   children: [
-                //                     // Name + Message icon
-                //                     Row(
-                //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                       children: [
-                //                         Expanded(
-                //                           child: Text(
-                //                             assignedWorker?['name'] ?? "No name",
-                //                             style: TextStyle(
-                //                               fontSize: 16,
-                //                               fontWeight: FontWeight.bold,
-                //                             ),
-                //                             overflow: TextOverflow.ellipsis,
-                //                           ),
-                //                         ),
-                //                         CircleAvatar(
-                //                           radius: 15,
-                //                           backgroundColor: Colors.grey.shade200,
-                //                           child: Icon(
-                //                             Icons.message,
-                //                             size: 18,
-                //                             color: Colors.green.shade600,
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     ),
-                //                     SizedBox(height: 6),
-                //                     // Phone + Call icon
-                //                     Row(
-                //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //                       children: [
-                //                         Text(
-                //                           assignedWorker?['phone'] ?? "No phone",
-                //                           style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                //                         ),
-                //                         CircleAvatar(
-                //                           radius: 15,
-                //                           backgroundColor: Colors.grey.shade200,
-                //                           child: Icon(
-                //                             Icons.call,
-                //                             size: 18,
-                //                             color: Colors.green.shade600,
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     ),
-                //                     SizedBox(height: 8),
-                //                     // View profile link
-                //                     GestureDetector(
-                //                       onTap: () {
-                //                         Navigator.push(
-                //                           context,
-                //                           MaterialPageRoute(
-                //                             builder: (context) => UserViewWorkerDetails(
-                //                               workerId: assignedWorker?['_id'],
-                //                               hirebuttonhide: "hide",
-                //                               // userId: widget.userId,
-                //                             UserId: widget.userId,
-                //                             ),
-                //                           ),
-                //                         );
-                //                       },
-                //                       child: Align(
-                //                         alignment: Alignment.centerRight,
-                //                         child: Text(
-                //                           "View profile",
-                //                           style: TextStyle(
-                //                             fontSize: 14,
-                //                             fontWeight: FontWeight.w600,
-                //                             color: Colors.green,
-                //                           ),
-                //                         ),
-                //                       ),
-                //                     ),
-                //                   ],
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ) : SizedBox(),
+                  data?['hire_status'] == 'accepted' && assignedWorker?['name'] != null ?
+                  Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 3,
+                    child: Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Assigned Person",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Profile Image
+                              CircleAvatar(
+                                radius: MediaQuery.of(context).size.height * 0.05,
+                                backgroundImage: assignedWorker?['image'] != null
+                                    ? NetworkImage(assignedWorker?['image'])
+                                    : null,
+                                child: assignedWorker?['image'] == null
+                                    ? Icon(Icons.person,
+                                    size: MediaQuery.of(context).size.height * 0.05)
+                                    : null,
+                              ),
+                              SizedBox(width: 12),
+                              // Details + Actions
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Name + Message icon
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            assignedWorker?['name'] ?? "No name",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 6),
+                                    // Phone + Call icon
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          assignedWorker?['phone'] ?? "No phone",
+                                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8),
+                                    // View profile link
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => WorkerListViewProfileScreen(
+                                              workerId: assignedWorker?['_id'],
+                                              // hirebuttonhide: "hide",
+                                              // userId: widget.userId,
+                                            // UserId: widget.userId,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: InkWell(
+                                          onTap: (){
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => WorkerListViewProfileScreen(
+                                                  workerId: assignedWorker?['_id'],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 29,
+                                            width: 100,
+                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color: Colors.green.shade700,),
+                                            child: Center(
+                                              child: Text(
+                                                "View profile",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ) : SizedBox(),
 
                 SizedBox(height: height * 0.02),
                   data?['hire_status'] == 'pending' ? Padding(
