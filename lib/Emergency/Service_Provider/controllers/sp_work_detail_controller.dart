@@ -68,6 +68,7 @@ class SpWorkDetailController extends GetxController {
   }
 
   Future<bool> getEmergencyOrder(String id) async {
+    print("yyyyyyyyyyyyyyyyyyyy");
     var result = false;
     isLoading.value = true;
     bwDebug("[getEmergencyOrder] call orderId:$id", tag: tag);
@@ -87,6 +88,7 @@ class SpWorkDetailController extends GetxController {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
+        print('dsss :- $json');
         final dataModel = SpWorkDetailModel.fromJson(json);
         final serviceProvider = dataModel.data?.serviceProvider;
 
@@ -106,6 +108,7 @@ class SpWorkDetailController extends GetxController {
         providerImage.value = serviceProvider?.profilePic ?? "";
 
         if (dataModel.assignedWorker != null) {
+          print('dss:- assigned worker is not null');
           assignedWorker.value = dataModel.assignedWorker!;
         }
 
@@ -143,6 +146,7 @@ class SpWorkDetailController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+    isLoading.value = false;
     return result;
   }
 

@@ -3,6 +3,7 @@ import 'package:developer/Emergency/utils/assets.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/Widgets/AppColors.dart';
+import 'package:developer/directHiring/views/ServiceProvider/ServiceWorkerListScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,7 +11,7 @@ import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerScreen.dart';
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
 
-class SpTaskView extends StatelessWidget {
+class SpTaskView extends StatefulWidget {
   final String orderId;
 
   SpTaskView({
@@ -18,12 +19,25 @@ class SpTaskView extends StatelessWidget {
     required this.orderId,
   }) : super(key: key);
 
-  final controller = Get.find<SpWorkDetailController>();
+  @override
+  State<SpTaskView> createState() => _SpTaskViewState();
+}
+
+class _SpTaskViewState extends State<SpTaskView> {
+
+
   final tag = "TaskView";
+  late final controller;
+  @override
+  void initState() {
+    // TODO: implement initState
+     controller = Get.find<SpWorkDetailController>();
+    controller.getEmergencyOrder(widget.orderId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    controller.getEmergencyOrder(orderId);
+
 
     return SafeArea(
       child: Obx(() {
@@ -48,10 +62,9 @@ class SpTaskView extends StatelessWidget {
                   controller.plateFormFee.value,
                   context
               ),
-              const SizedBox(height: 20),
-              if (controller.assignedWorker.value.fullName != null)
+              const SizedBox(height: 10),
                 _buildAssignedPerson(controller.assignedWorker.value,context),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               _buildPaymentSection(controller, context),
               const SizedBox(height: 20),
               if (controller.warningMessage.value.isNotEmpty)
@@ -195,35 +208,22 @@ class SpTaskView extends StatelessWidget {
   }
 
   Widget _buildAssignedPerson(person,BuildContext context) {
-    return
-
-      controller.assignedWorker.value.fullName ==null?
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.primaryGreen, width: 1.5),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Center(
-          child: ElevatedButton(
-            onPressed: () {
-
-              Get.to(() => const WorkerScreen());
-
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              minimumSize: const Size(200, 40), // Ensure button is wide enough
-            ),
-            child: const Text(
-              'Assign to another person',
-              style: TextStyle(color: Colors.white, fontSize: 14),
-            ),
+    print("dss :- ${controller.assignedWorker.value.id}");
+    return controller.assignedWorker.value.id == null?
+      InkWell(
+        onTap: () {Get.to(() => ServiceWorkerListScreen(orderId: controller.userId.value));},
+        child: Container(
+          alignment: Alignment.center,
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Text(
+            'Assign to another person',
+            style: TextStyle(color: Colors.green, fontSize: 20,fontWeight: FontWeight.w600),
           ),
         ),
       )
