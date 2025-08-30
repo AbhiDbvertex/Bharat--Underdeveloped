@@ -1696,7 +1696,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: SizedBox(
-        height: 1000,
+        height: 550,
         width: 1.toWidthPercent(),
         child: ListView.builder(
           itemCount: spEmergencyOrders!.data.length,
