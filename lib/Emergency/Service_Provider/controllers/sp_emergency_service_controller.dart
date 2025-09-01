@@ -190,12 +190,12 @@ class SpEmergencyServiceController extends GetxController {
     }
   }
 
-  Future<SpEmergencyListModel?> getEmergencySpOrderByRole() async {
+  Future<SpEmergencyOrderListModel?> getEmergencySpOrderByRole() async {
     bwDebug("[getEmergencySpOrder] call:", tag: tag);
     return await _fetchOrders(ApiUrl.getAllSpOrders);
   }
 
-  Future<SpEmergencyListModel?> _fetchOrders(String url) async {
+  Future<SpEmergencyOrderListModel?> _fetchOrders(String url) async {
     isLoading.value = true;
     bwDebug("[_fetchOrders] API call started: $url", tag: tag);
 
@@ -225,8 +225,9 @@ class SpEmergencyServiceController extends GetxController {
 
       if (res.statusCode == 200) {
         final decoded = json.decode(res.body);
+        print('dssss :- $decoded');
         if (decoded is Map<String, dynamic>) {
-          final model = SpEmergencyListModel.fromJson(decoded);
+          final model = SpEmergencyOrderListModel.fromJson(decoded);
           bwDebug("[_fetchOrders] parsed model: ${model.toJson()}", tag: tag);
           return model;
         } else {

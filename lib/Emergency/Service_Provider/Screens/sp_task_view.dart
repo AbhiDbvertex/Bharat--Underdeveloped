@@ -32,7 +32,9 @@ class _SpTaskViewState extends State<SpTaskView> {
   void initState() {
     // TODO: implement initState
      controller = Get.find<SpWorkDetailController>();
-    controller.getEmergencyOrder(widget.orderId);
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       controller.getEmergencyOrder();
+     });
   }
 
   @override

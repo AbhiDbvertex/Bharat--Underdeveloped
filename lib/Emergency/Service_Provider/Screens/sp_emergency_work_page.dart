@@ -249,7 +249,7 @@ class _SpEmergencyWorkPageState extends State<SpEmergencyWorkPage> {
                   children: [
                     Expanded(
                       child: Text(
-                        "Date: ${data.deadline != null ? DateFormat('dd/MM/yyyy').format(data.deadline.toLocal()) : 'N/A'}",
+                        "Date: ${data.deadline != null ?  DateFormat('dd/MM/yyyy').format(DateTime.parse(data.deadline).toLocal()) : 'N/A'}",
                         style: _cardDate(fontSize: 11),
                       ),
                     ),

@@ -35,7 +35,7 @@ class ApiUrl {
   static String acceptUserOrder = path("emergency-order/accept-order"); //POST
   static String rejectUserOrder = path("emergency-order/reject-order"); //POST
   static String getAllSPOrderList = path("emergency-order/filtered-emergency-orders"); //GET
-  static String getAllSpOrders = path("emergency-order/getAllEmergencyOrdersByRole"); //GET
+  static String getAllSpOrders = path("emergency-order/getAllEmergencyordersforProvider"); //GET
   static String getSpEmergencyOrderById = path("emergency-order/getEmergencyOrder"); //GET
 
 }

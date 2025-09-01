@@ -865,7 +865,9 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                 onPressed: () async {
                                   controller.isLoading.value = true;
                                   String status= await  controller.acceptUserOrder(controller.orderId.value);
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
+                                  ScaffoldMessenger.of(Navigator.of(context).context).showSnackBar(
+                                    SnackBar(content: Text(status)),
+                                  );
                                   controller.isLoading.value = false;
                                   // accept logic
                                 },
