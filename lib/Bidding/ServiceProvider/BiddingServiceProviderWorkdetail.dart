@@ -5795,6 +5795,76 @@ class _BiddingserviceproviderworkdetailState
                             .toList(),
                       ),
                     ),
+                    SizedBox(height: height*0.02,),
+                    biddingOrder?.hireStatus == 'cancelled'
+                        ? Center(
+                      child: Container(
+                        height: 35,
+                        width: 300,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_amber, color: Colors.red),
+                            Text("The order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                          ],
+                        ),
+                      ),
+                    )
+                        : SizedBox(),
+                    biddingOrder?.hireStatus == 'cancelledDispute'
+                        ? Center(
+                      child: Container(
+                        height: 35,
+                        width: 300,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_amber, color: Colors.red),
+                            Text("The order is dispute Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                          ],
+                        ),
+                      ),
+                    )
+                        : SizedBox(),
+
+                    biddingOrder?.hireStatus == 'completed'
+                        ? Center(
+                      child: Container(
+                        height: 35,
+                        width: 300,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_outline, color: Colors.green),
+                            Text("  The order has been completed",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+                          ],
+                        ),
+                      ),
+                    )
+                        : SizedBox(),
+                    biddingOrder?.hireStatus == 'rejected'
+                        ? Center(
+                      child: Container(
+                        height: 35,
+                        width: 300,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.block, color: Colors.grey),
+                            Text("The order is rejected"),
+                          ],
+                        ),
+                      ),
+                    )
+                        : SizedBox(),
                     if (isAccepted) ...[
                       Card(
                         child: Container(
@@ -5882,7 +5952,7 @@ class _BiddingserviceproviderworkdetailState
                                     Row(
                                       children: [
                                         Text(
-                                          'Cost: ₹${biddingOrder!.cost.toStringAsFixed(0)}',
+                                          'Awarded amount: ₹${biddingOrder!.cost.toStringAsFixed(0)}',
                                           style: GoogleFonts.roboto(
                                             fontSize: 12,
                                             color: Colors.black,
@@ -5891,29 +5961,7 @@ class _BiddingserviceproviderworkdetailState
                                         SizedBox(
                                           width: 17,
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 22.0),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ViewUserProfileScreen(
-                                                            userId: 'id',
-                                                          )));
-                                            },
-                                            child: Text(
-                                              "View Profile",
-                                              style: GoogleFonts.roboto(
-                                                color: Colors.green,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+
                                         Spacer(),
                                         Container(
                                           height: 30,
@@ -5932,6 +5980,32 @@ class _BiddingserviceproviderworkdetailState
                                           ),
                                         ),
                                       ],
+                                    ),
+                                    SizedBox(height: height*0.008,),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                           child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ViewUserProfileScreen(
+                                                        userId: biddingOrder!.userId?.id ??
+                                                            'Unknown',
+                                                        profileImage: biddingOrder!.userId?.profilePic ??
+                                                            'Unknown',
+                                                      )));
+                                        },
+                                        child: Text(
+                                          "View Profile",
+                                          style: GoogleFonts.roboto(
+                                            color: Colors.green,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

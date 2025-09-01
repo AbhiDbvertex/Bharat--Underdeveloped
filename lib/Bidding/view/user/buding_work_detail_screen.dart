@@ -828,6 +828,81 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                   ),
                 ) : SizedBox(),
 
+                  //   This is show all status according filed
+
+                  SizedBox(height: 15,),
+
+                  data?['hire_status'] == 'cancelled'
+                      ? Center(
+                    child: Container(
+                      height: 35,
+                      width: 300,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.warning_amber, color: Colors.red),
+                          Text("The order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                        ],
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                  data?['hire_status'] == 'cancelledDispute'
+                      ? Center(
+                    child: Container(
+                      height: 35,
+                      width: 300,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.warning_amber, color: Colors.red),
+                          Text("The order is dispute Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                        ],
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+
+                  data?['hire_status'] == 'completed'
+                      ? Center(
+                    child: Container(
+                      height: 35,
+                      width: 300,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Colors.green),
+                          Text("  The order has been completed",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+                        ],
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                  data?['hire_status'] == 'rejected'
+                      ? Center(
+                    child: Container(
+                      height: 35,
+                      width: 300,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.block, color: Colors.grey),
+                          Text("The order is rejected"),
+                        ],
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                  data?['hire_status'] == 'accepted' ? const SizedBox(height: 20) : SizedBox(),
+
 
                   data?['hire_status'] == 'accepted' && assignedWorker?['name'] != null ?
                   Card(

@@ -236,7 +236,7 @@ class SpEmergencyServiceController extends GetxController {
         }
       } else {
         bwDebug("[_fetchOrders] failed with body: ${res.body}", tag: tag);
-        Get.snackbar('Error', 'Failed to fetch orders: ${res.body}');
+        // Get.snackbar('Error', 'Failed to fetch orders: ${res.body}');
         return null;
       }
     } catch (e, stack) {

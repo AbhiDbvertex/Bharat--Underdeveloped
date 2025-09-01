@@ -1956,9 +1956,9 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- AcceptNegotiation statusCode: ${response.statusCode}");
         print("Abhi:- AcceptNegotiation response: ${response.body}");
-        Get.back();
-        Get.back();
-        Get.back();
+        Get.back(result: true);
+        Get.back(result: true);
+        Get.back(result: true);
         Get.snackbar(
           "Success",
           responseData['message'],
@@ -2351,7 +2351,8 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                 ),
               ),*/
               GestureDetector(
-                onTap: (getCurrentBiddingAmmount == null || getCurrentBiddingAmmount.toString().isEmpty)
+                onTap: (
+                    getCurrentBiddingAmmount == null || getCurrentBiddingAmmount.toString().isEmpty)
                     ? null
                     : () async {
                   setState(() {

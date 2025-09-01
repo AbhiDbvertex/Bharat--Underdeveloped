@@ -419,8 +419,7 @@ class _TestingfileState extends State<Testingfile> {
       ),
     );
   }
-  // It is immutable its once build , can not change data in runtime
-  // It is mutable its data change in runtime
+  // flutter architecture is the layered structure of flutter
   Widget CustomTextFormfiled () {
     return Column(
       children: [
@@ -429,7 +428,6 @@ class _TestingfileState extends State<Testingfile> {
             hintText: 'Please inter ',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide(strokeAlign: double.infinity))
           ),
-
         )
       ],
     );
@@ -438,3 +436,19 @@ class _TestingfileState extends State<Testingfile> {
 
 // It is immutable once its build, cannot be change data in runtime
 //It is immutable → once it’s built, it cannot change its internal data during runtime.
+//Flutter architecture is the layered structure of Flutter (Framework, Engine, Embedder) that defines how apps are built and run. (flutter architecture is the layered structure of flutter)
+//Flutter architecture is the layered of structure of flutter.
+//A widget is a basic building block of Flutter UI that represents everything you see on the screen, like text, button, image, or layout.
+//The main() function is the entry point of a Flutter app, from where the execution starts and the first widget (usually runApp) is called.
+
+// App live.
+// In the user tab got ot bidding , cancel,canceldispute,complite time show proper flag.
+// In the worker tab:-
+// In the my worker tab bidding list , add currect api and show currect data
+// In the resent worker change api and currect data for resent time.
+// Currect Ui in recent post work
+// Remove unnaccery sanckbar in homepage
+//In the darect hiring cancel dispute tab show cenceldispute flag
+//In the Worker tab bidding detail page , cancel, canceldispute,complite, show proper flag
+//In the bidding detail page show user profile page. currect alinment in detail page
+//In the location tab not update location on the tab submit tab

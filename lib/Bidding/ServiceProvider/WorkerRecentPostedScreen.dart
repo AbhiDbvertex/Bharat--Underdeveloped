@@ -1006,7 +1006,8 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
       final res = await http.get(
         Uri.parse(
             // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
-            'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
+                //   Abhishek added this new api
+            'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1260,7 +1261,7 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                     padding: EdgeInsets.all(screenWidth * 0.02),
                                     child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
                                       children: [
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(
@@ -1298,10 +1299,8 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
                                                   Expanded(
                                                     child: Padding(
                                                       padding: EdgeInsets.only(
-                                                          top: screenHeight *
-                                                              0.015),
-                                                      child: Text(
-                                                          item.description),
+                                                          top: screenHeight * 0.015),
+                                                        child: Text(item.description,maxLines: 2,overflow: TextOverflow.ellipsis,),
                                                     ),
                                                   ),
                                                   if (item

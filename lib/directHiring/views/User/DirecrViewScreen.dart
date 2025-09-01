@@ -1678,7 +1678,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 ),
               ),
             )
-                : SizedBox(),order!['hire_status'] == 'cancelledDispute'
+                : SizedBox(),
+            order!['hire_status'] == 'cancelledDispute'
                 ? Center(
               child: Container(
                 height: 35,

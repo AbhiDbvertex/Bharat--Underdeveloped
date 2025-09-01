@@ -3528,6 +3528,23 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                             ),
                           ),
                         ),
+                      order!['hire_status'] == 'cancelledDispute'
+                          ? Center(
+                        child: Container(
+                          height: 35,
+                          width: 300,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.warning_amber, color: Colors.red),
+                              Text("The order is dispute Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                            ],
+                          ),
+                        ),
+                      )
+                          : SizedBox(),
                       if (order!['hire_status'] == 'rejected')
                         Center(
                           child: Container(
@@ -3811,7 +3828,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Assigned Person",
+                                  "Assigned Person asdsa",
                                   style: GoogleFonts.roboto(
                                     color: Colors.black,
                                     fontSize: 18,
@@ -3822,7 +3839,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                 Row(
                                   children: [
                                     CircleAvatar(
-                                      radius: 50,
+                                      radius: 40,
                                       backgroundImage: order != null &&
                                               order!['assignedWorker'] !=
                                                   null &&

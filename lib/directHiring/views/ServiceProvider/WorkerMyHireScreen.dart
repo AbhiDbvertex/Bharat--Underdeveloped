@@ -1274,7 +1274,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
       final res = await http.get(
         Uri.parse(
-            'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
+            // 'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
+            //     Abhishek added new link
+            'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -1358,8 +1360,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       print('🔐 Token: $token');
 
       final res = await http.get(
-        Uri.parse(
-            'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
+        Uri.parse('https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1783,25 +1784,29 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.05,
-                        vertical: screenHeight * 0.005,
-                      ),
+                      width:  screenWidth * 0.3,
+                      height:  screenHeight * 0.03,
+                      // padding: EdgeInsets.symmetric(
+                      //   horizontal: screenWidth * 0.05,
+                      //   vertical: screenHeight * 0.005,
+                      // ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(data.status),
                         borderRadius:
                             BorderRadius.circular(screenWidth * 0.015),
                       ),
-                      child: Text(
-                        data.status.isEmpty
-                            ? 'Pending'
-                            : data.status == 'cancelleddispute'
-                                ? 'Cancelled Dispute'
-                                : data.status[0].toUpperCase() +
-                                    data.status.substring(1),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: screenWidth * 0.03,
+                      child: Center(
+                        child: Text(
+                          data.status.isEmpty
+                              ? 'Pending'
+                              : data.status == 'cancelleddispute'
+                                  ? 'Cancelled Dispute'
+                                  : data.status[0].toUpperCase() +
+                                      data.status.substring(1),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: screenWidth * 0.03,
+                          ),
                         ),
                       ),
                     ),
@@ -1820,6 +1825,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                             ),
                           ),
                         ).then((_) {
+                          //  Abhishek check screen refrase the code
                           print(
                               "🔄 Wapas aaya WorkerMyHireScreen pe, orders refresh kar raha hai");
                           fetchDirectOrders();
@@ -1996,6 +2002,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     ),
                     GestureDetector(
                       onTap: () {
+                        var result =
                         print(
                             'Navigating to details with orderId: ${data.id}, status: ${data.hireStatus}');
                         Navigator.push(
@@ -2010,6 +2017,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                         ).then((_) {
                           print(
                               "🔄 Returned to WorkerMyHireScreen, refreshing bidding tasks");
+                          if (_ == true) {
+                            fetchBiddingOrders();
+                          }
                           fetchBiddingOrders();
                         });
                       },
