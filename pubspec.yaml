@@ -65,7 +65,6 @@ dependencies:
   photo_view: ^0.15.0
   smooth_page_indicator: ^1.2.1
   fluttertoast:
-  sms_autofill: ^2.4.1
 #  just_audio:
 
 
