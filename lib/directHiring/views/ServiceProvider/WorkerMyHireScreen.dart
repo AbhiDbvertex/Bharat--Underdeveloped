@@ -1211,7 +1211,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   final TextEditingController _directSearchController = TextEditingController();
   final TextEditingController _emergencySearchController =
       TextEditingController();
-  SpEmergencyListModel? spEmergencyOrders;
+  SpEmergencyOrderListModel? spEmergencyOrders;
 
   @override
   void initState() {
@@ -2209,7 +2209,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                   children: [
                     Expanded(
                       child: Text(
-                        "Date: ${data.deadline != null ? DateFormat('dd/MM/yyyy').format(data.deadline!.toLocal()) : 'N/A'}",
+                        "Date: ${data.deadline != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(data.deadline).toLocal()) : 'N/A'}",
                         style: _cardDate(fontSize: screenWidth * 0.03),
                       ),
                     ),
