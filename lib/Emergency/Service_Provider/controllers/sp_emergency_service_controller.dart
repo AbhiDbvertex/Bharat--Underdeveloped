@@ -158,6 +158,7 @@ import 'dart:convert';
 import 'package:developer/Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import 'package:developer/Emergency/utils/ApiUrl.dart';
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -166,12 +167,19 @@ class SpEmergencyServiceController extends GetxController {
   final String tag = "SpEmergencyServiceController";
   var isLoading = false.obs;
   var orders = <SpEmergencyOrderData>[].obs;
-  @override
-  void onInit() {
-    super.onInit();
-    if (orders.isEmpty && !isLoading.value) {
-      getEmergencySpOrderList();
-    }  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //
+  //   // if (orders.isEmpty && !isLoading.value) {
+  //   //   getEmergencySpOrderList();
+  //   // }
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     if (orders.isEmpty && !isLoading.value) {
+  //       getEmergencySpOrderList();
+  //     }
+  //   });
+  // }
 
   @override
   void onClose() {
