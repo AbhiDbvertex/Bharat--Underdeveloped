@@ -91,7 +91,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserFeedback(),
+                      builder: (context) => UserFeedback(oderType: 'direct',),
                     ),
                   );
                 },

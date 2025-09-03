@@ -20,6 +20,7 @@ class RoleEditProfileScreen extends StatefulWidget {
   final List<String>? subCategoryIds;
   final String? documentUrl;
   final updateBothrequest;
+  final role;
 
   const RoleEditProfileScreen({
     super.key,
@@ -27,7 +28,9 @@ class RoleEditProfileScreen extends StatefulWidget {
     this.skill,
     this.categoryId,
     this.subCategoryIds,
-    this.documentUrl, this.updateBothrequest,
+    this.documentUrl,
+    this.updateBothrequest,
+    this.role,
   });
 
   @override
@@ -199,12 +202,17 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
 
        print("Abhi:- post uploade detail screen data:- ${res.body}");
        print("Abhi:- post uploade detail screen data:- ${res.statusCode}");
-      if (res.statusCode == 200 || res.statusCode == 201) { ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("✅ Upload successful")));
+      if (res.statusCode == 200 || res.statusCode == 201) {
+
       await Future.delayed(const Duration(milliseconds: 500));
       Navigator.pop(context, true);
-        switchRoleRequest();
+
+      switchRoleRequest();
+       // widget.role == "user" ? switchRoleRequest() : SizedBox();
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("✅ Upload successful")));
       } else {
         ScaffoldMessenger.of(
           context,
@@ -356,7 +364,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                     TextFormField(
                       controller: fullNameController,
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-z]')),
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]'))
                       ],
 
                       decoration: InputDecoration(
@@ -425,7 +433,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                       controller: skillController,
 
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-z,0-9\./]')),
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-z,0-9\./ ]')),
                       ],
 
                       maxLines: 4,
@@ -438,6 +446,8 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    Text("Note: Please upload your valid document (PAN Card, Driving Licence, Aadhaar Card, etc.)",style: TextStyle(color: Colors.red),),
                     const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: pickDocument,

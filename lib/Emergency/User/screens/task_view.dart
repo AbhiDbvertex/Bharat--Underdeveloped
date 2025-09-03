@@ -1191,6 +1191,7 @@ class TaskView extends StatelessWidget {
                     Get.to(() => UserFeedback(
                       providerId: controller.providerId.value,
                       oderId: controller.orderId.value,
+                      oderType: "emergency",
                     ));
                   }
                 } else {

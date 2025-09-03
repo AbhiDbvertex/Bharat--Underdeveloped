@@ -1013,8 +1013,9 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => UserFeedback(
-                    providerId: widget.orderProviderId, oderId: widget.orderId)));
+                    providerId: widget.orderProviderId, oderId: widget.orderId,oderType: 'bidding',)));
         // Navigator.pop(context);
+        print("Abhi:- getOderId tab mark as complete oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
       } else {
         print("Abhi:- else darect-hire Mark as Complete error :- ${response.body}");
       }
@@ -1068,7 +1069,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Abhi:- getOderId postPaymentRequest ${widget.orderId}");
+    print("Abhi:- getOderId postPaymentRequest oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
     // Validation for enabling/disabling the Submit button
     bool isFormValid = _description.isNotEmpty &&
         _amount.isNotEmpty &&

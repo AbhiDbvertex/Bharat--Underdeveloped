@@ -59,6 +59,7 @@ class ServiceProviderProfileModel {
     this.bankDetail,
     this.documents, // ✅ ADDED HERE TOO
   });
+  //Keys in Flutter uniquely identify widgets and preserve their state during rebuilds, especially in lists or tree changes
 
   factory ServiceProviderProfileModel.fromJson(Map<String, dynamic> json) {
     return ServiceProviderProfileModel(
@@ -96,10 +97,7 @@ class ServiceProviderProfileModel {
               .toList() ??
           [],
       rateAndReviews:
-          (json['rateAndReviews'] as List<dynamic>?)
-              ?.map((e) => Review.fromJson(e))
-              .toList() ??
-          [],
+          (json['rateAndReviews'] as List<dynamic>?)?.map((e) => Review.fromJson(e)).toList() ?? [],
       customerReview:
           (json['customerReview'] as List<dynamic>?)
               ?.map((e) => e.toString())

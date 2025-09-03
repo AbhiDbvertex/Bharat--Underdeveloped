@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../testingfile.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -841,21 +842,36 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        height: 24,
-                        width: 160,
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.red,
-                        ),
-                        child: Text(
-                          order!['address'] ?? '',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
+                      InkWell(
+                        onTap: (){
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                latitude: order?['user_id']?['location']?['latitude'] ?? 'No lat',
+                                longitude: order?['user_id']?['location']?['longitude'] ?? 'No long',
+                              ),
+                            ),
+                          );
+                          print("Abhi:- print lat : ${order?['user_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['user_id']?['location']?['latitude'] ?? 'No long'}");
+                        },
+                        child: Container(
+                          height: 24,
+                          width: 160,
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.red,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          child: Text(
+                            order!['address'] ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       Text(
@@ -1527,22 +1543,27 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                               const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Container(
-                                    width: 120,
-                                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF27773),
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Text(
-                                      worker.location?['address'] ?? "No address",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w500,
+                                  InkWell(
+                                    onTap: (){
+
+                                    },
+                                    child: Container(
+                                      width: 120,
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF27773),
+                                        borderRadius: BorderRadius.circular(15),
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
+                                      child: Text(
+                                        worker.location?['address'] ?? "No address",
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 20),

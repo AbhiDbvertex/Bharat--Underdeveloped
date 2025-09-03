@@ -8,10 +8,13 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../Emergency/utils/assets.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
+import '../../../testingfile.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
 class BiddingWorkerDetailScreen extends StatefulWidget {
@@ -35,6 +38,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   List<dynamic> filteredBidders = [];
   List<dynamic> filteredRelatedWorkers = [];
   List<dynamic>? getBuddingOderByIdResponseDatalist;
+  late Razorpay _razorpay;
   @override
   void initState() {
     super.initState();
@@ -43,12 +47,78 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     _searchController.addListener(_filterLists);
     _filterLists();
     fetchBiddingOffers();
+    var getCurrentBiddingId;
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+  Future<void> verifaibiddingPlateformFee(String paymentId, String orderId) async {
+    final String url =
+        'https://api.thebharatworks.com/api/bidding-order/verifyPlatformFeePayment';
+    print("Abhi:- verifaibiddingPlateformFee url: $url");
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "razorpay_order_id": orderId,
+          "razorpay_payment_id": paymentId,
+        }),
+      );
+
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Abhi:- verifaibiddingPlateformFee statusCode: ${response.statusCode}");
+        print("Abhi:- verifaibiddingPlateformFee response: ${response.body}");
+        // Verify success hone ke baad AcceptNegotiation call karo
+        // await AcceptNegotiation();
+        Get.back(result: true);
+        Get.back(result: true);
+        Get.snackbar(
+          "Success",
+          responseData['message'],
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        print("Abhi:- else verifaibiddingPlateformFee statusCode: ${response.statusCode}");
+        print("Abhi:- else verifaibiddingPlateformFee response: ${response.body}");
+      }
+    } catch (e) {
+      print("Abhi:- verifaibiddingPlateformFee Exception: $e");
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    print("Abhi:- Payment Success: ${response.paymentId}");
+    verifaibiddingPlateformFee(response.paymentId!, razorpayOrderId!); // Call verify
+    Get.snackbar("Payment Success", "Transaction completed!", backgroundColor: Colors.green, colorText: Colors.white);
+    Get.back(); // Close dialog
+    Get.back(); // Extra back if needed for previous screen
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    print("Abhi:- Payment Error: ${response.message}");
+    Get.snackbar("Payment Failed", "Error: ${response.message}", backgroundColor: Colors.red, colorText: Colors.white);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    print("Abhi:- External Wallet: ${response.walletName}");
   }
 
   void _filterLists() {
@@ -510,6 +580,44 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   //   }
   // }
 
+  //          create plateform Fee
+  int? platformFee;
+  Future<void> CreatebiddingPlateformfee() async {
+    final String url =
+        'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
+    print("Abhi:- CreatebiddingPlateformfee url: $url");
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+        print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
+        setState(() {
+          razorpayOrderId = responseData['orderId']; // Store orderId
+          platformFee = responseData['amount']; // Store platform fee amount (assuming it's int)
+        });
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+        // Do not open Razorpay here; it will be opened from dialog's Pay button
+      } else {
+        print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+        print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+      }
+    } catch (e) {
+      print("Abhi:- CreatebiddingPlateformfee Exception: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -541,6 +649,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
       statusBarIconBrightness: Brightness.light, // status bar icons' color
       systemNavigationBarIconBrightness: Brightness.light, //navigation bar icons' color
     ));
+
 
     return GestureDetector(
       onTap: () {
@@ -630,23 +739,38 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.025,
-                          width: MediaQuery.of(context).size.width * 0.28,
-                          decoration: BoxDecoration(
-                            color: Colors.red.shade300,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              address.split(',').last.trim(),
-                              style: GoogleFonts.roboto(
-                                color: Colors.white,
-                                fontSize:
-                                MediaQuery.of(context).size.width *
-                                    0.03,
+                        InkWell(
+                          onTap: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MapScreen(
+                                  latitude:  data?['user_id']?['location']?['latitude'] ?? 'N/A',
+                                  longitude: data?['user_id']?['location']?['longitude'] ?? 'N/A',
+                                ),
                               ),
-                              overflow: TextOverflow.ellipsis,
+                            );
+                            print("Abhi:- get oder Details lat : ${data?['user_id']?['location']?['latitude'] ?? 'N/A'} long : ${data?['user_id']?['location']?['longitude'] ?? 'N/A'}");
+
+                          },
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.025,
+                            width: MediaQuery.of(context).size.width * 0.28,
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                address.split(',').last.trim(),
+                                style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontSize:
+                                  MediaQuery.of(context).size.width *
+                                      0.03,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
                         ),
@@ -1278,7 +1402,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                 final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
                                 final biddingofferId = bidder?['_id']?.toString() ?? '';
                                 final  OderId = bidder?['order_id']?.toString() ?? '';
-                                final bidAmount = bidder?['bid_amount']?.toString() ?? '0';
+                                final bidAmount = bidder?['bid_amount'] ?? '0';
                                 final location = bidder?['provider_id']['location']['address']?.toString() ?? 'N/A';
                                 final profilePic = bidder?['provider_id']['profile_pic']?.toString();
         
@@ -1462,23 +1586,25 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                 ),
                                                 Flexible(
                                                   child: InkWell(
-                                                    onTap: () {
+                                                    onTap: () async {
                                                       // acceptBid(bidderId, bidAmount);
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => UserViewWorkerDetails(
-                                                            workerId: bidderId,
-                                                            hirebuttonhide: "hide",
-                                                            UserId: widget.userId,
-                                                            oderId: OderId,
-                                                            biddingOfferId: biddingofferId,
-                                                          ),
-                                                          // UserViewWorkerDetails(
-                                                          //   workerId: '68ac07f700315e754a037e56',
-                                                          // ),
-                                                        ),
-                                                      );
+                                                      // Navigator.push(
+                                                      //   context,
+                                                      //   MaterialPageRoute(
+                                                      //     builder: (context) => UserViewWorkerDetails(
+                                                      //       workerId: bidderId,
+                                                      //       hirebuttonhide: "hide",
+                                                      //       UserId: widget.userId,
+                                                      //       oderId: OderId,
+                                                      //       biddingOfferId: biddingofferId,
+                                                      //     ),
+                                                      //     // UserViewWorkerDetails(
+                                                      //     //   workerId: '68ac07f700315e754a037e56',
+                                                      //     // ),
+                                                      //   ),
+                                                      // );
+                                                      await CreatebiddingPlateformfee();
+                                                      showTotalDialog(context,index,bidAmount,platformFee);
                                                     },
                                                     child: Container(
                                                       height: 32,
@@ -1886,6 +2012,9 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                       ],
                     ),
                   ) : SizedBox(),
+                  // TextButton(onPressed: (){
+                  //   print("Abhi:-print data providerId : ${data?['service_provider_id']?['_id']}");
+                  // }, child: Text("print data")),
                   data?['hire_status'] == 'pending' ? SizedBox(height: height * 0.04) : SizedBox(),
                   data?['hire_status'] == 'accepted' ? BiddingPaymentScreen(orderId: widget.buddingOderId ?? "",
                     paymentHistory: data?['service_payment']?['payment_history'],orderProviderId: data?['service_provider_id']?['_id'],) : SizedBox(),
@@ -2032,6 +2161,143 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+  //        Accept pyment dailog box
+  String? razorpayOrderId; // New variable to store orderId
+  // late Razorpay _razorpay;
+  void showTotalDialog(BuildContext context,int index, dynamic amount, dynamic platformFee) {
+    int fee = platformFee ?? 0 ; // Default to 0 if null
+    getBuddingOderByIdResponseDatalist?[index];
+
+    final bidder = getBuddingOderByIdResponseDatalist?[index];
+    final bidAmount = bidder?['bid_amount']?.toString() ?? '0';
+    int bidAmountValue = int.tryParse(bidAmount) ?? 0;
+    int totalAmount = bidAmountValue + fee;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text("Payment Confirmation", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 16),
+                Image.asset(BharatAssets.payConfLogo2),
+                const SizedBox(height: 24),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Date", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+                        Text(DateFormat("dd-MM-yy").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Time", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+                        Text(DateFormat("hh:mm a").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Amount", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+                        Text("RS $bidAmount", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Platform fees", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+                        Text("INR $fee", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Image.asset(BharatAssets.payLine),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Total", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
+                        Text("RS $totalAmount/-", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Divider(height: 4, color: Colors.green),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        if (platformFee != null && razorpayOrderId != null) {
+                          var options = {
+                            'key': 'rzp_test_R7z5O0bqmRXuiH',
+                            'amount': totalAmount * 100, // Changed to totalAmount for payment
+                            'name': 'The Bharat Work',
+                            'description': 'Payment for Order',
+                            'prefill': {
+                              'contact': '9876543210',
+                              'email': 'test@razorpay.com',
+                            },
+                            'external': {
+                              'wallets': ['paytm']
+                            }
+                          };
+                          try {
+                            _razorpay.open(options); // Open Razorpay now
+                          } catch (e) {
+                            debugPrint('Razorpay Error: $e');
+                          }
+                        } else {
+                          Get.snackbar("Error", "Platform fee or order ID not available", backgroundColor: Colors.red, colorText: Colors.white);
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 35,
+                        width: MediaQuery.of(context).size.width * 0.28,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Color(0xff228B22)),
+                        child: Text("Pay", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white)),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context); // Close dialog
+                      },
+                      child: Container(
+                        height: 35,
+                        width: MediaQuery.of(context).size.width * 0.28,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green, width: 1.5),
+                        ),
+                        child: Text("Cancel", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.green)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

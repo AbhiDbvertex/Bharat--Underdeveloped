@@ -2860,6 +2860,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../testingfile.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/userModel/subCategoriesModel.dart';
@@ -3446,17 +3447,32 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          order!['address'] ?? '',
-                          style: const TextStyle(color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
+                                longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
+                              ),
+                            ),
+                          );
+                          print("Abhi:- get oder Details lat : ${order?['service_provider_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['service_provider_id']?['location']?['longitude'] ?? 'No long'}");
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            // "",
+                            order!['address'] ?? '',
+                            style: const TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),

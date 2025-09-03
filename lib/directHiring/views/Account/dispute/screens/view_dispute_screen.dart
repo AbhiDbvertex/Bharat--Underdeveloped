@@ -229,14 +229,14 @@ class ViewDispute extends StatelessWidget {
 
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Phone ${user.phone}',textAlign: TextAlign.start,),
-              Row(
-                spacing: 8,
-                children: [
-                  Text('Review: ${user.totalReview}'),
-                  Text('Rating: ${user.rating}')
-                ],
-              )
+              // Text('Phone ${user.phone}',textAlign: TextAlign.start,),
+              // Row(
+              //   spacing: 8,
+              //   children: [
+              //     Text('Review: ${user.totalReview}'),
+              //     Text('Rating: ${user.rating}')
+              //   ],
+              // )
             ],
           ),
         ),

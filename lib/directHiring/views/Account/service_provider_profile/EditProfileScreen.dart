@@ -536,6 +536,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
+                    Text("Note: Please upload your valid document (PAN Card, Driving Licence, Aadhaar Card, etc.)",style: TextStyle(color: Colors.red),),
+                    const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: pickDocument,
                       icon: const Icon(Icons.attach_file),
@@ -566,6 +568,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           : const Text(
                         "UPDATE",
                         style: TextStyle(color: Colors.white),
+                        // basically setstate is use for change over app state
                       ),
                     ),
                   ],

@@ -2913,6 +2913,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             builder: (context) => UserFeedback(
               providerId: widget.orderProviderId ?? '',
               oderId: widget.orderId,
+              oderType: "direct",
             ),
           ),
         );

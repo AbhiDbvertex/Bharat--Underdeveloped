@@ -16,15 +16,16 @@
 // import 'RoleSelectionScreen.dart';
 // import '../../../../Widgets/AppColors.dart';
 // import 'package:developer/Widgets/CustomButton.dart';
+//
 // class AddressDetailScreen extends StatefulWidget {
 //   final String? initialAddress;
 //   final LatLng? initialLocation;
 //   final String? initialTitle;
 //   final String? initialLandmark;
 //   final String? editlocationId;
-//   final name;
-//   final refralCode;
-//   final role;
+//   final String? name;
+//   final String? refralCode;
+//   final String? role;
 //
 //   const AddressDetailScreen({
 //     super.key,
@@ -32,7 +33,10 @@
 //     this.initialLocation,
 //     this.initialTitle,
 //     this.initialLandmark,
-//     this.editlocationId, this.name, this.refralCode, this.role,
+//     this.editlocationId,
+//     this.name,
+//     this.refralCode,
+//     this.role,
 //   });
 //
 //   @override
@@ -48,6 +52,10 @@
 //   LatLng _initialPosition = const LatLng(22.7196, 75.8577);
 //   bool _isLoadingAddress = false;
 //   Timer? _debounceTimer;
+//
+//   // Placeholder for selected location from radio button (latitude, longitude, address)
+//   LatLng? _selectedLocation; // Updated when radio button is selected
+//   String? _selectedAddress; // Updated when radio button is selected
 //
 //   @override
 //   void initState() {
@@ -163,7 +171,7 @@
 //       filled: true,
 //       contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 12),
 //       enabledBorder: OutlineInputBorder(
-//         borderSide:  BorderSide(color: AppColors.greyBorder, width: 1.5),
+//         borderSide: BorderSide(color: AppColors.greyBorder, width: 1.5),
 //         borderRadius: BorderRadius.circular(15),
 //       ),
 //       focusedBorder: OutlineInputBorder(
@@ -181,7 +189,7 @@
 //       errorStyle: const TextStyle(
 //         height: 0,
 //         fontSize: 0,
-//       ), // Hide error text to prevent height change
+//       ),
 //     );
 //   }
 //
@@ -195,7 +203,7 @@
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       children: [
 //         Container(
-//           height: 50, // Fixed height for the TextFormField
+//           height: 50,
 //           child: TextFormField(
 //             controller: controllerField,
 //             textAlign: TextAlign.center,
@@ -209,6 +217,19 @@
 //         const SizedBox(height: 15),
 //       ],
 //     );
+//   }
+//
+//   // Placeholder function to update selected location from radio button
+//   void _updateSelectedLocation(LatLng location, String address) {
+//     setState(() {
+//       _selectedLocation = location;
+//       _selectedAddress = address;
+//       _initialPosition = location; // Update map position
+//       addressController.text = address; // Update address field
+//       mapController.animateCamera(
+//         CameraUpdate.newLatLngZoom(location, 15.0),
+//       );
+//     });
 //   }
 //
 //   Future<void> _updateAddress() async {
@@ -231,81 +252,68 @@
 //           return;
 //         }
 //
-//         const String apiUrl =
-//             'https://api.thebharatworks.com/api/user/updateLocation';
+//         const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
 //         final Map<String, dynamic> payload = {
-//           '_id': widget.editlocationId,
-//           'title': titleController.text,
-//           'address': addressController.text,
-//           'landmark': landmarkController.text,
-//           'latitude': _initialPosition.latitude,
-//           'longitude': _initialPosition.longitude,
+//           'full_name': widget.name ?? '',
+//           'role': widget.role ?? '',
+//           'location': {
+//             'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//             'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//             'address': _selectedAddress ?? addressController.text,
+//           },
+//           'full_address': [
+//             {
+//               '_id': widget.editlocationId ?? '',
+//               'title': titleController.text,
+//               'address': _selectedAddress ?? addressController.text,
+//               'landmark': landmarkController.text,
+//               'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//             }
+//           ],
+//           'referral_code': widget.refralCode ?? '',
 //         };
 //
-//         print("Debug: Sending updateLocation with payload: $payload");
+//         print("Debug: Sending updateUserProfile with payload: $payload");
 //
-//         final response = await http.put(
+//         final response = await http.post(
 //           Uri.parse(apiUrl),
 //           headers: {
 //             'Content-Type': 'application/json',
 //             'Authorization': 'Bearer $token',
 //           },
-//           // body: jsonEncode(payload),
-//           body: {
-//             "full_name": widget.name,
-//             "role": widget.role,
-//
-//             "location": {
-//               "latitude": 28.6139,
-//               "longitude": 77.2090,
-//               "address": "New Delhi, India"
-//             },
-//             "full_address":[{
-//               '_id': widget.editlocationId,
-//               'title': titleController.text,
-//               'address': addressController.text,
-//               'landmark': landmarkController.text,
-//               'latitude': _initialPosition.latitude,
-//               'longitude': _initialPosition.longitude,
-//             }],
-//             "referral_code": widget.refralCode
-//           }
+//           body: jsonEncode(payload),
 //         );
 //
-//         print("Debug: updateLocation response: ${response.body}");
-//         print("Debug: updateLocation statusCode: ${response.statusCode}");
+//         print("Debug: updateUserProfile response: ${response.body}");
+//         print("Debug: updateUserProfile statusCode: ${response.statusCode}");
 //
 //         if (!mounted) return;
 //
 //         final responseData = jsonDecode(response.body);
 //
 //         if (response.statusCode == 200 && responseData['status'] == true) {
-//           await prefs.setString('selected_location', addressController.text);
-//           await prefs.setString('address', addressController.text);
-//           await prefs.setDouble('user_latitude', _initialPosition.latitude);
-//           await prefs.setDouble('user_longitude', _initialPosition.longitude);
-//           await prefs.setString(
-//             'selected_address_id',
-//             widget.editlocationId ?? '',
-//           );
+//           await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
+//           await prefs.setString('address', _selectedAddress ?? addressController.text);
+//           await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
+//           await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
+//           await prefs.setString('selected_address_id', widget.editlocationId ?? '');
 //
 //           if (mounted) {
 //             _showMessage('Address updated successfully.');
 //             await Future.delayed(const Duration(seconds: 2));
 //             if (mounted) {
 //               Navigator.pop(context, {
-//                 'address': addressController.text,
-//                 'latitude': _initialPosition.latitude,
-//                 'longitude': _initialPosition.longitude,
+//                 'address': _selectedAddress ?? addressController.text,
+//                 'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//                 'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
 //                 'addressId': widget.editlocationId,
 //               });
 //             }
 //           }
 //         } else {
 //           if (mounted) {
-//             _showMessage(
-//               'API error: ${responseData['message'] ?? 'Unknown error'}',
-//             );
+//             _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
 //           }
 //         }
 //       } catch (e) {
@@ -340,17 +348,28 @@
 //           return;
 //         }
 //
-//         const String apiUrl =
-//             'https://api.thebharatworks.com/api/user/addAddress';
+//         const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
 //         final Map<String, dynamic> payload = {
-//           'title': titleController.text,
-//           'address': addressController.text,
-//           'landmark': landmarkController.text,
-//           'latitude': _initialPosition.latitude,
-//           'longitude': _initialPosition.longitude,
+//           'full_name': widget.name ?? '',
+//           'role': widget.role ?? '',
+//           'location': {
+//             'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//             'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//             'address': _selectedAddress ?? addressController.text,
+//           },
+//           'full_address': [
+//             {
+//               'title': titleController.text,
+//               'address': _selectedAddress ?? addressController.text,
+//               'landmark': landmarkController.text,
+//               'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//             }
+//           ],
+//           'referral_code': widget.refralCode ?? '',
 //         };
 //
-//         print("Debug: Sending addAddress with payload: $payload");
+//         print("Debug: Sending updateUserProfile with payload: $payload");
 //
 //         final response = await http.post(
 //           Uri.parse(apiUrl),
@@ -361,8 +380,8 @@
 //           body: jsonEncode(payload),
 //         );
 //
-//         print("Debug: addAddress response: ${response.body}");
-//         print("Debug: addAddress statusCode: ${response.statusCode}");
+//         print("Debug: updateUserProfile response: ${response.body}");
+//         print("Debug: updateUserProfile statusCode: ${response.statusCode}");
 //
 //         if (!mounted) return;
 //
@@ -370,14 +389,11 @@
 //
 //         if (response.statusCode == 200 && responseData['status'] == true) {
 //           await prefs.setBool('isProfileComplete', true);
-//           await prefs.setString('selected_location', addressController.text);
-//           await prefs.setString('address', addressController.text);
-//           await prefs.setDouble('user_latitude', _initialPosition.latitude);
-//           await prefs.setDouble('user_longitude', _initialPosition.longitude);
-//           await prefs.setString(
-//             'selected_address_id',
-//             responseData['addressId'] ?? '',
-//           );
+//           await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
+//           await prefs.setString('address', _selectedAddress ?? addressController.text);
+//           await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
+//           await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
+//           await prefs.setString('selected_address_id', responseData['addressId'] ?? '');
 //
 //           if (mounted) {
 //             _showMessage('Address added successfully.');
@@ -386,9 +402,7 @@
 //               Navigator.pushAndRemoveUntil(
 //                 context,
 //                 MaterialPageRoute(
-//                   builder:
-//                       (context) =>
-//                   (role == 'user' || role == 'service_provider')
+//                   builder: (context) => (role == 'user' || role == 'service_provider')
 //                       ? const Bottombar()
 //                       : const RoleSelectionScreen(),
 //                 ),
@@ -398,9 +412,7 @@
 //           }
 //         } else {
 //           if (mounted) {
-//             _showMessage(
-//               'API error: ${responseData['message'] ?? 'Unknown error'}',
-//             );
+//             _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
 //           }
 //         }
 //       } catch (e) {
@@ -416,10 +428,8 @@
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     print(
-//       "Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}",
-//     );
-//     print("Abhi:- get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
+//     print("Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}");
+//     print("Debug: get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
 //     return Scaffold(
 //       backgroundColor: AppColors.white,
 //       appBar: AppBar(
@@ -459,9 +469,7 @@
 //                 const SizedBox(height: 20),
 //                 Center(
 //                   child: Text(
-//                     widget.editlocationId != null
-//                         ? 'Edit Location'
-//                         : 'Select your location',
+//                     widget.editlocationId != null ? 'Edit Location' : 'Select your location',
 //                     style: GoogleFonts.poppins(
 //                       fontSize: 16,
 //                       fontWeight: FontWeight.bold,
@@ -482,8 +490,7 @@
 //                         borderRadius: BorderRadius.circular(15),
 //                       ),
 //                       child: GoogleMap(
-//                         gestureRecognizers:
-//                         <Factory<OneSequenceGestureRecognizer>>{
+//                         gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
 //                           Factory<OneSequenceGestureRecognizer>(
 //                                 () => EagerGestureRecognizer(),
 //                           ),
@@ -561,7 +568,7 @@
 //                       const SizedBox(height: 5),
 //                       buildCustomField(
 //                         controllerField: titleController,
-//                         hint: 'Enter Title ',
+//                         hint: 'Enter Title',
 //                         formatters: [
 //                           FilteringTextInputFormatter.allow(
 //                             RegExp(r"[a-zA-Z\s]+"),
@@ -598,9 +605,7 @@
 //                           LengthLimitingTextInputFormatter(50),
 //                         ],
 //                         validator: (value) {
-//                           if (value != null &&
-//                               value.isNotEmpty &&
-//                               value.length < 3) {
+//                           if (value != null && value.isNotEmpty && value.length < 3) {
 //                             return 'Landmark must be at least 3 characters long.';
 //                           }
 //                           return null;
@@ -609,11 +614,10 @@
 //                       const SizedBox(height: 15),
 //                       CustomButton(
 //                         label: 'Submit',
-//                         /*onPressed: () async {
+//                         onPressed: () async {
 //                           if (_formKey.currentState!.validate()) {
 //                             try {
-//                               final prefs =
-//                               await SharedPreferences.getInstance();
+//                               final prefs = await SharedPreferences.getInstance();
 //                               final token = prefs.getString('token');
 //                               final role = prefs.getString('role');
 //                               print(
@@ -622,19 +626,12 @@
 //
 //                               if (token == null || token.isEmpty) {
 //                                 if (mounted) {
-//                                   _showMessage(
-//                                     'Token not found. Please log in.',
-//                                   );
-//                                   await Future.delayed(
-//                                     const Duration(seconds: 2),
-//                                   ); // Wait for message to show
+//                                   _showMessage('Token not found. Please log in.');
+//                                   await Future.delayed(const Duration(seconds: 2));
 //                                   if (mounted) {
 //                                     Navigator.pushAndRemoveUntil(
 //                                       context,
-//                                       MaterialPageRoute(
-//                                         builder:
-//                                             (context) => const LoginScreen(),
-//                                       ),
+//                                       MaterialPageRoute(builder: (context) => const LoginScreen()),
 //                                           (route) => false,
 //                                     );
 //                                   }
@@ -642,21 +639,29 @@
 //                                 return;
 //                               }
 //
-//                               const String apiUrl =
-//                                   'https://api.thebharatworks.com/api/user/updateUserProfile';
-//
+//                               const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
 //                               final Map<String, dynamic> payload = {
+//                                 'full_name': widget.name ?? '',
+//                                 'role': widget.role ?? '',
+//                                 'location': {
+//                                   'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//                                   'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//                                   'address': _selectedAddress ?? addressController.text,
+//                                 },
 //                                 'full_address': [
 //                                   {
+//                                     '_id': widget.editlocationId ?? '',
 //                                     'title': titleController.text,
-//                                     'address': addressController.text,
+//                                     'address': _selectedAddress ?? addressController.text,
 //                                     'landmark': landmarkController.text,
-//                                     'latitude': _initialPosition.latitude,
-//                                     'longitude': _initialPosition.longitude,
-//                                     "_id": widget.editlocationId,
-//                                   },
+//                                     'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+//                                     'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+//                                   }
 //                                 ],
+//                                 'referral_code': widget.refralCode ?? '',
 //                               };
+//
+//                               print("Debug: Sending updateUserProfile with payload: $payload");
 //
 //                               final response = await http.post(
 //                                 Uri.parse(apiUrl),
@@ -664,51 +669,32 @@
 //                                   'Content-Type': 'application/json',
 //                                   'Authorization': 'Bearer $token',
 //                                 },
-//                                 // body: jsonEncode(payload),
-//                                   body: {
-//                                     "full_name": widget.name ?? "",
-//                                     "role": widget.role ?? "",
-//                                     "location": {
-//                                       "latitude": 28.6139,
-//                                       "longitude": 77.2090,
-//                                       "address": "New Delhi, India"
-//                                     },
-//                                     "full_address": [
-//                                       {
-//                                         "_id": widget.editlocationId ?? "",
-//                                         "title": titleController.text.isNotEmpty ? titleController.text : "",
-//                                         "address": addressController.text.isNotEmpty ? addressController.text : "",
-//                                         "landmark": landmarkController.text.isNotEmpty ? landmarkController.text : "",
-//                                         "latitude": _initialPosition.latitude,
-//                                         "longitude": _initialPosition.longitude,
-//                                       }
-//                                     ],
-//                                     "referral_code": widget.refralCode ?? ""
-//                                   },
+//                                 body: jsonEncode(payload),
 //                               );
-//                                   // print("🔍 API Response: ${response.body}");
+//
+//                               print("Debug: updateUserProfile response: ${response.body}");
+//                               print("Debug: updateUserProfile statusCode: ${response.statusCode}");
 //
 //                               if (!mounted) return;
 //
 //                               final responseData = jsonDecode(response.body);
 //
-//                               if (response.statusCode == 200 &&
-//                                   responseData['status'] == true) {
+//                               if (response.statusCode == 200 && responseData['status'] == true) {
 //                                 await prefs.setBool('isProfileComplete', true);
+//                                 await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
+//                                 await prefs.setString('address', _selectedAddress ?? addressController.text);
+//                                 await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
+//                                 await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
+//                                 await prefs.setString('selected_address_id', responseData['addressId'] ?? widget.editlocationId ?? '');
+//
 //                                 if (mounted) {
 //                                   _showMessage('Address saved successfully.');
-//                                   await Future.delayed(
-//                                     const Duration(seconds: 2),
-//                                   ); // Wait for message to show
+//                                   await Future.delayed(const Duration(seconds: 2));
 //                                   if (mounted) {
 //                                     Navigator.pushAndRemoveUntil(
 //                                       context,
 //                                       MaterialPageRoute(
-//                                         builder:
-//                                             (context) =>
-//                                         (role == 'user' ||
-//                                             role ==
-//                                                 'service_provider')
+//                                         builder: (context) => (role == 'user' || role == 'service_provider')
 //                                             ? const Bottombar()
 //                                             : const RoleSelectionScreen(),
 //                                       ),
@@ -718,9 +704,7 @@
 //                                 }
 //                               } else {
 //                                 if (mounted) {
-//                                   _showMessage(
-//                                     'API error: ${responseData['message'] ?? 'Unknown error'}',
-//                                   );
+//                                   _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
 //                                 }
 //                               }
 //                             } catch (e) {
@@ -732,109 +716,7 @@
 //                           } else {
 //                             _showMessage('Please fill all fields correctly.');
 //                           }
-//                         },*/
-//                           onPressed: () async {
-//                             if (_formKey.currentState!.validate()) {
-//                               try {
-//                                 final prefs = await SharedPreferences.getInstance();
-//                                 final token = prefs.getString('token');
-//                                 final role = prefs.getString('role');
-//                                 print(
-//                                   "🔍 Before API Call - Token: $token, Role: $role, ProfileComplete: ${prefs.getBool('isProfileComplete')}",
-//                                 );
-//
-//                                 if (token == null || token.isEmpty) {
-//                                   if (mounted) {
-//                                     _showMessage('Token not found. Please log in.');
-//                                     await Future.delayed(const Duration(seconds: 2));
-//                                     if (mounted) {
-//                                       Navigator.pushAndRemoveUntil(
-//                                         context,
-//                                         MaterialPageRoute(builder: (context) => const LoginScreen()),
-//                                             (route) => false,
-//                                       );
-//                                     }
-//                                   }
-//                                   return;
-//                                 }
-//
-//                                 const String apiUrl =
-//                                     'https://api.thebharatworks.com/api/user/updateUserProfile';
-//
-//                                 final Map<String, dynamic> payload = {
-//                                   "full_name": widget.name ?? "",
-//                                   "role": widget.role ?? "",
-//                                   "location": {
-//                                     "latitude": _initialPosition.latitude,
-//                                     "longitude": _initialPosition.longitude,
-//                                     "address": "New Delhi, India"
-//                                   },
-//                                   "full_address": [
-//                                     {
-//                                       "_id": widget.editlocationId ?? "",
-//                                       "title":
-//                                       titleController.text.isNotEmpty ? titleController.text : "",
-//                                       "address":
-//                                       addressController.text.isNotEmpty ? addressController.text : "",
-//                                       "landmark": landmarkController.text.isNotEmpty
-//                                           ? landmarkController.text
-//                                           : "",
-//                                       "latitude": _initialPosition.latitude,
-//                                       "longitude": _initialPosition.longitude,
-//                                     }
-//                                   ],
-//                                   "referral_code": widget.refralCode ?? ""
-//                                 };
-//
-//                                 final response = await http.post(
-//                                   Uri.parse(apiUrl),
-//                                   headers: {
-//                                     'Content-Type': 'application/json',
-//                                     'Authorization': 'Bearer $token',
-//                                   },
-//                                   body: jsonEncode(payload),
-//                                 );
-//
-//                                 if (!mounted) return;
-//
-//                                 final responseData = jsonDecode(response.body);
-//                                 print("🔍 API Response: $responseData");
-//
-//                                 if (response.statusCode == 200 && responseData['status'] == true) {
-//                                   await prefs.setBool('isProfileComplete', true);
-//                                   if (mounted) {
-//                                     _showMessage('Address saved successfully.');
-//                                     await Future.delayed(const Duration(seconds: 2));
-//                                     if (mounted) {
-//                                       Navigator.pushAndRemoveUntil(
-//                                         context,
-//                                         MaterialPageRoute(
-//                                           builder: (context) => (role == 'user' || role == 'service_provider')
-//                                               ? const Bottombar()
-//                                               : const RoleSelectionScreen(),
-//                                         ),
-//                                             (route) => false,
-//                                       );
-//                                     }
-//                                   }
-//                                 } else {
-//                                   if (mounted) {
-//                                     _showMessage(
-//                                       'API error: ${responseData['message'] ?? 'Unknown error'}',
-//                                     );
-//                                   }
-//                                 }
-//                               } catch (e) {
-//                                 if (mounted) {
-//                                   _showMessage('Error calling API: $e');
-//                                   print("❌ Error: $e");
-//                                 }
-//                               }
-//                             } else {
-//                               _showMessage('Please fill all fields correctly.');
-//                             }
-//                           }
-//
+//                         },
 //                       ),
 //                     ],
 //                   ),
@@ -876,6 +758,9 @@ class AddressDetailScreen extends StatefulWidget {
   final String? name;
   final String? refralCode;
   final String? role;
+  final String? gender;
+  final  age;
+  final  dataHide;
 
   const AddressDetailScreen({
     super.key,
@@ -887,6 +772,9 @@ class AddressDetailScreen extends StatefulWidget {
     this.name,
     this.refralCode,
     this.role,
+    this.gender,
+    this.age,
+    this.dataHide,
   });
 
   @override
@@ -1493,6 +1381,8 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                               final Map<String, dynamic> payload = {
                                 'full_name': widget.name ?? '',
                                 'role': widget.role ?? '',
+                                "gender": widget.gender,  //["male", "female", "other"],
+                                "age":widget.age,
                                 'location': {
                                   'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
                                   'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,

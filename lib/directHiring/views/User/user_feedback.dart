@@ -278,7 +278,8 @@ import '../../../../Widgets/AppColors.dart';
 class UserFeedback extends StatefulWidget {
   final providerId;
   final oderId;
-  const UserFeedback({Key? key, this.providerId, this.oderId}) : super(key: key);
+  final String oderType;
+  const UserFeedback({Key? key, this.providerId, this.oderId, required this.oderType}) : super(key: key);
 
   @override
   State<UserFeedback> createState() => _UserFeedbackState();
@@ -321,6 +322,7 @@ class _UserFeedbackState extends State<UserFeedback> {
     try {
       final String url = "${AppConstants.baseUrl}${ApiEndpoint.postRatingDarect}";
       print("Abhi:- postRatingDarect call api url :- $url");
+      print("Abhi:- postRatingDarect call api oderId :- ${widget.oderId} providerId : ${widget.providerId} type : ${widget.oderType}");
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
 
@@ -332,7 +334,7 @@ class _UserFeedbackState extends State<UserFeedback> {
       // Add form fields
       request.fields['serviceProviderId'] = /*'685d21fdb93a9a07a9fe3d0d'*/ widget.providerId;
       request.fields['orderId'] = /*'685d21fdb93a9a07a9fe3d0d'*/ widget.oderId;
-      request.fields['type'] = 'direct';
+      request.fields['type'] = /*'direct'*/ widget.oderType;
       request.fields['review'] = feedController.text.trim();
       request.fields['rating'] = selectedRating.toString();
 
@@ -364,7 +366,8 @@ class _UserFeedbackState extends State<UserFeedback> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Feedback submitted successfully",),backgroundColor: Colors.green,),
         );
-        Navigator.pop(context);
+        Navigator.pop(context,true);
+        Navigator.pop(context,true);
         // Navigator.pushAndRemoveUntil(
         //   context,
         //   MaterialPageRoute(
