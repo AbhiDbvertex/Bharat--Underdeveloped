@@ -187,14 +187,20 @@ class SpEmergencyServiceController extends GetxController {
   }
 
   Future<void> getEmergencySpOrderList() async {
+    final prefs = await SharedPreferences.getInstance();
+
     bwDebug("[getEmergencySpOrderList] call:", tag: tag);
     final result = await _fetchOrders(ApiUrl.getAllSPOrderList);
     if (result != null && result.status) {
+
       orders.assignAll(result.data); // Update reactive list
       bwDebug("[getEmergencySpOrderList] orders fetched: ${orders.length}", tag: tag);
+      await prefs.setBool("emergency_task", true);
     } else {
       orders.clear(); // Clear list if no data
       bwDebug("[getEmergencySpOrderList] no data or error", tag: tag);
+      await prefs.setBool("emergency_task", false);
+
     }
   }
 

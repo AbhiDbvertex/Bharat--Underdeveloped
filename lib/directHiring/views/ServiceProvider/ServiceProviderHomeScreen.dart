@@ -1512,6 +1512,7 @@ import 'dart:io';
 
 import 'package:developer/Bidding/ServiceProvider/WorkerRecentPostedScreen.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_emergency_work_page.dart';
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -1901,6 +1902,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
             );
           }
         }
+
       }
     } catch (e) {
       bwDebug("Error in Emergency API: $e");
@@ -1910,6 +1912,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
         );
       }
     } finally {
+      controller.getEmergencySpOrderList();
       setState(() {
         _isToggling = false;
       });
@@ -2296,7 +2299,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (controller.orders.isEmpty) {
-                      return const Center(child: Text("No data found"));
+                      return const Center(child: Text("No data found.\nTurn on emergency task!!",textAlign: TextAlign.center,));
                     }
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -2537,11 +2540,42 @@ class EmergencyCard extends StatelessWidget {
               width: screenWidth * 0.3,
               height: screenHeight * 0.12,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
+              loadingBuilder: (context, child, loadingProgress) {
+                if(loadingProgress == null){
+                  return child;
+                }
+                return SizedBox(
+                  width: screenWidth *0.3,
+                  height: screenHeight*0.12,
+                  child: Center(
+                    child: SizedBox(
+                      width: 0.15.toWidthPercent(),
+                      height: 0.15.toWidthPercent(),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => /*Image.asset(
                 'assets/images/Fur.png',
                 width: screenWidth * 0.3,
                 height: screenHeight * 0.12,
                 fit: BoxFit.cover,
+
+              ),*/
+              SizedBox(
+                width: screenWidth * 0.3,
+                height: screenHeight * 0.12,
+                child: const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             ),
             SizedBox(height: screenHeight * 0.005),

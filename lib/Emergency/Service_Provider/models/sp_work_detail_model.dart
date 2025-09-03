@@ -73,6 +73,7 @@ class Data {
   int? platformFee;
   String? razorOrderIdPlatform;
   ServicePayment? servicePayment;
+  Commission ? commission;
   // List<dynamic>? acceptedByProviders;
   List<AcceptedByProvider>? acceptedByProviders;
   String? createdAt;
@@ -101,6 +102,7 @@ class Data {
         this.platformFee,
         this.razorOrderIdPlatform,
         this.servicePayment,
+        this.commission,
         this.acceptedByProviders,
         this.createdAt,
         this.updatedAt,
@@ -199,6 +201,32 @@ class Data {
     map['__v'] = v;
     map['razorPaymentIdPlatform'] = razorPaymentIdPlatform;
     if (warningMessage != null) map['warningMessage'] = warningMessage!.toJson();
+
+    return map;
+  }
+}
+
+class Commission {
+  int? amount;
+  int? percentage;
+  String? type;
+  String? isCollected;
+
+  Commission(this.amount,this.percentage, this.type, this.isCollected);
+
+  Commission.fromJson(Map<String, dynamic> json) {
+    amount = json['amount'];
+    percentage = json['percentage'];
+    type = json['type'];
+    isCollected = json['is_collected'];
+
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = {};
+    map['amount'] = amount;
+    map['percentage'] = percentage;
+    map['type'] = type;
+    map['is_collected'] = isCollected;
 
     return map;
   }
@@ -319,6 +347,10 @@ class PaymentHistory {
   String? status;
   String? releaseStatus;
   bool? isCollected;
+  int? commissionAmount;
+  int? providerEarning;
+  String? commissionType;
+  int? commissionPercentage;
   String? id;
   String? date;
 
@@ -331,6 +363,10 @@ class PaymentHistory {
     this.status,
     this.releaseStatus,
     this.isCollected,
+  this.commissionAmount,
+  this.providerEarning,
+  this.commissionType,
+  this.commissionPercentage,
     this.id,
     this.date,
   });
@@ -344,6 +380,10 @@ class PaymentHistory {
     status = json['status'];
     releaseStatus = json['release_status'];
     isCollected = json['is_collected'];
+    isCollected = json['commission_amount'];
+    isCollected = json['provider_earning'];
+    isCollected = json['commissionType'];
+    isCollected = json['commissionPercentage'];
     id = json['_id'];
     date = json['date'];
   }
@@ -358,6 +398,10 @@ class PaymentHistory {
     data['status'] = status;
     data['release_status'] = releaseStatus;
     data['is_collected'] = isCollected;
+    data['commission_amount'] = commissionAmount;
+    data['provider_earning'] = providerEarning;
+    data['commissionType'] = commissionType;
+    data['commissionPercentage'] = commissionPercentage;
     data['_id'] = id;
     data['date'] = date;
     return data;

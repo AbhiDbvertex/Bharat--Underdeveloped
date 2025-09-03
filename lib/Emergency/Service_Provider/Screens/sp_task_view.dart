@@ -213,7 +213,10 @@ class _SpTaskViewState extends State<SpTaskView> {
     print("dss :- ${controller.assignedWorker.value.id}");
     return controller.assignedWorker.value.id == null?
       InkWell(
-        onTap: () {Get.to(() => ServiceWorkerListScreen(orderId: controller.userId.value));},
+        onTap: () {
+          Get.to(() => ServiceWorkerListScreen(orderId: controller.userId.value,callType:"emergency"));
+          // Get.to(() => WorkerScreen());
+          },
         child: Container(
           alignment: Alignment.center,
           width: double.infinity,
