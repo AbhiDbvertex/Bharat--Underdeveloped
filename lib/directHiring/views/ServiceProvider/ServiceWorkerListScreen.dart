@@ -385,13 +385,17 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart'; // GetX import kiya
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import 'AddWorkerScreen.dart';
 import 'WorkerListViewProfileScreen.dart'; // Worker profile wala screen
 
 // Worker ka Model
@@ -429,9 +433,9 @@ class ServiceWorkerListModel {
 
 // Screen
 class ServiceWorkerListScreen extends StatefulWidget {
-  final String orderId; // Dynamic order ID yaha se aayega
-
-  const ServiceWorkerListScreen({Key? key, required this.orderId})
+  final String orderId;
+final String? callType;
+  const ServiceWorkerListScreen({Key? key, required this.orderId, this.callType})
       : super(key: key);
 
   @override
@@ -446,6 +450,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
 
   @override
   void initState() {
+
     super.initState();
     PaintingBinding.instance.imageCache.clear(); // Image cache saaf karo
     fetchWorkers();
@@ -536,6 +541,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
   }
 
   Future<void> assignOrderToWorker(String workerId) async {
+    bwDebug("[assignOrderToWorker],  WorkerId: $workerId, orderId: ${widget.orderId}, type: ${widget.callType}");
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
@@ -546,7 +552,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
     final body = {
       "worker_id": workerId,
       "order_id": widget.orderId,
-      "type": "direct",
+      "type": widget.callType??"direct",
     };
 
     try {
@@ -610,17 +616,68 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: /*AppBar(
         backgroundColor: AppColors.primaryGreen,
         elevation: 0,
         toolbarHeight: 20,
         automaticallyImplyLeading: false,
+      ),*/
+      AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Text("Worker List",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+        leading: const BackButton(color: Colors.black),
+        actions: [
+          Padding(
+            padding:  EdgeInsets.only(right: 0.04.toWidthPercent()),
+            child: GestureDetector(
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddWorkerScreen()),
+                );
+                if (result == true) {
+                  fetchWorkers();
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Worker added successfully"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: Row(
+                children: [
+                  Card(
+                    margin: EdgeInsets.symmetric(vertical: 0.05.toWidthPercent(),horizontal: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.015.toWidthPercent())),
+
+                  color: AppColors.primaryGreen,
+                  child: Center(
+                    child: Icon(Icons.add,color: Colors.white,size: 0.05.toWidthPercent(),),
+                  ),
+                  ),
+                  Text(
+                    "Add Worker",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 0.035.toWidthPercent()),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          Padding(
+         /* Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
@@ -638,7 +695,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
                 ),
               ],
             ),
-          ),
+          ),*/
 
           // Worker List
           Expanded(

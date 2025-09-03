@@ -68,7 +68,7 @@ class SpWorkDetailController extends GetxController {
   }
 
   Future<bool> getEmergencyOrder(String id) async {
-    print("yyyyyyyyyyyyyyyyyyyy");
+    bwDebug("yyyyyyyyyyyyyyyyyyyy");
     var result = false;
     isLoading.value = true;
     bwDebug("[getEmergencyOrder] call orderId:$id", tag: tag);
