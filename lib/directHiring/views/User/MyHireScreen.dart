@@ -435,13 +435,25 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       ? item['image_url'][0]
                       : "";
                   var user = item?['user_id'];
-                  String userId = "";
+                  var serviceProvider = item?['service_provider_id']; // 👈 yaha var rakho
 
+                  String userId = "";
+                  String serviceProviderId = "";
+
+// user check
                   if (user is Map) {
                     userId = user['_id']?.toString() ?? "";
                   } else if (user is String) {
                     userId = user;
                   }
+
+// service provider check
+                  if (serviceProvider is Map) {
+                    serviceProviderId = serviceProvider['_id']?.toString() ?? "";
+                  } else if (serviceProvider is String) {
+                    serviceProviderId = serviceProvider;
+                  }
+
 
                   print("Abhi:- get bidding oderId : ${buddingOderId }");
                   print("Abhi:- get bidding oderId status : ${status}");
@@ -574,6 +586,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                             builder: (context) => BiddingWorkerDetailScreen(
                                               buddingOderId: buddingOderId,
                                               userId: userId,
+                                              serviceProviderId: serviceProviderId,
                                             ),
                                           ),
                                         );

@@ -5,6 +5,8 @@ class ServiceProviderProfileModel {
   final String? id;
   final String? phone;
   late final String? fullName;
+  late final String? age;
+  late final String? gender;
   final String? location;
   final String? currentLocation;
   final String? fullAddress;
@@ -34,6 +36,8 @@ class ServiceProviderProfileModel {
     this.id,
     this.phone,
     this.fullName,
+    this.age,
+    this.gender,
     this.location,
     this.currentLocation,
     this.fullAddress,
@@ -66,6 +70,8 @@ class ServiceProviderProfileModel {
       id: json['_id']?.toString(),
       phone: json['phone']?.toString(),
       fullName: json['full_name']?.toString(),
+      age: json['age']?.toString(),
+      gender: json['gender']?.toString(),
       location: json['location']?.toString(),
       currentLocation: json['current_location']?.toString(),
       fullAddress: json['full_address']?.toString(),

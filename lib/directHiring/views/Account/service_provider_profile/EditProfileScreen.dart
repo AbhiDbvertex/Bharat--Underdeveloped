@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -19,6 +17,9 @@ class EditProfileScreen extends StatefulWidget {
   final String? categoryId;
   final List<String>? subCategoryIds;
   final String? documentUrl;
+  final gender;
+  // final age;
+  final String? age; // best way
 
   const EditProfileScreen({
     super.key,
@@ -27,6 +28,8 @@ class EditProfileScreen extends StatefulWidget {
     this.categoryId,
     this.subCategoryIds,
     this.documentUrl,
+    this.gender,
+    this.age,
   });
 
   @override
@@ -35,39 +38,27 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  // final TextEditingController fullNameController = TextEditingController();
   final TextEditingController skillController = TextEditingController();
   File? selectedFile;
   bool isLoading = false;
-
   String? selectedCategory;
   List<String> selectedSubCategories = [];
-
   List<Map<String, String>> categories = [];
   List<Map<String, String>> subcategories = [];
   String? uploadedDocName;
+  final Map<String, String> _errorTexts = {};
+  String? _selectedGender; // Added for gender selection
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   fullNameController.text = widget.fullName ?? '';
-  //   skillController.text = widget.skill ?? '';
-  //   selectedCategory = widget.categoryId;
-  //   selectedSubCategories = widget.subCategoryIds ?? [];
-  //   uploadedDocName = widget.documentUrl?.split('/').last;
-  //
-  //   fetchCategories().then((_) {
-  //     if (selectedCategory != null) {
-  //       fetchSubCategories(selectedCategory!);
-  //     }
-  //   });
-  // }
 
   @override
   void initState() {
     super.initState();
 
     fullNameController.text = widget.fullName ?? '';
+    ageController.text = widget.age?.toString() ?? "";
+    _selectedGender = widget.gender ?? "";
     skillController.text = widget.skill ?? '';
     selectedSubCategories = widget.subCategoryIds ?? [];
     uploadedDocName = widget.documentUrl?.split('/').last;
@@ -83,29 +74,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  // Future<void> fetchCategories() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   final res = await http.get(
-  //     Uri.parse('https://api.thebharatworks.com/api/work-category'),
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-  //
-  //   if (res.statusCode == 200) {
-  //     final data = jsonDecode(res.body);
-  //     setState(() {
-  //       categories = List<Map<String, String>>.from(
-  //         data['data'].map(
-  //               (cat) => {
-  //             'id': cat['_id'].toString(),
-  //             'name': cat['name'].toString(),
-  //           },
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
   Future<void> fetchCategories() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -133,30 +101,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print("Failed to fetch categories: ${res.statusCode} - ${res.body}");
     }
   }
-
-  // Future<void> fetchSubCategories(String categoryId) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   final res = await http.get(
-  //     Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
-  //     headers: {'Authorization': 'Bearer $token'},
-  //   );
-  //
-  //   if (res.statusCode == 200) {
-  //     final data = jsonDecode(res.body);
-  //     setState(() {
-  //       subcategories = List<Map<String, String>>.from(
-  //         data['data'].map(
-  //               (sub) => {
-  //             'id': sub['_id'].toString(),
-  //             'name': sub['name'].toString(),
-  //           },
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
 
   Future<void> fetchSubCategories(String categoryId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -202,6 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         selectedSubCategories.isEmpty ||
         skillController.text.isEmpty ||
         fullNameController.text.isEmpty ||
+        ageController.text.isEmpty ||
         (selectedFile == null && uploadedDocName == null)) {
       Get.snackbar(
         'Warning',
@@ -237,6 +182,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       request.fields['category_id'] = selectedCategory!;
+      request.fields['age'] = ageController.text;
+      request.fields['gender'] = _selectedGender!;
       request.fields['subcategory_ids'] = jsonEncode(selectedSubCategories);
       request.fields['skill'] = skillController.text.trim();
       request.fields['full_name'] = fullNameController.text.trim();
@@ -345,38 +292,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // Widget buildSimpleDropdown({
-  //   required String? value,
-  //   required String hint,
-  //   required List<Map<String, String>> items,
-  //   required void Function(String?) onChanged,
-  // }) {
-  //   return Container(
-  //     margin: const EdgeInsets.only(bottom: 12),
-  //     padding: const EdgeInsets.symmetric(horizontal: 12),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(10),
-  //       border: Border.all(color: Colors.grey.shade400),
-  //     ),
-  //     child: DropdownButtonFormField<String>(
-  //       value: value,
-  //       isExpanded: true,
-  //       decoration: const InputDecoration(border: InputBorder.none),
-  //       hint: Text(hint, style: const TextStyle(color: Colors.grey)),
-  //       items:
-  //       items
-  //           .map(
-  //             (item) => DropdownMenuItem(
-  //           value: item['id'],
-  //           child: Text(item['name'] ?? ''),
-  //         ),
-  //       )
-  //           .toList(),
-  //       onChanged: onChanged,
-  //     ),
-  //   );
-  // }
 
   Widget buildSimpleDropdown({
     required String? value,
@@ -415,6 +330,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("Abhi: get age: ${widget.age} gender: ${widget.gender}");
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F4),
       appBar: AppBar(
@@ -466,6 +382,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 15),
+                    TextFormField(
+                      controller: ageController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your age',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),const SizedBox(height: 15),
+                    buildGenderRadio(),
                     const SizedBox(height: 12),
                     buildSimpleDropdown(
                       hint: 'Select Category',
@@ -516,8 +446,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 (sub) => selectedSubCategories.contains(
                               sub['id'],
                             ),
-                          )
-                              .map((sub) => sub['name'])
+                          ).map((sub) => sub['name'])
                               .join(', '),
                           style: const TextStyle(color: Colors.black),
                         ),
@@ -578,6 +507,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           );
         },
       ),
+    );
+  }
+  Widget buildGenderRadio() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Select Your Gender"),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Radio<String>(
+              value: 'male',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Male'),
+            Radio<String>(
+              value: 'female',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Female'),
+            Radio<String>(
+              value: 'other',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Other'),
+          ],
+        ),
+        SizedBox(
+          // height: 0,
+          child: _errorTexts['gender'] != null
+              ? Text(
+            _errorTexts['gender']!,
+            style: const TextStyle(color: AppColors.red, fontSize: 11),
+          )
+              : null,
+        ),
+        // const SizedBox(height: 10),
+      ],
     );
   }
 }

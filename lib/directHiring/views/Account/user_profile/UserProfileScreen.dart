@@ -29,10 +29,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String selectedRole = 'user';
   String? profilePicUrl;
   String? fullName = 'Your Name';
+  String? age = 'Your age';
+  String? gender = 'Your gender';
   String? requestStatus;
   String? role = 'No role';
   String? aboutUs = '';
   String? phone;
+  String? selectedGender;
   late TextEditingController aboutController;
   final GetXRoleController roleController = Get.put(GetXRoleController()); // Updated to GetXRoleController
   @override
@@ -62,19 +65,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
       );
 
+      // if (response.statusCode == 200) {
+      //   final body = json.decode(response.body);
+      //   if (body['status'] == true) {
+      //     final data = body['data'];
+      //     setState(() {
+      //       fullName = data['full_name'] ?? 'Your Name';
+      //       age = data['age'];
+      //       gender = data['gender'] ?? 'Your gender';
+      //       role = data['role'] ?? 'role';
+      //       profilePicUrl = data['profilePic'];
+      //       aboutUs = data['aboutUs'] ?? '';
+      //       phone = data['phone'] ?? '';
+      //       requestStatus = data['requestStatus'] ?? '';
+      //       aboutController.text = aboutUs!;
+      //     });
+      //   }
+      //   print("Abhi:- show exception fetchProfileFromAPI data $age Gender: $gender ");
+      // }
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
         if (body['status'] == true) {
           final data = body['data'];
-          setState(() {
-            fullName = data['full_name'] ?? 'Your Name';
-            role = data['role'] ?? 'role';
-            profilePicUrl = data['profilePic'];
-            aboutUs = data['aboutUs'] ?? '';
-            phone = data['phone'] ?? '';
-            requestStatus = data['requestStatus'] ?? '';
-            aboutController.text = aboutUs!;
-          });
+
+          final userAge = data['age']?.toString() ?? '0';   // ✅ safe string
+          final userGender = data['gender'] ?? '';         // ✅ string
+
+          // setState(() {
+          //   fullName = data['full_name'] ?? 'Your Name';
+          //   age = userAge;
+          //   gender = userGender;
+          //   role = data['role'] ?? 'role';
+          //   profilePicUrl = data['profilePic'];
+          //   aboutUs = data['aboutUs'] ?? '';
+          //   phone = data['phone'] ?? '';
+          //   requestStatus = data['requestStatus'] ?? '';
+          //   aboutController.text = aboutUs!;
+          // });
+
+          if (body['status'] == true) {
+            final data = body['data'];
+            final userAge = data['age']?.toString() ?? '';
+            final userGender = (data['gender'] ?? '').toString().toLowerCase();
+
+            setState(() {
+              fullName = data['full_name'] ?? 'Your Name';
+              age = userAge;
+              gender = userGender;          // UI ke liye
+              selectedGender = userGender;  // bottomsheet radio ke liye
+              role = data['role'] ?? 'role';
+              profilePicUrl = data['profilePic'];
+              aboutUs = data['aboutUs'] ?? '';
+              phone = data['phone'] ?? '';
+              requestStatus = data['requestStatus'] ?? '';
+              aboutController.text = aboutUs!;
+            });
+          }
+
+
+          print("Abhi:- User Age: $userAge, Gender: $userGender");
         }
       }
     } catch (e) {
@@ -82,6 +131,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print("Abhi:- show exception fetchProfileFromAPI Error: $e");
     }
   }
+
+  // Future<void> _uploadCombinedProfileData(
+  //     String name,
+  //     String aboutText,
+  //     File? imageFile,
+  //     ) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+  //   if (token == null) return;
+  //
+  //   if (imageFile != null) {
+  //     final uri = Uri.parse(
+  //       'https://api.thebharatworks.com/api/user/updateProfilePic',
+  //     );
+  //     final request =
+  //     http.MultipartRequest('PUT', uri)
+  //       ..headers['Authorization'] = 'Bearer $token'
+  //       ..fields['full_name'] = name
+  //       ..fields['aboutUs'] = aboutText;
+  //
+  //     request.files.add(
+  //       await http.MultipartFile.fromPath('profilePic', imageFile.path),
+  //     );
+  //
+  //     final response = await request.send();
+  //     final resBody = await http.Response.fromStream(response);
+  //     final body = json.decode(resBody.body);
+  //
+  //     if (body['status'] == true) {
+  //       setState(() {
+  //         fullName = name;
+  //         aboutUs = aboutText;
+  //         _image = imageFile;
+  //         profilePicUrl = null;
+  //       });
+  //       await _fetchProfileFromAPI();
+  //
+  //     }
+  //   } else {
+  //     final uri = Uri.parse(
+  //       'https://api.thebharatworks.com/api/user/updateUserDetails',
+  //     );
+  //     final request =
+  //     http.MultipartRequest('PUT', uri)
+  //       ..headers['Authorization'] = 'Bearer $token'
+  //       ..fields['full_name'] = name
+  //       ..fields['aboutUs'] = aboutText;
+  //      // ..fields['category_id'] = '68443fdbf03868e7d6b74874'
+  //      //  ..fields['subcategory_ids'] = jsonEncode([
+  //      //    "6844412075d28c40d10de2c4",
+  //      //  ]);
+  //
+  //     final response = await request.send();
+  //     final resBody = await http.Response.fromStream(response);
+  //     final body = json.decode(resBody.body);
+  //     switchRoleRequest();
+  //     if (body['status'] == true) {
+  //       setState(() {
+  //         fullName = name;
+  //         aboutUs = aboutText;
+  //         aboutController.text = aboutText;
+  //       });
+  //       await _fetchProfileFromAPI();
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text("Profile updated successfully")),
+  //       );
+  //       // widget.swithcrole == 'serviceroleSwitch' ?  switchRoleRequest() : SizedBox();
+  //       Navigator.pop(context);
+  //       // Navigator.pop(context);
+  //     }
+  //   }
+  // }
 
   Future<void> _uploadCombinedProfileData(
       String name,
@@ -93,14 +214,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (token == null) return;
 
     if (imageFile != null) {
+      // 👉 Update profile with image
       final uri = Uri.parse(
         'https://api.thebharatworks.com/api/user/updateProfilePic',
       );
-      final request =
-      http.MultipartRequest('PUT', uri)
+      final request = http.MultipartRequest('PUT', uri)
         ..headers['Authorization'] = 'Bearer $token'
         ..fields['full_name'] = name
-        ..fields['aboutUs'] = aboutText;
+        ..fields['aboutUs'] = aboutText
+        ..fields['age'] = age ?? ''   // ✅ Age
+        ..fields['gender'] = selectedGender ?? 'other'; // ✅ Gender
 
       request.files.add(
         await http.MultipartFile.fromPath('profilePic', imageFile.path),
@@ -118,26 +241,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           profilePicUrl = null;
         });
         await _fetchProfileFromAPI();
-
       }
     } else {
+      // 👉 Update profile without image
       final uri = Uri.parse(
         'https://api.thebharatworks.com/api/user/updateUserDetails',
       );
-      final request =
-      http.MultipartRequest('PUT', uri)
+      final request = http.MultipartRequest('PUT', uri)
         ..headers['Authorization'] = 'Bearer $token'
         ..fields['full_name'] = name
-        ..fields['aboutUs'] = aboutText;
-       // ..fields['category_id'] = '68443fdbf03868e7d6b74874'
-       //  ..fields['subcategory_ids'] = jsonEncode([
-       //    "6844412075d28c40d10de2c4",
-       //  ]);
+        ..fields['aboutUs'] = aboutText
+        ..fields['age'] = age ?? ''   // ✅ Age
+        ..fields['gender'] = selectedGender ?? 'other'; // ✅ Gender
 
       final response = await request.send();
       final resBody = await http.Response.fromStream(response);
       final body = json.decode(resBody.body);
-      switchRoleRequest();
+
       if (body['status'] == true) {
         setState(() {
           fullName = name;
@@ -145,15 +265,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           aboutController.text = aboutText;
         });
         await _fetchProfileFromAPI();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Profile updated successfully")),
         );
-        // widget.swithcrole == 'serviceroleSwitch' ?  switchRoleRequest() : SizedBox();
         Navigator.pop(context);
-        // Navigator.pop(context);
       }
     }
   }
+
 
   Future<void> switchRoleRequest() async{
     final String url = "https://api.thebharatworks.com/api/user/request-role-upgrade";
@@ -177,8 +297,240 @@ class _ProfileScreenState extends State<ProfileScreen> {
     catch(e){print("Abhi:- get Exception $e");}
   }
 
+  // void _showEditProfileBottomSheet() {
+  //   final nameController = TextEditingController(text: fullName ?? '');
+  //
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (context) {
+  //       return SafeArea(
+  //         child: Padding(
+  //           padding: EdgeInsets.only(
+  //             bottom: MediaQuery.of(context).viewInsets.bottom,
+  //             left: 16,
+  //             right: 16,
+  //             top: 24,
+  //           ),
+  //           child: SingleChildScrollView(
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Center(
+  //                   child: Text(
+  //                     "Edit Name",
+  //                     style: GoogleFonts.roboto(
+  //                       fontSize: 18,
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 12),
+  //                 Row(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Expanded(
+  //                       child: TextField(
+  //                         controller: nameController,
+  //                         maxLength: 20,
+  //                         decoration: const InputDecoration(
+  //                           labelText: 'Full Name',
+  //                           hintText: 'Enter your full name',
+  //                           border: OutlineInputBorder(),
+  //                           counterText: '',
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     const SizedBox(width: 8),
+  //                     Icon(Icons.edit, size: 24, color: Colors.grey),
+  //                   ],
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //                 ElevatedButton.icon(
+  //                   icon: const Icon(Icons.save, color: Colors.white),
+  //                   label: const Text(
+  //                     "Save",
+  //                     style: TextStyle(color: Colors.white),
+  //                   ),
+  //                   onPressed: () async {
+  //                     Navigator.pop(context);
+  //                     await _uploadCombinedProfileData(
+  //                       nameController.text,
+  //                       aboutUs ?? '',
+  //                       null,
+  //                     );
+  //                   },
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: AppColors.primaryGreen,
+  //                     minimumSize: const Size(double.infinity, 45),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  // void _showEditProfileBottomSheet() {
+  //   final nameController = TextEditingController(text: fullName ?? '');
+  //   final ageController = TextEditingController(text: age ?? '');
+  //   String selectedGender = gender ?? '';
+  //
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return SafeArea(
+  //             child: Padding(
+  //               padding: EdgeInsets.only(
+  //                 bottom: MediaQuery.of(context).viewInsets.bottom,
+  //                 left: 16,
+  //                 right: 16,
+  //                 top: 24,
+  //               ),
+  //               child: SingleChildScrollView(
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.min,
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Center(
+  //                       child: Text(
+  //                         "Edit Profile",
+  //                         style: GoogleFonts.roboto(
+  //                           fontSize: 18,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 16),
+  //
+  //                     // 👤 Name
+  //                     TextField(
+  //                       controller: nameController,
+  //                       maxLength: 20,
+  //                       decoration: const InputDecoration(
+  //                         labelText: 'Full Name',
+  //                         border: OutlineInputBorder(),
+  //                         counterText: '',
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 12),
+  //
+  //                     // 🎂 Age
+  //                     TextField(
+  //                       controller: ageController,
+  //                       keyboardType: TextInputType.number,
+  //                       maxLength: 3,
+  //                       decoration: const InputDecoration(
+  //                         labelText: 'Age',
+  //                         border: OutlineInputBorder(),
+  //                         counterText: '',
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 12),
+  //
+  //                     // 🚻 Gender
+  //                     Text("Gender", style: GoogleFonts.roboto(
+  //                         fontWeight: FontWeight.bold, fontSize: 14)),
+  //                     Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                       children: [
+  //                         Row(
+  //                           mainAxisSize: MainAxisSize.min,
+  //                           children: [
+  //                             Radio<String>(
+  //                               value: "Male",
+  //                               groupValue: selectedGender,
+  //                               onChanged: (value) {
+  //                                 setState(() => selectedGender = value!);
+  //                               },
+  //                             ),
+  //                             const Text("Male"),
+  //                           ],
+  //                         ),
+  //                         Row(
+  //                           mainAxisSize: MainAxisSize.min,
+  //                           children: [
+  //                             Radio<String>(
+  //                               value: "Female",
+  //                               groupValue: selectedGender,
+  //                               onChanged: (value) {
+  //                                 setState(() => selectedGender = value!);
+  //                               },
+  //                             ),
+  //                             const Text("Female"),
+  //                           ],
+  //                         ),
+  //                         Row(
+  //                           mainAxisSize: MainAxisSize.min,
+  //                           children: [
+  //                             Radio<String>(
+  //                               value: "Other",
+  //                               groupValue: selectedGender,
+  //                               onChanged: (value) {
+  //                                 setState(() => selectedGender = value!);
+  //                               },
+  //                             ),
+  //                             const Text("Other"),
+  //                           ],
+  //                         ),
+  //                       ],
+  //                     ),
+  //
+  //
+  //                     const SizedBox(height: 20),
+  //                     ElevatedButton.icon(
+  //                       icon: const Icon(Icons.save, color: Colors.white),
+  //                       label: const Text(
+  //                         "Save",
+  //                         style: TextStyle(color: Colors.white),
+  //                       ),
+  //                       onPressed: () async {
+  //                         Navigator.pop(context);
+  //                         await _uploadCombinedProfileData(
+  //                           nameController.text,
+  //                           aboutUs ?? '',
+  //                           null,
+  //                         );
+  //                         setState(() {
+  //                           fullName = nameController.text;
+  //                           age = ageController.text;
+  //                           gender = selectedGender;
+  //                         });
+  //                       },
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: AppColors.primaryGreen,
+  //                         minimumSize: const Size(double.infinity, 45),
+  //                       ),
+  //                     ),
+  //                     const SizedBox(height: 20),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
   void _showEditProfileBottomSheet() {
     final nameController = TextEditingController(text: fullName ?? '');
+    final ageController  = TextEditingController(text: age ?? '');
+    String tempGender = (selectedGender ?? '').toLowerCase(); // 👈 API se jo aaya wahi
 
     showModalBottomSheet(
       context: context,
@@ -187,77 +539,116 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 24,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      "Edit Name",
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  left: 16, right: 16, top: 24,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: nameController,
-                          maxLength: 20,
-                          decoration: const InputDecoration(
-                            labelText: 'Full Name',
-                            hintText: 'Enter your full name',
-                            border: OutlineInputBorder(),
-                            counterText: '',
-                          ),
+                      Center(child: Text("Edit Profile", style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold))),
+                      const SizedBox(height: 16),
+
+                      TextField(
+                        controller: nameController,
+                        maxLength: 20,
+                        decoration: const InputDecoration(
+                          labelText: 'Full Name',
+                          border: OutlineInputBorder(),
+                          counterText: '',
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Icon(Icons.edit, size: 24, color: Colors.grey),
+                      const SizedBox(height: 12),
+
+                      TextField(
+                        controller: ageController,
+                        keyboardType: TextInputType.number,
+                        maxLength: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Age',
+                          border: OutlineInputBorder(),
+                          counterText: '',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      Text("Gender", style: GoogleFonts.roboto(fontWeight: FontWeight.bold, fontSize: 14)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            Radio<String>(
+                              value: 'male',
+                              groupValue: tempGender,
+                              onChanged: (v) => setModalState(() => tempGender = v!),
+                            ),
+                            const Text('Male'),
+                          ]),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            Radio<String>(
+                              value: 'female',
+                              groupValue: tempGender,
+                              onChanged: (v) => setModalState(() => tempGender = v!),
+                            ),
+                            const Text('Female'),
+                          ]),
+                          Row(mainAxisSize: MainAxisSize.min, children: [
+                            Radio<String>(
+                              value: 'other',
+                              groupValue: tempGender,
+                              onChanged: (v) => setModalState(() => tempGender = v!),
+                            ),
+                            const Text('Other'),
+                          ]),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: const Text("Save", style: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          Navigator.pop(context);
+
+                          // UI state update
+                          setState(() {
+                            fullName = nameController.text;
+                            age = ageController.text;
+                            gender = tempGender;
+                            selectedGender = tempGender; // 👈 persist selection
+                          });
+
+                          // backend call (agar gender/age bhi bhejna hai to yahan add kar do)
+                          await _uploadCombinedProfileData(
+                            nameController.text,
+                            aboutUs ?? '',
+                            null,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGreen,
+                          minimumSize: const Size(double.infinity, 45),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.save, color: Colors.white),
-                    label: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      await _uploadCombinedProfileData(
-                        nameController.text,
-                        aboutUs ?? '',
-                        null,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                      minimumSize: const Size(double.infinity, 45),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
   }
+
+
 
   void _showEditAboutBottomSheet() {
     final aboutEditController = TextEditingController(text: aboutUs ?? '');
@@ -749,295 +1140,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-/*  Widget _buildRoleSwitcher(BuildContext context, String? role, String? requestStatus) {
-    const roleMap = {'User': 'user', 'Worker': 'service_provider'};
-    final GetXRoleController roleController = Get.find<GetXRoleController>();
-
-    return Obx(() {
-      final String selectedRole = roleController.role.value;
-
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            child: _roleButton("User", selectedRole == "user", () async {
-              // Agar selectedRole already "user" hai, toh kuch nahi karna
-              if (selectedRole == "user") {
-                return;
-              }
-              // Agar role "both" hai aur requestStatus null ya empty hai
-              if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-                await roleController.updateRole('user');
-                Get.off(() => ProfileScreen());
-              } else {
-                // Agar requestStatus null ya empty hai
-                if (requestStatus == null || requestStatus!.isEmpty) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Center(child: const Text("Confirmation Box")),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/rolechangeConfim.png",
-                              height: 90,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Confirmation",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text("Do you want to change your role?"),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        actions: [
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.green,
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Confirm",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                await roleController.updateRole('user');
-                                Navigator.of(context).pop();
-                                switchRoleRequest();
-                                Get.off(() => ProfileScreen());
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green),
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Cancel",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  // Jab requestStatus null ya empty nahi hai
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Request Submitted"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/rolechangeConfim.png",
-                              height: 90,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Request Status",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              "App ki request submit ho gayi hai, 2-3 din ka wait kariye.",
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        actions: [
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.green,
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "OK",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              }
-            }),
-          ),
-          const SizedBox(width: 16),
-          InkWell(
-            child: _roleButton("Worker", selectedRole == "service_provider", () async {
-              // Agar selectedRole already "service_provider" hai, toh kuch nahi karna
-              if (selectedRole == "service_provider") {
-                return;
-              }
-              // Agar role "both" hai aur requestStatus null ya empty hai
-              if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-                await roleController.updateRole('service_provider');
-                Get.off(() => SellerScreen());
-              } else {
-                // Agar requestStatus null ya empty hai
-                if (requestStatus == null || requestStatus!.isEmpty) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Center(child: const Text("Confirmation Box")),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/rolechangeConfim.png",
-                              height: 90,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Confirmation",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text("Do you want to change your role?"),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        actions: [
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.green,
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Confirm",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                // Navigator.push(context, MaterialPageRoute(builder: (context)=>EditProfileScreen()));
-                                await roleController.updateRole('service_provider');
-                                Navigator.of(context).pop();
-                                Get.off(() => EditProfileScreen());
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green),
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Cancel",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  // Jab requestStatus null ya empty nahi hai
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Request Submitted"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/rolechangeConfim.png",
-                              height: 90,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Request Status",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              "Profile has been submitted\n waiting for admin approval",
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        actions: [
-                          Center(
-                            child: Container(
-                              width: 100,
-                              height: 35,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.green,
-                              ),
-                              child: TextButton(
-                                child: const Text(
-                                  "OK",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              }
-            }),
-          ),
-        ],
-      );
-    });
-  }*/
-
-
   Widget _roleButton(String title, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -1109,6 +1211,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           GestureDetector(
                             onTap: _showEditProfileBottomSheet,
                             child: /*Image.asset('assets/images/edit1.png'),*/ SvgPicture.asset("assets/svg_images/editicon.svg")
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Age: ${age ?? 0}',
+                            // fullName ?? 'Your Name',
+                            style: GoogleFonts.roboto(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ), SizedBox(width: 6,),
+                          Text(
+                            'Gender: ${ (gender != null && gender!.isNotEmpty)
+                                ? "${gender?[0].toUpperCase()}${gender?.substring(1).toLowerCase()}"
+                                : "No data"}',
+                            style: GoogleFonts.roboto(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),

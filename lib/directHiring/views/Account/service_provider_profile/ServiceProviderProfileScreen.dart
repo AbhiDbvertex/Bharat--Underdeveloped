@@ -347,13 +347,74 @@ class _SellerScreenState extends State<SellerScreen> {
                       ) : SizedBox(),
                     ],
                   ),
-                  Text(
-                    // profile?.fullName ?? '',
-                    '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase()}',
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        // profile?.fullName ?? '',
+                        '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase()}',
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      widget.iconsHide == 'hide'
+                          ? SizedBox()
+                          : GestureDetector(
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => EditProfileScreen(
+                                fullName: profile?.fullName,
+                                age: profile?.age,
+                                gender: profile?.gender,
+                                skill: profile?.skill,
+                                categoryId: profile?.categoryId,
+                                subCategoryIds:
+                                profile?.subCategoryIds
+                                    ?.map(
+                                      (e) => e.toString(),
+                                )
+                                    .toList(),
+                                documentUrl: profile?.documents,
+                              ),
+                            ),
+                          );
+                          if (result == true) {
+                            fetchProfile();
+                          }
+                        },
+                        child: profile?.verified == true ? Container(
+                            padding: const EdgeInsets.all(6),
+                            width: 32,
+                            height: 32,
+                            child:/* Image.asset(
+                            'assets/images/edit1.png',
+                            height: 18,
+                          ),*/SvgPicture.asset("assets/svg_images/editicon.svg")
+                        ) : SizedBox(),
+                      ),
+                    ],
+                  ),Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        // profile?.fullName ?? '',
+                        'Age: ${profile?.age ?? 0}',
+                        style: GoogleFonts.roboto(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ), SizedBox(width: 6,),
+                      Text(
+                        // profile?.fullName ?? '',
+                        'Gender: ${profile?.gender?[0].toUpperCase() ?? "No data"}${profile?.gender?.substring(1).toLowerCase()}',
+                        style: GoogleFonts.roboto(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -396,42 +457,7 @@ class _SellerScreenState extends State<SellerScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      widget.iconsHide == 'hide'
-                          ? SizedBox()
-                          : GestureDetector(
-                        onTap: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => EditProfileScreen(
-                                fullName: profile?.fullName,
-                                skill: profile?.skill,
-                                categoryId: profile?.categoryId,
-                                subCategoryIds:
-                                profile?.subCategoryIds
-                                    ?.map(
-                                      (e) => e.toString(),
-                                )
-                                    .toList(),
-                                documentUrl: profile?.documents,
-                              ),
-                            ),
-                          );
-                          if (result == true) {
-                            fetchProfile();
-                          }
-                        },
-                        child: profile?.verified == true ? Container(
-                            padding: const EdgeInsets.all(6),
-                            width: 32,
-                            height: 32,
-                            child:/* Image.asset(
-                            'assets/images/edit1.png',
-                            height: 18,
-                          ),*/SvgPicture.asset("assets/svg_images/editicon.svg")
-                        ) : SizedBox(),
-                      ),
+
                     ],
                   ),
                   Row(
@@ -492,53 +518,6 @@ class _SellerScreenState extends State<SellerScreen> {
     );
   }
 
-  // Widget _buildHeader(BuildContext context, dynamic profile) {
-  //   final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
-  //   return ClipPath(
-  //     clipper: BottomCurveClipper(),
-  //     child: Container(
-  //       color: const Color(0xFF9DF89D),
-  //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-  //       height: 140,
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           // SizedBox(height: 20),
-  //           Row(
-  //             children: [
-  //               GestureDetector(
-  //                 onTap: () => Navigator.pop(context),
-  //                 child: const Padding(
-  //                   padding: EdgeInsets.only(left: 8.0),
-  //                   child: Icon(Icons.arrow_back, size: 25),
-  //                 ),
-  //               ),
-  //               // const SizedBox(width: 100),
-  //               Expanded(
-  //                 child: Center(
-  //                   child: Padding(
-  //                     padding: const EdgeInsets.only(right: 18.0),
-  //                     child: Text(
-  //                       "Worker Profile",
-  //                       style: GoogleFonts.roboto(
-  //                         fontSize: 18,
-  //                         fontWeight: FontWeight.bold,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //           SizedBox(height: 16),
-  //           Center(child: _buildRoleSwitcher(context, profile)),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-
 
   Widget _buildHeader(BuildContext context, dynamic profile) {
     final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
@@ -584,332 +563,6 @@ class _SellerScreenState extends State<SellerScreen> {
       ),
     );
   }
-
-  // Widget _buildServiceproviderVerification(BuildContext context, String? role, String? requestStatus) {
-  //   final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
-  //   const roleMap = {'User': 'user', 'Worker': 'service_provider'};
-  //   final GetXRoleController roleController = Get.find<GetXRoleController>();
-  //
-  //   return Obx(() {
-  //     final String selectedRole = roleController.role.value;
-  //
-  //     return Row(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         InkWell(
-  //           child: _roleButton("User", selectedRole == "user", () async {
-  //             // Agar selectedRole already "user" hai, toh kuch nahi karna
-  //             if (selectedRole == "user") {
-  //               return;
-  //             }
-  //             // Agar role "both" hai aur requestStatus null ya empty hai
-  //             if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-  //               await roleController.updateRole('user');
-  //               Get.off(() => ProfileScreen());
-  //             } else {
-  //               // Agar requestStatus null ya empty hai
-  //               if (requestStatus == null || requestStatus!.isEmpty) {
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (BuildContext context) {
-  //                     return AlertDialog(
-  //                       title: Center(child: const Text("Confirmation Box")),
-  //                       content: Column(
-  //                         mainAxisSize: MainAxisSize.min,
-  //                         children: [
-  //                           /* Image.asset(
-  //                             "assets/images/rolechangeConfim.png",
-  //                             height: 90,
-  //                           ),*/
-  //                           SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-  //                           const SizedBox(height: 8),
-  //                           const Text(
-  //                             "Confirmation",
-  //                             style: TextStyle(
-  //                               fontWeight: FontWeight.bold,
-  //                               fontSize: 18,
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 2),
-  //                           const Text("If you’d like to become a service provider, kindly complete and submit the document form."),
-  //                           const SizedBox(height: 8),
-  //                         ],
-  //                       ),
-  //                       actions: [
-  //                         Container(
-  //                           width: 100,
-  //                           height: 35,
-  //                           decoration: BoxDecoration(
-  //                             borderRadius: BorderRadius.circular(8),
-  //                             color: Colors.green,
-  //                           ),
-  //                           child: TextButton(
-  //                             child: const Text(
-  //                               "Confirm",
-  //                               style: TextStyle(color: Colors.white),
-  //                             ),
-  //                             onPressed: () async {
-  //                               if (role == "both") {
-  //                                 await roleController.updateRole('user');
-  //                               }
-  //                               Navigator.of(context).pop();
-  //                               Get.off(() => ProfileScreen());
-  //                             },
-  //                           ),
-  //                         ),
-  //                         Container(
-  //                           width: 100,
-  //                           height: 35,
-  //                           decoration: BoxDecoration(
-  //                             borderRadius: BorderRadius.circular(8),
-  //                             border: Border.all(color: Colors.green),
-  //                           ),
-  //                           child: TextButton(
-  //                             child: const Text(
-  //                               "Cancel",
-  //                               style: TextStyle(color: Colors.black),
-  //                             ),
-  //                             onPressed: () {
-  //                               Navigator.of(context).pop();
-  //                             },
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     );
-  //                   },
-  //                 );
-  //               } else {
-  //                 // Jab requestStatus null ya empty nahi hai
-  //                 showDialog(
-  //                   context: context,
-  //                   builder: (BuildContext context) {
-  //                     return AlertDialog(
-  //                       title: const Text("Request Submitted"),
-  //                       content: Column(
-  //                         mainAxisSize: MainAxisSize.min,
-  //                         children: [
-  //                           /*Image.asset(
-  //                             "assets/images/rolechangeConfim.png",
-  //                             height: 90,
-  //                           ),*/
-  //                           SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-  //                           const SizedBox(height: 8),
-  //                           const Text(
-  //                             "Request Status",
-  //                             style: TextStyle(
-  //                               fontWeight: FontWeight.bold,
-  //                               fontSize: 18,
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 2),
-  //                           const Text(
-  //                             "Profile has been submitted\n waiting for admin approval",
-  //                           ),
-  //                           const SizedBox(height: 8),
-  //                         ],
-  //                       ),
-  //                       actions: [
-  //                         Center(
-  //                           child: Container(
-  //                             width: 100,
-  //                             height: 35,
-  //                             decoration: BoxDecoration(
-  //                               borderRadius: BorderRadius.circular(8),
-  //                               color: Colors.green,
-  //                             ),
-  //                             child: TextButton(
-  //                               child: const Text(
-  //                                 "OK",
-  //                                 style: TextStyle(color: Colors.white),
-  //                               ),
-  //                               onPressed: () {
-  //                                 Navigator.of(context).pop();
-  //                               },
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     );
-  //                   },
-  //                 );
-  //               }
-  //             }
-  //           }),
-  //         ),
-  //         const SizedBox(width: 16),
-  //         Container(
-  //
-  //           decoration: BoxDecoration(
-  //             color: Colors.white, // background color
-  //             borderRadius: BorderRadius.circular(12), // rounded corners
-  //             boxShadow: [
-  //               BoxShadow(
-  //                 color: Colors.grey.withOpacity(0.5),
-  //                 spreadRadius: 2,
-  //                 blurRadius: 8,
-  //                 offset: Offset(0, 4), // shadow position
-  //               ),
-  //             ],
-  //           ),
-  //           child: InkWell(
-  //             child: _roleButton("Worker", selectedRole == "service_provider", () async {
-  //               // Agar selectedRole already "service_provider" hai, toh kuch nahi karna
-  //               if (selectedRole == "service_provider") {
-  //                 return;
-  //               }
-  //               // Agar role "both" hai aur requestStatus null ya empty hai
-  //               if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-  //                 await roleController.updateRole('service_provider');
-  //                 Get.off(() => SellerScreen());
-  //               } else {
-  //                 // Agar requestStatus null ya empty hai
-  //                 if (requestStatus == null || requestStatus!.isEmpty) {
-  //                   showDialog(
-  //                     context: context,
-  //                     builder: (BuildContext context) {
-  //                       return AlertDialog(
-  //                         title: Center(child: const Text("Confirmation Box")),
-  //                         content: Column(
-  //                           mainAxisSize: MainAxisSize.min,
-  //                           children: [
-  //                             Image.asset(
-  //                               "assets/images/confimationImage.png",
-  //                               height: 120,
-  //                             ),
-  //                             // SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-  //                             // SvgPicture.asset(
-  //                             //   'assets/svg_images/ConfirmationIcon.svg', // Suggested placeholder, replace with actual path
-  //                             //   height: 60,
-  //                             //
-  //                             // ),
-  //                             const SizedBox(height: 8),
-  //                             const Text(
-  //                               "Confirmation",
-  //                               style: TextStyle(
-  //                                 fontWeight: FontWeight.bold,
-  //                                 fontSize: 18,
-  //                               ),
-  //                             ),
-  //                             const SizedBox(height: 2),
-  //                             const Text("If you’d like to become a service provider, kindly complete and submit the document form."),
-  //                             const SizedBox(height: 8),
-  //                           ],
-  //                         ),
-  //                         actions: [                                                       //     this is current page for confarmation
-  //                           Card(
-  //                             child: Container(
-  //                               width: 100,
-  //                               height: 35,
-  //                               decoration: BoxDecoration(
-  //                                 borderRadius: BorderRadius.circular(8),
-  //                                 color: Colors.green,
-  //                               ),
-  //                               child: TextButton(
-  //                                 child: const Text(
-  //                                   "Confirm",
-  //                                   style: TextStyle(color: Colors.white),
-  //                                 ),
-  //                                 onPressed: () async {
-  //                                   if (role == "both") {
-  //                                     await roleController.updateRole('service_provider');
-  //                                   } else {
-  //                                     // await switchRoleRequest();
-  //                                   }
-  //                                   Navigator.of(context).pop();
-  //                                   Get.off(() => RoleEditProfileScreen(updateBothrequest: true,));
-  //
-  //                                 },
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           Container(
-  //                             width: 100,
-  //                             height: 35,
-  //                             decoration: BoxDecoration(
-  //                               borderRadius: BorderRadius.circular(8),
-  //                               border: Border.all(color: Colors.green),
-  //                             ),
-  //                             child: TextButton(
-  //                               child: const Text(
-  //                                 "Cancel",
-  //                                 style: TextStyle(color: Colors.black),
-  //                               ),
-  //                               onPressed: () {
-  //                                 Navigator.of(context).pop();
-  //                               },
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       );
-  //                     },
-  //                   );
-  //                 } else {
-  //                   // Jab requestStatus null ya empty nahi hai
-  //                   showDialog(
-  //                     context: context,
-  //                     builder: (BuildContext context) {
-  //                       return AlertDialog(
-  //                         title: const Text("Request Submitted"),
-  //                         content: Column(
-  //                           mainAxisSize: MainAxisSize.min,
-  //                           children: [
-  //                             // Image.asset(
-  //                             //   "assets/images/rolechangeConfim.png",
-  //                             //   height: 90,
-  //                             // ),
-  //                             Image.asset(
-  //                               "assets/images/confimationImage.png",
-  //                               height: 120,
-  //                             ),
-  //                             const SizedBox(height: 8),
-  //                             const Text(
-  //                               "Request Status",
-  //                               style: TextStyle(
-  //                                 fontWeight: FontWeight.bold,
-  //                                 fontSize: 18,
-  //                               ),
-  //                             ),
-  //                             const SizedBox(height: 2),
-  //                             const Text(
-  //                               "Profile has been submitted\n waiting for admin approval",
-  //                             ),
-  //                             const SizedBox(height: 8),
-  //                           ],
-  //                         ),
-  //                         actions: [
-  //                           Center(
-  //                             child: Container(
-  //                               width: 100,
-  //                               height: 35,
-  //                               decoration: BoxDecoration(
-  //                                 borderRadius: BorderRadius.circular(8),
-  //                                 color: Colors.green,
-  //                               ),
-  //                               child: TextButton(
-  //                                 child: const Text(
-  //                                   "OK",
-  //                                   style: TextStyle(color: Colors.white),
-  //                                 ),
-  //                                 onPressed: () {
-  //                                   Navigator.of(context).pop();
-  //                                 },
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       );
-  //                     },
-  //                   );
-  //                 }
-  //               }
-  //             }),
-  //           ),
-  //         ),
-  //       ],
-  //     );
-  //   });
-  // }
-
   Widget _buildServiceproviderVerification(
       BuildContext context, String? role, String? requestStatus, bool? status,categoryId) {
     print("Abhi:- print requestStatus : $requestStatus");
@@ -1014,368 +667,8 @@ class _SellerScreenState extends State<SellerScreen> {
         ],
       );
     }
-    // else if ( role == 'service_provider' && requestStatus == null && status == false) {
-    //   return AlertDialog(
-    //     title: const Text("Request Submitted"),
-    //     content: Column(
-    //       mainAxisSize: MainAxisSize.min,
-    //       children: [
-    //         Image.asset(
-    //           "assets/images/confimationImage.png",
-    //           height: 120,
-    //         ),
-    //         const SizedBox(height: 8),
-    //         const Text(
-    //           "Request Status",
-    //           style: TextStyle(
-    //             fontWeight: FontWeight.bold,
-    //             fontSize: 18,
-    //           ),
-    //         ),
-    //         const SizedBox(height: 2),
-    //         const Text(
-    //           "Profile has been submitted\nwaiting for admin approval",
-    //         ),
-    //         const SizedBox(height: 8),
-    //       ],
-    //     ),
-    //     actions: [
-    //       Center(
-    //         child: Container(
-    //           width: 100,
-    //           height: 35,
-    //           decoration: BoxDecoration(
-    //             borderRadius: BorderRadius.circular(8),
-    //             color: Colors.green,
-    //           ),
-    //           child: TextButton(
-    //             child: const Text(
-    //               "OK",
-    //               style: TextStyle(color: Colors.white),
-    //             ),
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //           ),
-    //         ),
-    //       ),
-    //     ],
-    //   );
-    // }
-
-    // Agar dono condition match na karein toh null return
     return const SizedBox.shrink();
   }
-
-
-  /*Widget _buildServiceproviderVerification(BuildContext context, String? role, String? requestStatus) {
-    final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
-    const roleMap = {'User': 'user', 'Worker': 'service_provider'};
-    final GetXRoleController roleController = Get.find<GetXRoleController>();
-
-    return Obx(() {
-      final String selectedRole = roleController.role.value;
-
-      return AlertDialog(
-        title: Center(child: const Text("Verification Required")),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    child: _roleButton("User", selectedRole == "user", () async {
-                      if (selectedRole == "user") {
-                        return;
-                      }
-                      if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-                        await roleController.updateRole('user');
-                        Get.off(() => ProfileScreen());
-                      } else {
-                        if (requestStatus == null || requestStatus!.isEmpty) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Center(child: const Text("Confirmation Box")),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-                                    const SizedBox(height: 8),
-                                    const Text(
-                                      "Confirmation",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    const Text("If you’d like to become a service provider, kindly complete and submit the document form."),
-                                    const SizedBox(height: 8),
-                                  ],
-                                ),
-                                actions: [
-                                  Container(
-                                    width: 100,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.green,
-                                    ),
-                                    child: TextButton(
-                                      child: const Text(
-                                        "Confirm",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      onPressed: () async {
-                                        if (role == "both") {
-                                          await roleController.updateRole('user');
-                                        }
-                                        Navigator.of(context).pop();
-                                        Get.off(() => ProfileScreen());
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.green),
-                                    ),
-                                    child: TextButton(
-                                      child: const Text(
-                                        "Cancel",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        } else {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text("Request Submitted"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-                                    const SizedBox(height: 8),
-                                    const Text(
-                                      "Request Status",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    const Text(
-                                      "Profile has been submitted\n waiting for admin approval",
-                                    ),
-                                    const SizedBox(height: 8),
-                                  ],
-                                ),
-                                actions: [
-                                  Center(
-                                    child: Container(
-                                      width: 100,
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.green,
-                                      ),
-                                      child: TextButton(
-                                        child: const Text(
-                                          "OK",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        } // else
-                      }
-                    }),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: InkWell(
-                      child: _roleButton("Worker", selectedRole == "service_provider", () async {
-                        if (selectedRole == "service_provider") {
-                          return;
-                        }
-                        if (role == "both" && (requestStatus == null || requestStatus!.isEmpty)) {
-                          await roleController.updateRole('service_provider');
-                          Get.off(() => SellerScreen());
-                        } else {
-                          if (requestStatus == null || requestStatus!.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Center(child: const Text("Confirmation Box")),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        "assets/images/confimationImage.png",
-                                        height: 120,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      const Text(
-                                        "Confirmation",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      const Text("If you’d like to become a service provider, kindly complete and submit the document form."),
-                                      const SizedBox(height: 8),
-                                    ],
-                                  ),
-                                  actions: [
-                                    Card(
-                                      child: Container(
-                                        width: 100,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          color: Colors.green,
-                                        ),
-                                        child: TextButton(
-                                          child: const Text(
-                                            "Confirm",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          onPressed: () async {
-                                            if (role == "both") {
-                                              await roleController.updateRole('service_provider');
-                                            } else {
-                                              await switchRoleRequest();
-                                            }
-                                            Navigator.of(context).pop();
-                                            Get.off(() => RoleEditProfileScreen(updateBothrequest: true));
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 100,
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.green),
-                                      ),
-                                      child: TextButton(
-                                        child: const Text(
-                                          "Cancel",
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text("Request Submitted"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        "assets/images/confimationImage.png",
-                                        height: 120,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      const Text(
-                                        "Request Status",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      const Text(
-                                        "Profile has been submitted\n waiting for admin approval",
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
-                                  ),
-                                  actions: [
-                                    Center(
-                                      child: Container(
-                                        width: 100,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          color: Colors.green,
-                                        ),
-                                        child: TextButton(
-                                          child: const Text(
-                                            "OK",
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        }
-                      }),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    });
-  }*/
 
   Widget _buildRoleSwitcher(BuildContext context, dynamic profile) {
     final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
@@ -1417,81 +710,6 @@ class _SellerScreenState extends State<SellerScreen> {
                   // fir navigation karo
                   // Navigator.of(context).pop();
                   Get.off(() => ProfileScreen(swithcrole: "",));
-
-                  /* showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Center(child: const Text("Confirmation Box")),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/rolechangeConfim.png",
-                              height: 90,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Confirmation",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text("Are you sure you want to switch\n                your profile?"),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        actions: [
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.green,
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Confirm",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              onPressed: () async {
-                                // if (data.role == "both") {
-                                //   await roleController.updateRole('user');              //  <<<<---------<-     this code is currect show please dont change without permission!!!!
-                                // }
-                                // Navigator.of(context).pop();
-                                // Get.off(() => ProfileScreen(swithcrole: "serviceroleSwitch",));
-                                await switchRoleRequest();
-                                if (data.role == "both") {
-                                  await roleController.updateRole('user');              //  <<<<---------<-     this code is currect show please dont change without permission!!!!
-                                }
-                                Navigator.of(context).pop();
-                                Get.off(() => ProfileScreen(swithcrole: "",));
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: 100,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green),
-                            ),
-                            child: TextButton(
-                              child: const Text(
-                                "Cancel",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );*/
                 } else {
                   // Jab requestStatus null ya empty nahi hai
                   showDialog(
