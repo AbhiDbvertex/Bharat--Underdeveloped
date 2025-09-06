@@ -413,7 +413,7 @@ class _PromotionBannerScreenState extends State<PromotionBannerScreen> {
             children: [
               SizedBox(
                 width: 1.toWidthPercent(),
-                height: height*0.2 /*250*/,
+                height:  250,
                 child: PromotionCarouselSlider(),
               ),
               const SizedBox(height: 25),

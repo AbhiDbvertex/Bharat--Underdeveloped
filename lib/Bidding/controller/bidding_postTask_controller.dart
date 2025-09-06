@@ -10,13 +10,13 @@
 // import 'package:image_picker/image_picker.dart';
 // import 'package:mime/mime.dart' as mime;
 // import 'package:shared_preferences/shared_preferences.dart';
-//
+// import 'package:http_parser/http_parser.dart' as http_parser;
 // import '../../../../Widgets/AppColors.dart';
 // import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 // import '../../../directHiring/views/auth/MapPickerScreen.dart';
 // import '../../../directHiring/views/comm/home_location_screens.dart';
 //
-// class PostTaskController extends GetxController {
+// class PostTaskEditController extends GetxController {
 //   final formKey = GlobalKey<FormState>();
 //   final dateController = TextEditingController();
 //   final titleController = TextEditingController();
@@ -24,6 +24,12 @@
 //   final googleAddressController = TextEditingController();
 //   final descriptionController = TextEditingController();
 //   final costController = TextEditingController();
+//   final oderIdController = TextEditingController(); // yeh declare karna jaruri tha ✅
+//
+//   final String biddingOderId; // value store karne ke liye
+//
+//   // constructor
+//   PostTaskEditController(this.biddingOderId);
 //
 //   var selectedImages = <File>[].obs;
 //   var selectedDate = Rxn<DateTime>();
@@ -41,10 +47,13 @@
 //   @override
 //   void onInit() {
 //     super.onInit();
-//     resetForm(); // Reset form on initialization to ensure fresh state
+//     resetForm();
 //     fetchCategories();
 //     initializeLocation();
-//     // Sync addressController with userLocation
+//
+//     // ab error nahi aayega
+//     oderIdController.text = biddingOderId;
+//
 //     ever(userLocation, (String? newLocation) {
 //       addressController.text = newLocation ?? 'Select Location';
 //     });
@@ -117,7 +126,7 @@
 //       final token = prefs.getString('token') ?? '';
 //       if (token.isEmpty) {
 //         if (Get.context != null && Get.context!.mounted) {
-//           showSnackbar("Error", "No token found, please log in again!", context: Get.context!);
+//           showSnackbar("Error", "No token found. Please log in again.", context: Get.context!);
 //         }
 //         isLoading.value = false;
 //         return;
@@ -168,20 +177,20 @@
 //           print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
 //         } else {
 //           if (Get.context != null && Get.context!.mounted) {
-//             showSnackbar("Error", data["message"] ?? "Profile fetch failed", context: Get.context!);
+//             showSnackbar("Error", data["message"] ?? "Failed to fetch profile.", context: Get.context!);
 //           }
 //           isLoading.value = false;
 //         }
 //       } else {
 //         if (Get.context != null && Get.context!.mounted) {
-//           showSnackbar("Error", "Server error, profile fetch failed!", context: Get.context!);
+//           showSnackbar("Error", "Server error. Failed to fetch profile.", context: Get.context!);
 //         }
 //         isLoading.value = false;
 //       }
 //     } catch (e) {
 //       print("❌ Error fetching profile: $e");
 //       if (Get.context != null && Get.context!.mounted) {
-//         showSnackbar("Error", "Something went wrong, try again!", context: Get.context!);
+//         showSnackbar("Error", "Something went wrong. Please try again.", context: Get.context!);
 //       }
 //       isLoading.value = false;
 //     }
@@ -191,7 +200,7 @@
 //       String newAddress, double latitude, double longitude) async {
 //     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
 //       if (Get.context != null && Get.context!.mounted) {
-//         showSnackbar("Error", "Invalid location data!", context: Get.context!);
+//         showSnackbar("Error", "Invalid location data.", context: Get.context!);
 //       }
 //       return;
 //     }
@@ -245,18 +254,18 @@
 //           print("📍 Location updated: $newAddress (ID: $newAddressId)");
 //         } else {
 //           if (Get.context != null && Get.context!.mounted) {
-//             showSnackbar("Error", data["message"] ?? "Failed to update location", context: Get.context!);
+//             showSnackbar("Error", data["message"] ?? "Failed to update location.", context: Get.context!);
 //           }
 //         }
 //       } else {
 //         if (Get.context != null && Get.context!.mounted) {
-//           showSnackbar("Error", "Server error, failed to update location!", context: Get.context!);
+//           showSnackbar("Error", "Server error. Failed to update location.", context: Get.context!);
 //         }
 //       }
 //     } catch (e) {
 //       print("❌ Error updating location: $e");
 //       if (Get.context != null && Get.context!.mounted) {
-//         showSnackbar("Error", "Error updating location!", context: Get.context!);
+//         showSnackbar("Error", "Failed to update location. Please try again.", context: Get.context!);
 //       }
 //     }
 //   }
@@ -286,7 +295,7 @@
 //       isLoading.value = false;
 //       debugPrint("📍 Using saved or default location: $userLocation");
 //       if (Get.context != null && Get.context!.mounted) {
-//         showSnackbar("Error", "Authentication failed, please log in again!", context: Get.context!);
+//         showSnackbar("Error", "Authentication failed. Please log in again.", context: Get.context!);
 //       }
 //       return;
 //     }
@@ -371,7 +380,7 @@
 //           isLoading.value = false;
 //           debugPrint("❌ API error: ${responseData['message']}");
 //           if (Get.context != null && Get.context!.mounted) {
-//             showSnackbar("Error", responseData['message'] ?? 'Failed to fetch profile', context: Get.context!);
+//             showSnackbar("Error", responseData['message'] ?? 'Failed to fetch profile data.', context: Get.context!);
 //           }
 //         }
 //       } else {
@@ -380,7 +389,7 @@
 //         isLoading.value = false;
 //         debugPrint("❌ API call failed: ${response.statusCode}");
 //         if (Get.context != null && Get.context!.mounted) {
-//           showSnackbar("Error", 'Failed to fetch profile data!', context: Get.context!);
+//           showSnackbar("Error", 'Failed to fetch profile data.', context: Get.context!);
 //         }
 //       }
 //     } catch (e) {
@@ -389,7 +398,7 @@
 //       addressController.text = savedLocation ?? 'Select Location'; // Sync addressController
 //       isLoading.value = false;
 //       if (Get.context != null && Get.context!.mounted) {
-//         showSnackbar("Error", 'Error fetching location: $e', context: Get.context!);
+//         showSnackbar("Error", 'Failed to fetch location. Please try again.', context: Get.context!);
 //       }
 //     }
 //   }
@@ -413,6 +422,10 @@
 //           },
 //         ),
 //       );
+//     } else {
+//       if (Get.context != null && Get.context!.mounted) {
+//         showSnackbar("Error", "Failed to fetch categories.", context: Get.context!);
+//       }
 //     }
 //   }
 //
@@ -435,6 +448,10 @@
 //           },
 //         ),
 //       );
+//     } else {
+//       if (Get.context != null && Get.context!.mounted) {
+//         showSnackbar("Error", "Failed to fetch subcategories.", context: Get.context!);
+//       }
 //     }
 //   }
 //
@@ -562,7 +579,7 @@
 //       }
 //
 //       if (permission == LocationPermission.deniedForever) {
-//         showSnackbar("Error", "Location permission denied forever. Please enable from app settings.", context: Get.context!);
+//         showSnackbar("Error", "Location permission permanently denied. Please enable from app settings.", context: Get.context!);
 //         await Geolocator.openAppSettings();
 //         return;
 //       }
@@ -586,9 +603,10 @@
 //         showSnackbar("Error", "Unable to fetch address from location.", context: Get.context!);
 //       }
 //     } catch (e) {
-//       showSnackbar("Error", "Error fetching location: $e", context: Get.context!);
+//       showSnackbar("Error", "Failed to fetch location. Please try again.", context: Get.context!);
 //     }
 //   }
+//
 //
 //   Future<void> submitTask(BuildContext context) async {
 //     try {
@@ -599,65 +617,62 @@
 //           ? "${selectedDate.value!.year}-${selectedDate.value!.month.toString().padLeft(2, '0')}-${selectedDate.value!.day.toString().padLeft(2, '0')}"
 //           : "2025-08-01";
 //
-//       List<String> base64Images = [];
-//       for (var image in selectedImages) {
-//         final bytes = await image.readAsBytes();
-//         final mimeType = mime.lookupMimeType(image.path) ?? 'image/jpeg';
-//         base64Images.add("data:$mimeType;base64,${base64Encode(bytes)}");
-//       }
-//
 //       String addressToSend = addressController.text.trim().isNotEmpty
 //           ? addressController.text.trim()
 //           : userLocation.value.trim();
 //       if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
-//         showSnackbar("Error", "Please provide a valid address", context: context);
+//         showSnackbar("Error", "Please provide a valid address.", context: context);
 //         return;
 //       }
 //
-//       final body = {
-//         "title": titleController.text.trim(),
-//         "category_id": selectedCategoryId.value,
-//         "sub_category_ids": selectedSubCategoryIds.join(','),
-//         "address": addressToSend,
-//         "google_address": googleAddressController.text.trim(),
-//         "description": descriptionController.text.trim(),
-//         "cost": costController.text.trim(),
-//         "deadline": formattedDeadline,
-//         if (base64Images.isNotEmpty) "images": base64Images,
-//       };
+//       var uri = Uri.parse("https://api.thebharatworks.com/api/bidding-order/edit");
+//       var request = http.MultipartRequest('PUT', uri);
 //
-//       print("📩 Sending task with address: $addressToSend");
+//       request.headers['Authorization'] = 'Bearer $token';
 //
-//       final response = await http.post(
-//         Uri.parse("https://api.thebharatworks.com/api/bidding-order/create"),
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'Authorization': 'Bearer $token',
-//         },
-//         body: jsonEncode(body),
-//       );
+//       request.fields['title'] = titleController.text.trim();
+//       request.fields['order_id'] = biddingOderId;
+//       request.fields['category_id'] = selectedCategoryId.value.toString();
+//       request.fields['sub_category_ids'] = selectedSubCategoryIds.join(',');
+//       request.fields['address'] = addressToSend;
+//       request.fields['google_address'] = googleAddressController.text.trim();
+//       request.fields['description'] = descriptionController.text.trim();
+//       request.fields['cost'] = costController.text.trim();
+//       request.fields['deadline'] = formattedDeadline;
 //
-//       print("Abhi:- Post Task response ${response.body}");
-//       print("Abhi:- Post Task response ${response.statusCode}");
+//       print("Abhi:- get bidding oderId ${biddingOderId}");
+//       // images add karna
+//       for (var image in selectedImages) {
+//         request.files.add(await http.MultipartFile.fromPath('images', image.path));
+//       }
+//
+//       var response = await request.send();
+//       var responseBody = await response.stream.bytesToString();
+//
+//       print("📡 Response Status: ${response.statusCode}");
+//       print("📡 Response Body: $responseBody");
 //
 //       if (response.statusCode == 200 || response.statusCode == 201) {
-//         showSnackbar("Success", "Task Posted Successfully", context: context);
-//         resetForm(); // Reset form after successful submission
-//         // Add a slight delay to ensure snackbar is visible
-//         await Future.delayed(const Duration(seconds: 1));
-//         Get.delete<PostTaskController>(); // Delete controller before navigation
+//         // showSnackbar("Success", "Task posted successfully.", context: context,);
 //         Get.back();
+//         Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
+//         resetForm();
 //         // Get.back();
+//         Get.back();
+//         await Future.delayed(const Duration(seconds: 1));
+//         Get.delete<PostTaskEditController>();
+//         Get.back();
 //       } else if (response.statusCode == 401) {
-//         showSnackbar("Error", "Session expired. Please login again.", context: context);
+//         showSnackbar("Error", "Session expired. Please log in again.", context: context);
 //         Get.offAllNamed('/login');
 //       } else {
-//         showSnackbar("Error", "❌ Failed: ${response.body}", context: context);
+//         showSnackbar("Error", "Failed to post task. Please try again.", context: context);
 //       }
 //     } catch (e) {
-//       showSnackbar("Error", "Error: Something went wrong - $e", context: context);
+//       showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
 //     }
 //   }
+//
 //
 //   void navigateToLocationScreen() async {
 //     final result = await Get.to(
@@ -685,7 +700,7 @@
 //         await fetchLocation();
 //       } else {
 //         debugPrint("❌ Invalid location data received: $result");
-//         showSnackbar("Error", "Invalid location data, please try again!", context: Get.context!);
+//         showSnackbar("Error", "Invalid location data. Please try again.", context: Get.context!);
 //       }
 //     }
 //   }
@@ -707,9 +722,28 @@ import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
-/*
 
 class PostTaskEditController extends GetxController {
+  final String biddingOderId;
+  final String? title;
+  final String? category;
+  final dynamic subcategory;
+  final String? location;
+  final String? description;
+  final String? cost;
+  final String? selectDeadline;
+
+  PostTaskEditController({
+    required this.biddingOderId,
+    this.title,
+    this.category,
+    this.subcategory,
+    this.location,
+    this.description,
+    this.cost,
+    this.selectDeadline,
+  });
+
   final formKey = GlobalKey<FormState>();
   final dateController = TextEditingController();
   final titleController = TextEditingController();
@@ -717,10 +751,7 @@ class PostTaskEditController extends GetxController {
   final googleAddressController = TextEditingController();
   final descriptionController = TextEditingController();
   final costController = TextEditingController();
-  final String biddingOderId; // value store karne ke liye
-
-  // yeh constructor zaroori hai
-  PostTaskEditController(this.biddingOderId);
+  final oderIdController = TextEditingController();
 
   var selectedImages = <File>[].obs;
   var selectedDate = Rxn<DateTime>();
@@ -738,53 +769,43 @@ class PostTaskEditController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    resetForm(); // Reset form on initialization to ensure fresh state
+
+    // Set data from constructor
+    titleController.text = title ?? '';
+    descriptionController.text = description ?? '';
+    costController.text = cost ?? '';
+    addressController.text = location ?? 'Select Location';
+    googleAddressController.text = location ?? '';
+    userLocation.value = location ?? 'Select Location';
+
+    if (selectDeadline != null) {
+      try {
+        final date = DateTime.parse(selectDeadline!); // Assume YYYY-MM-DD or ISO format
+        selectedDate.value = date;
+        dateController.text = "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}"; // Format to DD-MM-YYYY
+      } catch (e) {
+        debugPrint("❌ Deadline parse error: $e");
+      }
+    }
+
+    if (category != null) {
+      selectedCategoryId.value = category;
+      fetchSubCategories(category!);
+    }
+
+    // Fixed: Handle subcategory as List<String> directly
+    if (subcategory != null) {
+      if (subcategory is String) {
+        selectedSubCategoryIds.value = subcategory.split(',');
+      } else if (subcategory is List<String>) {
+        selectedSubCategoryIds.value = subcategory; // Directly assign List<String>
+      } else {
+        debugPrint("❌ Unexpected subcategory format: $subcategory");
+      }
+    }
+
     fetchCategories();
     initializeLocation();
-    OderIdCotroller.text = biddingOderId; // textfield me direct set
-    // Sync addressController with userLocation
-    ever(userLocation, (String? newLocation) {
-      addressController.text = newLocation ?? 'Select Location';
-    });
-  }
-*/
-
-class PostTaskEditController extends GetxController {
-  final formKey = GlobalKey<FormState>();
-  final dateController = TextEditingController();
-  final titleController = TextEditingController();
-  final addressController = TextEditingController();
-  final googleAddressController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final costController = TextEditingController();
-  final oderIdController = TextEditingController(); // yeh declare karna jaruri tha ✅
-
-  final String biddingOderId; // value store karne ke liye
-
-  // constructor
-  PostTaskEditController(this.biddingOderId);
-
-  var selectedImages = <File>[].obs;
-  var selectedDate = Rxn<DateTime>();
-  var selectedCategoryId = Rxn<String>();
-  var categories = <Map<String, String>>[].obs;
-  var allSubCategories = <Map<String, String>>[].obs;
-  var selectedSubCategoryIds = <String>[].obs;
-  var isSwitched = false.obs;
-  var userLocation = "Select Location".obs;
-  var profile = Rxn<ServiceProviderProfileModel>();
-  var isLoading = true.obs;
-  var showReviews = true.obs;
-  var address = "".obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    resetForm();
-    fetchCategories();
-    initializeLocation();
-
-    // ab error nahi aayega
     oderIdController.text = biddingOderId;
 
     ever(userLocation, (String? newLocation) {
@@ -794,11 +815,10 @@ class PostTaskEditController extends GetxController {
 
   @override
   void onClose() {
-    resetForm(); // Reset form when controller is disposed
+    resetForm();
     super.onClose();
   }
 
-  // Helper method to show snackbar with consistent styling
   void showSnackbar(String title, String message, {required BuildContext context}) {
     if (context.mounted) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -816,7 +836,6 @@ class PostTaskEditController extends GetxController {
     }
   }
 
-  // Method to reset all form fields
   void resetForm() {
     titleController.clear();
     dateController.clear();
@@ -832,19 +851,18 @@ class PostTaskEditController extends GetxController {
     userLocation.value = "Select Location";
     isSwitched.value = false;
     address.value = "";
-    formKey.currentState?.reset(); // Reset form validation state
+    formKey.currentState?.reset();
     debugPrint("📝 Form reset: All fields cleared");
   }
 
   Future<void> initializeLocation() async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
-    String? savedLocation =
-        prefs.getString("selected_location") ?? prefs.getString("address");
+    String? savedLocation = prefs.getString("selected_location") ?? prefs.getString("address");
 
     if (savedLocation != null && savedLocation != "Select Location") {
       userLocation.value = savedLocation;
-      addressController.text = savedLocation; // Sync addressController
+      addressController.text = savedLocation;
       isLoading.value = false;
       print("📍 Loaded saved location: $savedLocation");
       return;
@@ -865,9 +883,7 @@ class PostTaskEditController extends GetxController {
         return;
       }
 
-      final url = Uri.parse(
-        "https://api.thebharatworks.com/api/user/getUserProfileData",
-      );
+      final url = Uri.parse("https://api.thebharatworks.com/api/user/getUserProfileData");
       final response = await http.get(
         url,
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
@@ -882,11 +898,9 @@ class PostTaskEditController extends GetxController {
           String apiLocation = 'Select Location';
           String? addressId;
 
-          if (data['data']?['full_address'] != null &&
-              data['data']['full_address'].isNotEmpty) {
+          if (data['data']?['full_address'] != null && data['data']['full_address'].isNotEmpty) {
             final addresses = data['data']['full_address'] as List;
-            final currentLocations =
-            addresses.where((addr) => addr['title'] == 'Current Location').toList();
+            final currentLocations = addresses.where((addr) => addr['title'] == 'Current Location').toList();
             if (currentLocations.isNotEmpty) {
               final latestLocation = currentLocations.last;
               apiLocation = latestLocation['address'] ?? 'Select Location';
@@ -905,7 +919,7 @@ class PostTaskEditController extends GetxController {
 
           profile.value = ServiceProviderProfileModel.fromJson(data['data']);
           userLocation.value = apiLocation;
-          addressController.text = apiLocation; // Sync addressController
+          addressController.text = apiLocation;
           isLoading.value = false;
           print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
         } else {
@@ -929,8 +943,7 @@ class PostTaskEditController extends GetxController {
     }
   }
 
-  Future<void> updateLocationOnServer(
-      String newAddress, double latitude, double longitude) async {
+  Future<void> updateLocationOnServer(String newAddress, double latitude, double longitude) async {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (Get.context != null && Get.context!.mounted) {
         showSnackbar("Error", "Invalid location data.", context: Get.context!);
@@ -941,9 +954,7 @@ class PostTaskEditController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
-      final url = Uri.parse(
-        "https://api.thebharatworks.com/api/user/updateUserProfile",
-      );
+      final url = Uri.parse("https://api.thebharatworks.com/api/user/updateUserProfile");
       final response = await http.post(
         url,
         headers: {
@@ -982,7 +993,7 @@ class PostTaskEditController extends GetxController {
             await prefs.setString("selected_address_id", newAddressId);
           }
           userLocation.value = newAddress;
-          addressController.text = newAddress; // Sync addressController
+          addressController.text = newAddress;
           isLoading.value = false;
           print("📍 Location updated: $newAddress (ID: $newAddressId)");
         } else {
@@ -1005,15 +1016,12 @@ class PostTaskEditController extends GetxController {
 
   Future<void> fetchLocation() async {
     final prefs = await SharedPreferences.getInstance();
-    String? savedLocation =
-        prefs.getString('selected_location') ?? prefs.getString('address');
+    String? savedLocation = prefs.getString('selected_location') ?? prefs.getString('address');
     String? savedAddressId = prefs.getString('selected_address_id');
 
-    if (savedLocation != null &&
-        savedLocation != 'Select Location' &&
-        savedAddressId != null) {
+    if (savedLocation != null && savedLocation != 'Select Location' && savedAddressId != null) {
       userLocation.value = savedLocation;
-      addressController.text = savedLocation; // Sync addressController
+      addressController.text = savedLocation;
       isLoading.value = false;
       debugPrint("📍 Prioritized saved location: $userLocation (ID: $savedAddressId)");
       return;
@@ -1024,7 +1032,7 @@ class PostTaskEditController extends GetxController {
     if (token == null || token.isEmpty) {
       debugPrint("❌ No token found!");
       userLocation.value = savedLocation ?? 'Select Location';
-      addressController.text = savedLocation ?? 'Select Location'; // Sync addressController
+      addressController.text = savedLocation ?? 'Select Location';
       isLoading.value = false;
       debugPrint("📍 Using saved or default location: $userLocation");
       if (Get.context != null && Get.context!.mounted) {
@@ -1034,9 +1042,7 @@ class PostTaskEditController extends GetxController {
     }
 
     try {
-      final url = Uri.parse(
-        'https://api.thebharatworks.com/api/user/getUserProfileData',
-      );
+      final url = Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData');
       final response = await http.get(
         url,
         headers: {
@@ -1069,11 +1075,8 @@ class PostTaskEditController extends GetxController {
             }
           }
 
-          if (apiLocation == 'Select Location' &&
-              data['full_address'] != null &&
-              data['full_address'].isNotEmpty) {
-            final currentLocations =
-            data['full_address'].where((address) => address['title'] == 'Current Location').toList();
+          if (apiLocation == 'Select Location' && data['full_address'] != null && data['full_address'].isNotEmpty) {
+            final currentLocations = data['full_address'].where((address) => address['title'] == 'Current Location').toList();
             if (currentLocations.isNotEmpty) {
               final latestCurrentLocation = currentLocations.last;
               apiLocation = latestCurrentLocation['address'] ?? 'Select Location';
@@ -1104,12 +1107,12 @@ class PostTaskEditController extends GetxController {
           }
 
           userLocation.value = apiLocation;
-          addressController.text = apiLocation; // Sync addressController
+          addressController.text = apiLocation;
           isLoading.value = false;
           debugPrint("📍 Saved API location and displayed in UI: $userLocation (ID: $addressId)");
         } else {
           userLocation.value = savedLocation ?? 'Select Location';
-          addressController.text = savedLocation ?? 'Select Location'; // Sync addressController
+          addressController.text = savedLocation ?? 'Select Location';
           isLoading.value = false;
           debugPrint("❌ API error: ${responseData['message']}");
           if (Get.context != null && Get.context!.mounted) {
@@ -1118,7 +1121,7 @@ class PostTaskEditController extends GetxController {
         }
       } else {
         userLocation.value = savedLocation ?? 'Select Location';
-        addressController.text = savedLocation ?? 'Select Location'; // Sync addressController
+        addressController.text = savedLocation ?? 'Select Location';
         isLoading.value = false;
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (Get.context != null && Get.context!.mounted) {
@@ -1128,7 +1131,7 @@ class PostTaskEditController extends GetxController {
     } catch (e) {
       debugPrint("❌ Error fetching location: $e");
       userLocation.value = savedLocation ?? 'Select Location';
-      addressController.text = savedLocation ?? 'Select Location'; // Sync addressController
+      addressController.text = savedLocation ?? 'Select Location';
       isLoading.value = false;
       if (Get.context != null && Get.context!.mounted) {
         showSnackbar("Error", 'Failed to fetch location. Please try again.', context: Get.context!);
@@ -1248,8 +1251,7 @@ class PostTaskEditController extends GetxController {
     );
     if (picked != null) {
       selectedDate.value = picked;
-      dateController.text =
-      "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
+      dateController.text = "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
     }
   }
 
@@ -1331,7 +1333,7 @@ class PostTaskEditController extends GetxController {
         ].where((e) => e != null && e.isNotEmpty).join(', ');
 
         addressController.text = formattedAddress;
-        userLocation.value = formattedAddress; // Sync userLocation
+        userLocation.value = formattedAddress;
       } else {
         showSnackbar("Error", "Unable to fetch address from location.", context: Get.context!);
       }
@@ -1340,15 +1342,34 @@ class PostTaskEditController extends GetxController {
     }
   }
 
-
   Future<void> submitTask(BuildContext context) async {
+    if (!formKey.currentState!.validate()) {
+      showSnackbar("Error", "Please fill all required fields correctly.", context: context);
+      return;
+    }
+
+    if (selectedCategoryId.value == null) {
+      showSnackbar("Error", "Please select a category.", context: context);
+      return;
+    }
+
+    if (selectedSubCategoryIds.isEmpty) {
+      showSnackbar("Error", "Please select at least one subcategory.", context: context);
+      return;
+    }
+
+    if (addressController.text.trim() == 'Select Location' || addressController.text.trim().isEmpty) {
+      showSnackbar("Error", "Please provide a valid address.", context: context);
+      return;
+    }
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
 
       String formattedDeadline = selectedDate.value != null
           ? "${selectedDate.value!.year}-${selectedDate.value!.month.toString().padLeft(2, '0')}-${selectedDate.value!.day.toString().padLeft(2, '0')}"
-          : "2025-08-01";
+          : "2025-12-31"; // Fixed: Changed default to future date
 
       String addressToSend = addressController.text.trim().isNotEmpty
           ? addressController.text.trim()
@@ -1374,9 +1395,13 @@ class PostTaskEditController extends GetxController {
       request.fields['deadline'] = formattedDeadline;
 
       print("Abhi:- get bidding oderId ${biddingOderId}");
-      // images add karna
       for (var image in selectedImages) {
-        request.files.add(await http.MultipartFile.fromPath('images', image.path));
+        var mimeType = mime.lookupMimeType(image.path);
+        request.files.add(await http.MultipartFile.fromPath(
+          'images',
+          image.path,
+          contentType: mimeType != null ? http_parser.MediaType.parse(mimeType) : null,
+        ));
       }
 
       var response = await request.send();
@@ -1386,11 +1411,9 @@ class PostTaskEditController extends GetxController {
       print("📡 Response Body: $responseBody");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // showSnackbar("Success", "Task posted successfully.", context: context,);
         Get.back();
-        Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
+        Get.snackbar("Success", "Task updated successfully", backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
         resetForm();
-        // Get.back();
         Get.back();
         await Future.delayed(const Duration(seconds: 1));
         Get.delete<PostTaskEditController>();
@@ -1399,20 +1422,19 @@ class PostTaskEditController extends GetxController {
         showSnackbar("Error", "Session expired. Please log in again.", context: context);
         Get.offAllNamed('/login');
       } else {
-        showSnackbar("Error", "Failed to post task. Please try again.", context: context);
+        showSnackbar("Error", "Failed to update task. Please try again.", context: context);
       }
     } catch (e) {
-      showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
+      showSnackbar("Error", "An error occurred while updating the task. Please try again.", context: context);
     }
   }
-
 
   void navigateToLocationScreen() async {
     final result = await Get.to(
           () => LocationSelectionScreen(
         onLocationSelected: (Map<String, dynamic> locationData) {
           userLocation.value = locationData['address'] ?? 'Select Location';
-          addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
+          addressController.text = locationData['address'] ?? 'Select Location';
           debugPrint(
             "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
           );

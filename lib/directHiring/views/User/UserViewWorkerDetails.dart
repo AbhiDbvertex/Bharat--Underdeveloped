@@ -836,7 +836,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                             Image.asset('assets/images/line2.png'),
                             const SizedBox(width: 5),
                             Text(
-                              "Aadhar Card",
+                              "Valid Id Proof",
                               style: GoogleFonts.roboto(
                                 color: Colors.black,
                                 fontSize: 13,

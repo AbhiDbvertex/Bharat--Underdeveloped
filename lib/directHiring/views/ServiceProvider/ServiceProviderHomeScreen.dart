@@ -1544,7 +1544,8 @@ class BiddingOrder {
       title: json['title'] ?? 'No Title',
       description: json['description'] ?? 'No Description',
       imageUrl: json['image_url']?.isNotEmpty == true
-          ? 'https://api.thebharatworks.com${json['image_url'][0]}'
+          // ? 'https://api.thebharatworks.com${json['image_url'][0]}'
+          ? '${json['image_url'][0]}'
           : 'https://via.placeholder.com/150',
     );
   }
@@ -1701,7 +1702,9 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       }
 
       final url = Uri.parse(
-        "https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders",
+        // "https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders",
+        //   Abhishek added this new api
+          'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'
       );
       final response = await http.get(
         url,

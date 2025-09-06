@@ -130,24 +130,35 @@ class _BankScreenState extends State<BankScreen> {
     );
   }
 
+
   Widget _buildInputField(
-    String label,
-    TextEditingController inputController,
-    InputType type,
-  ) {
-    List<TextInputFormatter> formatters;
-    TextInputType keyboardType;
+      String label,
+      TextEditingController inputController,
+      InputType type,
+      ) {
+    List<TextInputFormatter> formatters = [];
+    TextInputType keyboardType = TextInputType.text;
 
     switch (type) {
       case InputType.text:
         keyboardType = TextInputType.name;
+        // user name max 20 char
+        formatters = [LengthLimitingTextInputFormatter(20)];
         break;
+
       case InputType.number:
-        formatters = [FilteringTextInputFormatter.digitsOnly];
         keyboardType = TextInputType.number;
+        // account number max 18 digit
+        formatters = [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(18),
+        ];
         break;
+
       case InputType.ifsc:
         keyboardType = TextInputType.text;
+        // IFSC usually 11 character hota hai
+        formatters = [LengthLimitingTextInputFormatter(11)];
         break;
     }
 
@@ -157,17 +168,19 @@ class _BankScreenState extends State<BankScreen> {
         width: 340,
         child: TextFormField(
           controller: inputController,
+          inputFormatters: formatters,
           keyboardType: keyboardType,
           textCapitalization:
-              type == InputType.ifsc
-                  ? TextCapitalization.characters
-                  : TextCapitalization.words,
+          type == InputType.ifsc
+              ? TextCapitalization.characters
+              : TextCapitalization.words,
           decoration: _inputDecoration(label),
           validator: (value) => controller.validateField(label, value),
         ),
       ),
     );
   }
+
 
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(

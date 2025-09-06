@@ -1,7 +1,7 @@
 class ApiEndpoint {
   static const String accountScreen = '/user/getUserProfileData';
   static const String workerScreen = '/api/worker/add';
-  static const String bankScreen = '/api/user/updateBankDetails';
+  static const String bankScreen = '/user/updateBankDetails';
   static const String customerCare = '/CompanyDetails/contact/email';
   static const String loginScreen = '/user/register';
   static const String otpVerificationScreen = '/user/userProfile';

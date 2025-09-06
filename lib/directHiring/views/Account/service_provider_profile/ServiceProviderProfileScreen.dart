@@ -1131,7 +1131,7 @@ class _SellerScreenState extends State<SellerScreen> {
               SvgPicture.asset("assets/svg_images/adharicon.svg"),
               const SizedBox(width: 20),
               Text(
-                "Aadhar card",
+                "Valid Id Proof",
                 style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w400,
                   fontSize: 14,

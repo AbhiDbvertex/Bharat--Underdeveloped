@@ -1056,25 +1056,9 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
     }
   }
 
-  // Color getStatusColor(String status) {
-  //   switch (status.toLowerCase()) {
-  //     case 'cancelled':
-  //       return Colors.red;
-  //     case 'accepted':
-  //       return Colors.green;
-  //     case 'completed':
-  //       return Colors.green;
-  //     case 'review':
-  //       return Colors.brown;
-  //     case 'pending':
-  //       return Colors.orange;
-  //     default:
-  //       return Colors.transparent;
-  //   }
-  // }
 
   Color _getStatusColor(String status) {
-    print("🎨 Checking status color for: $status");
+    print("Checking status color for: $status");
     switch (status.toLowerCase()) {
       case 'cancelled':
       case 'cancelleddispute':
@@ -1082,13 +1066,13 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
       case 'accepted':
         return Colors.green;
       case 'completed':
-        return Colors.green;
+        return Colors.blue.shade400;
       case 'pending':
         return Colors.orange;
       case 'rejected':
         return Colors.red;
       case 'review':
-        return Colors.brown;
+        return Colors.brown.shade400;
       default:
         return Colors.grey;
     }

@@ -31,7 +31,7 @@ class BankController {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final url = Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.bankScreen}');
+      final url = Uri.parse('${AppConstants.baseUrl}/${ApiEndpoint.bankScreen}');
 
       try {
         final response = await http.put(
@@ -44,14 +44,15 @@ class BankController {
         );
 
         final responseData = jsonDecode(response.body);
-        debugPrint("🔵 API Response: $responseData");
+        debugPrint("API Response: $responseData");
 
         if (response.statusCode == 200 && responseData['status'] == true) {
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 responseData['message'] ??
-                    '✅ Bank details submitted successfully',
+                    'Bank details submitted successfully',
               ),
               backgroundColor: Colors.green,
             ),
@@ -60,7 +61,7 @@ class BankController {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                responseData['message'] ?? '❌ Failed to update bank details',
+                responseData['message'] ?? 'Failed to update bank details',
               ),
               backgroundColor: Colors.red,
             ),
@@ -87,8 +88,11 @@ class BankController {
         }
         break;
       case 'IFSC Code':
-        if (!RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(value)) {
-          return 'Invalid IFSC code (e.g., SBIN0123456)';
+        // if (!RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(value)) {
+        //   return 'Invalid IFSC code (e.g., SBIN0123456)';
+        // }
+        if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value!)) {
+          return 'Invalid IFSC code (only letters & numbers allowed)';
         }
         break;
       case 'UPI Id':

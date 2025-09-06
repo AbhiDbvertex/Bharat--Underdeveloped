@@ -424,12 +424,14 @@ class _MyHireScreenState extends State<MyHireScreen> {
                 itemBuilder: (context, index) {
                   final item = dataList[index];
 
-                  final title = item['category_id']?['name'] ?? "No Title";
+                  final category = item['category_id']?['name'] ?? "No Title";
                   final price = item['service_payment']?['amount']?.toString() ?? "0";
                   // final userId = item?['user_id']['_id'] ?? "";
                   final buddingOderId = item['_id'] ?? "0";
                   final address = item['google_address'] ?? "No Address";
+                  final description = item['description'] ?? "No description";
                   final status = item['hire_status'] ?? "No Status";
+                  final title = item['title'] ?? "No title";
                   final deadline = item['deadline']?.toString() ?? "";
                   final imageUrl = (item['image_url'] != null && item['image_url'].isNotEmpty)
                       ? item['image_url'][0]
@@ -469,28 +471,30 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // left image
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: imageUrl.isNotEmpty
-                                  ? Image.network(
-                                imageUrl,
+                          Center(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: imageUrl.isNotEmpty
+                                    ? Image.network(
+                                  'https://api.thebharatworks.com/${imageUrl}',
+                                  height: 125,
+                                  width: 100,
+                                  fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(Icons.image_not_supported_outlined,size: 100,);
+                                },
+                                )
+                                    : /*Image.asset(
+                                "assets/images/Work.png",
                                 height: 100,
                                 width: 100,
                                 fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.image_not_supported_outlined,size: 100,);
-                              },
-                              )
-                                  : /*Image.asset(
-                              "assets/images/Work.png",
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
-                            ),*/
-                              Icon(Icons.image_not_supported_outlined,size: 100,)
+                              ),*/
+                                Icon(Icons.image_not_supported_outlined,size: 100,)
+                            ),
                           ),
                           SizedBox(width: 10),
                           // right content
@@ -504,6 +508,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(height: 3),
                                 Text(
@@ -516,11 +522,12 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                 ),
                                 SizedBox(height: 3),
                                 Text(
-                                  address,
+                                  description,
                                   style: TextStyle(
                                     color: Colors.black54,
                                     fontSize: 13,
                                   ),
+                                  maxLines: 2,
                                 ),
                                 SizedBox(height: 3),
                                 Row(

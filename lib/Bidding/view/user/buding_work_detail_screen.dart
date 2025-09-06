@@ -12,6 +12,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Emergency/utils/assets.dart';
 import '../../../Widgets/AppColors.dart';
+import '../../../Widgets/address_map_class.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import '../../../testingfile.dart';
@@ -1263,14 +1264,39 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     InkWell(
-                                      onTap: () {
+                                     /* onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 PostTaskEditScreen(
-                                                    biddingOderId:
-                                                        widget.buddingOderId),
+                                                  title: data?['title'],
+                                                    description: data?['description'],
+                                                    category:  data?['category_id']?['name'],
+                                                    location:  data?['google_address'],
+                                                    selectDeadline:  data?['deadline'],
+                                                    // subcategory:  data?['sub_category_ids']?['sub_category_ids'],
+                                                    cost:  data?['cost'],
+                                                    biddingOderId: widget.buddingOderId),
+                                          ),
+                                        );
+                                      },*/
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PostTaskEditScreen(
+                                              title: data?['title']?.toString(), // "Chair repair"
+                                              description: data?['description']?.toString(), // "Welcome to Gboard clipboard..."
+                                              category: data?['category_id']?['_id']?.toString(), // "68936066cff3b791084d288e"
+                                              location: data?['google_address']?.toString(), // "8, Indore, Madhya Pradesh, India"
+                                              selectDeadline: data?['deadline']?.toString(), // "2025-08-30T00:00:00.000Z"
+                                              subcategory: data?['sub_category_ids'] != null
+                                                  ? (data['sub_category_ids'] as List).map((sub) => sub['_id'].toString()).toList() // ["689453bbe57505b551542c3b"]
+                                                  : [],
+                                              cost: data?['cost']?.toString(), // "5000"
+                                              biddingOderId: widget.buddingOderId?.toString() ?? data?['_id']?.toString(), // "68b1af1ff77872fc186ad308"
+                                            ),
                                           ),
                                         );
                                       },

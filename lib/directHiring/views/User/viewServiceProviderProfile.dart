@@ -1291,7 +1291,7 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
               Image.asset('assets/images/line2.png', height: 24),
               const SizedBox(width: 20),
               Text(
-                "Aadhar card",
+                "Valid Id Proof",
                 style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w400,
                   fontSize: 14,
