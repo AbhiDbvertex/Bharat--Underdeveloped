@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
+import '../../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
+import '../../../../Emergency/utils/logger.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../ServiceProvider/GalleryScreen.dart';
@@ -28,11 +30,14 @@ class SellerScreen extends StatefulWidget {
 }
 
 class _SellerScreenState extends State<SellerScreen> {
+  bool _isSwitched = false;
+  bool _isToggling = false;
   File? _pickedImage;
   ServiceProviderProfileModel? profile;
   bool isLoading = true;
   bool _showReviews = true;
   String? address = "";
+  final controller = Get.put(SpEmergencyServiceController());
   final GetXRoleController roleController = Get.put(
     GetXRoleController(),
   ); // Updated to GetXRoleController
@@ -269,6 +274,70 @@ class _SellerScreenState extends State<SellerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Something went wrong, try again!")),
       );
+    }
+  }
+
+  Future<void> _checkEmergencyTask() async {
+    setState(() {
+      _isToggling = true;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final url =
+      Uri.parse("https://api.thebharatworks.com/api/user/emergency");
+
+      final response = await http.post(
+        // ✅ bas post call karni hai
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+      );
+
+      bwDebug("Emergency API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["success"] == true) {
+          setState(() {
+            _isSwitched = data["emergency_task"] ?? false;
+          });
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool("emergency_task", _isSwitched);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data["message"] ?? "Updated")),
+            );
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(data["message"] ?? "Failed to update")),
+              );
+            }
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error: ${response.statusCode}")),
+            );
+          }
+        }
+
+      }
+    } catch (e) {
+      bwDebug("Error in Emergency API: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error occurred: $e")),
+        );
+      }
+    } finally {
+      controller.getEmergencySpOrderList();
+      setState(() {
+        _isToggling = false;
+      });
     }
   }
 
@@ -1059,6 +1128,38 @@ class _SellerScreenState extends State<SellerScreen> {
               style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
             ),
           ),
+          // SizedBox(
+          //   width: 40,
+          //   height: 20,
+          //   child: Transform.scale(
+          //       scale: 0.6,
+          //       alignment: Alignment.centerLeft,
+          //       child: Stack(
+          //         alignment: Alignment.center,
+          //         children: [
+          //           Switch(
+          //             value: _isSwitched,
+          //             onChanged: _isToggling
+          //                 ? null
+          //                 : (bool value) {
+          //               _checkEmergencyTask();
+          //             },
+          //             activeColor: Colors.red,
+          //             inactiveThumbColor: Colors.white,
+          //             inactiveTrackColor: Colors.grey.shade300,
+          //             materialTapTargetSize:
+          //             MaterialTapTargetSize.shrinkWrap,
+          //           ),
+          //           if (_isToggling)
+          //             const CircularProgressIndicator(
+          //               // strokeWidth: 2.0,
+          //               valueColor: AlwaysStoppedAnimation<Color>(
+          //                   Colors.red),
+          //             ),
+          //         ],
+          //       )
+          //   ),
+          // ),
         ],
       ),
     );
@@ -1117,12 +1218,21 @@ class _SellerScreenState extends State<SellerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 5),
-          Text(
-            "Document",
-            style: GoogleFonts.roboto(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Document",
+                style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              profile?.verified == true ? Container(
+                width: 100,
+                decoration: BoxDecoration(border: Border.all(color: Colors.green,width: 2,),borderRadius: BorderRadius.circular(10)),
+                child: Center(child: Text("Verified",style: TextStyle(color: Colors.green.shade700,fontWeight: FontWeight.w600),)),
+              ): SizedBox()
+            ],
           ),
           const SizedBox(height: 15),
           Row(

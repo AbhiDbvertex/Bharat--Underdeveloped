@@ -9,8 +9,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../Widgets/AppColors.dart';
+import '../../Widgets/address_map_class.dart';
 import '../../directHiring/views/ServiceProvider/view_user_profile_screen.dart';
 import '../../testingfile.dart';
 import '../Models/bidding_order.dart';
@@ -111,6 +113,17 @@ class _BiddingserviceproviderworkdetailState
   var name;
   var imge;
   var address;
+
+  Future<void> openMap(double lat, double lng) async {
+    final Uri googleMapUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
+
+    if (await canLaunchUrl(googleMapUrl)) {
+      await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open the map.";
+    }
+  }
+
 
   Future<void> fetchCurrentUserId() async {
     try {
@@ -1116,20 +1129,36 @@ class _BiddingserviceproviderworkdetailState
                       children: [
                         Flexible(
                           child: InkWell(
+                          //   onTap: (){
+                          //     MaterialPageRoute(
+                          //       // builder: (context) => MapScreen(
+                          //       //   latitude:  biddingOrder?.serviceProviderId? ?? "No lat",
+                          //       //   longitude: data?['user_id']?['location']?['longitude'] ?? 'N/A',
+                          //       // ),
+                          //       builder: (context) => MapScreen(
+                          //         latitude: biddingOrder?.userId?.location?.latitude ?? 0.0,
+                          //         longitude: biddingOrder?.userId?.location?.longitude ?? 0.0,
+                          //       ),
+                          //
+                          //     // print("Abhi:- get oder Details lat : ${biddingOrder?.serviceProvider?.location?.latitude ?? 0.0} long : ${biddingOrder?.serviceProvider?.location?.longitude ?? 0.0}");
+                          //     );
+                          //   },
+        //              onTap: () {
+        // Navigator.push(
+        // context,
+        // MaterialPageRoute(
+        // builder: (context) => MapScreen(
+        // latitude: biddingOrder?.userId?.location?.latitude ?? 0.0,
+        // longitude: biddingOrder?.userId?.location?.longitude ?? 0.0,
+        // ),
+        // ),
+        // );
+        // },
                             onTap: (){
-                            //   MaterialPageRoute(
-                            //     // builder: (context) => MapScreen(
-                            //     //   latitude:  biddingOrder?.serviceProviderId? ?? "No lat",
-                            //     //   longitude: data?['user_id']?['location']?['longitude'] ?? 'N/A',
-                            //     // ),
-                            // // builder: (context) => MapScreen(
-                            // //   latitude: biddingOrder?.serviceProviderId?.location?.latitude ?? 0.0,
-                            // //   longitude: biddingOrder?.serviceProviderId?.location?.longitude ?? 0.0,
-                            // // ),
-                            //
-                            //   // print("Abhi:- get oder Details lat : ${biddingOrder?.serviceProvider?.location?.latitude ?? 0.0} long : ${biddingOrder?.serviceProvider?.location?.longitude ?? 0.0}");
-                            //
+                              openMap(biddingOrder?.userId?.location?.latitude ?? 0.0,
+                                biddingOrder?.userId?.location?.longitude ?? 0.0,);
                             },
+
                             child: Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: width * 0.06,
@@ -1140,7 +1169,8 @@ class _BiddingserviceproviderworkdetailState
                                 borderRadius: BorderRadius.circular(width * 0.03),
                               ),
                               child: Text(
-                                biddingOrder!.address,
+                                // biddingOrder!.address,
+                                biddingOrder?.userId?.location?.address ?? "No data",
                                 style: GoogleFonts.roboto(
                                   color: Colors.white,
                                   fontSize: width * 0.03,

@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../Emergency/utils/assets.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../../Widgets/address_map_class.dart';
@@ -538,63 +539,16 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     }
   }
 
-  // Future<void> acceptBid(String bidderId, String bidAmount) async {
-  //   final String url =
-  //       'https://api.thebharatworks.com/api/bidding-order/acceptBid';
-  //   print("Abhi:- acceptBid api url : $url");
-  //
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   try {
-  //     var response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {
-  //         'Authorization': 'Bearer $token',
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: jsonEncode({
-  //         "order_id": widget.buddingOderId,
-  //         "bidder_id": bidderId,
-  //         "bid_amount": bidAmount,
-  //       }),
-  //     );
-  //
-  //     var responseData = jsonDecode(response.body);
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       print("Abhi:- acceptBid response : ${response.body}");
-  //       Get.snackbar(
-  //         "Success",
-  //         responseData['message'] ?? "Bid accepted successfully",
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.green,
-  //         colorText: Colors.white,
-  //       );
-  //       // Refresh bidders list after accepting a bid
-  //       await getAllBidders();
-  //     } else {
-  //       print("Abhi:- else acceptBid response : ${response.body}");
-  //       Get.snackbar(
-  //         "Error",
-  //         responseData['message'] ?? "Failed to accept bid",
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.red,
-  //         colorText: Colors.white,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print("Abhi:- acceptBid api Exception $e");
-  //     Get.snackbar(
-  //       "Error",
-  //       "Something went wrong!",
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.red,
-  //       colorText: Colors.white,
-  //     );
-  //   }
-  // }
+  Future<void> openMap(double lat, double lng) async {
+    final Uri googleMapUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
 
-  //          create plateform Fee
+    if (await canLaunchUrl(googleMapUrl)) {
+      await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open the map.";
+    }
+  }
+
   int? platformFee;
 
   Future<void> CreatebiddingPlateformfee() async {
@@ -759,21 +713,25 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MapScreen(
-                                        latitude: data?['user_id']?['location']
-                                                ?['latitude'] ??
-                                            'N/A',
-                                        longitude: data?['user_id']?['location']
-                                                ?['longitude'] ??
-                                            'N/A',
-                                      ),
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => MapScreen(
+                                  //       latitude: data?['user_id']?['location']
+                                  //               ?['latitude'] ??
+                                  //           'N/A',
+                                  //       longitude: data?['user_id']?['location']
+                                  //               ?['longitude'] ??
+                                  //           'N/A',
+                                  //     ),
+                                  //   ),
+                                  // );
+
+                                    openMap(data?['user_id']?['location']?['latitude'] ?? 'N/A',
+                                        data?['user_id']?['location']?['longitude'] ?? 'N/A');
+
                                   print(
-                                      "Abhi:- get oder Details lat : ${data?['user_id']?['location']?['latitude'] ?? 'N/A'} long : ${data?['user_id']?['location']?['longitude'] ?? 'N/A'}");
+                                      "Abhi:- get oder Details lat for bidding : ${data?['user_id']?['location']?['latitude'] ?? 'N/A'} long : ${data?['user_id']?['location']?['longitude'] ?? 'N/A'}");
                                 },
                                 child: Container(
                                   height: MediaQuery.of(context).size.height *
@@ -785,15 +743,21 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
-                                    child: Text(
-                                      address.split(',').last.trim(),
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.white,
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: Text(
+                                        // address.split(',').last.trim(),
+                                        data?['user_id']?['location']
+                                        ?['address'] ??
+                                            'N/A',
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.white,
+                                          fontSize:
+                                              MediaQuery.of(context).size.width *
+                                                  0.03,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ),

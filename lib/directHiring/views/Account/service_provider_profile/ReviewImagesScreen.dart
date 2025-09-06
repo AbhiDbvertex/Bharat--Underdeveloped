@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../ServiceProvider/FullImageScreen.dart';
 class ReviewImagesScreen extends StatelessWidget {
   final List<String> images;
 
@@ -57,18 +58,23 @@ class ReviewImagesScreen extends StatelessWidget {
                           ),
                       itemCount: images.length,
                       itemBuilder: (context, index) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            images[index],
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    const Icon(Icons.error, color: Colors.red),
+                        return InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> FullImageScreen(imageUrl: images[index],),));
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              images[index],
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) =>
+                                      const Icon(Icons.error, color: Colors.red),
+                            ),
                           ),
                         );
                       },
-                    )
+                    )//
                     : const Center(
                       child: Text("No customer review images available."),
                     ),

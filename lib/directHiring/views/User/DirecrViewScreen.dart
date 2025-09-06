@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../Widgets/address_map_class.dart';
 import '../../../testingfile.dart';
 import '../../Consent/ApiEndpoint.dart';
@@ -179,6 +180,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     }
   }
 
+  Future<void> openMap(double lat, double lng) async {
+    final Uri googleMapUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
+
+    if (await canLaunchUrl(googleMapUrl)) {
+      await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open the map.";
+    }
+  }
 
   Future<void> cancelDarectOder() async {
     print("Abhi:- darect cancelOder order id ${widget.id}");
@@ -733,15 +743,19 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                       InkWell(
                         onTap: (){
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MapScreen(
-                                latitude: order?['user_id']?['location']?['latitude'] ?? 'No lat',
-                                longitude: order?['user_id']?['location']?['longitude'] ?? 'No long',
-                              ),
-                            ),
-                          );
+                            openMap(order?['user_id']?['location']?['latitude'] ?? 'No lat',
+                              order?['user_id']?['location']?['longitude'] ?? 'No long',);
+
+
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => MapScreen(
+                          //       latitude: order?['user_id']?['location']?['latitude'] ?? 'No lat',
+                          //       longitude: order?['user_id']?['location']?['longitude'] ?? 'No long',
+                          //     ),
+                          //   ),
+                          // );
                           print("Abhi:- print lat : ${order?['user_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['user_id']?['location']?['latitude'] ?? 'No long'}");
                         },
                         child: Container(
@@ -753,7 +767,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                             color: Colors.red,
                           ),
                           child: Text(
-                            order!['address'] ?? '',
+                            // order!['address'] ?? '',
+                            order?['user_id']?['location']?['address'] ?? 'No lat',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,

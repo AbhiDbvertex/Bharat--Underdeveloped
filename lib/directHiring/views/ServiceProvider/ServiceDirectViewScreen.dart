@@ -2858,6 +2858,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/address_map_class.dart';
@@ -3322,6 +3323,16 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
     }
   }
 
+  Future<void> openMap(double lat, double lng) async {
+    final Uri googleMapUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
+
+    if (await canLaunchUrl(googleMapUrl)) {
+      await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open the map.";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(
@@ -3450,29 +3461,37 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       const SizedBox(height: 10),
                       InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MapScreen(
-                                latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
-                                longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
-                              ),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => MapScreen(
+                          //       latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
+                          //       longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
+                          //     ),
+                          //   ),
+                          // );
+                          openMap(order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
+                            order?['service_provider_id']?['location']?['longitude'] ?? 'No long',);
                           print("Abhi:- get oder Details lat : ${order?['service_provider_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['service_provider_id']?['location']?['longitude'] ?? 'No long'}");
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 5),
+                          height: 24,
+                          width: 160,
+                          // padding: const EdgeInsets.symmetric(
+                          //     horizontal: 18, vertical: 5),
                           decoration: BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            // "",
-                            order!['address'] ?? '',
-                            style: const TextStyle(color: Colors.white),
-                            overflow: TextOverflow.ellipsis,
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              // "",
+                              // order!['address'] ?? '',
+                            order?['service_provider_id']?['location']?['address'] ?? 'No long',
+                              style: const TextStyle(color: Colors.white),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),

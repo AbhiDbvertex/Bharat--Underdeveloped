@@ -1542,7 +1542,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Token not found! Please log in.')),
+          const SnackBar(content: Text('Token not found! Please log in.')),
         );
         setState(() => _isUploading = false);
         return;
@@ -1611,9 +1611,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    await _fetchImagesFromApi();
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('⚠️ Token not found! Please log in.')),
+        const SnackBar(content: Text('Token not found! Please log in.')),
       );
       return;
     }
