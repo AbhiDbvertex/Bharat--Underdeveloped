@@ -10,17 +10,17 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
-import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';// Worker profile wala screen
+import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 
-// Worker ka Model
-class SpEmergenyWorkerList {
+
+class SpEmergencyWorkerList {
   final String id;
   final String name;
   final String location;
   final String image;
   final String date;
 
-  SpEmergenyWorkerList({
+  SpEmergencyWorkerList({
     required this.id,
     required this.name,
     required this.location,
@@ -28,14 +28,14 @@ class SpEmergenyWorkerList {
     required this.date,
   });
 
-  factory SpEmergenyWorkerList.fromJson(Map<String, dynamic> json) {
+  factory SpEmergencyWorkerList.fromJson(Map<String, dynamic> json) {
     final rawImage = json['image'] ?? '';
     final fullImageUrl = rawImage.startsWith('http')
         ? rawImage.replaceFirst('http://', 'https://')
         : 'https://via.placeholder.com/150'; // Default image agar nahi mila
     print('Bhai, ${json['name']} ka image URL: $fullImageUrl');
 
-    return SpEmergenyWorkerList(
+    return SpEmergencyWorkerList(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
       location: json['address'] ?? 'Unknown',
@@ -58,7 +58,7 @@ class SpServiceWorkerListScreen extends StatefulWidget {
 }
 
 class _ServiceWorkerListScreenState extends State<SpServiceWorkerListScreen> {
-  List<SpEmergenyWorkerList> workers = [];
+  List<SpEmergencyWorkerList> workers = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -93,7 +93,7 @@ class _ServiceWorkerListScreenState extends State<SpServiceWorkerListScreen> {
         final List workerList = data['workers'];
         setState(() {
           workers = workerList
-              .map((e) => SpEmergenyWorkerList.fromJson(e))
+              .map((e) => SpEmergencyWorkerList.fromJson(e))
               .toList();
           isLoading = false;
         });
