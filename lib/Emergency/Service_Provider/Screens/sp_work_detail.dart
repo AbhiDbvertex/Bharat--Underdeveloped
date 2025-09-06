@@ -480,11 +480,12 @@ class SpWorkDetail extends StatefulWidget {
 class _WorkDetailPageState extends State<SpWorkDetail> {
   late SpWorkDetailController controller;
   late bool isAccepted;
+  final tag="SpWorkDetail";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    bwDebug("data : ${widget.data}");
+    bwDebug("data : ${widget.data}",tag: tag);
     controller = Get.put(SpWorkDetailController() );
     controller.getEmergencyOrder(widget.data);
     isAccepted = controller.hireStatus.value == "assigned";
@@ -505,7 +506,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Work Detail",
+        title: const Text("Work Details",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
@@ -888,7 +889,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                 ),
                                 onPressed: () async {
                                   controller.isLoading.value = true;
-                                  String status=   await controller.rejectUserOrder("6871f5b5ed31367eed8d2210");
+                                  String status=   await controller.rejectUserOrder(controller.orderId.value);
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(status)));
                                   controller.isLoading.value = false;
                                 },

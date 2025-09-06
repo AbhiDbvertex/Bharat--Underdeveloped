@@ -395,6 +395,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../Emergency/Service_Provider/controllers/sp_work_detail_controller.dart';
 import 'AddWorkerScreen.dart';
 import 'WorkerListViewProfileScreen.dart'; // Worker profile wala screen
 
@@ -450,9 +451,9 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
 
   @override
   void initState() {
-
+bwDebug("orderId: ${widget.orderId}, call type: ${widget.callType}");
     super.initState();
-    PaintingBinding.instance.imageCache.clear(); // Image cache saaf karo
+    PaintingBinding.instance.imageCache.clear();
     fetchWorkers();
   }
 
@@ -569,6 +570,7 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
       print("📤 Assign Body: ${response.body}");
 
       if (response.statusCode == 200) {
+      var  controller = Get.find<SpWorkDetailController>();
         final data = json.decode(response.body);
         final message = data['message'] ?? 'Worker assigned successfully';
         Get.snackbar(
@@ -587,6 +589,8 @@ class _ServiceWorkerListScreenState extends State<ServiceWorkerListScreen> {
             Get.back(); // Back navigate karo
           });
         }
+await controller.getEmergencyOrder(widget.orderId);
+        Navigator.pop(context);
       } else {
         final data = json.decode(response.body);
         final message = data['message'] ?? 'Assignment fail ho gaya!';

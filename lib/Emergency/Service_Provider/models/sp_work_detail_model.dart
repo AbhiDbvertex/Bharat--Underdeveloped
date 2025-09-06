@@ -1,18 +1,18 @@
 class SpWorkDetailModel {
   bool? status;
   String? message;
-  Data? data;
-  AssignedWorker? assignedWorker;
+  SpData? data;
+  SpAssignedWorker? assignedWorker;
 
   SpWorkDetailModel({this.status, this.message, this.data, this.assignedWorker});
 
   SpWorkDetailModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? SpData.fromJson(json['data']) : null;
     // assignedWorker = json['assignedWorker'];
     assignedWorker = json['assignedWorker'] != null
-        ? AssignedWorker.fromJson(json['assignedWorker'])
+        ? SpAssignedWorker.fromJson(json['assignedWorker'])
         : null;
   }
 
@@ -28,37 +28,131 @@ class SpWorkDetailModel {
   }
 }
 
-class AssignedWorker {
+// class SpAssignedWorker {
+//   String? id;
+//   String? phone;
+//   String? fullName;
+//   String? profilePic;
+//
+//   SpAssignedWorker({this.id, this.phone, this.fullName, this.profilePic});
+//
+//   SpAssignedWorker.fromJson(Map<String, dynamic> json) {
+//     id = json['_id'];
+//     phone = json['phone'];
+//     fullName = json['full_name'];
+//     profilePic = json['profile_pic'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> map = {};
+//     map['_id'] = id;
+//     map['phone'] = phone;
+//     map['full_name'] = fullName;
+//     map['profile_pic'] = profilePic;
+//     return map;
+//   }
+// }
+class SpAssignedWorker {
   String? id;
+  String? name;
   String? phone;
-  String? fullName;
-  String? profilePic;
+  String? aadharNumber;
+  String? dob;
+  String? address;
+  String? image;
+  String? aadharImage;
+  String? serviceProviderId;
+  String? verifyStatus;
+  List<SpAssignOrder>? assignOrders;
+  String? createdAt;
+  int? v;
 
-  AssignedWorker({this.id, this.phone, this.fullName, this.profilePic});
+  SpAssignedWorker({
+    this.id,
+    this.name,
+    this.phone,
+    this.aadharNumber,
+    this.dob,
+    this.address,
+    this.image,
+    this.aadharImage,
+    this.serviceProviderId,
+    this.verifyStatus,
+    this.assignOrders,
+    this.createdAt,
+    this.v,
+  });
 
-  AssignedWorker.fromJson(Map<String, dynamic> json) {
+  SpAssignedWorker.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
+    name = json['name'];
     phone = json['phone'];
-    fullName = json['full_name'];
-    profilePic = json['profile_pic'];
+    aadharNumber = json['aadharNumber'];
+    dob = json['dob'];
+    address = json['address'];
+    image = json['image'];
+    aadharImage = json['aadharImage'];
+    serviceProviderId = json['service_provider_id'];
+    verifyStatus = json['verifyStatus'];
+    if (json['assignOrders'] != null) {
+      assignOrders = <SpAssignOrder>[];
+      json['assignOrders'].forEach((v) {
+        assignOrders!.add(SpAssignOrder.fromJson(v));
+      });
+    }
+    createdAt = json['createdAt'];
+    v = json['__v'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {};
+    final map = <String, dynamic>{};
     map['_id'] = id;
+    map['name'] = name;
     map['phone'] = phone;
-    map['full_name'] = fullName;
-    map['profile_pic'] = profilePic;
+    map['aadharNumber'] = aadharNumber;
+    map['dob'] = dob;
+    map['address'] = address;
+    map['image'] = image;
+    map['aadharImage'] = aadharImage;
+    map['service_provider_id'] = serviceProviderId;
+    map['verifyStatus'] = verifyStatus;
+    if (assignOrders != null) {
+      map['assignOrders'] = assignOrders!.map((v) => v.toJson()).toList();
+    }
+    map['createdAt'] = createdAt;
+    map['__v'] = v;
     return map;
   }
 }
 
-class Data {
+class SpAssignOrder {
+  String? orderId;
+  String? type;
   String? id;
-  UserId? userId;
+
+  SpAssignOrder({this.orderId, this.type, this.id});
+
+  SpAssignOrder.fromJson(Map<String, dynamic> json) {
+    orderId = json['order_id'];
+    type = json['type'];
+    id = json['_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['order_id'] = orderId;
+    map['type'] = type;
+    map['_id'] = id;
+    return map;
+  }
+}
+
+class SpData {
+  String? id;
+  SpUserId? userId;
   String? projectId;
-  CategoryId? categoryId;
-  List<SubCategoryIds>? subCategoryIds;
+  SpCategoryId? categoryId;
+  List<SpSubCategoryIds>? subCategoryIds;
   String? googleAddress;
   String? detailedAddress;
   String? contact;
@@ -68,22 +162,22 @@ class Data {
   String? userStatus;
   String? paymentStatus;
   // dynamic serviceProviderId;
-  ServiceProvider? serviceProvider;
+  SpServiceProvider? serviceProvider;
   bool? platformFeePaid;
   int? platformFee;
   String? razorOrderIdPlatform;
-  ServicePayment? servicePayment;
-  Commission ? commission;
+  SpServicePayment? servicePayment;
+  SpCommission ? commission;
   // List<dynamic>? acceptedByProviders;
-  List<AcceptedByProvider>? acceptedByProviders;
+  List<SpAcceptedByProvider>? acceptedByProviders;
   String? createdAt;
   String? updatedAt;
   int? v;
   String? razorPaymentIdPlatform;
-  WarningMessage? warningMessage; // Added WarningMessage
+  SpWarningMessage? warningMessage; // Added SpWarningMessage
 
 
-  Data(
+  SpData(
       {this.id,
         this.userId,
         this.projectId,
@@ -111,17 +205,17 @@ class Data {
         this.warningMessage});
 
 
-  Data.fromJson(Map<String, dynamic> json) {
+  SpData.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
-    userId = json['user_id'] != null ? UserId.fromJson(json['user_id']) : null;
+    userId = json['user_id'] != null ? SpUserId.fromJson(json['user_id']) : null;
     projectId = json['project_id'];
     categoryId = json['category_id'] != null
-        ? CategoryId.fromJson(json['category_id'])
+        ? SpCategoryId.fromJson(json['category_id'])
         : null;
     if (json['sub_category_ids'] != null) {
-      subCategoryIds = <SubCategoryIds>[];
+      subCategoryIds = <SpSubCategoryIds>[];
       json['sub_category_ids'].forEach((v) {
-        subCategoryIds!.add(SubCategoryIds.fromJson(v));
+        subCategoryIds!.add(SpSubCategoryIds.fromJson(v));
       });
     }
     googleAddress = json['google_address'];
@@ -137,13 +231,13 @@ class Data {
     paymentStatus = json['payment_status'];
     // serviceProviderId = json['service_provider_id'];
     serviceProvider = json['service_provider_id'] != null
-        ? ServiceProvider.fromJson(json['service_provider_id'])
+        ? SpServiceProvider.fromJson(json['service_provider_id'])
         : null;
     platformFeePaid = json['platform_fee_paid'];
     platformFee = json['platform_fee'];
     razorOrderIdPlatform = json['razorOrderIdPlatform'];
     servicePayment = json['service_payment'] != null
-        ? ServicePayment.fromJson(json['service_payment'])
+        ? SpServicePayment.fromJson(json['service_payment'])
         : null;
     // acceptedByProviders = json['accepted_by_providers'];
     // createdAt = json['createdAt'];
@@ -151,9 +245,9 @@ class Data {
     // v = json['__v'];
 
     if (json['accepted_by_providers'] != null) {
-      acceptedByProviders = <AcceptedByProvider>[];
+      acceptedByProviders = <SpAcceptedByProvider>[];
       json['accepted_by_providers'].forEach((v) {
-        acceptedByProviders!.add(AcceptedByProvider.fromJson(v));
+        acceptedByProviders!.add(SpAcceptedByProvider.fromJson(v));
       });
     }
     createdAt = json['createdAt'];
@@ -161,7 +255,7 @@ class Data {
     v = json['__v'];
     razorPaymentIdPlatform = json['razorPaymentIdPlatform'];
     warningMessage = json['warningMessage'] != null
-        ? WarningMessage.fromJson(json['warningMessage'])
+        ? SpWarningMessage.fromJson(json['warningMessage'])
         : null;
   }
 
@@ -206,15 +300,15 @@ class Data {
   }
 }
 
-class Commission {
+class SpCommission {
   int? amount;
   int? percentage;
   String? type;
-  String? isCollected;
+  bool? isCollected;
 
-  Commission(this.amount,this.percentage, this.type, this.isCollected);
+  SpCommission(this.amount,this.percentage, this.type, this.isCollected);
 
-  Commission.fromJson(Map<String, dynamic> json) {
+  SpCommission.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
     percentage = json['percentage'];
     type = json['type'];
@@ -232,14 +326,14 @@ class Commission {
   }
 }
 
-class UserId {
+class SpUserId {
   String? id;
   String? phone;
   String? fullName;
   String? profilePic;
-  UserId({this.id, this.phone, this.fullName, this.profilePic});
+  SpUserId({this.id, this.phone, this.fullName, this.profilePic});
 
-  UserId.fromJson(Map<String, dynamic> json) {
+  SpUserId.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
     fullName = json['full_name'];
@@ -258,13 +352,13 @@ class UserId {
   }
 }
 
-class CategoryId {
+class SpCategoryId {
   String? id;
   String? name;
 
-  CategoryId({this.id, this.name});
+  SpCategoryId({this.id, this.name});
 
-  CategoryId.fromJson(Map<String, dynamic> json) {
+  SpCategoryId.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     name = json['name'];
   }
@@ -277,13 +371,13 @@ class CategoryId {
   }
 }
 
-class SubCategoryIds {
+class SpSubCategoryIds {
   String? id;
   String? name;
 
-  SubCategoryIds({this.id, this.name});
+  SpSubCategoryIds({this.id, this.name});
 
-  SubCategoryIds.fromJson(Map<String, dynamic> json) {
+  SpSubCategoryIds.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     name = json['name'];
   }
@@ -296,30 +390,30 @@ class SubCategoryIds {
   }
 }
 
-class ServicePayment {
+class SpServicePayment {
   int? amount;
   int? totalExpected;
   int? remainingAmount;
   int? totalTax;
-  List<PaymentHistory>? paymentHistory;
+  List<SpPaymentHistory>? paymentHistory;
 
-  ServicePayment(
+  SpServicePayment(
       {this.amount,
         this.totalExpected,
         this.remainingAmount,
         this.totalTax,
         this.paymentHistory});
 
-  ServicePayment.fromJson(Map<String, dynamic> json) {
+  SpServicePayment.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
     totalExpected = json['total_expected'];
     remainingAmount = json['remaining_amount'];
     totalTax = json['total_tax'];
     // paymentHistory = json['payment_history'];
     if (json['payment_history'] != null) {
-      paymentHistory = <PaymentHistory>[];
+      paymentHistory = <SpPaymentHistory>[];
       json['payment_history'].forEach((v) {
-        paymentHistory!.add(PaymentHistory.fromJson(v));
+        paymentHistory!.add(SpPaymentHistory.fromJson(v));
       });
     }
   }
@@ -338,7 +432,7 @@ class ServicePayment {
   }
 }
 
-class PaymentHistory {
+class SpPaymentHistory {
   int? amount;
   int? tax;
   String? paymentId;
@@ -354,7 +448,7 @@ class PaymentHistory {
   String? id;
   String? date;
 
-  PaymentHistory({
+  SpPaymentHistory({
     this.amount,
     this.tax,
     this.paymentId,
@@ -371,7 +465,7 @@ class PaymentHistory {
     this.date,
   });
 
-  PaymentHistory.fromJson(Map<String, dynamic> json) {
+  SpPaymentHistory.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
     tax = json['tax'];
     paymentId = json['payment_id'];
@@ -380,10 +474,10 @@ class PaymentHistory {
     status = json['status'];
     releaseStatus = json['release_status'];
     isCollected = json['is_collected'];
-    isCollected = json['commission_amount'];
-    isCollected = json['provider_earning'];
-    isCollected = json['commissionType'];
-    isCollected = json['commissionPercentage'];
+    commissionAmount = json['commission_amount'];
+    providerEarning = json['provider_earning'];
+    commissionType = json['commissionType'];
+    commissionPercentage = json['commissionPercentage'];
     id = json['_id'];
     date = json['date'];
   }
@@ -407,14 +501,14 @@ class PaymentHistory {
     return data;
   }
 }
-class AcceptedByProvider {
+class SpAcceptedByProvider {
   String? provider;
   String? status;
   String? id;
 
-  AcceptedByProvider({this.provider, this.status, this.id});
+  SpAcceptedByProvider({this.provider, this.status, this.id});
 
-  AcceptedByProvider.fromJson(Map<String, dynamic> json) {
+  SpAcceptedByProvider.fromJson(Map<String, dynamic> json) {
     provider = json['provider'];
     status = json['status'];
     id = json['_id'];
@@ -427,17 +521,21 @@ class AcceptedByProvider {
     map['_id'] = id;
     return map;
   }
+
+  static List<SpAcceptedByProvider> fromJsonList(List<dynamic> list) {
+    return list.map((e) => SpAcceptedByProvider.fromJson(e)).toList();
+  }
 }
 
-class ServiceProvider {
+class SpServiceProvider {
   String? id;
   String? phone;
   String? fullName;
   String? profilePic;
 
-  ServiceProvider({this.id, this.phone, this.fullName, this.profilePic});
+  SpServiceProvider({this.id, this.phone, this.fullName, this.profilePic});
 
-  ServiceProvider.fromJson(Map<String, dynamic> json) {
+  SpServiceProvider.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
     fullName = json['full_name'];
@@ -454,14 +552,14 @@ class ServiceProvider {
   }
 }
 
-// WarningMessage class
-class WarningMessage {
+// SpWarningMessage class
+class SpWarningMessage {
   final String message;
 
-  WarningMessage({required this.message});
+  SpWarningMessage({required this.message});
 
-  factory WarningMessage.fromJson(Map<String, dynamic> json) {
-    return WarningMessage(
+  factory SpWarningMessage.fromJson(Map<String, dynamic> json) {
+    return SpWarningMessage(
       message: json['message'] as String,
     );
   }

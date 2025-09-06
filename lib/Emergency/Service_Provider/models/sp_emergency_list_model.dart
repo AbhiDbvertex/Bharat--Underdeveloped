@@ -378,13 +378,13 @@ class SpEmergencyOrderListModel {
 }
 
 class SpEmergencyOrderData {
-  ServicePayment servicePayment;
-  Commission commission;
+  SpServicePayment servicePayment;
+  SpCommission commission;
   String id;
-  User userId;
+  SpUser userId;
   String projectId;
-  Category categoryId;
-  List<Category> subCategoryIds;
+  SpCategory categoryId;
+  List<SpCategory> subCategoryIds;
   String googleAddress;
   String detailedAddress;
   String contact;
@@ -397,7 +397,7 @@ class SpEmergencyOrderData {
   bool platformFeePaid;
   int platformFee;
   String razorOrderIdPlatform;
-  List<AcceptedProvider> acceptedByProviders;
+  List<SpAcceptedProvider> acceptedByProviders;
   String createdAt;
   String updatedAt;
   int v;
@@ -432,14 +432,14 @@ class SpEmergencyOrderData {
 
   factory SpEmergencyOrderData.fromJson(Map<String, dynamic> json) {
     return SpEmergencyOrderData(
-      servicePayment: ServicePayment.fromJson(json['service_payment']),
-      commission: Commission.fromJson(json['commission']),
+      servicePayment: SpServicePayment.fromJson(json['service_payment']),
+      commission: SpCommission.fromJson(json['commission']),
       id: json['_id'] ?? '',
-      userId: User.fromJson(json['user_id']),
+      userId: SpUser.fromJson(json['user_id']),
       projectId: json['project_id'] ?? '',
-      categoryId: Category.fromJson(json['category_id']),
+      categoryId: SpCategory.fromJson(json['category_id']),
       subCategoryIds: (json['sub_category_ids'] as List<dynamic>?)
-          ?.map((e) => Category.fromJson(e))
+          ?.map((e) => SpCategory.fromJson(e))
           .toList() ??
           [],
       googleAddress: json['google_address'] ?? '',
@@ -456,7 +456,7 @@ class SpEmergencyOrderData {
       platformFee: json['platform_fee'] ?? 0,
       razorOrderIdPlatform: json['razorOrderIdPlatform'] ?? '',
       acceptedByProviders: (json['accepted_by_providers'] as List<dynamic>?)
-          ?.map((e) => AcceptedProvider.fromJson(e))
+          ?.map((e) => SpAcceptedProvider.fromJson(e))
           .toList() ??
           [],
       createdAt: json['createdAt'] ?? '',
@@ -496,14 +496,14 @@ class SpEmergencyOrderData {
   }
 }
 
-class ServicePayment {
+class SpServicePayment {
   int amount;
   int totalExpected;
   int remainingAmount;
   int totalTax;
-  List<PaymentHistory> paymentHistory;
+  List<SpPaymentHistory> paymentHistory;
 
-  ServicePayment({
+  SpServicePayment({
     required this.amount,
     required this.totalExpected,
     required this.remainingAmount,
@@ -511,14 +511,14 @@ class ServicePayment {
     required this.paymentHistory,
   });
 
-  factory ServicePayment.fromJson(Map<String, dynamic> json) {
-    return ServicePayment(
+  factory SpServicePayment.fromJson(Map<String, dynamic> json) {
+    return SpServicePayment(
       amount: json['amount'] ?? 0,
       totalExpected: json['total_expected'] ?? 0,
       remainingAmount: json['remaining_amount'] ?? 0,
       totalTax: json['total_tax'] ?? 0,
       paymentHistory: (json['payment_history'] as List<dynamic>?)
-          ?.map((e) => PaymentHistory.fromJson(e))
+          ?.map((e) => SpPaymentHistory.fromJson(e))
           .toList() ??
           [],
     );
@@ -535,7 +535,7 @@ class ServicePayment {
   }
 }
 
-class PaymentHistory {
+class SpPaymentHistory {
   int amount;
   int tax;
   String paymentId;
@@ -551,7 +551,7 @@ class PaymentHistory {
   String id;
   String date;
 
-  PaymentHistory({
+  SpPaymentHistory({
     required this.amount,
     required this.tax,
     required this.paymentId,
@@ -568,8 +568,8 @@ class PaymentHistory {
     required this.date,
   });
 
-  factory PaymentHistory.fromJson(Map<String, dynamic> json) {
-    return PaymentHistory(
+  factory SpPaymentHistory.fromJson(Map<String, dynamic> json) {
+    return SpPaymentHistory(
       amount: json['amount'] ?? 0,
       tax: json['tax'] ?? 0,
       paymentId: json['payment_id'] ?? '',
@@ -607,21 +607,21 @@ class PaymentHistory {
   }
 }
 
-class Commission {
+class SpCommission {
   int amount;
   int percentage;
   String type;
   bool isCollected;
 
-  Commission({
+  SpCommission({
     required this.amount,
     required this.percentage,
     required this.type,
     required this.isCollected,
   });
 
-  factory Commission.fromJson(Map<String, dynamic> json) {
-    return Commission(
+  factory SpCommission.fromJson(Map<String, dynamic> json) {
+    return SpCommission(
       amount: json['amount'] ?? 0,
       percentage: json['percentage'] ?? 0,
       type: json['type'] ?? '',
@@ -639,21 +639,21 @@ class Commission {
   }
 }
 
-class User {
+class SpUser {
   String id;
   String fullName;
   String phone;
   String? profilePic;
 
-  User({
+  SpUser({
     required this.id,
     required this.fullName,
     required this.phone,
     this.profilePic,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory SpUser.fromJson(Map<String, dynamic> json) {
+    return SpUser(
       id: json['_id'] ?? '',
       fullName: json['full_name'] ?? '',
       phone: json['phone'] ?? '',
@@ -671,17 +671,17 @@ class User {
   }
 }
 
-class Category {
+class SpCategory {
   String id;
   String name;
 
-  Category({
+  SpCategory({
     required this.id,
     required this.name,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
+  factory SpCategory.fromJson(Map<String, dynamic> json) {
+    return SpCategory(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
     );
@@ -695,19 +695,19 @@ class Category {
   }
 }
 
-class AcceptedProvider {
+class SpAcceptedProvider {
   String provider;
   String status;
   String id;
 
-  AcceptedProvider({
+  SpAcceptedProvider({
     required this.provider,
     required this.status,
     required this.id,
   });
 
-  factory AcceptedProvider.fromJson(Map<String, dynamic> json) {
-    return AcceptedProvider(
+  factory SpAcceptedProvider.fromJson(Map<String, dynamic> json) {
+    return SpAcceptedProvider(
       provider: json['provider'] ?? '',
       status: json['status'] ?? '',
       id: json['_id'] ?? '',

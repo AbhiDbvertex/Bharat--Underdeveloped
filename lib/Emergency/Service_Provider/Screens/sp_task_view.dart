@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
+import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerScreen.dart';
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
 
@@ -107,8 +108,8 @@ class _SpTaskViewState extends State<SpTaskView> {
           children: [
             // Bada Circular Avatar
             CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.grey.shade200,
+              radius: 40,
+           //   backgroundColor: Colors.grey.shade200,
               child: ClipOval(
                 child: Image.network(
                   imageUrl,
@@ -116,7 +117,7 @@ class _SpTaskViewState extends State<SpTaskView> {
                   width: 120,
                   height: 120,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 60);
+                    return const Icon(Icons.person, size: 40);
                   },
                 ),
               ),
@@ -210,11 +211,11 @@ class _SpTaskViewState extends State<SpTaskView> {
   }
 
   Widget _buildAssignedPerson(person,BuildContext context) {
-    print("dss :- ${controller.assignedWorker.value.id}");
+
     return controller.assignedWorker.value.id == null?
       InkWell(
         onTap: () {
-          Get.to(() => ServiceWorkerListScreen(orderId: controller.userId.value,callType:"emergency"));
+          Get.to(() => ServiceWorkerListScreen(orderId: controller.orderId.value,callType:"emergency"));
           // Get.to(() => WorkerScreen());
           },
         child: Container(
@@ -259,9 +260,18 @@ class _SpTaskViewState extends State<SpTaskView> {
           const SizedBox(height: 10),
           Row(
             children: [
+              // CircleAvatar(
+              //   radius: 40,
+              //   backgroundImage: NetworkImage(person.image ?? ""),
+              // ),
               CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(person.profilePic ?? ""),
+                backgroundImage: person.image != null && person.image!.isNotEmpty
+                    ? NetworkImage(person.image!)
+                    : null,
+                child: (person.image == null || person.image!.isEmpty)
+                    ? const Icon(Icons.person, size: 40)
+                    : null,
               ),
               const SizedBox(width: 15),
               Expanded(
@@ -269,36 +279,46 @@ class _SpTaskViewState extends State<SpTaskView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      person.fullName ?? "",
+                      person.name ?? "",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(
+                /*    Text(
                       'Category: ${controller.categoryName.value}',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xff777777),
                       ),
-                    ),
+                    ),*/
                     const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder:
+                        //         (
+                        //         context,
+                        //         ) => ViewServiceProviderProfileScreen(
+                        //       serviceProviderId:
+                        //       person.id ??
+                        //           '',
+                        //     ),
+                        //   ),
+                        // );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (
-                                context,
-                                ) => ViewServiceProviderProfileScreen(
-                              serviceProviderId:
-                              person.id ??
-                                  '',
-                            ),
+                            builder: (context) =>
+                                WorkerListViewProfileScreen(
+                                  workerId:
+                                  person.id
+
+                                ),
                           ),
                         );
-
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(

@@ -753,6 +753,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -782,6 +783,7 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
   bool isLoading = true;
   bool _showReviews = true;
   String? address = "";
+  String tag="ViewServiceProviderProfileScreen";
 
   // Utility function to clean URLs
   String cleanImageUrl(String? url) {
@@ -796,6 +798,7 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
 
   @override
   void initState() {
+    bwDebug("service provider Id : ${widget.serviceProviderId}",tag: tag);
     super.initState();
     loadSavedLocation();
     fetchProfile();

@@ -33,7 +33,7 @@ class SpWorkDetailController extends GetxController {
   var hireStatus = "".obs;
   var paymentAmount = 0.obs;
   var plateFormFee = 0.obs;
-  var currentImageIndex = 0.obs; // Purana variable, ab wapas aa gaya
+  var currentImageIndex = 0.obs;
   var orderId = "".obs;
   var acceptedByProviders = <Map<String, dynamic>>[].obs;
   var apiMessage = "".obs;
@@ -41,12 +41,11 @@ class SpWorkDetailController extends GetxController {
   var providerName = "".obs;
   var providerPhone = "".obs;
   var providerImage = "".obs;
-  var assignedWorker = AssignedWorker().obs;
+  var assignedWorker = SpAssignedWorker().obs;
   var warningMessage = "".obs;
   var razorOrderIdPlatform = "".obs;
 
-  // New variables and methods from the payments logic
-  var payments = <PaymentHistory>[].obs;
+  var payments = <SpPaymentHistory>[].obs;
   var selectedPaymentIndex = (-1).obs;
   var isCreatingNewPayment = false.obs;
   final descriptionController = TextEditingController();
@@ -442,7 +441,6 @@ class SpWorkDetailController extends GetxController {
     }
   }
 
-  // Your existing `acceptUserOrder` method
   Future<String> acceptUserOrder(String orderId) async {
     try {
       isLoading.value = true;
@@ -465,6 +463,7 @@ class SpWorkDetailController extends GetxController {
             "[acceptUserOrder]response:  ${response.statusCode} ${response.body}",
             tag: tag);
 
+        getEmergencyOrder(orderId);
         return message;
       } else {
         bwDebug(

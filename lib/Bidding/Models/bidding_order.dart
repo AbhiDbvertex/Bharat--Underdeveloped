@@ -1,4 +1,5 @@
 import '../../Emergency/Service_Provider/models/sp_work_detail_model.dart';
+import '../../Emergency/User/models/work_detail_model.dart';
 
 class AssignedWorker {
   final String id;
