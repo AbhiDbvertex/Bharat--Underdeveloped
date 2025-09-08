@@ -1,4 +1,5 @@
 // import 'dart:convert';
+
 // import 'dart:io';
 //
 // import 'package:flutter/material.dart';
@@ -404,7 +405,6 @@
 // }
 
 
-
 ///////////////////////////////
 import 'dart:convert';
 import 'dart:io';
@@ -435,6 +435,7 @@ class EditWorkerController {
   List<File> aadhaarSelectedImages = []; // locally picked images
   List<String> aadhaarImageUrls = []; // from API
   bool isAadhaarLoading = false;
+  bool isSubmitting = false;
 
   // Helper method to determine MIME type based on file extension
   String getMimeType(String path) {
@@ -456,86 +457,88 @@ class EditWorkerController {
     nameError = nameController.text.trim().isEmpty ? 'Name is required' : null;
     if (nameError != null) isValid = false;
 
-    phoneError =
-    (phoneNumber == null || phoneNumber!.isEmpty) ? 'Phone is required' : null;
+    phoneError = (phoneNumber == null || phoneNumber!.isEmpty)
+        ? 'Phone is required'
+        : null;
     if (phoneError != null) isValid = false;
 
     aadhaarError = aadhaarController.text.trim().isEmpty
         ? 'Aadhaar is required'
         : (!RegExp(r'^\d{12}$').hasMatch(aadhaarController.text.trim())
-        ? 'Aadhaar must be 12 digits'
-        : null);
+            ? 'Aadhaar must be 12 digits'
+            : null);
     if (aadhaarError != null) isValid = false;
 
     dobError = dobController.text.trim().isEmpty ? 'DOB is required' : null;
     if (dobError != null) isValid = false;
 
     addressError =
-    addressController.text.trim().isEmpty ? 'Address is required' : null;
+        addressController.text.trim().isEmpty ? 'Address is required' : null;
     if (addressError != null) isValid = false;
 
     return isValid;
   }
 
   Future<bool> submitUpdateWorkerAPI(
-      BuildContext context,
-      String workerId,
-      ) async {
+    BuildContext context,
+    String workerId,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      SnackBarHelper.showSnackBar(context, "🔐 Token not found. Please login again.");
+      SnackBarHelper.showSnackBar(
+          context, "🔐 Token not found. Please login again.");
       return false;
     }
 
-    final url = Uri.parse(
-      "https://api.thebharatworks.com/api/worker/edit/$workerId",
-    );
-    final request = http.MultipartRequest('PUT', url);
-
-    request.headers['Authorization'] = 'Bearer $token';
-    request.headers['Accept'] = 'application/json';
-
-    request.fields.addAll({
-      'name': nameController.text.trim(),
-      'phone': phoneNumber ?? '',
-      'aadharNumber': aadhaarController.text.trim(),
-      'dob': dobController.text.trim(),
-      'address': addressController.text.trim(),
-    });
-
-    // Upload profile image
-    if (selectedImage != null && selectedImage!.existsSync()) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'image', // backend field
-          selectedImage!.path,
-          contentType: MediaType.parse(getMimeType(selectedImage!.path)),
-        ),
+    isSubmitting = true; // loader start
+    try {
+      final url = Uri.parse(
+        "https://api.thebharatworks.com/api/worker/edit/$workerId",
       );
-    }
+      final request = http.MultipartRequest('PUT', url);
 
-    // Upload Aadhaar images
-    for (var file in aadhaarSelectedImages) {
-      if (file.existsSync()) {
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Accept'] = 'application/json';
+
+      request.fields.addAll({
+        'name': nameController.text.trim(),
+        'phone': phoneNumber ?? '',
+        'aadharNumber': aadhaarController.text.trim(),
+        'dob': dobController.text.trim(),
+        'address': addressController.text.trim(),
+      });
+
+      if (selectedImage != null && selectedImage!.existsSync()) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'aadharImage[]', // confirm with backend if array is supported
-            file.path,
-            contentType: MediaType.parse(getMimeType(file.path)),
+            'image',
+            selectedImage!.path,
+            contentType: MediaType.parse(getMimeType(selectedImage!.path)),
           ),
         );
       }
-    }
 
-    try {
+      for (var file in aadhaarSelectedImages) {
+        if (file.existsSync()) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'aadharImage',
+              file.path,
+              contentType: MediaType.parse(getMimeType(file.path)),
+            ),
+          );
+        }
+      }
+
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
       final decoded = jsonDecode(respStr);
 
       debugPrint("Status: ${response.statusCode}");
       debugPrint("Response: $respStr");
+
 
       if (response.statusCode == 200) {
         if (decoded['success'] == true || decoded['worker'] != null) {
@@ -550,12 +553,18 @@ class EditWorkerController {
         }
       } else {
         SnackBarHelper.showSnackBar(context, "❌ Update failed: $respStr");
+
         return false;
       }
+      isSubmitting = false;
     } catch (e) {
+      isSubmitting = false; // loader stop
       debugPrint("Exception: $e");
       SnackBarHelper.showSnackBar(context, "❌ Something went wrong");
       return false;
+    }
+    finally{
+      isSubmitting = false;
     }
   }
 
