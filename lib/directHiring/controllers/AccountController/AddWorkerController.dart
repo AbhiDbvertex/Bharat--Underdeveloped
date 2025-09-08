@@ -130,6 +130,7 @@
 
 import 'dart:io';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -145,6 +146,7 @@ class AddWorkerController {
   final dobController = TextEditingController();
   final dojController = TextEditingController();
   final phoneController = TextEditingController(); // New controller for phone
+  List<XFile> aadhaarImages = [];
 
   String? phone;
   File? selectedImage;
@@ -181,6 +183,9 @@ class AddWorkerController {
     }
     // Validate other form fields
     final isValid = formKey.currentState?.validate() ?? false;
+    if (aadhaarImages.isEmpty) {
+      return false;
+    }
     return isValid;
   }
 
@@ -225,12 +230,32 @@ class AddWorkerController {
         ),
       );
     }
+    // Aadhaar Image(s)
+    if (aadhaarImages.isEmpty) {
+      if (!context.mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("📷 Please upload at least 1 Aadhaar image.")),
+      );
+      return false;
+    }
+    for (int i = 0; i < aadhaarImages.length; i++) {
+      final file = aadhaarImages[i];
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'aadharImage',
+          file.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+    }
 
     try {
       final response = await request.send();
       final body = await response.stream.bytesToString();
 
       print("📤 Fields: ${request.fields}");
+      bwDebug("📎 Files: ${request.files.map((f) => f.filename).toList()}");
+
       print("📡 Status: ${response.statusCode}");
       print("📩 Response: $body");
 
@@ -254,6 +279,58 @@ class AddWorkerController {
       );
       return false;
     }
+  }
+  Future<void> pickAadhaarImages(BuildContext context, VoidCallback onUpdate) async {
+    if (aadhaarImages.length >= 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You can upload up to 2 Aadhaar images only.')),
+      );
+
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () async {
+                  final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+                  if (pickedImage != null) {
+                    aadhaarImages.add(pickedImage);
+                    onUpdate();
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final picked = await picker.pickMultiImage();
+                  if (picked.isNotEmpty) {
+                    final remaining = 2 - aadhaarImages.length;
+                    aadhaarImages.addAll(picked.take(remaining));
+                    onUpdate();
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void removeAadhaarImage(int index, VoidCallback onUpdate) {
+    aadhaarImages.removeAt(index);
+    onUpdate();
   }
 
   void dispose() {

@@ -1,7 +1,10 @@
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
+import 'package:developer/Emergency/utils/snack_bar_helper.dart';
 import 'package:developer/Widgets/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
 import '../controllers/request_accepted_controller.dart';
@@ -493,19 +496,39 @@ final tag="RequestAcceptedSection";
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                item.location.isNotEmpty? Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffF27773),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    item.location,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
+                                item.location.address.isNotEmpty? InkWell(
+                                  onTap:() async {
+                                    final latitude = item.location.latitude;
+                                    final longitude = item.location.longitude;
+                                    final address = item.location.address;
+                                    //final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
+
+                                    // if (await canLaunch(googleMapsUrl)) {
+                                    // await launch(googleMapsUrl);
+                                    // } else {
+                                    // bwDebug("Could not open the map.");
+                                    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Could not open the map.")));
+                                    // }
+
+                                    bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude);
+                                    if(!success) {
+                                      SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                    }
+                                    },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffF27773),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      item.location.address,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                 ):SizedBox(),

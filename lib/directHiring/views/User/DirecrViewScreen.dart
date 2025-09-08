@@ -226,7 +226,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("Abhi:- else darect-hire cancelOder statusCode :- ${response.statusCode}");
         Get.snackbar(
           'Error',
-          'Failed to cancel order: ${response.statusCode}',
+          // 'Failed to cancel order: ${response.statusCode}',
+          'Failed to cancel order: ',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -238,7 +239,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       print("Abhi:- Exception darect-hire : - $e");
       Get.snackbar(
         'Error',
-        'Error cancelling order: $e',
+        // 'Error cancelling order: $e',
+        'Error cancelling order: ',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -274,7 +276,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("❌ Provider fetch failed: ${response.body}");
         Get.snackbar(
           'Error',
-          'Failed to fetch provider: ${response.statusCode}',
+          // 'Failed to fetch provider: ${response.statusCode}',
+          'Failed to fetch provider:',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -286,7 +289,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       print("❗ fetchProviderById Error: $e");
       Get.snackbar(
         'Error',
-        'Error fetching provider: $e',
+        // 'Error fetching provider: $e',
+        'Error fetching provider: ',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -326,7 +330,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("❗ Refund Error: $e");
         Get.snackbar(
           'Error',
-          'Error processing refund: $e',
+          // 'Error processing refund: $e',
+          'Error processing refund: ',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -347,7 +352,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     if (token == null) {
       Get.snackbar(
         'Login Required',
-        'Pehle login kar bhai',
+        'Login Required',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -447,7 +452,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("❌ API Error: ${response.statusCode}");
         Get.snackbar(
           '',
-          'Error ${response.statusCode}',
+          // 'Error ${response.statusCode}',
+          'Error ',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -459,7 +465,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       print("❗ Error: $e");
       Get.snackbar(
         'Error',
-        'Error: $e',
+        // 'Error: $e',
+        'Error',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -578,7 +585,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
           print("❌ Send offer failed: ${data['message']}");
           Get.snackbar(
             'Error',
-            '${data['message']}',
+            // '${data['message']}',
+            'Something wrong',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red,
             colorText: Colors.white,
@@ -591,7 +599,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("❗ API Error: ${response.statusCode} - ${err['message']}");
         Get.snackbar(
           'Error',
-          '${err['message']}',
+          // '${err['message']}',
+          'Getting error',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -603,7 +612,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       print("❗ sendNextOffer Exception: $e");
       Get.snackbar(
         'Error',
-        'Error: $e',
+        // 'Error: $e',
+        'Error: ',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,

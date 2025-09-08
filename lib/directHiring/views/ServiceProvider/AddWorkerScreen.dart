@@ -368,6 +368,8 @@
 //   }
 // }
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -650,6 +652,70 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 hint: 'Address',
                 validator: (value) => value!.isEmpty ? 'Please enter an address' : null,
               ),
+              // Aadhaar Upload Button
+              // const SizedBox(height: 16),
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: Text(
+              //     "Upload Aadhaar Card",
+              //     style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w600),
+              //   ),
+              // ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: const Text("Upload Aadhaar Card"),
+                onPressed: () {
+                  controller.pickAadhaarImages(context, () => setState(() {}));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade700,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+
+// Selected Aadhaar Images
+              if (controller.aadhaarImages.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: List.generate(controller.aadhaarImages.length, (index) {
+                    final file = controller.aadhaarImages[index];
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(file.path),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              controller.removeAadhaarImage(index, () => setState(() {}));
+                            },
+                            child: const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.red,
+                              child: Icon(Icons.close, size: 14, color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }),
+                ),
+              ],
+
               const SizedBox(height: 30),
               SizedBox(
                 height: 50,

@@ -603,32 +603,40 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     MaterialPageRoute(builder: (context) =>  EmergencyScreen()),
                   );
                 },
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.green.shade700,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Emergency Task",
-                        style: GoogleFonts.roboto(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                     color:Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(12)
+
+                    ),
+                    width: double.infinity,
+                  //  color: Colors.green.shade700,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Emergency Task",
+                          style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "Book emergency services for quick fixes",
-                        style: GoogleFonts.roboto(
-                          color: Colors.white,
-                          fontSize: 12,
+                        const SizedBox(height: 5),
+                        Text(
+                          "Book emergency services for quick fixes",
+                          style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      SvgPicture.asset('assets/svg_images/emergencytaskIcon.svg'),
-                    ],
+                        const SizedBox(height: 5),
+                        SvgPicture.asset('assets/svg_images/emergencytaskIcon.svg'),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:developer/Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
 import 'package:developer/Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
+import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
 import 'package:developer/Widgets/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -275,17 +276,22 @@ class _SpEmergencyWorkPageState extends State<SpEmergencyWorkPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF27773),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          data.googleAddress,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                      child: InkWell(
+                        onTap: () {
+                          MapLauncher.openMap(address: data.googleAddress);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Color(0xffF27773),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            data.googleAddress,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
                         ),
                       ),
                     ),

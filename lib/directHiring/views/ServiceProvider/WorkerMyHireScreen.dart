@@ -1151,6 +1151,7 @@
 import 'dart:convert';
 
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
+import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1163,6 +1164,8 @@ import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
 import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
 import '../../../Emergency/Service_Provider/models/sp_emergency_list_model.dart';
+import '../../../Emergency/Service_Provider/models/sp_review_model.dart';
+import '../../../Emergency/User/screens/sp_review_screen.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
 import 'ServiceDirectViewScreen.dart';
 
@@ -1360,7 +1363,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       print('🔐 Token: $token');
 
       final res = await http.get(
-        Uri.parse('https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
+        Uri.parse(
+            'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1614,6 +1618,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           filteredEmergencyItems = emergencyItems;
         });
         if (selectedTab == 2) {
+          setState(() => isLoading = true);
+
           final orders =
               await SpEmergencyServiceController().getEmergencySpOrderByRole();
           setState(() {
@@ -1701,8 +1707,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         width: 1.toWidthPercent(),
         child: ListView.builder(
           itemCount: spEmergencyOrders!.data.length,
-          itemBuilder: (context, index) =>
-              _buildEmergencyCard(spEmergencyOrders!.data[index],screenWidth, screenHeight),
+          itemBuilder: (context, index) => _buildEmergencyCard(
+              spEmergencyOrders!.data[index], screenWidth, screenHeight),
         ),
       ),
     );
@@ -1716,8 +1722,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     double screenHeight,
   ) {
     final bool hasImage = data.image.isNotEmpty;
-    print(
-        "🛠 Card ban raha hai, Order ID: ${data.id}, Status: ${data.status}, Image: ${data.image}, Address: ${data.address}");
 
     return Container(
       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
@@ -1740,8 +1744,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     width: screenWidth * 0.3,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      print(
-                          'Image load nahi hui: ${data.image}, Error: $error');
                       return Image.asset(
                         'assets/images/task.png',
                         height: screenHeight * 0.15,
@@ -1784,8 +1786,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 Row(
                   children: [
                     Container(
-                      width:  screenWidth * 0.3,
-                      height:  screenHeight * 0.03,
+                      width: screenWidth * 0.3,
+                      height: screenHeight * 0.03,
                       // padding: EdgeInsets.symmetric(
                       //   horizontal: screenWidth * 0.05,
                       //   vertical: screenHeight * 0.005,
@@ -1826,8 +1828,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                           ),
                         ).then((_) {
                           //  Abhishek check screen refrase the code
-                          print(
-                              "🔄 Wapas aaya WorkerMyHireScreen pe, orders refresh kar raha hai");
+
                           fetchDirectOrders();
                         });
                       },
@@ -1981,29 +1982,33 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      height: 20,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          data.address,
-                          style: GoogleFonts.roboto(
-                            fontSize: screenWidth * 0.035,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                    InkWell(
+                      onTap: () {
+                        MapLauncher.openMap(address: data.address);
+                      },
+                      child: Container(
+                        height: 20,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade300,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            data.address,
+                            style: GoogleFonts.roboto(
+                              fontSize: screenWidth * 0.035,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        var result =
-                        print(
+                        var result = print(
                             'Navigating to details with orderId: ${data.id}, status: ${data.hireStatus}');
                         Navigator.push(
                           context,
@@ -2186,7 +2191,28 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     SizedBox(width: screenWidth * 0.02),
                     TextButton(
                       onPressed: () {
-                        // Add navigation logic if needed
+                        final reviews = [
+                          SpReviewModel(
+                            title: "Made a computer table",
+                            description:
+                                "It is a long established fact that a reader will be distracted...",
+                            date: "14 Apr, 2023",
+                            rating: 4,
+                            images: [
+                              "https://picsum.photos/200",
+                              "https://picsum.photos/201",
+                              "https://picsum.photos/202",
+                            ],
+                          ),
+                        ];
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SpReviewScreen(reviews: reviews),
+                          ),
+                        );
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xff353026),
@@ -2243,22 +2269,27 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.01,
-                            vertical: screenHeight * 0.005),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffF27773),
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.025),
-                        ),
-                        child: Text(
-                          data.googleAddress ?? 'N/A',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenWidth * 0.03),
+                      child: InkWell(
+                        onTap: () {
+                          MapLauncher.openMap(address: data.googleAddress);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.01,
+                              vertical: screenHeight * 0.005),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffF27773),
+                            borderRadius:
+                                BorderRadius.circular(screenWidth * 0.025),
+                          ),
+                          child: Text(
+                            data.googleAddress ?? 'N/A',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: screenWidth * 0.03),
+                          ),
                         ),
                       ),
                     ),

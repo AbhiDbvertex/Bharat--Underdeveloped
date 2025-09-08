@@ -139,7 +139,7 @@ class _ServiceWorkerListScreenState extends State<SpServiceWorkerListScreen> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = 'Error aa gaya: ${e.toString()}';
+        errorMessage = 'Error: ${e.toString()}';
       });
       Get.snackbar(
         "Error",

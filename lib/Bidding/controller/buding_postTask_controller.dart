@@ -707,6 +707,7 @@ import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
+import '../../Emergency/User/controllers/emergency_service_controller.dart';
 
 class PostTaskController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -1422,11 +1423,14 @@ class PostTaskController extends GetxController {
 
 
   void navigateToLocationScreen() async {
+    final emergencyServiceController = Get.find<EmergencyServiceController>();
+
     final result = await Get.to(
           () => LocationSelectionScreen(
         onLocationSelected: (Map<String, dynamic> locationData) {
           userLocation.value = locationData['address'] ?? 'Select Location';
           addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
+          emergencyServiceController.googleAddressController.text = locationData['address'] ?? 'Select Location';
           debugPrint(
             "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
           );
@@ -1445,6 +1449,7 @@ class PostTaskController extends GetxController {
           await prefs.setString('selected_address_id', addressId);
         }
         await fetchLocation();
+        emergencyServiceController.googleAddressController.text = newAddress;
       } else {
         debugPrint("❌ Invalid location data received: $result");
         showSnackbar("Error", "Invalid location data. Please try again.", context: Get.context!);

@@ -1506,7 +1506,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         print("Error in _loadSavedLocation: $e");
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error fetching location: $e")),
+            // SnackBar(content: Text("Error fetching location: $e")),
+            SnackBar(content: Text("Error fetching location: ")),
           );
         }
       }
@@ -1720,7 +1721,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  "API error: ${data['message'] ?? 'Unknown error'}",
+                  // "API error: ${data['message'] ?? 'Unknown error'}",
+                  "API error:'}",
                 ),
               ),
             );
@@ -1739,7 +1741,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       print("Error in fetchLocationDetails: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching location details: $e")),
+          // SnackBar(content: Text("Error fetching location details: $e")),
+          SnackBar(content: Text("Error fetching location details: ")),
         );
       }
       return null;
@@ -1858,7 +1861,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  "API error: ${data['message'] ?? 'Unknown error'}",
+                  // "API error: ${data['message'] ?? 'Unknown error'}",
+                  "API error: something wrong",
                 ),
               ),
             );
@@ -1867,14 +1871,16 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+            // SnackBar(content: Text("Server error: ${response.statusCode}")),
+            SnackBar(content: Text("Server error: ")),
           );
         }
       }
     } catch (e) {
       print("Error in updateLocation: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error updating location: $e")));
+        // ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error updating location: $e")));
+        ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error updating location: ")));
       }
     } finally {
       if (mounted) {

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:developer/Emergency/User/controllers/work_detail_controller.dart';
-
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +10,7 @@ import '../../utils/logger.dart';
 import '../models/request_accepted_model.dart';
 
 class RequestController extends GetxController {
-  final tag ="RequestController";
+  final tag = "RequestController";
   var isFetchingRequests = false.obs;
   var isHiring = false.obs;
 
@@ -22,18 +21,18 @@ class RequestController extends GetxController {
 
   final workDetailController = Get.find<WorkDetailController>();
 
-  Future<void>  getRequestAccepted(String id) async {
-    bwDebug("[getRequestAccept] call orderId:$id",tag: tag);
+  Future<void> getRequestAccepted(String id) async {
+    bwDebug("[getRequestAccept] call orderId:$id", tag: tag);
 
     try {
       isFetchingRequests.value = true;
       //workDetailController.isLoading.value=true;
-    var url = "${ApiUrl.requestAcceptById}/$id";
+      var url = "${ApiUrl.requestAcceptById}/$id";
 
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
 
-    bwDebug("[getRequestAccept] final url :$url,token: $token",tag: tag);
+      bwDebug("[getRequestAccept] final url :$url,token: $token", tag: tag);
 
       var response = await http.get(
         Uri.parse(url),
@@ -42,29 +41,28 @@ class RequestController extends GetxController {
           "Content-Type": "application/json",
         },
       );
-    bwDebug("[getRequestAccept] response status: ${response.statusCode}\n response Body ${response.body}",tag: tag);
+      bwDebug(
+          "[getRequestAccept] response status: ${response.statusCode}\n response Body ${response.body}",
+          tag: tag);
 
       if (response.statusCode == 200) {
-
         final data = jsonDecode(response.body);
         requestAcceptedModel.value = RequestAcceptedModel.fromJson(data);
       } else {
         bwDebug("Error: ${response.body}");
         errorMessage.value =
-        "Error: ${response.statusCode} - ${response.reasonPhrase}";
+            "Error: ${response.statusCode} - ${response.reasonPhrase}";
       }
-
-    }catch(e){
-      bwDebug("[getRequestAccept] error : $e  ",tag: tag);
+    } catch (e) {
+      bwDebug("[getRequestAccept] error : $e  ", tag: tag);
       errorMessage.value = "Exception: $e";
-
-    }
-    finally {
+    } finally {
       // workDetailController.isLoading.value = false;
       isFetchingRequests.value = false;
-    }  }
+    }
+  }
 
-      // Future<void> fetchRequests() async {
+  // Future<void> fetchRequests() async {
   //   try {
   //     isLoading.value = true;
   //     await Future.delayed(const Duration(seconds: 1)); // thoda loading dikhane ke liye
@@ -110,10 +108,11 @@ class RequestController extends GetxController {
   //   }
   // }
 
-
   Future<void> assignEmergencyOrder(
       {required String orderId, required String serviceProviderId}) async {
-    bwDebug("[assignEmergencyOrder] call orderId:$orderId, serviceProvider:$serviceProviderId", tag: tag);
+    bwDebug(
+        "[assignEmergencyOrder] call orderId:$orderId, serviceProvider:$serviceProviderId",
+        tag: tag);
 
     try {
       isHiring.value = true;
@@ -123,7 +122,8 @@ class RequestController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
 
-      bwDebug("[assignEmergencyOrder] final url :$url, token: $token", tag: tag);
+      bwDebug("[assignEmergencyOrder] final url :$url, token: $token",
+          tag: tag);
 
       final body = jsonEncode({
         "service_provider_id": serviceProviderId,
@@ -138,27 +138,27 @@ class RequestController extends GetxController {
         body: body,
       );
 
-      bwDebug("[assignEmergencyOrder] response status: ${response.statusCode}\n response Body ${response.body}", tag: tag);
+      bwDebug(
+          "[assignEmergencyOrder] response status: ${response.statusCode}\n response Body ${response.body}",
+          tag: tag);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         assignOrderResponse.value = AssignOrderResponse.fromJson(data);
 
         if (assignOrderResponse.value.status) {
-          bwDebug("[assignEmergencyOrder] SUCCESS: ${assignOrderResponse.value.message}", tag: tag);
-         await workDetailController.getEmergencyOrder(orderId);
+          bwDebug(
+              "[assignEmergencyOrder] SUCCESS: ${assignOrderResponse.value.message}",
+              tag: tag);
+          await workDetailController.getEmergencyOrder(orderId);
         } else {
           errorMessage.value = assignOrderResponse.value.message;
         }
-
-
       } else {
         bwDebug("Error: ${response.body}");
         errorMessage.value =
-        "Error: ${response.statusCode} - ${response.reasonPhrase}";
+            "Error: ${response.statusCode} - ${response.reasonPhrase}";
       }
-
-
     } catch (e) {
       bwDebug("[assignEmergencyOrder] error : $e", tag: tag);
       errorMessage.value = "Exception: $e";
@@ -168,4 +168,3 @@ class RequestController extends GetxController {
     }
   }
 }
-
