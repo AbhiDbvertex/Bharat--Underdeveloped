@@ -341,12 +341,12 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = true;
   ScaffoldMessengerState?
-  _scaffoldMessengerState; // ScaffoldMessengerState save karne ke liye
+  _scaffoldMessengerState; //
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _scaffoldMessengerState = ScaffoldMessenger.of(context); // Yahan save karo
+    _scaffoldMessengerState = ScaffoldMessenger.of(context); //
   }
 
   @override
@@ -592,6 +592,87 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
                 controller.addressController,
                 controller.addressError,
               ),
+              const SizedBox(height: 10),
+              // Aadhaar Images Header Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Aadhaar Images",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (controller.aadhaarSelectedImages.length +
+                          controller.aadhaarImageUrls.length >=
+                          2) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("⚠️ You can upload max 2 Aadhaar images")),
+                        );
+                        return;
+                      }
+                      _showImagePickerBottomSheet(context);
+                    },
+                    child: const Text("Update Aadhaar"),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+// Aadhaar Images Grid
+              controller.isAadhaarLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : controller.aadhaarSelectedImages.isEmpty &&
+                  controller.aadhaarImageUrls.isEmpty
+                  ? const Text("No Aadhaar images uploaded")
+                  : Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  // Local selected images
+                  ...controller.aadhaarSelectedImages.map(
+                        (file) => _buildAadhaarImageTile(
+                      Image.file(file,
+                          fit: BoxFit.cover,
+                          width: controller.aadhaarSelectedImages.length == 1
+                              ? double.infinity
+                              : 150,
+                          height: 150,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image, size: 50)),
+                          () {
+                        setState(() {
+                          controller.aadhaarSelectedImages.remove(file);
+                        });
+                      },
+                    ),
+                  ),
+                  // API images
+                  ...controller.aadhaarImageUrls.map(
+                        (url) => _buildAadhaarImageTile(
+                      Image.network(url,
+                          fit: BoxFit.cover,
+                          width: controller.aadhaarImageUrls.length == 1
+                              ? double.infinity
+                              : 150,
+                          height: 150,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image, size: 50)),
+                          () {
+                        setState(() {
+                          controller.aadhaarImageUrls.remove(url);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -667,5 +748,73 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  Widget _buildAadhaarImageTile(Widget imageWidget, VoidCallback onRemove) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: imageWidget,
+        ),
+        Positioned(
+          right: 4,
+          top: 4,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(2),
+              child: const Icon(Icons.close, size: 18, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showImagePickerBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
+                onTap: () async {
+                  final picked =
+                  await ImagePicker().pickImage(source: ImageSource.camera);
+                  if (picked != null) {
+                    setState(() {
+                      controller.aadhaarSelectedImages.add(File(picked.path));
+                    });
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Gallery"),
+                onTap: () async {
+                  final picked =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+                  if (picked != null) {
+                    setState(() {
+                      controller.aadhaarSelectedImages.add(File(picked.path));
+                    });
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

@@ -29,12 +29,13 @@ class ServiceProvider {
   final String fullName;
   final String profilePic;
   final int totalReview;
+
   final double rating;
   final String id;
 
   // 👇 extra fields
   final double amount;
-  final String location;
+  final Location  location;
   final String view;
 
   ServiceProvider({
@@ -61,12 +62,43 @@ class ServiceProvider {
 
       // 👇 extra fields (agar backend se nahi aa rahe toh dummy assign kar le)
       amount: double.tryParse(json['amount']?.toString() ?? '0') ?? 0,
-      location: json['location'] ?? '',
+      // location: json['location'] ?? '',
+      location: json['location'] != null
+          ? Location.fromJson(json['location'])
+          : Location(latitude: 0, longitude: 0, address: ''),
       view: json['view'] ?? '',
       id: json['id'] ?? '',
     );
   }
 }
+class Location {
+  final double latitude;
+  final double longitude;
+  final String address;
+
+  Location({
+    required this.latitude,
+    required this.longitude,
+    required this.address,
+  });
+
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(
+      latitude: (json['latitude'] ?? 0).toDouble(),
+      longitude: (json['longitude'] ?? 0).toDouble(),
+      address: json['address'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'address': address,
+    };
+  }
+}
+
 class AssignOrderResponse {
   final bool status;
   final String message;

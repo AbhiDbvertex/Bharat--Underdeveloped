@@ -19,8 +19,6 @@ class SpWorkDetailController extends GetxController {
   var isActionLoading = false.obs;
   var tag = "SPWorkDetailController";
   static const double _taxPercentage = 0.18;
-
-  // Data from API (Your original code)
   var imageUrls = <String>[].obs;
   var projectId = "".obs;
   var userId="".obs;
@@ -36,6 +34,7 @@ class SpWorkDetailController extends GetxController {
   var currentImageIndex = 0.obs;
   var orderId = "".obs;
   var acceptedByProviders = <Map<String, dynamic>>[].obs;
+  var currentProviderId = "".obs;
   var apiMessage = "".obs;
   var providerId = "".obs;
   var providerName = "".obs;
@@ -58,6 +57,28 @@ class SpWorkDetailController extends GetxController {
   void onInit() {
     super.onInit();
   }
+  void loadCurrentProviderId() async {
+    final prefs = await SharedPreferences.getInstance();
+    currentProviderId.value = prefs.getString("user_id") ?? "";
+  }
+
+  bool get isFirstRejected {
+    var record = acceptedByProviders.firstWhere(
+          (element) => element["provider"] == currentProviderId.value,
+      orElse: () => {},
+    );
+    return record.isNotEmpty && record["status"] == "rejected";
+  }
+
+  bool get isFirstAccepted {
+
+    var record = acceptedByProviders.firstWhere(
+          (element) => element["provider"] == currentProviderId.value,
+      orElse: () => {},
+    );
+    return record.isNotEmpty && record["status"] == "accepted";
+  }
+
 
   @override
   void onClose() {
@@ -463,7 +484,7 @@ class SpWorkDetailController extends GetxController {
             "[acceptUserOrder]response:  ${response.statusCode} ${response.body}",
             tag: tag);
 
-        getEmergencyOrder(orderId);
+
         return message;
       } else {
         bwDebug(
@@ -480,6 +501,7 @@ class SpWorkDetailController extends GetxController {
       bwDebug("[acceptUserOrder]⚠️ Exception: $e", tag: tag);
       return "Exception: $e";
     } finally {
+      getEmergencyOrder(orderId);
       isLoading.value = false;
     }
   }
@@ -524,6 +546,8 @@ class SpWorkDetailController extends GetxController {
       bwDebug("[rejectUserOrder] ⚠️ Exception: $e", tag: tag);
       return "Exception: $e";
     } finally {
+      getEmergencyOrder(orderId);
+
       isLoading.value = false;
     }
   }

@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 import 'dart:math';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -175,6 +176,7 @@ class OtpController {
   }
 
   Future<void> fetchAndSaveProfileData(String token) async {
+    bwDebug("[fetchAndSaveProfileData],  call: ",tag: "otp COntroller ");
     final profileUrl = Uri.parse(
       '${AppConstants.baseUrl}${ApiEndpoint.otpVerificationScreen}',
     );

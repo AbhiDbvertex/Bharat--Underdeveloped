@@ -457,13 +457,16 @@ import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
 import 'package:developer/Emergency/User/screens/task_view.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:developer/Emergency/utils/snack_bar_helper.dart';
 import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../utils/map_launcher_lat_long.dart';
 import '../controllers/work_detail_controller.dart';
 import '../models/emergency_list_model.dart';
 
@@ -697,19 +700,29 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /// ROW 1
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: Color(0xfff27773),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              controller.googleAddress.value,
-                              style: GoogleFonts.roboto(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                          GestureDetector(
+                            onTap: () async {
+                              bwDebug("on tap call: ");
+                              final address = controller.googleAddress.value;
+                              bool success=await MapLauncher.openMap(address: address);
+                              if(!success) {
+                                SnackBarHelper.showSnackBar(context, "Could not open the map");
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Color(0xfff27773),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                controller.googleAddress.value,
+                                style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),

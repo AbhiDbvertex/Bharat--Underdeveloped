@@ -182,7 +182,8 @@ class _HireScreenState extends State<HireScreen> {
     } catch (e) {
       print("❗ Error fetching location: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error fetching location: $e")),
+        // SnackBar(content: Text("Error fetching location: $e")),
+        SnackBar(content: Text("Error fetching location: ")),
       );
     }
   }

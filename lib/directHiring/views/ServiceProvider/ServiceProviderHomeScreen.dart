@@ -1512,6 +1512,7 @@ import 'dart:io';
 
 import 'package:developer/Bidding/ServiceProvider/WorkerRecentPostedScreen.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_emergency_work_page.dart';
+import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -1633,6 +1634,9 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
         if (data['status'] == true) {
           String apiLocation = 'Select Location';
           String? addressId;
+          String userId = data['data']['_id'];
+          await prefs.setString("user_id", userId);
+
 
           if (data['data']?['full_address'] != null &&
               data['data']['full_address'].isNotEmpty) {
@@ -1869,7 +1873,6 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           Uri.parse("https://api.thebharatworks.com/api/user/emergency");
 
       final response = await http.post(
-        // ✅ bas post call karni hai
         url,
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -2310,14 +2313,27 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                         children: controller.orders.map((order) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 12),
-                            child: EmergencyCard(
-                              name: order.categoryId.name, // category ka name
-                              role: order.subCategoryIds.isNotEmpty
-                                  ? order.subCategoryIds.first.name
-                                  : "No SubCategory",
-                              imagePath: order.imageUrls.isNotEmpty
-                                  ? order.imageUrls.first
-                                  : 'assets/images/Fur.png',
+                            child: InkWell(
+                              onTap: () {
+                                bwDebug("onTap card ; orderId: ${order.id}",tag:"Service ProviderHomeScreen");
+
+                                Navigator.push(context, MaterialPageRoute(builder:
+                                (_) =>SpWorkDetail(order.id, isUser: false),
+                                ),
+                                ).then((_) async{
+                                  await controller.getEmergencySpOrderList();
+
+                                },);
+                              },
+                              child: EmergencyCard(
+                                name: order.categoryId.name, // category ka name
+                                role: order.subCategoryIds.isNotEmpty
+                                    ? order.subCategoryIds.first.name
+                                    : "No SubCategory",
+                                imagePath: order.imageUrls.isNotEmpty
+                                    ? order.imageUrls.first
+                                    : 'assets/images/Fur.png',
+                              ),
                             ),
                           );
                         }).toList(),

@@ -5,12 +5,15 @@ import 'package:developer/Emergency/utils/assets.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/Widgets/AppColors.dart';
+import 'package:developer/directHiring/views/User/UserHomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
+import '../../../Bidding/controller/buding_postTask_controller.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 
 
@@ -32,9 +35,22 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     // TODO: implement initState
   controller.calculateFee();
     super.initState();
+  SharedPreferences.getInstance().then((prefs) {
+    String? savedLocation = prefs.getString('selected_location');
+    if (savedLocation != null && savedLocation != 'Select Location') {
+      setState(() {
+        controller.googleAddressController.text = savedLocation;
+        bwDebug("📍 Pre-populated googleAddressController with: $savedLocation");
+      });
+    } else {
+      bwDebug("📍 No valid saved location found");
+    }
+  });
   }
   @override
   Widget build(BuildContext context) {
+    final postTaskController = Get.put(PostTaskController(), permanent: false);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -124,13 +140,35 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                     ),
                     SizedBox(height: .04.toWidthPercent()),
 
-                    _buildTitle("Google Address (GPS)"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildTitle("Google Address (GPS)"),
+                  InkWell(
+                  onTap: postTaskController.navigateToLocationScreen,
+                  child: Container(
+              width: 0.35.toWidthPercent(),
+              decoration: BoxDecoration(
+              color: AppColors.primaryGreen,
+              borderRadius: BorderRadius.circular(5),
+        ),
+        child: const Center(
+          child: Text(
+            "Change location",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    ),
+
+                      ],
+                    ),
                     //customTextField(hint: "Abc gali 145 banglow no. Indore"),
                     _googleLocationField(controller.googleAddressController),
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Detailed Address (Landmark)"),
-                    customTextField(hint: "Abc gali 145 banglow no. Indore",controller: controller.detailedAddressController),
+                    customTextField(hint: "Enter address",controller: controller.detailedAddressController),
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Contact"),
@@ -220,7 +258,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     TextEditingController? controller,
     required String hint,
     TextInputType keyboardType = TextInputType.text,
-    int? maxLength
+    int? maxLength,
   }) {
     return TextFormField(
       controller: controller,
@@ -452,7 +490,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   }
 
   Widget _googleLocationField(googleAddressController) {
-    return GestureDetector(
+    return
+      /*GestureDetector(
       onTap: () async {
         final result = await Navigator.push(context,
           MaterialPageRoute(builder: (_) => MapPickerScreen()),
@@ -462,19 +501,26 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         }
       },
       child: AbsorbPointer(
-        child: TextFormField(
+        child: */
+
+      TextFormField(
+      enabled: false,
+          maxLines: 2,
           controller: googleAddressController,
-          decoration: _inputDecoration("Location", icon: Icons.my_location),
+          // decoration: _inputDecoration("Location", icon: Icons.my_location,),
+      decoration: _inputDecoration("Location", icon: Icons.my_location),
+
           validator:
               (val) => val == null || val.isEmpty ? "Required field" : null,
-        ),
+        )/*,
       ),
-    );
+    )*/;
   }
       InputDecoration _inputDecoration(String hint, {IconData? icon}) =>
       InputDecoration(
         hintText: hint,
         hintStyle: fieldHintStyle,
+
         prefixIcon: icon != null ? Icon(icon, color: AppColors.primaryGreen) : null,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
 

@@ -462,10 +462,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../Widgets/AppColors.dart';
 import '../../User/screens/request_accepted_section.dart';
 import '../../User/screens/task_view.dart';
+import '../../utils/map_launcher_lat_long.dart';
+import '../../utils/snack_bar_helper.dart';
 
 class SpWorkDetail extends StatefulWidget {
   final  data;
@@ -489,6 +492,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
     controller = Get.put(SpWorkDetailController() );
     controller.getEmergencyOrder(widget.data);
     isAccepted = controller.hireStatus.value == "assigned";
+    controller.loadCurrentProviderId();
   }
 
   @override
@@ -518,7 +522,6 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
       body: Obx(
               ()  {
             if (controller.isLoading.value) {
-              // loading true -> show loader
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -699,22 +702,47 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /// ROW 1
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: Color(0xfff27773),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              controller.googleAddress.value,
-                              style: GoogleFonts.roboto(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                          // Container(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       vertical: 4, horizontal: 8),
+                          //   decoration: BoxDecoration(
+                          //     color: Color(0xfff27773),
+                          //     borderRadius: BorderRadius.circular(8),
+                          //   ),
+                          //   child: Text(
+                          //     controller.googleAddress.value,
+                          //     style: GoogleFonts.roboto(
+                          //       color: Colors.white,
+                          //       fontSize: 12,
+                          //       fontWeight: FontWeight.w500,
+                          //     ),
+                          //   ),
+                          // ),
+                          GestureDetector(
+                            onTap: () async {
+                              final address = controller.googleAddress.value;
+                              bool success=await MapLauncher.openMap(address: address);
+                              if(!success) {
+                                SnackBarHelper.showSnackBar(context, "Could not open the map");
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Color(0xfff27773),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                controller.googleAddress.value,
+                                style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 4),
                           Text(
                             controller.detailedAddress.value,
@@ -833,7 +861,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               ),
                             ),
                           )
-                              :*/ controller.hireStatus.value == "cancelled"
+                              :*/ /*controller.hireStatus.value == "cancelled"
                               ? Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
@@ -903,7 +931,101 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                 ),
                               ),
                             ],
-                          ),
+                          ),*/
+
+                          Obx(() {
+                            if (controller.isFirstRejected ) {
+                              return Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Cancelled",
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              );
+                            } else if (controller.isFirstAccepted) {
+                              return /*Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                    borderRadius: BorderRadius.circular(10)
+
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Accepted",
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              );*/SizedBox();
+                            } else {
+                              // default -> show Accept / Reject buttons
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primaryGreen,
+                                      minimumSize: const Size(140, 40),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      controller.isLoading.value = true;
+                                      String status = await controller.acceptUserOrder(controller.orderId.value);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(status)),
+                                      );
+                                      controller.isLoading.value = false;
+                                    },
+                                    child: Text(
+                                      "Accept",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 15),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      minimumSize: const Size(140, 40),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      controller.isLoading.value = true;
+                                      String status = await controller.rejectUserOrder(controller.orderId.value);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(status)),
+                                      );
+                                      controller.isLoading.value = false;
+                                    },
+                                    child: Text(
+                                      "Reject",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 15),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          })
+
                         ],
                       ),
                     ),

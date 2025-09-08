@@ -1315,7 +1315,8 @@ bwDebug("final url: $url");
       } else {
         bwDebug("API call failed: ${response.statusCode} - ${response.body}", tag: tag);
         final json = jsonDecode(response.body);
-        Get.snackbar('Error', json['message'] ?? 'Failed to send payment request.');
+        // Get.snackbar('Error', json['message'] ?? 'Failed to send payment request.');
+        Get.snackbar('error','Error: Failed to send payment request.');
       }
     } catch (e) {
       bwDebug("API call error: $e", tag: tag);

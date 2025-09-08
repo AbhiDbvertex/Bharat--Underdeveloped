@@ -170,9 +170,10 @@ class EmergencyServiceController extends GetxController {
   // }
   /// ------------------ SUBMIT FORM -------------------
   Future<void> submitForm(context) async {
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    bwDebug("token: $token");
+    bwDebug("token: $token,address ${googleAddressController.text}");
 
     // validation
     if (selectedCategoryId.value.isEmpty ||
@@ -279,7 +280,8 @@ class EmergencyServiceController extends GetxController {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("❌ Verification Failed: ${decoded['message']}"),
+          // content: Text("❌ Verification Failed: /*${decoded['message']}*/"),
+          content: Text("❌ Verification Failed: */"),
         ),
       );
       Navigator.pop(context);

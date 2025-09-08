@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
 import 'package:developer/Emergency/User/screens/work_detail.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Bidding/view/user/buding_work_detail_screen.dart';
 import '../../../Emergency/User/models/emergency_list_model.dart';
+import '../../../Emergency/utils/map_launcher_lat_long.dart';
+import '../../../Emergency/utils/snack_bar_helper.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
@@ -569,24 +572,29 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                 SizedBox(height: 6),
                                 Row(
                                   children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        address,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
+                                    InkWell(
+                                      onTap:(){
+                                        MapLauncher.openMap(address: address);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          address,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        width: 110,
                                       ),
-                                      width: 110,
                                     ),
                                     Spacer(),
                                     InkWell(
@@ -819,19 +827,24 @@ class _MyHireScreenState extends State<MyHireScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffF27773),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          data.address ?? "",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                          const TextStyle(color: Colors.white, fontSize: 12),
+                      child: InkWell(
+                        onTap: (){
+                          MapLauncher.openMap(address: data.address);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffF27773),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            data.address ?? "",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                          ),
                         ),
                       ),
                     ),
@@ -1100,23 +1113,38 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF27773),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          data.googleAddress,
-                          maxLines: 1, //
-                          overflow: TextOverflow.ellipsis, // ... lag jayega
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 12),
+                      child: InkWell(
+                        onTap:() async {
+                          bwDebug("on tap call: ");
+                          final address = data.googleAddress;
+                          bool success=await MapLauncher.openMap(address: address);
+                          if(!success) {
+                            SnackBarHelper.showSnackBar(context, "Could not open the map");
+                          }
+                        },
+                        child: InkWell(
+                          onTap: () {
+                            MapLauncher.openMap(address: data.googleAddress);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Color(0xffF27773),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              data.googleAddress,
+                              maxLines: 1, //
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 12),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8), // thoda gap de diya
+                    const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
