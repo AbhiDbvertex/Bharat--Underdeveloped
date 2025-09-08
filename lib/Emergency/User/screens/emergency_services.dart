@@ -1,21 +1,17 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
-import 'package:developer/Emergency/utils/assets.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/Widgets/AppColors.dart';
-import 'package:developer/directHiring/views/User/UserHomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 
 import '../../../Bidding/controller/buding_postTask_controller.dart';
-import '../../../directHiring/views/auth/MapPickerScreen.dart';
-
 
 class EmergencyScreen extends StatefulWidget {
   @override
@@ -30,23 +26,26 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     color: Colors.grey,
   );
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     // TODO: implement initState
-  controller.calculateFee();
+    controller.calculateFee();
     super.initState();
-  SharedPreferences.getInstance().then((prefs) {
-    String? savedLocation = prefs.getString('selected_location');
-    if (savedLocation != null && savedLocation != 'Select Location') {
-      setState(() {
-        controller.googleAddressController.text = savedLocation;
-        bwDebug("📍 Pre-populated googleAddressController with: $savedLocation");
-      });
-    } else {
-      bwDebug("📍 No valid saved location found");
-    }
-  });
+    SharedPreferences.getInstance().then((prefs) {
+      String? savedLocation = prefs.getString('selected_location');
+      if (savedLocation != null && savedLocation != 'Select Location') {
+        setState(() {
+          controller.googleAddressController.text = savedLocation;
+          bwDebug(
+              "📍 Pre-populated googleAddressController with: $savedLocation");
+        });
+      } else {
+        bwDebug("📍 No valid saved location found");
+      }
+    });
   }
+
   @override
   Widget build(BuildContext context) {
     final postTaskController = Get.put(PostTaskController(), permanent: false);
@@ -57,18 +56,17 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Emergency Services", style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
+        title: const Text("Emergency Services",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
-        actions:    [
-
-    ],
+        actions: [],
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
           statusBarIconBrightness: Brightness.light,
         ),
       ),
       body: Form(
-        key:_formKey,
+        key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +75,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 width: double.infinity,
                 color: Color(0xff5abc47).withOpacity(0.1),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                   child: Text(
                     'Choose your problem',
                     style: TextStyle(
@@ -100,39 +99,49 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                         value: controller.selectedCategoryId.value.isEmpty
                             ? null
                             : controller.selectedCategoryId.value,
-                        hint: Text("Select Category",style:   fieldHintStyle) ,
+                        hint: Text("Select Category", style: fieldHintStyle),
                         icon: Icon(
                           Icons.keyboard_arrow_down_sharp,
                           color: AppColors.primaryGreen,
                         ),
                         items: controller.categories
                             .map((c) => DropdownMenuItem(
-                          value: c['id'],
-                          child: Text(c['name']!,style: TextStyle(fontSize: 14,fontWeight: FontWeight.w400),),
-                        ))
+                                  value: c['id'],
+                                  child: Text(
+                                    c['name']!,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ))
                             .toList(),
                         onChanged: (val) {
                           controller.selectedCategoryId.value = val!;
                           controller.fetchSubCategories(val);
                         },
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                            borderSide: BorderSide(
+                                color: AppColors.primaryGreen, width: 1.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+                            borderSide: BorderSide(
+                                color: AppColors.primaryGreen, width: 2),
                           ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 15),
                         ),
                       );
                     }),
 
                     SizedBox(height: .04.toWidthPercent()),
 
-                    _buildTitle("Choose your problem ", otherText: "(Multiple Select)"),
+                    _buildTitle("Choose your problem ",
+                        otherText: "(Multiple Select)"),
                     customMultiSelectDropdown(
                       hint: "Select Subcategories",
                       items: controller.subCategories,
@@ -144,23 +153,22 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildTitle("Google Address (GPS)"),
-                  InkWell(
-                  onTap: postTaskController.navigateToLocationScreen,
-                  child: Container(
-              width: 0.35.toWidthPercent(),
-              decoration: BoxDecoration(
-              color: AppColors.primaryGreen,
-              borderRadius: BorderRadius.circular(5),
-        ),
-        child: const Center(
-          child: Text(
-            "Change location",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    ),
-
+                        InkWell(
+                          onTap: postTaskController.navigateToLocationScreen,
+                          child: Container(
+                            width: 0.35.toWidthPercent(),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Change location",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     //customTextField(hint: "Abc gali 145 banglow no. Indore"),
@@ -168,11 +176,17 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Detailed Address (Landmark)"),
-                    customTextField(hint: "Enter address",controller: controller.detailedAddressController),
+                    customTextField(
+                        hint: "Enter address",
+                        controller: controller.detailedAddressController),
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Contact"),
-                    customTextField(hint: "+ 91", keyboardType: TextInputType.phone,controller: controller.contactController,maxLength: 10),
+                    customTextField(
+                        hint: "+ 91",
+                        keyboardType: TextInputType.phone,
+                        controller: controller.contactController,
+                        maxLength: 10),
                     SizedBox(height: .04.toWidthPercent()),
 
                     _buildTitle("Task Completed by(Date & Time)"),
@@ -201,50 +215,48 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
               // Task Fee
               Obx(() => Container(
-                width: double.infinity,
-                color: Color(0xfff17773),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Text(
-                      "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
-                      style: TextStyle(
-                        fontSize: 0.050.toWidthPercent(),
-                        color: Colors.white,
+                    width: double.infinity,
+                    color: Color(0xfff17773),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
+                          style: TextStyle(
+                            fontSize: 0.050.toWidthPercent(),
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
 
               SizedBox(height: 20),
 
               Padding(
-                padding: const EdgeInsets.all(25),
-                child: Obx(() => customButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : () async {
-                    controller.isLoading.value = true;
-                    try {
-                      await controller.submitForm(context);
-                    } finally {
-                      controller.isLoading.value = false;
-                    }
-                  },
-                  child: controller.isLoading.value
-                      ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.primaryGreen,
-                    ),
-                  )
-                      : Text("Pay"),
-                ))
-
-              )
+                  padding: const EdgeInsets.all(25),
+                  child: Obx(() => customButton(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : () async {
+                                controller.isLoading.value = true;
+                                try {
+                                  await controller.submitForm(context);
+                                } finally {
+                                  controller.isLoading.value = false;
+                                }
+                              },
+                        child: controller.isLoading.value
+                            ? SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              )
+                            : Text("Pay"),
+                      )))
             ],
           ),
         ),
@@ -268,7 +280,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         hintText: hint,
         hintStyle: fieldHintStyle,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -289,33 +302,36 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required void Function(String?) onChanged,
   }) {
     return Obx(() => DropdownButtonFormField<String>(
-      isDense: true,
-      icon: Icon(Icons.keyboard_arrow_down_sharp,
-          size: 0.1.toWidthPercent(), color: AppColors.primaryGreen),
-      value: selectedValue.value.isEmpty ? null : selectedValue.value,
-      hint: Text(hint),
-      items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        isDense: true,
-       // labelText: hint,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
-        ),
-      ),
-    ));
+          isDense: true,
+          icon: Icon(Icons.keyboard_arrow_down_sharp,
+              size: 0.1.toWidthPercent(), color: AppColors.primaryGreen),
+          value: selectedValue.value.isEmpty ? null : selectedValue.value,
+          hint: Text(hint),
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            isDense: true,
+            // labelText: hint,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+            ),
+          ),
+        ));
   }
 
   Widget customButton({
-     String? text,
-    Widget?child,
+    String? text,
+    Widget? child,
     required FutureOr<void> Function()? onPressed,
   }) {
     return SizedBox(
@@ -331,7 +347,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         onPressed: onPressed,
-        child: child ?? Text(text??""),
+        child: child ?? Text(text ?? ""),
       ),
     );
   }
@@ -341,52 +357,50 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required Rxn<DateTime> selectedDateTime,
   }) {
     return Obx(() => Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.primaryGreen, width: 1.5),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          title: Text(
-            selectedDateTime.value == null
-                ? "Select Date & Time"
-                : "${selectedDateTime.value!.day}-${selectedDateTime.value!.month}-${selectedDateTime.value!.year} "
-                "${TimeOfDay.fromDateTime(selectedDateTime.value!).format(context)}",
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+            borderRadius: BorderRadius.circular(15),
           ),
-
-          trailing: Icon(Icons.calendar_month, color: AppColors.primaryGreen),
-          onTap: () async {
-
-            DateTime? pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime.now(),
-              lastDate: DateTime(2100),
-            );
-
-            if (pickedDate != null) {
-
-              TimeOfDay? pickedTime = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.now(),
-              );
-
-              if (pickedTime != null) {
-                final fullDateTime = DateTime(
-                  pickedDate.year,
-                  pickedDate.month,
-                  pickedDate.day,
-                  pickedTime.hour,
-                  pickedTime.minute,
+          child: ListTile(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              title: Text(
+                selectedDateTime.value == null
+                    ? "Select Date & Time"
+                    : "${selectedDateTime.value!.day}-${selectedDateTime.value!.month}-${selectedDateTime.value!.year} "
+                        "${TimeOfDay.fromDateTime(selectedDateTime.value!).format(context)}",
+              ),
+              trailing:
+                  Icon(Icons.calendar_month, color: AppColors.primaryGreen),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2100),
                 );
-                selectedDateTime.value = fullDateTime;
-              } else {
-                selectedDateTime.value = pickedDate;
-              }
-            }
-          }
-      ),
-    ));
+
+                if (pickedDate != null) {
+                  TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+
+                  if (pickedTime != null) {
+                    final fullDateTime = DateTime(
+                      pickedDate.year,
+                      pickedDate.month,
+                      pickedDate.day,
+                      pickedTime.hour,
+                      pickedTime.minute,
+                    );
+                    selectedDateTime.value = fullDateTime;
+                  } else {
+                    selectedDateTime.value = pickedDate;
+                  }
+                }
+              }),
+        ));
   }
 
   Widget customImagePicker({
@@ -394,82 +408,84 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required VoidCallback onPick,
   }) {
     return Obx(() => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-            minimumSize: Size(double.infinity, 60),
-            side: BorderSide(color: AppColors.primaryGreen, width: 2),
-            foregroundColor: AppColors.primaryGreen,
-          ),
-          onPressed: onPick,
-          label: Text("Upload Image +"),
-        ),
-        SizedBox(height: 10),
-        if (images.isNotEmpty)
-          SizedBox(
-            height: 120,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: images.length+1,
-              separatorBuilder: (c, i) => SizedBox(width: 10),
-              itemBuilder: (c, i) {
-
-                if(i == images.length){
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: InkWell(
-                      onTap: onPick,
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                                color: Colors.green
-                            )
-                        ),
-                        width: 120,
-                        height: 120,
-                        child: Icon(Icons.add,color: Colors.green,size: 50,),
-                      ),
-                    ),
-                  );
-                }else{
-                  final file = images[i];
-                  return Stack(
-                    children: [
-                      ClipRRect(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(double.infinity, 60),
+                side: BorderSide(color: AppColors.primaryGreen, width: 2),
+                foregroundColor: AppColors.primaryGreen,
+              ),
+              onPressed: onPick,
+              label: Text("Upload Image +"),
+            ),
+            SizedBox(height: 10),
+            if (images.isNotEmpty)
+              SizedBox(
+                height: 120,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: images.length + 1,
+                  separatorBuilder: (c, i) => SizedBox(width: 10),
+                  itemBuilder: (c, i) {
+                    if (i == images.length) {
+                      return ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          file,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
                         child: InkWell(
-                          onTap: () => images.remove(file),
+                          onTap: onPick,
                           child: Container(
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.green)),
+                            width: 120,
+                            height: 120,
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.green,
+                              size: 50,
                             ),
-                            child: Icon(Icons.close, color: Colors.red),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 12,),
-                    ],
-                  );
-                }
-              },
-            ),
-          ),
-      ],
-    ));
+                      );
+                    } else {
+                      final file = images[i];
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              file,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: InkWell(
+                              onTap: () => images.remove(file),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.close, color: Colors.red),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ),
+          ],
+        ));
   }
 
   Widget _buildTitle(String text, {String? otherText}) {
@@ -479,11 +495,13 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         children: [
           Text(
             text,
-            style: GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.w500),
+            style:
+                GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.w500),
           ),
           if (otherText != null)
             Text(otherText,
-                style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.w400)),
+                style: GoogleFonts.roboto(
+                    fontSize: 12, fontWeight: FontWeight.w400)),
         ],
       ),
     );
@@ -491,7 +509,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
   Widget _googleLocationField(googleAddressController) {
     return
-      /*GestureDetector(
+        /*GestureDetector(
       onTap: () async {
         final result = await Navigator.push(context,
           MaterialPageRoute(builder: (_) => MapPickerScreen()),
@@ -503,26 +521,29 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       child: AbsorbPointer(
         child: */
 
-      TextFormField(
+        TextFormField(
       enabled: false,
-          maxLines: 2,
-          controller: googleAddressController,
-          // decoration: _inputDecoration("Location", icon: Icons.my_location,),
+      maxLines: 2,
+      controller: googleAddressController,
+      // decoration: _inputDecoration("Location", icon: Icons.my_location,),
       decoration: _inputDecoration("Location", icon: Icons.my_location),
 
-          validator:
-              (val) => val == null || val.isEmpty ? "Required field" : null,
-        )/*,
+      validator: (val) => val == null || val.isEmpty ? "Required field" : null,
+    ) /*,
       ),
-    )*/;
+    )*/
+        ;
   }
-      InputDecoration _inputDecoration(String hint, {IconData? icon}) =>
+
+  InputDecoration _inputDecoration(String hint, {IconData? icon}) =>
       InputDecoration(
         hintText: hint,
         hintStyle: fieldHintStyle,
 
-        prefixIcon: icon != null ? Icon(icon, color: AppColors.primaryGreen) : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+        prefixIcon:
+            icon != null ? Icon(icon, color: AppColors.primaryGreen) : null,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
 
         // 👇 Common border style
         border: OutlineInputBorder(
@@ -530,6 +551,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+        ),
+        disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
         ),
@@ -546,7 +571,6 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           borderSide: BorderSide(color: Colors.red, width: 2),
         ),
       );
-
 
   @override
   void dispose() {
@@ -570,12 +594,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     return Obx(() {
       return GestureDetector(
         onTap: () async {
-          if(controller.selectedCategoryId.value.isEmpty){
+          if (controller.selectedCategoryId.value.isEmpty) {
             Get.showSnackbar(GetSnackBar(
               message: "Select a category first",
               duration: Duration(seconds: 2),
             ));
-            return ;
+            return;
           }
           // Create a temporary RxList for dialog
           final tempSelected = <String>[].obs;
@@ -585,27 +609,30 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             context: context,
             builder: (_) {
               return AlertDialog(
-                title: Text(hint,style: fieldHintStyle,),
+                title: Text(
+                  hint,
+                  style: fieldHintStyle,
+                ),
                 content: Obx(() => SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    children: items.map((item) {
-                      final id = item['id']!;
-                      final name = item['name']!;
-                      return CheckboxListTile(
-                        title: Text(name),
-                        value: tempSelected.contains(id),
-                        onChanged: (val) {
-                          if (val == true) {
-                            tempSelected.add(id);
-                          } else {
-                            tempSelected.remove(id);
-                          }
-                        },
-                      );
-                    }).toList(),
-                  ),
-                )),
+                      width: double.maxFinite,
+                      child: ListView(
+                        children: items.map((item) {
+                          final id = item['id']!;
+                          final name = item['name']!;
+                          return CheckboxListTile(
+                            title: Text(name),
+                            value: tempSelected.contains(id),
+                            onChanged: (val) {
+                              if (val == true) {
+                                tempSelected.add(id);
+                              } else {
+                                tempSelected.remove(id);
+                              }
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    )),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -638,9 +665,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   selectedIds.isEmpty
                       ? hint
                       : items
-                      .where((i) => selectedIds.contains(i['id']))
-                      .map((i) => i['name'])
-                      .join(", "),
+                          .where((i) => selectedIds.contains(i['id']))
+                          .map((i) => i['name'])
+                          .join(", "),
                   style: TextStyle(
                     color: selectedIds.isEmpty ? Colors.grey : Colors.black,
                   ),
@@ -677,7 +704,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
               ),
               Divider(),
               ListTile(
-                leading: Icon(Icons.photo_library, color: AppColors.primaryGreen),
+                leading:
+                    Icon(Icons.photo_library, color: AppColors.primaryGreen),
                 title: Text("Gallery"),
                 onTap: () {
                   Navigator.pop(context);
@@ -690,7 +718,4 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       },
     );
   }
-
-
-
 }
