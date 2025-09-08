@@ -732,10 +732,14 @@ class PostTaskEditController extends GetxController {
   final String? description;
   final String? cost;
   final String? selectDeadline;
+  // final  late;
+  // final  long;
 
   PostTaskEditController({
     required this.biddingOderId,
     this.title,
+    // this.late,
+    // this.long,
     this.category,
     this.subcategory,
     this.location,
@@ -752,6 +756,8 @@ class PostTaskEditController extends GetxController {
   final descriptionController = TextEditingController();
   final costController = TextEditingController();
   final oderIdController = TextEditingController();
+  final lateController = TextEditingController();
+  final longController = TextEditingController();
 
   var selectedImages = <File>[].obs;
   var selectedDate = Rxn<DateTime>();
@@ -765,10 +771,13 @@ class PostTaskEditController extends GetxController {
   var isLoading = true.obs;
   var showReviews = true.obs;
   var address = "".obs;
-
+  var late;
+  var long;
+  var addre;
   @override
   void onInit() {
     super.onInit();
+    fetchProfile();
 
     // Set data from constructor
     titleController.text = title ?? '';
@@ -777,6 +786,10 @@ class PostTaskEditController extends GetxController {
     addressController.text = location ?? 'Select Location';
     googleAddressController.text = location ?? '';
     userLocation.value = location ?? 'Select Location';
+
+    //   new added
+    lateController.text = late ?? '';
+    longController.text = long ?? '';
 
     if (selectDeadline != null) {
       try {
@@ -840,6 +853,8 @@ class PostTaskEditController extends GetxController {
     titleController.clear();
     dateController.clear();
     addressController.clear();
+    lateController.clear();
+    longController.clear();
     googleAddressController.clear();
     descriptionController.clear();
     costController.clear();
@@ -911,6 +926,19 @@ class PostTaskEditController extends GetxController {
               addressId = latestAddress['_id'];
             }
           }
+
+          final latitude;
+          final longitude;
+          final address;
+          latitude = data['data']?['location']?['latitude'];
+          longitude = data['data']?['location']?['longitude'];
+          address = data['data']?['location']?['address'];
+
+          late = latitude;
+          long = longitude;
+          addre = address;
+
+          print('Abhi:- get user lat : $latitude long : $longitude Address : $addre');
 
           await prefs.setString("address", apiLocation);
           if (addressId != null) {
@@ -1393,6 +1421,8 @@ class PostTaskEditController extends GetxController {
       request.fields['description'] = descriptionController.text.trim();
       request.fields['cost'] = costController.text.trim();
       request.fields['deadline'] = formattedDeadline;
+      request.fields['latitude'] = late.toString();
+      request.fields['longitude'] = long.toString();
 
       print("Abhi:- get bidding oderId ${biddingOderId}");
       for (var image in selectedImages) {

@@ -685,35 +685,38 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     ),
                   );
                 },
-                child: CarouselSlider(
-                  options: CarouselOptions(
-                    height: 200,
-                    autoPlay: true,
-                    enlargeCenterPage: true,
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 1.0,
-                    autoPlayInterval: const Duration(seconds: 3),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                  ),
-                  items: (order!['image_url'] as List).map((imageUrl) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return Image.network(
-                          '$imageUrl',
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            'assets/images/task.png',
+                child: Container(
+                  color: Colors.grey,
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: 200,
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      aspectRatio: 16 / 9,
+                      viewportFraction: 1.0,
+                      autoPlayInterval: const Duration(seconds: 3),
+                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                    ),
+                    items: (order!['image_url'] as List).map((imageUrl) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.network(
+                            '$imageUrl',
                             width: double.infinity,
                             height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
+                            // fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
+                              'assets/images/task.png',
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
                 ),
               )
             else
@@ -907,6 +910,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       categreyId: widget.categreyId,
                                       subcategreyId:
                                       widget.subcategreyId,
+                                      hirebuttonhide: "hideOnly",
                                     ),
                                   ),
                                 );
@@ -1044,6 +1048,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           categreyId: widget.categreyId,
                                           subcategreyId:
                                           widget.subcategreyId,
+                                          hirebuttonhide: "hideOnly",
                                         ),
                                       ),
                                     );

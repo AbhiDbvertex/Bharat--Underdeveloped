@@ -625,7 +625,8 @@ class BiddingTaskViewDetailsScreen extends StatelessWidget {
               Text('₹1,000', style: TextStyle(color: Colors.green)),
               SizedBox(height: 8),
               Text(
-                'Lorem ipsum dolor sit amet consectetur. Lorem ipsum dolor sit amet consectetur. Lorem ipsum dolor sit amet consectetur...',
+                'Make payments only through the app,\nit’s safer and more secure.',
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14),
               ),
               SizedBox(height: 16),
@@ -686,7 +687,8 @@ class BiddingTaskViewDetailsScreen extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 color: Colors.yellow[100],
                 child: Text(
-                  'Lorem ipsum dolor sit amet consectetur.',
+                  'Make payments only through the app,\nit’s safer and more secure.',
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12),
                 ),
               ),

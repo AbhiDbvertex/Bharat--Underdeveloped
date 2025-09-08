@@ -1320,6 +1320,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 categoryId: order.categoryId,
                 subcategoryIds: order.subcategoryIds,
                 servicePayment: order.servicePayment,
+                latitude: order.latitude,
+                longitude: order.longitude,
               );
             }).toList();
             filteredBiddingOrders = biddingOrders;
@@ -1506,7 +1508,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: screenHeight * 0.05,
+        toolbarHeight: screenHeight * 0.02,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -1731,31 +1733,34 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(screenWidth * 0.02),
-            child: hasImage
-                ? Image.network(
-                    data.image,
-                    height: screenHeight * 0.15,
-                    width: screenWidth * 0.3,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      print(
-                          'Image load nahi hui: ${data.image}, Error: $error');
-                      return Image.asset(
-                        'assets/images/task.png',
-                        height: screenHeight * 0.15,
-                        width: screenWidth * 0.3,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  )
-                : Image.asset(
-                    'assets/images/task.png',
-                    height: screenHeight * 0.15,
-                    width: screenWidth * 0.3,
-                    fit: BoxFit.cover,
-                  ),
+          Container(
+            color: Colors.grey,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+              child: hasImage
+                  ? Image.network(
+                      data.image,
+                      height: screenHeight * 0.15,
+                      width: screenWidth * 0.3,
+                      // fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        print(
+                            'Image load nahi hui: ${data.image}, Error: $error');
+                        return Image.asset(
+                          'assets/images/task.png',
+                          height: screenHeight * 0.15,
+                          width: screenWidth * 0.3,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    )
+                  : Image.asset(
+                      'assets/images/task.png',
+                      height: screenHeight * 0.15,
+                      width: screenWidth * 0.3,
+                      fit: BoxFit.cover,
+                    ),
+            ),
           ),
           SizedBox(width: screenWidth * 0.025),
           Expanded(
@@ -1882,33 +1887,35 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(screenWidth * 0.02),
-            child: Container(
-              alignment: Alignment.topCenter,
-              child: data.imageUrls.isNotEmpty
-                  ? Image.network(
-                      data.imageUrls.first,
-                      height: screenHeight * 0.16,
-                      width: screenWidth * 0.32,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        print(
-                            'Error loading image: ${data.imageUrls.first}, Error: $error');
-                        return Image.asset(
-                          'assets/images/chair.png',
-                          height: screenHeight * 0.16,
-                          width: screenWidth * 0.32,
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      'assets/images/chair.png',
-                      height: screenHeight * 0.16,
-                      width: screenWidth * 0.32,
-                      fit: BoxFit.cover,
-                    ),
+          Container(color: Colors.grey,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: data.imageUrls.isNotEmpty
+                    ? Image.network(
+                        data.imageUrls.first,
+                        height: screenHeight * 0.16,
+                        width: screenWidth * 0.32,
+                        // fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print(
+                              'Error loading image: ${data.imageUrls.first}, Error: $error');
+                          return Image.asset(
+                            'assets/images/chair.png',
+                            height: screenHeight * 0.16,
+                            width: screenWidth * 0.32,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/chair.png',
+                        height: screenHeight * 0.16,
+                        width: screenWidth * 0.32,
+                        fit: BoxFit.cover,
+                      ),
+              ),
             ),
           ),
           SizedBox(width: screenWidth * 0.025),
@@ -2091,29 +2098,32 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
             child: Stack(
               children: [
                 hasImage
-                    ? Image.network(
-                        data.imageUrls!.first,
-                        height: screenHeight * 0.2,
-                        width: screenWidth * 0.3,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: screenHeight * 0.2,
-                            width: screenWidth * 0.3,
-                            alignment: Alignment.center,
-                            child: const CircularProgressIndicator(
-                              color: AppColors.primaryGreen,
-                              strokeWidth: 2.5,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset('assets/images/task.png',
-                                height: screenHeight * 0.2,
-                                width: screenWidth * 0.3,
-                                fit: BoxFit.cover),
-                      )
+                    ? Container(
+                      color: Colors.grey,
+                      child: Image.network(
+                          data.imageUrls!.first,
+                          height: screenHeight * 0.2,
+                          width: screenWidth * 0.3,
+                          // fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: screenHeight * 0.2,
+                              width: screenWidth * 0.3,
+                              alignment: Alignment.center,
+                              child: const CircularProgressIndicator(
+                                color: AppColors.primaryGreen,
+                                strokeWidth: 2.5,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset('assets/images/task.png',
+                                  height: screenHeight * 0.2,
+                                  width: screenWidth * 0.3,
+                                  fit: BoxFit.cover),
+                        ),
+                    )
                     : Image.asset('assets/images/task.png',
                         height: screenHeight * 0.2,
                         width: screenWidth * 0.3,

@@ -87,6 +87,9 @@ class PostTaskScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  TextButton(onPressed: (){
+                    print("Abhi:- print late : ${controller.late} long : ${controller.long}");
+                  }, child: Text("Print data")),
                   TextFormField(
                     enabled: false,
                     controller: controller.addressController,

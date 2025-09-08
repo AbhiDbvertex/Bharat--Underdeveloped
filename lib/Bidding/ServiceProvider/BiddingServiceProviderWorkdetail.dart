@@ -1083,46 +1083,49 @@ class _BiddingserviceproviderworkdetailState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CarouselSlider(
-                      options: CarouselOptions(
-                        height: height * 0.25,
-                        enlargeCenterPage: true,
-                        autoPlay: true,
-                        viewportFraction: 1,
+                    Container(
+                      color: Colors.grey,
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          height: height * 0.25,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                          viewportFraction: 1,
+                        ),
+                        items: biddingOrder!.imageUrls.isNotEmpty
+                            ? biddingOrder!.imageUrls.map((item) {
+                                print('🖼️ Image: $item');
+                                return ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.circular(width * 0.025),
+                                  child: Image.network(
+                                    item,
+                                    // fit: BoxFit.cover,
+                                    width: width,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      print(
+                                          '❌ Image error: $item, Error: $error');
+                                      return Image.asset(
+                                        'assets/images/chair.png',
+                                        fit: BoxFit.cover,
+                                        width: width,
+                                      );
+                                    },
+                                  ),
+                                );
+                              }).toList()
+                            : [
+                                ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.circular(width * 0.025),
+                                  child: Image.asset(
+                                    'assets/images/chair.png',
+                                    fit: BoxFit.cover,
+                                    width: width,
+                                  ),
+                                ),
+                              ],
                       ),
-                      items: biddingOrder!.imageUrls.isNotEmpty
-                          ? biddingOrder!.imageUrls.map((item) {
-                              print('🖼️ Image: $item');
-                              return ClipRRect(
-                                borderRadius:
-                                    BorderRadius.circular(width * 0.025),
-                                child: Image.network(
-                                  item,
-                                  fit: BoxFit.cover,
-                                  width: width,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    print(
-                                        '❌ Image error: $item, Error: $error');
-                                    return Image.asset(
-                                      'assets/images/chair.png',
-                                      fit: BoxFit.cover,
-                                      width: width,
-                                    );
-                                  },
-                                ),
-                              );
-                            }).toList()
-                          : [
-                              ClipRRect(
-                                borderRadius:
-                                    BorderRadius.circular(width * 0.025),
-                                child: Image.asset(
-                                  'assets/images/chair.png',
-                                  fit: BoxFit.cover,
-                                  width: width,
-                                ),
-                              ),
-                            ],
                     ),
                     SizedBox(height: height * 0.015),
                     Row(
@@ -1155,8 +1158,9 @@ class _BiddingserviceproviderworkdetailState
         // );
         // },
                             onTap: (){
-                              openMap(biddingOrder?.userId?.location?.latitude ?? 0.0,
-                                biddingOrder?.userId?.location?.longitude ?? 0.0,);
+                              openMap(biddingOrder?.latitude ?? 0.0,
+                                biddingOrder?.longitude ?? 0.0,);
+                              print("Abhi:- print latitude : ${biddingOrder?.latitude ?? 0.0} logiture ${biddingOrder?.longitude ?? 0.0}");
                             },
 
                             child: Container(
@@ -1751,7 +1755,8 @@ class _BiddingserviceproviderworkdetailState
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Lorem ipsum dolor sit amet consectetur.',
+                                  'Make payments only through the app,\nit’s safer and more secure.',
+                                  textAlign: TextAlign.center,
                                   style: GoogleFonts.roboto(
                                     fontSize: 14,
                                     color: Colors.black87,

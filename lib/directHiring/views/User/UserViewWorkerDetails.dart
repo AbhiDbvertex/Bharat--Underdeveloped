@@ -720,6 +720,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 ),
                 const SizedBox(height: 8),
                 Text(
+                  // "Abhi",
                   workerData?.fullName ?? '',
                   style: GoogleFonts.roboto(
                     fontSize: 16,
@@ -879,7 +880,9 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                biddingOfferId: widget.biddingOfferId,
                oderId: widget.oderId,
                UserId: widget.UserId,
-             ) : GestureDetector(
+             ) : SizedBox(),
+
+                widget.hirebuttonhide == 'hideOnly' ? SizedBox(): GestureDetector(
                   onTap: () {
                     if (widget.workerId != null &&
                         widget.workerId!.isNotEmpty) {

@@ -395,18 +395,19 @@ class _MyHireScreenState extends State<MyHireScreen> {
       padding: const EdgeInsets.all(8.0),
       child: SingleChildScrollView(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextFormField(
-              readOnly: true,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                prefixIcon: Icon(Icons.search),
-                hintText: "Search for services",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-            ),
+            // TextFormField(
+            //   readOnly: true,
+            //   decoration: InputDecoration(
+            //     contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            //     prefixIcon: Icon(Icons.search),
+            //     hintText: "Search for services",
+            //     border: OutlineInputBorder(
+            //       borderRadius: BorderRadius.circular(15),
+            //     ),
+            //   ),
+            // ),
             SizedBox(height: 10),
             // Check if dataList is empty
             if (dataList.isEmpty)
@@ -475,25 +476,28 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         children: [
                           // left image
                           Center(
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: imageUrl.isNotEmpty
-                                    ? Image.network(
-                                  'https://api.thebharatworks.com/${imageUrl}',
-                                  height: 125,
+                            child: Container(
+                              color:Colors.grey,
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: imageUrl.isNotEmpty
+                                      ? Image.network(
+                                    'https://api.thebharatworks.com/${imageUrl}',
+                                    height: 125,
+                                    width: 100,
+                                    // fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.image_not_supported_outlined,size: 100,);
+                                  },
+                                  )
+                                      : /*Image.asset(
+                                  "assets/images/Work.png",
+                                  height: 100,
                                   width: 100,
                                   fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.image_not_supported_outlined,size: 100,);
-                                },
-                                )
-                                    : /*Image.asset(
-                                "assets/images/Work.png",
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),*/
-                                Icon(Icons.image_not_supported_outlined,size: 100,)
+                                ),*/
+                                  Icon(Icons.image_not_supported_outlined,size: 100,)
+                              ),
                             ),
                           ),
                           SizedBox(width: 10),
@@ -679,26 +683,29 @@ class _MyHireScreenState extends State<MyHireScreen> {
         children: [
           // Left side image
           Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: imageshow != null && imageshow.isNotEmpty
-                  ? Image.network(
-                imageshow,
-                height: 180,
-                width: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
+            child: Container(
+              color: Colors.grey,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: imageshow != null && imageshow.isNotEmpty
+                    ? Image.network(
+                  imageshow,
+                  height: 180,
+                  width: 100,
+                  // fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                    'assets/images/task.png',
+                    height: 180,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : Image.asset(
                   'assets/images/task.png',
                   height: 180,
                   width: 100,
                   fit: BoxFit.cover,
                 ),
-              )
-                  : Image.asset(
-                'assets/images/task.png',
-                height: 180,
-                width: 100,
-                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -903,56 +910,59 @@ class _MyHireScreenState extends State<MyHireScreen> {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Stack(
-              children: [
-                hasImage
-                    ? Image.network(
-                  data.imageUrls!.first, // first image show karenge
-                  height: 200,
-                  width: 110,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 200,
-                      width: 110,
-                      alignment: Alignment.center,
-                      child: const CircularProgressIndicator(
-                        color: AppColors.primaryGreen,
-                        strokeWidth: 2.5,
+          Container(
+            color: Colors.grey,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                children: [
+                  hasImage
+                      ? Image.network(
+                    data.imageUrls!.first, // first image show karenge
+                    height: 200,
+                    width: 110,
+                    // fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200,
+                        width: 110,
+                        alignment: Alignment.center,
+                        child: const CircularProgressIndicator(
+                          color: AppColors.primaryGreen,
+                          strokeWidth: 2.5,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) =>
+                        Image.asset('assets/images/task.png',
+                            height: 150, width: 110, fit: BoxFit.cover),
+                  )
+                      : Image.asset('assets/images/task.png',
+                      height: 150, width: 110, fit: BoxFit.cover),
+                  Positioned(
+                    bottom: 5,
+                    left: 5,
+                    right: 5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(15), // corner circle
                       ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) =>
-                      Image.asset('assets/images/task.png',
-                          height: 150, width: 110, fit: BoxFit.cover),
-                )
-                    : Image.asset('assets/images/task.png',
-                    height: 150, width: 110, fit: BoxFit.cover),
-                Positioned(
-                  bottom: 5,
-                  left: 5,
-                  right: 5,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(15), // corner circle
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    child: Text(
-                      "${data.projectId ?? 'N/A'}", // product id
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      child: Text(
+                        "${data.projectId ?? 'N/A'}", // product id
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 10),

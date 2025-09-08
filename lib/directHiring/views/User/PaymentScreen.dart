@@ -3284,7 +3284,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  "Lorem ipsum dolor sit amet consectetur.",
+                  "Make payments only through the app,\nit’s safer and more secure.",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.black87),
                 ),

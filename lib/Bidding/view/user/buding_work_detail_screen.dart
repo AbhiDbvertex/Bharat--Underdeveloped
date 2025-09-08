@@ -602,6 +602,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
 
     final title = data?['title'] ?? 'N/A';
     final address = data?['address'] ?? 'N/A';
+    final latitude = data?['latitude'] ?? 'N/A';
     final description = data?['description'] ?? 'N/A';
     final cost = data?['cost']?.toString() ?? '0';
     final deadline = data?['deadline'] != null
@@ -666,43 +667,45 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                           ],
                         ),
                         SizedBox(height: height * 0.01),
-                        CarouselSlider(
-                          options: CarouselOptions(
-                            height: height * 0.25,
-                            enlargeCenterPage: true,
-                            autoPlay: imageUrls.isNotEmpty,
-                            viewportFraction: 0.85,
-                          ),
-                          items: imageUrls.isNotEmpty
-                              ? imageUrls
-                                  .map((url) => Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          image: DecorationImage(
-                                            image: NetworkImage(url.trim()),
-                                            fit: BoxFit.cover,
-                                            onError: (exception, stackTrace) =>
-                                                Image.asset(
-                                              'assets/images/Bid.png',
-                                              fit: BoxFit.cover,
+                        Container(color: Colors.grey,
+                          child: CarouselSlider(
+                            options: CarouselOptions(
+                              height: height * 0.25,
+                              enlargeCenterPage: true,
+                              autoPlay: imageUrls.isNotEmpty,
+                              viewportFraction: 0.85,
+                            ),
+                            items: imageUrls.isNotEmpty
+                                ? imageUrls
+                                    .map((url) => Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: DecorationImage(
+                                              image: NetworkImage(url.trim()),
+                                              // fit: BoxFit.cover,
+                                              onError: (exception, stackTrace) =>
+                                                  Image.asset(
+                                                'assets/images/Bid.png',
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
                                           ),
+                                        ))
+                                    .toList()
+                                : [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        image: const DecorationImage(
+                                          image:
+                                              AssetImage('assets/images/Bid.png'),
+                                          fit: BoxFit.cover,
                                         ),
-                                      ))
-                                  .toList()
-                              : [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      image: const DecorationImage(
-                                        image:
-                                            AssetImage('assets/images/Bid.png'),
-                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                          ),
                         ),
                         SizedBox(height: height * 0.015),
                         Padding(
@@ -727,11 +730,11 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                   //   ),
                                   // );
 
-                                    openMap(data?['user_id']?['location']?['latitude'] ?? 'N/A',
-                                        data?['user_id']?['location']?['longitude'] ?? 'N/A');
+                                    openMap(data?['latitude'] ?? 0.0,
+                                        data?['longitude'] ?? 0.0);
 
                                   print(
-                                      "Abhi:- get oder Details lat for bidding : ${data?['user_id']?['location']?['latitude'] ?? 'N/A'} long : ${data?['user_id']?['location']?['longitude'] ?? 'N/A'}");
+                                      "Abhi:- get oder Details lat for bidding : ${data?['latitude'] ?? 0.0} long : ${data?['longitude'] ?? 0.0} address ${data?['address'] ?? ""}");
                                 },
                                 child: Container(
                                   height: MediaQuery.of(context).size.height *
@@ -747,9 +750,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                       padding: const EdgeInsets.all(3.0),
                                       child: Text(
                                         // address.split(',').last.trim(),
-                                        data?['user_id']?['location']
-                                        ?['address'] ??
-                                            'N/A',
+                                        // data?['user_id']?['location']
+                                        // ?['address'] ??
+                                        //     'N/A',
+                                        data?['address'] ?? "",
                                         style: GoogleFonts.roboto(
                                           color: Colors.white,
                                           fontSize:

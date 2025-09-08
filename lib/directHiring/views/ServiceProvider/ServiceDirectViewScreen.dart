@@ -3384,54 +3384,56 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       order!['image_url'] != null &&
                               (order!['image_url'] is List &&
                                   order!['image_url'].isNotEmpty)
-                          ? CarouselSlider(
-                              options: CarouselOptions(
-                                height: 200.0,
-                                autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 3),
-                                autoPlayAnimationDuration:
-                                    const Duration(milliseconds: 800),
-                                viewportFraction: 1.0, // Full screen width
-                                enableInfiniteScroll: true,
-                                enlargeCenterPage: false, // No scaling
-                              ),
-                              items:
-                                  (order!['image_url'] as List).map((imageUrl) {
-                                final url = imageUrl.startsWith('http')
-                                    ? imageUrl
-                                    : 'https://api.thebharatworks.com$imageUrl';
-                                print("📸 Carousel Image URL: $url");
-                                return Builder(
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      margin:
-                                          EdgeInsets.zero, // No extra margin
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(4),
-                                        child: Image.network(
-                                          url,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: 200,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            print(
-                                                "📸 Image load me lafda: $error");
-                                            return Image.asset(
-                                              'assets/images/task.png',
-                                              fit: BoxFit.cover,
-                                              width: double.infinity,
-                                              height: 200,
-                                            );
-                                          },
+                          ? Container(color: Colors.grey,
+                            child: CarouselSlider(
+                                options: CarouselOptions(
+                                  height: 200.0,
+                                  autoPlay: true,
+                                  autoPlayInterval: const Duration(seconds: 3),
+                                  autoPlayAnimationDuration:
+                                      const Duration(milliseconds: 800),
+                                  viewportFraction: 1.0, // Full screen width
+                                  enableInfiniteScroll: true,
+                                  enlargeCenterPage: false, // No scaling
+                                ),
+                                items:
+                                    (order!['image_url'] as List).map((imageUrl) {
+                                  final url = imageUrl.startsWith('http')
+                                      ? imageUrl
+                                      : 'https://api.thebharatworks.com$imageUrl';
+                                  print("📸 Carousel Image URL: $url");
+                                  return Builder(
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        width: MediaQuery.of(context).size.width,
+                                        margin:
+                                            EdgeInsets.zero, // No extra margin
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(4),
+                                          child: Image.network(
+                                            url,
+                                            // fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: 200,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              print(
+                                                  "📸 Image load me lafda: $error");
+                                              return Image.asset(
+                                                'assets/images/task.png',
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: 200,
+                                              );
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }).toList(),
-                            )
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                          )
                           : Image.asset(
                               'assets/images/task.png',
                               height: 200,
@@ -4151,7 +4153,8 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Lorem ipsum dolor sit amet consectetur.',
+                                    'Make payments only through the app,\nit’s safer and more secure.',
+                                    textAlign: TextAlign.center,
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       color: Colors.black87,
