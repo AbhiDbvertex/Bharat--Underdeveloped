@@ -14,6 +14,7 @@ import '../../../Bidding/controller/buding_postTask_controller.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
+import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../Account/RazorpayScreen.dart';
 import 'package:get/get.dart';
 class HireScreen extends StatefulWidget {
@@ -41,10 +42,108 @@ class _HireScreenState extends State<HireScreen> {
   List<XFile> selectedImages = [];
   int? platformFee;
   final controller = Get.put(PostTaskController(), permanent: false);
+  var isLoading = true;
+  var profile = Rxn<ServiceProviderProfileModel>();
+  var late;
+  var long;
+  var addre;
+
   @override
   void initState() {
     super.initState();
     fetchPlatformFee();
+    fetchProfile();
+  }
+
+  // Abhishek added this api
+
+  Future<void> fetchProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      if (token.isEmpty) {
+        if (Get.context != null && Get.context!.mounted) {
+          // showSnackbar("Error", "No token found. Please log in again.", context: Get.context!);
+        }
+        isLoading = false;
+        return;
+      }
+
+      final url = Uri.parse(
+        "https://api.thebharatworks.com/api/user/getUserProfileData",
+      );
+      final response = await http.get(
+        url,
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+      print("📡 Full API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("📋 Data: $data");
+
+        if (data['status'] == true) {
+          String apiLocation = 'Select Location';
+          String? addressId;
+
+          if (data['data']?['full_address'] != null &&
+              data['data']['full_address'].isNotEmpty) {
+            final addresses = data['data']['full_address'] as List;
+            final currentLocations =
+            addresses.where((addr) => addr['title'] == 'Current Location').toList();
+            if (currentLocations.isNotEmpty) {
+              final latestLocation = currentLocations.last;
+              apiLocation = latestLocation['address'] ?? 'Select Location';
+              addressId = latestLocation['_id'];
+            } else {
+              final latestAddress = addresses.last;
+              apiLocation = latestAddress['address'] ?? 'Select Location';
+              addressId = latestAddress['_id'];
+            }
+          }
+
+          final latitude;
+          final longitude;
+          final address;
+          latitude = data['data']?['location']?['latitude'];
+          longitude = data['data']?['location']?['longitude'];
+          address = data['data']?['location']?['address'];
+
+          late = latitude;
+          long = longitude;
+          addre = address;
+
+          print('Abhi:- get user lat : $latitude long : $longitude Address : $addre');
+
+          await prefs.setString("address", apiLocation);
+          if (addressId != null) {
+            await prefs.setString("selected_address_id", addressId);
+          }
+
+          profile.value = ServiceProviderProfileModel.fromJson(data['data']);
+          // userLocation.value = apiLocation;
+          addressController.text = apiLocation; // Sync addressController
+          isLoading = false;
+          print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
+        } else {
+          if (Get.context != null && Get.context!.mounted) {
+            // showSnackbar("Error", data["message"] ?? "Failed to fetch profile.", context: Get.context!);
+          }
+          isLoading = false;
+        }
+      } else {
+        if (Get.context != null && Get.context!.mounted) {
+          // showSnackbar("Error", "Server error. Failed to fetch profile.", context: Get.context!);
+        }
+        isLoading = false;
+      }
+    } catch (e) {
+      print("❌ Error fetching profile: $e");
+      if (Get.context != null && Get.context!.mounted) {
+        // showSnackbar("Error", "Something went wrong. Please try again.", context: Get.context!);
+      }
+      isLoading = false;
+    }
   }
 
   // ✅ Platform fee fetch karne ka function
@@ -319,8 +418,10 @@ class _HireScreenState extends State<HireScreen> {
     request.fields['description'] = description;
     request.fields['address'] = controller.addressController.text;
     request.fields['deadline'] = deadline; // ✅ Deadline mein time bhi add kiya
+    request.fields['latitude'] = late.toString();
+    request.fields['longitude'] = long.toString();
 
-    print("📤 Fields being sent:");
+    print("📤 Fields being sent: lat : $late long : $long");
     request.fields.forEach((key, value) {
       print(" - $key: $value");
     });

@@ -3472,9 +3472,10 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                           //     ),
                           //   ),
                           // );
-                          openMap(order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
-                            order?['service_provider_id']?['location']?['longitude'] ?? 'No long',);
-                          print("Abhi:- get oder Details lat : ${order?['service_provider_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['service_provider_id']?['location']?['longitude'] ?? 'No long'}");
+                          openMap(order?['latitude'] ?? 'No lat',
+                            order?['longitude'] ?? 'No long',);
+
+                          print("Abhi:- get oder Details lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
                         },
                         child: Container(
                           height: 24,
@@ -3489,14 +3490,15 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                             padding: const EdgeInsets.all(3.0),
                             child: Text(
                               // "",
-                              // order!['address'] ?? '',
-                            order?['service_provider_id']?['location']?['address'] ?? 'No long',
+                              order!['address'] ?? '',
+                            // order?['service_provider_id']?['location']?['address'] ?? 'No long',
                               style: const TextStyle(color: Colors.white),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 10),
                       Text(
                         "Completion: ${order!['deadline']?.toString().substring(0, 10) ?? 'N/A'}",

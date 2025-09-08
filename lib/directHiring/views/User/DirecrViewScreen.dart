@@ -754,10 +754,12 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: (){
+                        onTap: (){                                  //           Abhishek add map
 
-                            openMap(order?['user_id']?['location']?['latitude'] ?? 'No lat',
-                              order?['user_id']?['location']?['longitude'] ?? 'No long',);
+                            // openMap(order?['user_id']?['location']?['latitude'] ?? 'No lat',
+                            //   order?['user_id']?['location']?['longitude'] ?? 'No long',);
+                            openMap(order?['latitude'] ?? 'No lat',
+                              order?['longitude'] ?? 'No long',);
 
 
                           // Navigator.push(
@@ -769,7 +771,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                           //     ),
                           //   ),
                           // );
-                          print("Abhi:- print lat : ${order?['user_id']?['location']?['latitude'] ?? 'No lat'} long : ${order?['user_id']?['location']?['latitude'] ?? 'No long'}");
+                          print("Abhi:- print lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
                         },
                         child: Container(
                           height: 24,
@@ -780,8 +782,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                             color: Colors.red,
                           ),
                           child: Text(
-                            // order!['address'] ?? '',
-                            order?['user_id']?['location']?['address'] ?? 'No lat',
+                            order!['address'] ?? '',
+                            // order?['user_id']?['location']?['address'] ?? 'No lat',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
