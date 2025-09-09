@@ -5,7 +5,9 @@ class DirectOrder {
   final String date;
   final String status;
   final String image; // First image
-  final String? address; // <-- yeh add kiya
+  final String? address;
+  final double? latitude;
+  final double? longitude;
   final User? user_id;
   final List<Offer>? offer_history;
 
@@ -16,7 +18,9 @@ class DirectOrder {
     required this.date,
     required this.status,
     required this.image,
-    this.address, // <-- yeh add kiya
+    this.address,
+    this.latitude,
+    this.longitude,
     this.user_id,
     this.offer_history,
   });
@@ -34,7 +38,9 @@ class DirectOrder {
           (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
               ? json['image_url'][0]
               : '',
-      address: json['address'] ?? '', // <-- yaha se address pick karega
+      address: json['address'] ?? '',
+      latitude: json['latitude'] ?? 0.0,
+      longitude: json['longitude'] ?? 0.0,
       user_id: json['user_id'] != null ? User.fromJson(json['user_id']) : null,
       offer_history: json['offer_history'] != null
           ? (json['offer_history'] as List)

@@ -278,7 +278,8 @@ class _SpEmergencyWorkPageState extends State<SpEmergencyWorkPage> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          MapLauncher.openMap(address: data.googleAddress);
+                          // MapLauncher.openMap(address: data.googleAddress);
+                          MapLauncher.openMap(latitude: data.latitude,longitude: data.longitude,address: data.googleAddress);
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),

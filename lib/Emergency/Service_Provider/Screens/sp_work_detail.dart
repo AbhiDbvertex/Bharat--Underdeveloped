@@ -721,7 +721,11 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                           GestureDetector(
                             onTap: () async {
                               final address = controller.googleAddress.value;
-                              bool success=await MapLauncher.openMap(address: address);
+                              final latitude = controller.latitude.value;
+                              final longitude = controller.longitude.value;
+
+                              // bool success=await MapLauncher.openMap(address: address);
+                              bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
                               if(!success) {
                                 SnackBarHelper.showSnackBar(context, "Could not open the map");
                               }
@@ -972,7 +976,6 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                 ),
                               );*/SizedBox();
                             } else {
-                              // default -> show Accept / Reject buttons
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [

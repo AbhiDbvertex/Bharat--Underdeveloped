@@ -25,6 +25,8 @@ class SpWorkDetailController extends GetxController {
   var categoryName = "".obs;
   var subCategories = "".obs;
   var googleAddress = "".obs;
+  var latitude=0.0.obs;
+  var longitude=0.0.obs;
   var detailedAddress = "".obs;
   var contact = "".obs;
   var deadline = "".obs;
@@ -119,6 +121,8 @@ class SpWorkDetailController extends GetxController {
         subCategories.value =
             dataModel.data?.subCategoryIds?.map((e) => e.name).join(", ") ?? "";
         googleAddress.value = dataModel.data?.googleAddress ?? "";
+        latitude.value = dataModel.data?.latitude ?? 0.0;
+        longitude.value = dataModel.data?.longitude ?? 0.0;
         detailedAddress.value = dataModel.data?.detailedAddress ?? "";
         contact.value = dataModel.data?.contact ?? "";
 
@@ -162,7 +166,7 @@ class SpWorkDetailController extends GetxController {
       }
     } catch (e) {
       result = false;
-      bwDebug("⚠️ Exception: $e", tag: tag);
+      bwDebug("[getEmergencyOrder]⚠️ Exception: $e", tag: tag);
     } finally {
       isLoading.value = false;
     }

@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Bidding/controller/buding_postTask_controller.dart';
+import '../../../Bidding/controller/bidding_post_task_controller.dart';
 
 class EmergencyScreen extends StatefulWidget {
   @override
@@ -19,6 +19,7 @@ class EmergencyScreen extends StatefulWidget {
 }
 
 class _EmergencyScreenState extends State<EmergencyScreen> {
+  final tag="EmergencyServiceScreen";
   final controller = Get.put(EmergencyServiceController());
   TextStyle fieldHintStyle = TextStyle(
     fontSize: 14,
@@ -30,13 +31,19 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    controller.calculateFee();
     super.initState();
+    controller.calculateFee();
     SharedPreferences.getInstance().then((prefs) {
-      String? savedLocation = prefs.getString('selected_location');
+      String? savedLocation = prefs.getString('selected_location') ?? prefs.getString('address');
+      var savedLatitude = prefs.getDouble('user_latitude');
+      var savedLongitude = prefs.getDouble('user_longitude');
+
       if (savedLocation != null && savedLocation != 'Select Location') {
         setState(() {
           controller.googleAddressController.text = savedLocation;
+          controller.latitude.value = savedLatitude;
+          controller.longitude.value = savedLongitude;
+
           bwDebug(
               "📍 Pre-populated googleAddressController with: $savedLocation");
         });
@@ -44,10 +51,14 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         bwDebug("📍 No valid saved location found");
       }
     });
+    // await controller.loadSavedLocation();
   }
 
   @override
   Widget build(BuildContext context) {
+    bwDebug("address: ${controller.googleAddressController.text}\n"
+        "latitude: ${controller.latitude.value}\n"
+        "longitude: ${controller.longitude.value}",tag: tag);
     final postTaskController = Get.put(PostTaskController(), permanent: false);
 
     return Scaffold(

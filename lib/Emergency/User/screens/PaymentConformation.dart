@@ -194,7 +194,7 @@ class PaymentConformationScreen extends StatelessWidget {
                       InkWell(
                         onTap: () async {
                           final razorPayId=responseModel.razorpayOrder?.id;
-                          final amount=(responseModel.razorpayOrder?.amount)!/100;
+                          final amount=(responseModel.razorpayOrder?.amount)!;
                           final provierId=responseModel.order?.serviceProviderId;
                           final paymentSuccess = await Navigator.push(
                             context,

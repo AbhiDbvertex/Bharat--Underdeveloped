@@ -380,6 +380,8 @@ class SpEmergencyOrderListModel {
 class SpEmergencyOrderData {
   SpServicePayment servicePayment;
   SpCommission commission;
+  double? latitude;
+  double? longitude;
   String id;
   SpUser userId;
   String projectId;
@@ -406,6 +408,8 @@ class SpEmergencyOrderData {
   SpEmergencyOrderData({
     required this.servicePayment,
     required this.commission,
+    this.latitude,
+    this.longitude,
     required this.id,
     required this.userId,
     required this.projectId,
@@ -434,7 +438,10 @@ class SpEmergencyOrderData {
     return SpEmergencyOrderData(
       servicePayment: SpServicePayment.fromJson(json['service_payment']),
       commission: SpCommission.fromJson(json['commission']),
-      id: json['_id'] ?? '',
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
+
+    id: json['_id'] ?? '',
       userId: SpUser.fromJson(json['user_id']),
       projectId: json['project_id'] ?? '',
       categoryId: SpCategory.fromJson(json['category_id']),
@@ -470,7 +477,9 @@ class SpEmergencyOrderData {
     return {
       "service_payment": servicePayment.toJson(),
       "commission": commission.toJson(),
-      "_id": id,
+    "latitude" : latitude,
+    "longitude" : longitude,
+    "_id": id,
       "user_id": userId.toJson(),
       "project_id": projectId,
       "category_id": categoryId.toJson(),

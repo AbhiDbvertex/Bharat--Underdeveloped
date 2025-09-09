@@ -6,8 +6,8 @@
 // import 'package:mime/mime.dart' as mime;
 // import '../../../../Widgets/AppColors.dart';
 // import '../../../directHiring/views/auth/MapPickerScreen.dart';
-// import '../../controller/bidding_postTask_controller.dart';
-// import '../../controller/buding_postTask_controller.dart';
+// import '../../controller/bidding_post_task_Edit_controller.dart';
+// import '../../controller/bidding_post_task_controller.dart';
 //
 // class PostTaskEditScreen extends StatelessWidget {
 //   final biddingOderId;
@@ -413,8 +413,8 @@ import 'package:mime/mime.dart' as mime;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
-import '../../controller/bidding_postTask_controller.dart';
-import '../../controller/buding_postTask_controller.dart';
+import '../../controller/bidding_post_task_Edit_controller.dart';
+import '../../controller/bidding_post_task_controller.dart';
 
 class PostTaskEditScreen extends StatefulWidget {
   final biddingOderId;

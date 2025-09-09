@@ -38,7 +38,8 @@ class EmergencyServiceController extends GetxController {
 
   /// ------------------ TASK FEE -------------------
   var taskFee = 0.obs;
-
+  var latitude = RxnDouble();
+  var longitude = RxnDouble();
   /// ------------------ INIT -------------------
   @override
   void onInit() {
@@ -173,7 +174,10 @@ class EmergencyServiceController extends GetxController {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    bwDebug("token: $token,address ${googleAddressController.text}");
+    bwDebug("token: $token,\n"
+        "address ${googleAddressController.value.text}\n"
+        "latitude: ${latitude.value}\n"
+        "longitude: ${longitude.value}",tag: tag);
 
     // validation
     if (selectedCategoryId.value.isEmpty ||
@@ -200,6 +204,8 @@ class EmergencyServiceController extends GetxController {
     request.fields['detailed_address'] = detailedAddressController.text;
     request.fields['contact'] = contactController.text;
     request.fields['deadline'] = selectedDateTime.value!.toIso8601String();
+    request.fields['latitude'] = latitude.value?.toString() ?? '';
+    request.fields['longitude'] = longitude.value?.toString() ?? '';
     // request.fields['sub_category_ids'] = jsonEncode(selectedSubCategoryIds);
 
     // for (var id in selectedSubCategoryIds) {
@@ -301,7 +307,27 @@ class EmergencyServiceController extends GetxController {
     super.onClose();
   }
 
+  Future<void> loadSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    googleAddressController.text =await prefs.getString('selected_location') ?? '';
+    latitude.value = await prefs.getDouble('user_latitude');
+    longitude.value =await  prefs.getDouble('user_longitude');
 
+    bwDebug("📍 Loaded from prefs: ${googleAddressController.text} "
+        "(${latitude.value}, ${longitude.value})");
+  }
+  Future<void> updateLocation(String newAddress, double lat, double lng) async {
+    googleAddressController.text = newAddress;
+    latitude.value = lat;
+    longitude.value = lng;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_location', newAddress);
+    await prefs.setDouble('user_latitude', lat);
+    await prefs.setDouble('user_longitude', lng);
+
+    bwDebug("📍 Updated location: $newAddress ($lat,$lng)");
+  }
   Future<EmergencyListModel?> getEmergencyOrder() async {
     isLoading.value=true;
     bwDebug("[getEmergencyOrderUser] call: ",tag:tag);

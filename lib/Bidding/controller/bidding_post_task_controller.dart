@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:geocoding/geocoding.dart';
@@ -764,8 +765,10 @@ class PostTaskController extends GetxController {
           userLocation.value = locationData['address'] ?? 'Select Location';
           addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
           emergencyServiceController.googleAddressController.text = locationData['address'] ?? 'Select Location';
+          emergencyServiceController.latitude.value=locationData['latitude']??"";
+          emergencyServiceController.longitude.value=locationData['longitude']??"";
           debugPrint(
-            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']})",
+            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']}), location data: $locationData",
           );
         },
       ),
@@ -775,6 +778,7 @@ class PostTaskController extends GetxController {
       double latitude = result['latitude'] ?? 0.0;
       double longitude = result['longitude'] ?? 0.0;
       String? addressId = result['addressId'];
+      bwDebug("address: $newAddress\n latitude : $latitude\n longitude: $longitude",tag: "builtPostTask");
       if (newAddress != 'Select Location' && latitude != 0.0 && longitude != 0.0) {
         await updateLocationOnServer(newAddress, latitude, longitude);
         if (addressId != null) {
@@ -783,6 +787,13 @@ class PostTaskController extends GetxController {
         }
         await fetchLocation();
         emergencyServiceController.googleAddressController.text = newAddress;
+        emergencyServiceController.latitude.value=latitude;
+        emergencyServiceController.longitude.value=longitude;
+        bwDebug("address: ${emergencyServiceController.googleAddressController.text}"
+            "\n latitude : ${emergencyServiceController.latitude.value}"
+            "\n longitude: ${emergencyServiceController.longitude.value}",tag: "builtPostTask");
+
+
       } else {
         debugPrint("❌ Invalid location data received: $result");
         showSnackbar("Error", "Invalid location data. Please try again.", context: Get.context!);

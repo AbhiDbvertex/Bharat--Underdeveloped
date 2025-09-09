@@ -60,7 +60,7 @@ class SpAssignedWorker {
   String? dob;
   String? address;
   String? image;
-  String? aadharImage;
+  List<String>? aadharImage;
   String? serviceProviderId;
   String? verifyStatus;
   List<SpAssignOrder>? assignOrders;
@@ -91,7 +91,9 @@ class SpAssignedWorker {
     dob = json['dob'];
     address = json['address'];
     image = json['image'];
-    aadharImage = json['aadharImage'];
+    if (json['aadharImage'] != null) {
+      aadharImage = List<String>.from(json['aadharImage']);
+    }
     serviceProviderId = json['service_provider_id'];
     verifyStatus = json['verifyStatus'];
     if (json['assignOrders'] != null) {
@@ -113,8 +115,9 @@ class SpAssignedWorker {
     map['dob'] = dob;
     map['address'] = address;
     map['image'] = image;
-    map['aadharImage'] = aadharImage;
-    map['service_provider_id'] = serviceProviderId;
+    if (aadharImage != null) {
+      map['aadharImage'] = aadharImage;
+    }    map['service_provider_id'] = serviceProviderId;
     map['verifyStatus'] = verifyStatus;
     if (assignOrders != null) {
       map['assignOrders'] = assignOrders!.map((v) => v.toJson()).toList();
@@ -150,6 +153,8 @@ class SpAssignOrder {
 class SpData {
   String? id;
   SpUserId? userId;
+  double? latitude;
+  double? longitude;
   String? projectId;
   SpCategoryId? categoryId;
   List<SpSubCategoryIds>? subCategoryIds;
@@ -184,6 +189,8 @@ class SpData {
         this.categoryId,
         this.subCategoryIds,
         this.googleAddress,
+        this.latitude,
+        this.longitude,
         this.detailedAddress,
         this.contact,
         this.deadline,
@@ -222,7 +229,8 @@ class SpData {
     detailedAddress = json['detailed_address'];
     contact = json['contact'];
     deadline = json['deadline'];
-
+    latitude= (json['latitude'] as num?)?.toDouble();
+    longitude= (json['longitude'] as num?)?.toDouble();
     imageUrls = json['image_urls'] != null
         ? json['image_urls'].cast<String>()
         : null;
@@ -269,6 +277,8 @@ class SpData {
       map['sub_category_ids'] =
           subCategoryIds!.map((v) => v.toJson()).toList();
     }
+    map['latitude'] = latitude;
+    map['longitude'] = longitude;
     map['google_address'] = googleAddress;
     map['detailed_address'] = detailedAddress;
     map['contact'] = contact;
@@ -330,15 +340,18 @@ class SpUserId {
   String? id;
   String? phone;
   String? fullName;
-  String? profilePic;
-  SpUserId({this.id, this.phone, this.fullName, this.profilePic});
+  // String? profilePic;
+  SpLocation? location;
+  SpUserId({this.id, this.phone, this.fullName, /*this.profilePic,*/this.location});
 
   SpUserId.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
     fullName = json['full_name'];
-    profilePic = json['profile_pic'];
-
+   // profilePic = json['profile_pic'];
+    location= json['location'] != null
+        ? SpLocation.fromJson(json['location'] as Map<String, dynamic>)
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -346,9 +359,38 @@ class SpUserId {
     map['_id'] = id;
     map['phone'] = phone;
     map['full_name'] = fullName;
-    map['profile_pic'] = profilePic;
-
+    //map['profile_pic'] = profilePic;
+    if (location != null) {
+      map['location'] = location!.toJson();
+    }
     return map;
+  }
+}
+class SpLocation {
+  final double latitude;
+  final double longitude;
+  final String address;
+
+  SpLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.address,
+  });
+
+  factory SpLocation.fromJson(Map<String, dynamic> json) {
+    return SpLocation(
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      address: json['address'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'address': address,
+    };
   }
 }
 
@@ -532,14 +574,18 @@ class SpServiceProvider {
   String? phone;
   String? fullName;
   String? profilePic;
+  SpSpLocation?  location;
 
-  SpServiceProvider({this.id, this.phone, this.fullName, this.profilePic});
+  SpServiceProvider({this.id, this.phone, this.fullName, this.profilePic,this.location});
 
   SpServiceProvider.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     phone = json['phone'];
     fullName = json['full_name'];
-    profilePic = json['profile_pic'];
+   profilePic = json['profile_pic'];
+    location= json['location'] != null
+        ? SpSpLocation.fromJson(json['location'] as Map<String, dynamic>)
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -547,10 +593,45 @@ class SpServiceProvider {
     map['_id'] = id;
     map['phone'] = phone;
     map['full_name'] = fullName;
-    map['profile_pic'] = profilePic;
+   map['profile_pic'] = profilePic;
+    if (location != null) {
+      map['location'] = location!.toJson();
+    }
     return map;
   }
 }
+
+class SpSpLocation {
+  final double latitude;
+  final double longitude;
+  final String address;
+
+   SpSpLocation
+  ({
+    required this.latitude,
+    required this.longitude,
+    required this.address,
+  });
+
+  factory  SpSpLocation
+      .fromJson(Map<String, dynamic> json) {
+    return  SpSpLocation
+  (
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      address: json['address'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'address': address,
+    };
+  }
+}
+
 
 // SpWarningMessage class
 class SpWarningMessage {

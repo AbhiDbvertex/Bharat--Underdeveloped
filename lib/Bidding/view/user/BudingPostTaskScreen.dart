@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart' as mime;
 import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
-import '../../controller/buding_postTask_controller.dart';
+import '../../controller/bidding_post_task_controller.dart';
 
 class PostTaskScreen extends StatelessWidget {
   const PostTaskScreen({super.key});

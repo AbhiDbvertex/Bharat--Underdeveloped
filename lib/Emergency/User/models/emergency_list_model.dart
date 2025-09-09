@@ -28,6 +28,7 @@ class EmergencyListModel {
 
 class EmergencyOrderData {
   ServicePayment servicePayment;
+  Commission commission;
   String id;
   UserModel userId;
   String projectId;
@@ -38,6 +39,8 @@ class EmergencyOrderData {
   String contact;
   DateTime deadline;
   List<String> imageUrls;
+  var latitude;
+  var longitude;
   String hireStatus;
   String? userStatus;
   String paymentStatus;
@@ -55,6 +58,7 @@ class EmergencyOrderData {
 
   EmergencyOrderData({
     required this.servicePayment,
+    required this.commission,
     required this.id,
     required this.userId,
     required this.projectId,
@@ -65,7 +69,9 @@ class EmergencyOrderData {
     required this.contact,
     required this.deadline,
     required this.imageUrls,
-    required this.hireStatus,
+    required this.latitude,
+    required this.longitude,
+        required this.hireStatus,
     this.userStatus,
     required this.paymentStatus,
     this.serviceProviderId,
@@ -108,6 +114,7 @@ class EmergencyOrderData {
 
     return EmergencyOrderData(
       servicePayment: ServicePayment.fromJson(json['service_payment'] ?? {}),
+      commission: Commission.fromJson(json['commission'] ?? {}),
       id: json['_id'] ?? '',
       // userId: UserModel.fromJson(json['user_id'] ?? {}),
       userId: parsedUser,
@@ -121,6 +128,8 @@ class EmergencyOrderData {
       contact: json['contact'] ?? '',
       deadline: json['deadline'] != null ? DateTime.parse(json['deadline']) : DateTime.now(),
       imageUrls: json['image_urls'] != null ? List<String>.from(json['image_urls']) : [],
+      latitude: json['latitude'] ?? '',
+      longitude: json['longitude'] ?? '',
       hireStatus: json['hire_status'] ?? '',
       userStatus: json['user_status'],
       paymentStatus: json['payment_status'] ?? '',
@@ -150,6 +159,7 @@ class EmergencyOrderData {
 
   Map<String, dynamic> toJson() => {
     'service_payment': servicePayment.toJson(),
+    'commission': commission.toJson(),
     '_id': id,
     'user_id': userId.toJson(),
     'project_id': projectId,
@@ -160,6 +170,8 @@ class EmergencyOrderData {
     'contact': contact,
     'deadline': deadline.toIso8601String(),
     'image_urls': List<dynamic>.from(imageUrls),
+    'latitude': latitude,
+    'longitude': longitude,
     'hire_status': hireStatus,
     'user_status': userStatus,
     'payment_status': paymentStatus,
@@ -176,6 +188,40 @@ class EmergencyOrderData {
     '__v': v,
     'razorPaymentIdPlatform': razorPaymentIdPlatform,
   };
+}
+
+class Commission {
+  final double amount;
+  final double percentage;
+  final String type;
+  final bool isCollected;
+
+  Commission({
+    required this.amount,
+    required this.percentage,
+    required this.type,
+    required this.isCollected,
+  });
+
+  // Factory constructor for creating a CommissionModel from JSON
+  factory Commission.fromJson(Map<String, dynamic> json) {
+    return Commission(
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      percentage: (json['percentage'] as num?)?.toDouble() ?? 0.0,
+      type: json['type'] as String? ?? 'insideLimit',
+      isCollected: json['is_collected'] as bool? ?? false,
+    );
+  }
+
+  // Method to convert CommissionModel to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'amount': amount,
+      'percentage': percentage,
+      'type': type,
+      'is_collected': isCollected,
+    };
+  }
 }
 
 class UserModel {
