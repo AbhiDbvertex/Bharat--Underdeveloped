@@ -15,7 +15,7 @@ class ViewDispute extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -26,8 +26,8 @@ class ViewDispute extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18)),
-          Expanded(child: Text(value.isNotEmpty ? value : "-",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),)),
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 16)),
+          Expanded(child: Text(value.isNotEmpty ? value : "-",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600),)),
         ],
       ),
     );
@@ -49,10 +49,10 @@ class ViewDispute extends StatelessWidget {
               children: [
                 Text(
                   "$label1: ",
-                  style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),
+                  style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 16),
                 ),
                 Flexible(
-                  child: Text(value1.isNotEmpty ? value1 : "-",style:TextStyle(fontSize: 18),overflow: TextOverflow.ellipsis,),
+                  child: Text(value1.isNotEmpty ? value1 : "-",style:TextStyle(fontSize: 16),overflow: TextOverflow.ellipsis,),
                 ),
               ],
             ),
@@ -219,7 +219,7 @@ class ViewDispute extends StatelessWidget {
           title: Text(
             user.fullName,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),

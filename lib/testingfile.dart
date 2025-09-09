@@ -756,3 +756,144 @@
 //     );
 //   }
 // }
+
+import 'package:flutter/material.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+
+class DragToPayScreen extends StatefulWidget {
+  @override
+  State<DragToPayScreen> createState() => _DragToPayScreenState();
+}
+
+class _DragToPayScreenState extends State<DragToPayScreen> {
+  Razorpay? _razorpay;
+  bool isDropped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay!.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay!.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+  }
+
+  @override
+  void dispose() {
+    _razorpay?.clear();
+    super.dispose();
+  }
+
+  void openRazorpay() {
+    var options = {
+      'key': 'rzp_test_R7z5O0bqmRXuiH', // yahan apna key dalna
+      'amount': 5000, // amount in paise (50.00 INR)
+      'name': 'Test Payment',
+      'description': 'Payment for order',
+      'prefill': {
+        'contact': '9123456789',
+        'email': 'test@example.com'
+      },
+      'method': {
+        'netbanking': false,
+        'card': false,
+        'wallet': false,
+        'upi': true
+      },
+    };
+
+    try {
+      _razorpay!.open(options);
+    } catch (e) {
+      print("Error opening Razorpay: $e");
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment Success: ${response.paymentId}")),
+    );
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Payment Failed: ${response.message}")),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Drag To Pay"),
+        backgroundColor: Colors.green,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Drag UPI to Pay area", style: TextStyle(fontSize: 18)),
+
+            const SizedBox(height: 40),
+
+            DragTarget(
+              onAccept: (data) {
+                setState(() {
+                  isDropped = true;
+                });
+                openRazorpay();
+              },
+              builder: (context, candidateData, rejectedData) {
+                return Container(
+                  width: 200,
+                  height: 100,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isDropped ? Colors.green : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "Pay Here",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 50),
+
+            Draggable(
+              data: "upi",
+              feedback: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text("UPI", style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+              ),
+              childWhenDragging: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text("UPI", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text("UPI", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -31,7 +31,7 @@ class BankController {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final url = Uri.parse('${AppConstants.baseUrl}/${ApiEndpoint.bankScreen}');
+      final url = Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.bankScreen}');
 
       try {
         final response = await http.put(

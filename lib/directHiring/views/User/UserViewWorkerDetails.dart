@@ -19,6 +19,7 @@ class UserViewWorkerDetails extends StatefulWidget {
   final subcategreyId;
   final String workerId;
   final String? hirebuttonhide;
+  final String? hideonly;
   // this is filed requirement for user negotiate
   final oderId;
   final biddingOfferId;
@@ -29,7 +30,7 @@ class UserViewWorkerDetails extends StatefulWidget {
     super.key,
     required this.workerId,
     this.categreyId,
-    this.subcategreyId, this.hirebuttonhide, this.oderId, this.biddingOfferId, this.UserId,
+    this.subcategreyId, this.hirebuttonhide, this.oderId, this.biddingOfferId, this.UserId, this.hideonly,
   });
 
   @override
@@ -643,6 +644,8 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                       ),
                     ),
 
+                    Image.network(AutofillHints.birthday),
+
                     // Profile Image with Tap
                     GestureDetector(
                       onTap: () {
@@ -681,7 +684,6 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                             : null,
                       ),
                     ),
-
                     // Call Button
                     Padding(
                       padding: const EdgeInsets.only(left: 18.0),
@@ -824,12 +826,25 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Document",
-                          style: GoogleFonts.roboto(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Document",
+                              style: GoogleFonts.roboto(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Container(
+                              width: 82,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: Colors.green,width: 2)
+                              ),
+                              child: Center(child: Text("Verified",style: TextStyle(color: Colors.green.shade700,fontWeight: FontWeight.w600),)),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                         Row(
@@ -843,15 +858,24 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(width: 70),
-                            Image.asset('assets/images/Aadhar2.png'),
+                            // const SizedBox(width: 80),
+                            Spacer(),
+                            // Image.asset('assets/images/Aadhar2.png'),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 18.0),
+                              child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: Image.network(workerData?.documents ?? "No data",height: 70,)),
+                            ),
                           ],
                         ),
+                        Container(
+                          decoration: BoxDecoration(),
+                        )
                       ],
                     ),
                   ),
                 ),
-
                 // Reviews
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -882,7 +906,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                UserId: widget.UserId,
              ) : SizedBox(),
 
-                widget.hirebuttonhide == 'hideOnly' ? SizedBox(): GestureDetector(
+                widget.hideonly == 'hideOnly' ? SizedBox(): GestureDetector(
                   onTap: () {
                     if (widget.workerId != null &&
                         widget.workerId!.isNotEmpty) {

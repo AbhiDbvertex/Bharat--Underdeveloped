@@ -1,9 +1,133 @@
-import 'dart:convert';
+// import 'dart:convert';
+//
+// import 'package:flutter/material.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:http/http.dart' as http;
+//
+// import '../../../../Widgets/AppColors.dart';
+// import 'AccountScreen.dart';
+//
+// class Termsscreen extends StatefulWidget {
+//   const Termsscreen({Key? key}) : super(key: key);
+//
+//   @override
+//   _TermsscreenState createState() => _TermsscreenState();
+// }
+//
+// class _TermsscreenState extends State<Termsscreen> {
+//   String termsText = '';
+//   bool isLoading = true;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchTerms();
+//   }
+//
+//   Future<void> fetchTerms() async {
+//     final url = Uri.parse(
+//       'https://api.thebharatworks.com/api/CompanyDetails/getTermsConditions',
+//     );
+//
+//     try {
+//       final response = await http.get(url);
+//
+//       if (response.statusCode == 200) {
+//         final result = json.decode(response.body);
+//         setState(() {
+//           termsText = result['content'] ?? '';
+//           isLoading = false;
+//         });
+//       } else {
+//         setState(() {
+//           termsText = 'Failed to load terms.';
+//           isLoading = false;
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         termsText = 'Error: $e';
+//         isLoading = false;
+//       });
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         backgroundColor: AppColors.primaryGreen,
+//         centerTitle: true,
+//         elevation: 0,
+//         toolbarHeight: 20,
+//         automaticallyImplyLeading: false,
+//       ),
+//       body:
+//           isLoading
+//               ? Center(child: CircularProgressIndicator())
+//               : SingleChildScrollView(
+//                 padding: const EdgeInsets.all(16),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     const SizedBox(height: 10),
+//                     Row(
+//                       children: [
+//                         GestureDetector(
+//                           onTap: () {
+//                             Navigator.pop(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) => AccountScreen(),
+//                               ),
+//                             );
+//                           },
+//                           child: const Icon(
+//                             Icons.arrow_back_outlined,
+//                             size: 22,
+//                           ),
+//                         ),
+//                         const SizedBox(width: 80),
+//                         Text(
+//                           "Terms of Use",
+//                           style: GoogleFonts.roboto(
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.bold,
+//                             color: Colors.black,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(height: 30),
+//                     Center(
+//                       child: Image.asset(
+//                         'assets/images/terms.png',
+//                         height: 140,
+//                         width: 200,
+//                       ),
+//                     ),
+//                     const SizedBox(height: 20),
+//                     Center(
+//                       child: Padding(
+//                         padding: const EdgeInsets.symmetric(horizontal: 14),
+//                         child: Text(
+//                           termsText,
+//                           style: GoogleFonts.roboto(fontSize: 14, height: 1.5),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//     );
+//   }
+// }
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart'; // ye import karo
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-
 import '../../../../Widgets/AppColors.dart';
 import 'AccountScreen.dart';
 
@@ -62,63 +186,67 @@ class _TermsscreenState extends State<Termsscreen> {
         toolbarHeight: 20,
         automaticallyImplyLeading: false,
       ),
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AccountScreen(),
-                              ),
-                            );
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_outlined,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 80),
-                        Text(
-                          "Terms of Use",
-                          style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Center(
-                      child: Image.asset(
-                        'assets/images/terms.png',
-                        height: 140,
-                        width: 200,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AccountScreen(),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: Text(
-                          termsText,
-                          style: GoogleFonts.roboto(fontSize: 14, height: 1.5),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
+                  child: const Icon(
+                    Icons.arrow_back_outlined,
+                    size: 22,
+                  ),
                 ),
+                const SizedBox(width: 80),
+                Text(
+                  "Terms of Use",
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Center(
+              child: Image.asset(
+                'assets/images/terms.png',
+                height: 140,
+                width: 200,
               ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Html(
+                data: termsText,
+                style: {
+                  "body": Style(
+                    fontFamily: GoogleFonts.roboto().fontFamily,
+                    fontSize: FontSize(14),
+                    lineHeight: LineHeight.number(1.5),
+                    color: Colors.black,
+                  ),
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

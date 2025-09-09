@@ -942,6 +942,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                         workerId: data?['service_provider_id']?['_id'],
                                                         hirebuttonhide: "hide",
                                                         UserId: widget.userId,
+                                                        hideonly: "hideOnly",
                                                         // oderId: OderId,
                                                         // biddingOfferId: biddingofferId,
                                                       ),
@@ -1812,6 +1813,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                                 builder: (context) => UserViewWorkerDetails(
                                                                                   workerId: bidderId,
                                                                                   hirebuttonhide: "hide",
+                                                                                  hideonly: "hideOnly",
                                                                                   UserId: widget.userId,
                                                                                   oderId: OderId,
                                                                                   biddingOfferId: biddingofferId,
@@ -2221,6 +2223,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                                 workerId,
                                                                             hirebuttonhide:
                                                                                 "hide",
+                                                                                hideonly: "hideOnly",
                                                                           ),
                                                                         ),
                                                                       );
@@ -2448,6 +2451,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               builder: (context) => UserViewWorkerDetails(
                                 workerId: assignedWorker['_id'],
                                 hirebuttonhide: "hide",
+                                hideonly: "hideOnly",
                                 // userId: widget.userId,
                               ),
                             ),

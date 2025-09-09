@@ -80,7 +80,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         Uri.parse(
           'https://api.thebharatworks.com/api/direct-order/getDirectOrderWithWorker/${widget.id}',
         ),
-        headers: {'Authorization': 'Bearer $token'},
+        headers: await getCustomHeaders() /*{'Authorization': 'Bearer $token'}*/,
       );
 
       if (response.statusCode == 200) {
@@ -200,10 +200,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     try {
       var response = await http.post(
         Uri.parse(url),
-        headers: {
+        headers: await getCustomHeaders(), /*{
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
-        },
+        },*/
         body: jsonEncode({"order_id": widget.id}),
       );
 
@@ -260,10 +260,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     try {
       final response = await http.get(
         uri,
-        headers: {
+        headers: await getCustomHeaders() /*{
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
-        },
+        },*/
       );
 
       if (response.statusCode == 200) {
@@ -321,9 +321,9 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       try {
         final response = await http.post(
           Uri.parse('https://api.razorpay.com/v1/payments/${order!['service_payment']['payment_history'][0]['payment_id']}/refund'),
-          headers: {
+          headers: await getCustomHeaders() /*{
             'Authorization': 'Basic ${base64Encode(utf8.encode('YOUR_RAZORPAY_KEY_ID:YOUR_RAZORPAY_KEY_SECRET'))}',
-          },
+          },*/
         );
         print("📤 Refund API response: ${response.body}");
       } catch (e) {
@@ -372,10 +372,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     try {
       final response = await http.post(
         uri,
-        headers: {
+        headers: await getCustomHeaders(), /*{
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
-        },
+        },*/
         body: json.encode({
           "category_id": effectiveCategoryId,
           "subcategory_ids": [effectiveSubCategoryId],
@@ -523,10 +523,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     try {
       final response = await http.post(
         uri,
-        headers: {
+        headers: await getCustomHeaders(), /* {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
-        },
+        },*/
         body: json.encode({
           'order_id': orderId,
           'next_provider_id': providerId,
@@ -743,7 +743,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order!['title'] ?? '',
+                    order?['title'] ?? '',
                     style: GoogleFonts.roboto(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -793,14 +793,14 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                         ),
                       ),
                       Text(
-                        "Posted: ${order!['createdAt']?.toString().substring(0, 10) ?? ''}",
+                        "Posted: ${order?['createdAt']?.toString().substring(0, 10) ?? ''}",
                         style: GoogleFonts.roboto(color: Colors.grey),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Completion: ${order!['deadline']?.toString().substring(0, 10) ?? ''}",
+                    "Completion: ${order?['deadline']?.toString().substring(0, 10) ?? ''}",
                     style: const TextStyle(color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
@@ -813,14 +813,14 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    order!['description'] ?? "No description available.",
+                    order?['description'] ?? "No description available.",
                     style: const TextStyle(fontSize: 15),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            order!['hire_status'] == 'accepted'
+            order?['hire_status'] == 'accepted'
                 ? Center(
               child: Card(
                 elevation: 3,
@@ -838,7 +838,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     children: [
                       ClipOval(
                         child: Image.network(
-                          "${order!['service_provider_id']?['profile_pic'] ?? ''}",
+                          "${order?['service_provider_id']?['profile_pic'] ?? ''}",
                           height: 80,
                           width: 80,
                           fit: BoxFit.cover,
@@ -859,7 +859,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "${order!['service_provider_id']?['full_name'] ?? ''}",
+                                    "${order?['service_provider_id']?['full_name'] ?? ''}",
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -886,7 +886,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    "Project Fees - ₹${order!['platform_fee'] ?? "200"}/-",
+                                    "Project Fees - ₹${order?['platform_fee'] ?? "200"}/-",
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -918,11 +918,12 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       serviceProviderId: order!['service_provider_id']?['_id'] ?? '',
                                     ),*/
                                     UserViewWorkerDetails(
-                                      workerId: order!['service_provider_id']?['_id'] ?? '',
+                                      workerId: order?['service_provider_id']?['_id'] ?? '',
                                       categreyId: widget.categreyId,
                                       subcategreyId:
                                       widget.subcategreyId,
                                       hirebuttonhide: "hideOnly",
+                                      hideonly: 'hideOnly',
                                     ),
                                   ),
                                 );
@@ -1061,6 +1062,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           subcategreyId:
                                           widget.subcategreyId,
                                           hirebuttonhide: "hideOnly",
+                                          hideonly: 'hideOnly',
                                         ),
                                       ),
                                     );

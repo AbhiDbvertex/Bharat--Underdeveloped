@@ -29,12 +29,14 @@ class DisputeCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                        spacing: 4,
-                      children: [
-                        SvgPicture.asset('assets/svg_images/d_svg/dispte_icon.svg'),
-                        Text('Dispute ID: ${dispute.uniqueId}',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
-                      ],
+                    Expanded(
+                      child: Row(
+                          spacing: 4,
+                        children: [
+                          SvgPicture.asset('assets/svg_images/d_svg/dispte_icon.svg'),
+                          Expanded(child: Text( overflow: TextOverflow.ellipsis,maxLines: 1,'Dispute ID: ${dispute.uniqueId}',style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400),)),
+                        ],
+                      ),
                     ),
                     InkWell(
                       onTap: (){
@@ -61,7 +63,7 @@ class DisputeCard extends StatelessWidget {
                       spacing: 4,
                       children: [
                         SvgPicture.asset('assets/svg_images/d_svg/projecId_icon.svg',),
-                        Text('Project ID: ${dispute.order.projectId}',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400),),
+                        Text('Project ID: ${dispute.order.projectId}',style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400),),
                       ],
                     ),
 
@@ -72,7 +74,7 @@ class DisputeCard extends StatelessWidget {
                   spacing: 4,
                   children: [
                     SvgPicture.asset('assets/svg_images/d_svg/service_provider_icon.svg',),
-                    Text('Service Provider: ${dispute.raisedBy.fullName}',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis),),
+                    Expanded(child: Text('Service Provider: ${dispute.raisedBy.fullName}',style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis),)),
                   ],
                 ),
                 SizedBox(height: 15),
@@ -80,7 +82,7 @@ class DisputeCard extends StatelessWidget {
                  spacing: 4,
                   children: [
                   SvgPicture.asset('assets/svg_images/d_svg/user_icon.svg',),
-                    Text("User Name: ${dispute.against.fullName}",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis),)
+                    Expanded(child: Text("User Name: ${dispute.against.fullName}",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis),))
                   ],
                 ),
               ],

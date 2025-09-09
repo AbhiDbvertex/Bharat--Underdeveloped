@@ -65,6 +65,7 @@ dependencies:
   photo_view: ^0.15.0
   smooth_page_indicator: ^1.2.1
   fluttertoast:
+  flutter_html:
 
 
 #  just_audio:
