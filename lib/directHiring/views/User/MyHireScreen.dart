@@ -382,7 +382,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
   }
 
   Widget _buildBudingCard(dynamic BudingData) {
-    // Null check for BudingData
+
     if (BudingData == null) {
       return const Center(
         child: CircularProgressIndicator(
@@ -433,6 +433,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   // final userId = item?['user_id']['_id'] ?? "";
                   final buddingOderId = item['_id'] ?? "0";
                   final address = item['google_address'] ?? "No Address";
+                  final latitude = item['latitude'] ?? 0.0;
+                  final longitude = item['longitude'] ?? 0.0;
                   final description = item['description'] ?? "No description";
                   final status = item['hire_status'] ?? "No Status";
                   final title = item['title'] ?? "No title";
@@ -574,7 +576,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                   children: [
                                     InkWell(
                                       onTap:(){
-                                        MapLauncher.openMap(address: address);
+                                        MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
                                       },
                                       child: Container(
                                         padding: EdgeInsets.symmetric(
@@ -582,7 +584,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.red,
+                                          color: Color(0xffF27773),
                                           borderRadius: BorderRadius.circular(20),
                                         ),
                                         child: Text(
@@ -829,7 +831,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     Expanded(
                       child: InkWell(
                         onTap: (){
-                          MapLauncher.openMap(address: data.address);
+                          MapLauncher.openMap(latitude: data.latitude, longitude: data.longitude,address: data.address);
+                          // MapLauncher.openMap(address:  data.address);
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -924,7 +927,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
       child: Row(
         children: [
           Container(
-            color: Colors.grey,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color:Colors.grey,),
+           // color: Colors.grey,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Stack(
@@ -1117,14 +1121,15 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         onTap:() async {
                           bwDebug("on tap call: ");
                           final address = data.googleAddress;
-                          bool success=await MapLauncher.openMap(address: address);
+                          // bool success=await MapLauncher.openMap(address: address);
+                          bool success=await MapLauncher.openMap(address: address,latitude: data.latitude,longitude: data.longitude);
                           if(!success) {
                             SnackBarHelper.showSnackBar(context, "Could not open the map");
                           }
                         },
                         child: InkWell(
                           onTap: () {
-                            MapLauncher.openMap(address: data.googleAddress);
+                            MapLauncher.openMap(latitude: data.latitude!, longitude: data.longitude!,address: data.address);
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(

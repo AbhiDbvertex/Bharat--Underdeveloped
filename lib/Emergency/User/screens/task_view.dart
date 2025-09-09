@@ -929,18 +929,18 @@ class TaskView extends StatelessWidget {
                         statusColor = Colors.grey;
                     }
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      padding:  EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 30,
+                            width: 0.05.toWidthPercent(),
                             child: Text(
                               '${index + 1}.',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          Expanded(
-                            flex: 2,
+                          SizedBox(
+                            width: 0.3.toWidthPercent(),
                             child: Text(
                               payment.description ?? '',
                               overflow: TextOverflow.ellipsis,
@@ -949,7 +949,7 @@ class TaskView extends StatelessWidget {
                             ),
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 0.21.toWidthPercent(),
                             child: payment.status == 'success'
                                 ?  Text(
                              statusText,
@@ -958,14 +958,14 @@ class TaskView extends StatelessWidget {
                                 : const SizedBox(),
                           ),
                           SizedBox(
-                            width: 80,
+                            width: 0.21.toWidthPercent(),
                             child: Text(
                               '₹${totalAmount}/-',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           SizedBox(
-                            width: 70,
+                            width: 0.12.toWidthPercent(),
                             child: payment.releaseStatus == 'pending'
                                 ? ElevatedButton(
                               // onPressed: () => controller.selectPaymentToPay(index),

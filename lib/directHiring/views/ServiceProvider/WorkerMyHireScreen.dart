@@ -1151,6 +1151,7 @@
 import 'dart:convert';
 
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
@@ -1994,7 +1995,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                   children: [
                     InkWell(
                       onTap: () {
-                        MapLauncher.openMap(address: data.address);
+                        // MapLauncher.openMap(address: data.address);
+                        MapLauncher.openMap(latitude: data.latitude, longitude: data.longitude,address: data.address);
                       },
                       child: Container(
                         height: 20,
@@ -2284,7 +2286,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          MapLauncher.openMap(address: data.googleAddress);
+                          bwDebug("tap ");
+                          // MapLauncher.openMap(address: data.googleAddress);
+                          MapLauncher.openMap(latitude: data.latitude,longitude: data.longitude,address: data.googleAddress);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(

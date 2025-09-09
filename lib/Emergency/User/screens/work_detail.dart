@@ -481,6 +481,7 @@ class WorkDetailPage extends StatefulWidget {
 }
 
 class _WorkDetailPageState extends State<WorkDetailPage> {
+  final tag="WorkDetailPage";
   late WorkDetailController controller;
 
   @override
@@ -702,9 +703,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           /// ROW 1
                           GestureDetector(
                             onTap: () async {
-                              bwDebug("on tap call: ");
+                              bwDebug("on tap call: ",tag: tag);
                               final address = controller.googleAddress.value;
-                              bool success=await MapLauncher.openMap(address: address);
+                              final latitude = controller.latitude.value;
+                              final longitude = controller.longitude.value;
+                              bool success=await MapLauncher.openMap(latitude: latitude,longitude: longitude,address: address);
                               if(!success) {
                                 SnackBarHelper.showSnackBar(context, "Could not open the map");
                               }

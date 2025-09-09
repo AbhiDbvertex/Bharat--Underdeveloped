@@ -1,3 +1,5 @@
+import 'emergency_list_model.dart';
+
 class WorkDetailModel {
   bool? status;
   String? message;
@@ -64,6 +66,8 @@ class Data {
   String? contact;
   String? deadline;
   List<String>? imageUrls;
+  double? latitude;
+  double? longitude;
   String? hireStatus;
   String? userStatus;
   String? paymentStatus;
@@ -73,6 +77,7 @@ class Data {
   int? platformFee;
   String? razorOrderIdPlatform;
   ServicePayment? servicePayment;
+  Commission? commission;
   // List<dynamic>? acceptedByProviders;
   List<AcceptedByProvider>? acceptedByProviders;
   String? createdAt;
@@ -93,10 +98,13 @@ class Data {
         this.contact,
         this.deadline,
         this.imageUrls,
+        this.latitude,
+        this.longitude,
         this.hireStatus,
         this.userStatus,
         this.paymentStatus,
         this.serviceProvider,
+        this.commission,
         this.platformFeePaid,
         this.platformFee,
         this.razorOrderIdPlatform,
@@ -130,6 +138,8 @@ class Data {
     imageUrls = json['image_urls'] != null
         ? json['image_urls'].cast<String>()
         : null;
+    latitude= (json['latitude'] as num?)?.toDouble();
+    longitude= (json['longitude'] as num?)?.toDouble();
     hireStatus = json['hire_status'];
     userStatus = json['user_status'];
     paymentStatus = json['payment_status'];
@@ -142,6 +152,9 @@ class Data {
     razorOrderIdPlatform = json['razorOrderIdPlatform'];
     servicePayment = json['service_payment'] != null
         ? ServicePayment.fromJson(json['service_payment'])
+        : null;
+    commission = json['commission'] != null
+        ? Commission.fromJson(json['commission'])
         : null;
     // acceptedByProviders = json['accepted_by_providers'];
     // createdAt = json['createdAt'];
@@ -178,6 +191,8 @@ class Data {
     map['contact'] = contact;
     map['deadline'] = deadline;
     map['image_urls'] = imageUrls;
+    map['latitude'] = latitude;
+    map['longitude'] = longitude;
     map['hire_status'] = hireStatus;
     map['user_status'] = userStatus;
     map['payment_status'] = paymentStatus;
@@ -209,14 +224,19 @@ class UserId {
   String? phone;
   String? fullName;
   String? profilePic;
-  UserId({this.id, this.phone, this.fullName, this.profilePic});
+  Location? location;
+  UserId({this.id, this.phone, this.fullName, this.profilePic,this.location,});
 
-  UserId.fromJson(Map<String, dynamic> json) {
-    id = json['_id'];
-    phone = json['phone'];
-    fullName = json['full_name'];
-    profilePic = json['profile_pic'];
-
+  factory UserId.fromJson(Map<String, dynamic> json) {
+    return UserId(
+      id: json['_id'] as String?,
+      phone: json['phone'] as String?,
+      fullName: json['full_name'] as String?,
+      profilePic: json['profile_pic'] as String?,
+      location: json['location'] != null
+          ? Location.fromJson(json['location'] as Map<String, dynamic>)
+          : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -225,11 +245,39 @@ class UserId {
     map['phone'] = phone;
     map['full_name'] = fullName;
     map['profile_pic'] = profilePic;
-
+    if (location != null) {
+      map['location'] = location!.toJson();
+    }
     return map;
   }
 }
+class Location {
+  final double latitude;
+  final double longitude;
+  final String address;
 
+  Location({
+    required this.latitude,
+    required this.longitude,
+    required this.address,
+  });
+
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      address: json['address'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'address': address,
+    };
+  }
+}
 class CategoryId {
   String? id;
   String? name;

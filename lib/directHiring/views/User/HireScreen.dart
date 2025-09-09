@@ -10,7 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart'; // ✅ Location ke liye
 import 'package:geocoding/geocoding.dart'; // ✅ Address string ke liye
-import '../../../Bidding/controller/buding_postTask_controller.dart';
+import '../../../Bidding/controller/bidding_post_task_controller.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -368,7 +368,7 @@ class _HireScreenState extends State<HireScreen> {
 
   // ✅ Form submit karne ka function
   Future<void> submitForm() async {
-
+    setState(() => isLoading = true);
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
     final address = addressController.text.trim();
@@ -488,6 +488,11 @@ class _HireScreenState extends State<HireScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     }
+    finally{
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   @override
@@ -594,7 +599,7 @@ class _HireScreenState extends State<HireScreen> {
                 child: SizedBox(
                   width: 200,
                   child: ElevatedButton(
-                    onPressed: submitForm,
+                    onPressed: isLoading?null:submitForm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade700,
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -602,7 +607,15 @@ class _HireScreenState extends State<HireScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text(
+                    child: isLoading
+                        ?  const SizedBox(
+                      height: 20, width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                        : Text(
                       "Hire",
                       style: GoogleFonts.roboto(
                         fontSize: 16,
