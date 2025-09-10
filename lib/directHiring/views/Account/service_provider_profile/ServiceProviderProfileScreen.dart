@@ -66,6 +66,7 @@ class _SellerScreenState extends State<SellerScreen> {
   void initState() {
     super.initState();
     loadSavedLocation();
+    _loadEmergencyTask();
     fetchProfile().then((_) {
       print("Checking role: ${profile?.role}, verified: ${profile?.verified} request status : ${profile?.requestStatus}"); // Debug line
      // if (profile?.role == "service_provider" || profile?.role == "both"  && (profile?.verified == false || profile?.verified == null))
@@ -88,6 +89,14 @@ class _SellerScreenState extends State<SellerScreen> {
       } else {
         print("Dialog not shown: Role or verified condition not met");
       }
+    });
+  }
+
+  Future<void> _loadEmergencyTask() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool saved = prefs.getBool("emergency_task") ?? false;
+    setState(() {
+      _isSwitched = saved;
     });
   }
 
@@ -1066,6 +1075,7 @@ class _SellerScreenState extends State<SellerScreen> {
                           TextSpan(
                             text:
                             profile?.subCategoryNames?.join(', ') ?? 'N/A',
+                            // profile?.subCategoryNames?.join(',') ?? 'N/A',
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -1128,38 +1138,56 @@ class _SellerScreenState extends State<SellerScreen> {
               style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
             ),
           ),
-          // SizedBox(
-          //   width: 40,
-          //   height: 20,
-          //   child: Transform.scale(
-          //       scale: 0.6,
-          //       alignment: Alignment.centerLeft,
-          //       child: Stack(
-          //         alignment: Alignment.center,
-          //         children: [
-          //           Switch(
-          //             value: _isSwitched,
-          //             onChanged: _isToggling
-          //                 ? null
-          //                 : (bool value) {
-          //               _checkEmergencyTask();
-          //             },
-          //             activeColor: Colors.red,
-          //             inactiveThumbColor: Colors.white,
-          //             inactiveTrackColor: Colors.grey.shade300,
-          //             materialTapTargetSize:
-          //             MaterialTapTargetSize.shrinkWrap,
-          //           ),
-          //           if (_isToggling)
-          //             const CircularProgressIndicator(
-          //               // strokeWidth: 2.0,
-          //               valueColor: AlwaysStoppedAnimation<Color>(
-          //                   Colors.red),
-          //             ),
-          //         ],
-          //       )
-          //   ),
-          // ),
+          SizedBox(
+            width: 40,
+            height: 20,
+            child: Transform.scale(
+                scale: 0.6,
+                alignment: Alignment.centerLeft,
+                child:
+                // Switch(
+                //   value: _isSwitched,
+                //   onChanged: (bool value) {
+                //     setState(() {
+                //       _isSwitched = value;
+                //     });
+                //     if (value) {
+                //       myController.enableFeature();   // API call when ON
+                //     } else {
+                //       myController.disableFeature();  // API call when OFF
+                //     }
+                //   },
+                //   activeColor: Colors.red,
+                //   inactiveThumbColor: Colors.white,
+                //   inactiveTrackColor: Colors.grey.shade300,
+                //   materialTapTargetSize:
+                //   MaterialTapTargetSize.shrinkWrap,
+                // ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Switch(
+                      value: _isSwitched,
+                      onChanged: _isToggling
+                          ? null
+                          : (bool value) {
+                        _checkEmergencyTask();
+                      },
+                      activeColor: Colors.red,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.grey.shade300,
+                      materialTapTargetSize:
+                      MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    if (_isToggling)
+                      const CircularProgressIndicator(
+                        // strokeWidth: 2.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.red),
+                      ),
+                  ],
+                )),
+          )
         ],
       ),
     );

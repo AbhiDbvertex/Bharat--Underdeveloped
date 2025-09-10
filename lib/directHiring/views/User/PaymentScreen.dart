@@ -3552,8 +3552,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
         body: jsonEncode(payload),
       );
-      print("anjali Response Code: ${response.statusCode}");
-      print("anjali Response Body: ${response.body}");
+      print("anjali Response Code: 5 ${response.statusCode}");
+      print("anjali Response Body: 6 ${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
@@ -3667,8 +3667,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
         body: jsonEncode(payload),
       );
-      print("anjali Response Code: ${response.statusCode}");
-      print("anjali Response Body: ${response.body}");
+      print("anjali Response Code: 7 ${response.statusCode}");
+      print("anjali Response Body: 8 ${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&

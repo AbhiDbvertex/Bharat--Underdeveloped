@@ -714,58 +714,67 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              InkWell(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => MapScreen(
-                                  //       latitude: data?['user_id']?['location']
-                                  //               ?['latitude'] ??
-                                  //           'N/A',
-                                  //       longitude: data?['user_id']?['location']
-                                  //               ?['longitude'] ??
-                                  //           'N/A',
-                                  //     ),
-                                  //   ),
-                                  // );
+                              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => MapScreen(
+                                      //       latitude: data?['user_id']?['location']
+                                      //               ?['latitude'] ??
+                                      //           'N/A',
+                                      //       longitude: data?['user_id']?['location']
+                                      //               ?['longitude'] ??
+                                      //           'N/A',
+                                      //     ),
+                                      //   ),
+                                      // );
 
-                                    openMap(data?['latitude'] ?? 0.0,
-                                        data?['longitude'] ?? 0.0);
+                                        openMap(data?['latitude'] ?? 0.0,
+                                            data?['longitude'] ?? 0.0);
 
-                                  print(
-                                      "Abhi:- get oder Details lat for bidding : ${data?['latitude'] ?? 0.0} long : ${data?['longitude'] ?? 0.0} address ${data?['address'] ?? ""}");
-                                },
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.025,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.28,
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(3.0),
-                                      child: Text(
-                                        // address.split(',').last.trim(),
-                                        // data?['user_id']?['location']
-                                        // ?['address'] ??
-                                        //     'N/A',
-                                        data?['address'] ?? "",
-                                        style: GoogleFonts.roboto(
-                                          color: Colors.white,
-                                          fontSize:
-                                              MediaQuery.of(context).size.width *
-                                                  0.03,
+                                      print(
+                                          "Abhi:- get oder Details lat for bidding : ${data?['latitude'] ?? 0.0} long : ${data?['longitude'] ?? 0.0} address ${data?['address'] ?? ""}");
+                                    },
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height *
+                                          0.025,
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.28,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade300,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(3.0),
+                                          child: Text(
+                                            // address.split(',').last.trim(),
+                                            // data?['user_id']?['location']
+                                            // ?['address'] ??
+                                            //     'N/A',
+                                            data?['address'] ?? "",
+                                            style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  MediaQuery.of(context).size.width *
+                                                      0.03,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ),
-                                ),
+                                  Container(
+                                    decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                                    child: Center(child: Text(data?['project_id'] ?? "",style: TextStyle(color: Colors.white), maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,)),)
+                                ],
                               ),
+
                               SizedBox(height: height * 0.005),
                               Text(
                                 address,

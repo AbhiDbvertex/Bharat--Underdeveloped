@@ -432,6 +432,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   final price = item['service_payment']?['amount']?.toString() ?? "0";
                   // final userId = item?['user_id']['_id'] ?? "";
                   final buddingOderId = item['_id'] ?? "0";
+                  final buddingprojectid = item['project_id'] ?? "0";
                   final address = item['google_address'] ?? "No Address";
                   final latitude = item['latitude'] ?? 0.0;
                   final longitude = item['longitude'] ?? 0.0;
@@ -481,29 +482,39 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         children: [
                           // left image
                           Center(
-                            child: Container(
-                              color:Colors.grey,
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: imageUrl.isNotEmpty
-                                      ? Image.network(
-                                    'https://api.thebharatworks.com/${imageUrl}',
-                                    height: 125,
+                            child: Stack(
+                              children:[ Container(
+                                color:Colors.grey,
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: imageUrl.isNotEmpty
+                                        ? Image.network(
+                                      'https://api.thebharatworks.com/${imageUrl}',
+                                      height: 125,
+                                      width: 100,
+                                      // fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.image_not_supported_outlined,size: 100,);
+                                    },
+                                    )
+                                        : /*Image.asset(
+                                    "assets/images/Work.png",
+                                    height: 100,
                                     width: 100,
-                                    // fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(Icons.image_not_supported_outlined,size: 100,);
-                                  },
-                                  )
-                                      : /*Image.asset(
-                                  "assets/images/Work.png",
-                                  height: 100,
-                                  width: 100,
-                                  fit: BoxFit.cover,
-                                ),*/
-                                  Icon(Icons.image_not_supported_outlined,size: 100,)
+                                    fit: BoxFit.cover,
+                                  ),*/
+                                    Icon(Icons.image_not_supported_outlined,size: 100,)
+                                ),
                               ),
-                            ),
+                                Positioned(
+                                  bottom: 7,
+                                    left: 10,
+                                    right: 5,
+                                    child: Container(
+                                      decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                                      child: Center(child: Text(buddingprojectid,style: TextStyle(color: Colors.white), maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,)),))
+                            ],),
                           ),
                           SizedBox(width: 10),
                           // right content
@@ -661,8 +672,9 @@ class _MyHireScreenState extends State<MyHireScreen> {
   }
 
 
-  Widget _buildHireCard(DirectOrder data) {
-    String displayStatus = data.status;
+  Widget _buildHireCard(DirectOrder darectHiringData) {
+    String displayStatus = darectHiringData.status;
+    String displayProjectId = darectHiringData.projectid ?? "";
     // if (data.offer_history != null &&
     //     data.offer_history!.isNotEmpty &&
     //     data.status != 'cancelled' &&
@@ -671,8 +683,9 @@ class _MyHireScreenState extends State<MyHireScreen> {
     // }
 
     // Use the first image from image_url directly
-    final String? imageshow = data.image; // This is already the first image URL
-    print("Abhi:- get darect oder status : ${data.status}");
+    final String? imageshow = darectHiringData.image; // This is already the first image URL
+    print("Abhi:- get darect oder status : ${darectHiringData.status}");
+    print("Abhi:- get darect oder displayProjectId : ${darectHiringData.projectid}");
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -693,31 +706,41 @@ class _MyHireScreenState extends State<MyHireScreen> {
         children: [
           // Left side image
           Center(
-            child: Container(
-              color: Colors.grey,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: imageshow != null && imageshow.isNotEmpty
-                    ? Image.network(
-                  imageshow,
-                  height: 180,
-                  width: 100,
-                  // fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Image.asset(
+            child: Stack(
+              children:[ Container(
+                color: Colors.grey,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: imageshow != null && imageshow.isNotEmpty
+                      ? Image.network(
+                    imageshow,
+                    height: 180,
+                    width: 100,
+                    // fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/task.png',
+                      height: 180,
+                      width: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : Image.asset(
                     'assets/images/task.png',
                     height: 180,
                     width: 100,
                     fit: BoxFit.cover,
                   ),
-                )
-                    : Image.asset(
-                  'assets/images/task.png',
-                  height: 180,
-                  width: 100,
-                  fit: BoxFit.cover,
                 ),
               ),
-            ),
+                Positioned(
+                    bottom: 7,
+                    left: 10,
+                    right: 5,
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                      child: Center(child: Text(darectHiringData.projectid ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
+                        overflow: TextOverflow.ellipsis,)),))
+            ],),
           ),
           const SizedBox(width: 12),
           // Right side content (unchanged)
@@ -731,7 +754,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        data.title,
+                        darectHiringData.title,
                         style: _cardTitle(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -754,7 +777,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        data.description,
+                        darectHiringData.description,
                         style: _cardBody(),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -776,7 +799,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Date: ${data.date}",
+                      "Date: ${darectHiringData.date}",
                       style: _cardDate(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -831,7 +854,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     Expanded(
                       child: InkWell(
                         onTap: (){
-                          MapLauncher.openMap(latitude: data.latitude, longitude: data.longitude,address: data.address);
+                          MapLauncher.openMap(latitude: darectHiringData.latitude, longitude: darectHiringData.longitude,address: darectHiringData.address);
                           // MapLauncher.openMap(address:  data.address);
                         },
                         child: Container(
@@ -842,7 +865,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            data.address ?? "",
+                            darectHiringData.address ?? "",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style:
@@ -858,7 +881,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => DirectViewScreen(
-                              id: data.id,
+                              id: darectHiringData.id,
                               categreyId: categoryId ?? '68443fdbf03868e7d6b74874',
                               subcategreyId:
                               subCategoryId ?? '684e7226962b4919ae932af5',

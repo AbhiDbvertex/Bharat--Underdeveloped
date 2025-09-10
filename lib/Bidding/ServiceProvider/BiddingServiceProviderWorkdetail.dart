@@ -459,6 +459,11 @@ class _BiddingserviceproviderworkdetailState
     }
   }
 
+  var editbidAmount;
+  var editbidmassage;
+  var editbidduration;
+
+  // submit bid
   Future<void> submitBid(
       String amount, String description, String duration) async {
     try {
@@ -531,8 +536,8 @@ class _BiddingserviceproviderworkdetailState
         'message': description,
       };
 
-      print('📤 Sending Bid Payload: ${jsonEncode(payload)}');
-      print('🔐 Using Token: $token');
+      print('Abhi:- Sending Bid Payload: ${jsonEncode(payload)}');
+      print('Abhi:- Using Token: $token');
 
       final response = await http.post(
         Uri.parse('https://api.thebharatworks.com/api/bidding-order/placeBid'),
@@ -543,8 +548,8 @@ class _BiddingserviceproviderworkdetailState
         body: jsonEncode(payload),
       );
 
-      print('📥 Bid Response Status: ${response.statusCode}');
-      print('📥 Bid Response Body: ${response.body}');
+      print('Abhi:- Bid Response Status: ${response.statusCode}');
+      print('Abhi:- Bid Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonData = jsonDecode(response.body);
@@ -553,8 +558,11 @@ class _BiddingserviceproviderworkdetailState
             isLoading = false;
             hasAlreadyBid = true;
             biddingOfferId = jsonData['data']['_id'];
+            editbidAmount = jsonData['data']['bid_amount'];
+            editbidmassage = jsonData['data']['message'];
+            editbidduration = jsonData['data']['duration'];
           });
-          print('✅ Bid placed, biddingOfferId: $biddingOfferId');
+          print('Abhi:- Bid placed, biddingOfferId: $biddingOfferId');
           Get.snackbar(
             'Success',
             'Bid successfully placed!',
@@ -626,7 +634,7 @@ class _BiddingserviceproviderworkdetailState
         );
       }
     } catch (e) {
-      print('❌ Bid API Error: $e');
+      print('Abhi:- Bid API Error: $e');
       setState(() {
         isLoading = false;
       });
@@ -642,6 +650,48 @@ class _BiddingserviceproviderworkdetailState
     }
   }
 
+ //   edit bid api
+  Future<void> editBid (editbidAmout,editbidduration,editbidmessage) async {
+   final String url = "https://api.thebharatworks.com/api/bidding-order/edit";
+   print("Abhi:- print editbid url : $url");
+   final prefs = await SharedPreferences.getInstance();
+   final token = prefs.getString('token') ?? '';
+
+    final payload = {
+    'order_id': widget.orderId,
+    'bid_amount': editbidAmout.toString(),
+    'duration': editbidduration,
+    'message': editbidmessage,
+    };
+
+
+   var response = await http.put(Uri.parse(url),
+     headers: {
+       'Authorization': 'Bearer $token',
+       'Content-Type': 'application/json',
+     },
+     // body: jsonEncode(payload),
+     body: jsonEncode(payload),
+   );
+
+   print("Abhi:- edit bid amount print : $payload");
+
+   var responseData = jsonDecode(response.body);
+   try{
+     if (response.statusCode == 200 || response.statusCode == 201) {
+       Get.snackbar("Success", responseData['message'],snackPosition: SnackPosition.BOTTOM,colorText: Colors.white,backgroundColor: Colors.green.shade700);
+       print("Abhi:- editbide response :${response.statusCode}");
+       print("Abhi:- editbide response :${response.body}");
+     }else{
+       print("Abhi:- editbide response :${response.statusCode}");
+       print("Abhi:- editbide response :${response.body}");
+     }
+   }catch(e){
+     print("Abhi:- editbid Exception");
+   }
+  }
+
+  //      Negotiation tab
   Future<void> startNegotiation(String amount) async {
     try {
       setState(() {
@@ -1104,7 +1154,7 @@ class _BiddingserviceproviderworkdetailState
                                     width: width,
                                     errorBuilder: (context, error, stackTrace) {
                                       print(
-                                          '❌ Image error: $item, Error: $error');
+                                          'Image error: $item, Error: $error');
                                       return Image.asset(
                                         'assets/images/chair.png',
                                         fit: BoxFit.cover,
@@ -1128,35 +1178,10 @@ class _BiddingserviceproviderworkdetailState
                       ),
                     ),
                     SizedBox(height: height * 0.015),
-                    Row(
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
                           child: InkWell(
-                          //   onTap: (){
-                          //     MaterialPageRoute(
-                          //       // builder: (context) => MapScreen(
-                          //       //   latitude:  biddingOrder?.serviceProviderId? ?? "No lat",
-                          //       //   longitude: data?['user_id']?['location']?['longitude'] ?? 'N/A',
-                          //       // ),
-                          //       builder: (context) => MapScreen(
-                          //         latitude: biddingOrder?.userId?.location?.latitude ?? 0.0,
-                          //         longitude: biddingOrder?.userId?.location?.longitude ?? 0.0,
-                          //       ),
-                          //
-                          //     // print("Abhi:- get oder Details lat : ${biddingOrder?.serviceProvider?.location?.latitude ?? 0.0} long : ${biddingOrder?.serviceProvider?.location?.longitude ?? 0.0}");
-                          //     );
-                          //   },
-        //              onTap: () {
-        // Navigator.push(
-        // context,
-        // MaterialPageRoute(
-        // builder: (context) => MapScreen(
-        // latitude: biddingOrder?.userId?.location?.latitude ?? 0.0,
-        // longitude: biddingOrder?.userId?.location?.longitude ?? 0.0,
-        // ),
-        // ),
-        // );
-        // },
                             onTap: (){
                               openMap(biddingOrder?.latitude ?? 0.0,
                                 biddingOrder?.longitude ?? 0.0,);
@@ -1164,26 +1189,35 @@ class _BiddingserviceproviderworkdetailState
                             },
 
                             child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: width * 0.06,
-                                vertical: height * 0.005,
-                              ),
+                             height:  height * 0.03,
+                             width:  width * 0.4,
+                              // padding: EdgeInsets.symmetric(
+                              //   horizontal: width * 0.06,
+                              //   vertical: height * 0.005,
+                              // ),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade300,
-                                borderRadius: BorderRadius.circular(width * 0.03),
+                                borderRadius: BorderRadius.circular(width * 0.02),
                               ),
-                              child: Text(
-                                // biddingOrder!.address,
-                                biddingOrder?.userId?.location?.address ?? "No data",
-                                style: GoogleFonts.roboto(
-                                  color: Colors.white,
-                                  fontSize: width * 0.03,
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Text(
+                                  // biddingOrder!.address,
+                                  biddingOrder?.userId?.location?.address ?? "No data",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.white,
+                                    fontSize: width * 0.03,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
                         ),
+                        Container(
+                          decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                          child: Center(child: Text(biddingOrder?.projectId ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
+                            overflow: TextOverflow.ellipsis,)),)
                       ],
                     ),
                     SizedBox(height: height * 0.015),
@@ -1791,7 +1825,177 @@ class _BiddingserviceproviderworkdetailState
                     ],
                     if (isPending) ...[
                       SizedBox(height: height * 0.02),
-                      Center(
+                      /*hasAlreadyBid ? */ biddingOrder!.userId == currentUserId ||
+                          hasAlreadyBid ? GestureDetector(
+                        onTap: (){
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              final TextEditingController
+                              editamountController =
+                              TextEditingController();
+                              final TextEditingController
+                              editdescriptionController =
+                              TextEditingController();
+                              final TextEditingController
+                              editdurationController =
+                              TextEditingController();
+                              return AlertDialog(
+                                backgroundColor: Colors.white,
+                                insetPadding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05),
+                                title: Center(
+                                  child: Text(
+                                    "Bid",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: width * 0.05,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                content: SingleChildScrollView(
+                                  child: SizedBox(
+                                    width: width * 0.8,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Enter Amount",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: width * 0.035,
+                                            fontWeight:
+                                            FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.005),
+                                        TextField(
+                                          controller:
+                                          editamountController,
+                                          keyboardType:
+                                          TextInputType.number,
+                                          decoration:
+                                          InputDecoration(
+                                            hintText: "₹0.00",
+                                            border:
+                                            OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius
+                                                  .circular(
+                                                  width *
+                                                      0.02),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.01),
+                                        Text(
+                                          "Description",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: width * 0.035,
+                                            fontWeight:
+                                            FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.005),
+                                        TextField(
+                                          controller:
+                                          editdescriptionController,
+                                          maxLines: 3,
+                                          decoration:
+                                          InputDecoration(
+                                            hintText:
+                                            "Enter Description",
+                                            border:
+                                            OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius
+                                                  .circular(
+                                                  width *
+                                                      0.02),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.01),
+                                        Text(
+                                          "Duration",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: width * 0.035,
+                                            fontWeight:
+                                            FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.005),
+                                        TextField(
+                                          controller:
+                                          editdurationController,
+                                          keyboardType:
+                                          TextInputType.number,
+                                          decoration:
+                                          InputDecoration(
+                                            hintText:
+                                            "Enter Duration (in days)",
+                                            border:
+                                            OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(width * 0.02),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            height: height * 0.015),
+                                        Center(
+                                          child: GestureDetector(
+                                            onTap: () {
+
+                                              String editbidAmout = editamountController.text.trim();
+                                              String editbidmessage = editdescriptionController.text.trim();
+                                              String editbidduration = editdurationController.text.trim();
+                                              print("Abhi:- edit bid amount print : amount : $editbidAmout editbidmessage : $editbidmessage editbidduration : $editbidduration");
+                                              editBid(editbidAmout,editbidduration,editbidmessage);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: width * 0.18,
+                                                vertical: height * 0.012,
+                                              ),
+                                              decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
+                                              child: Text(
+                                                "Edit Bid",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: width * 0.04,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Center(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: width * 0.18,
+                              vertical: height * 0.012,
+                            ),
+                            decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
+                            child: Text("Edit bid",style: TextStyle(color: Colors.white),),
+                          ),
+                        ),
+                      ) :  Center(
                         child: GestureDetector(
                           onTap: biddingOrder!.userId == currentUserId
                               ? () {
@@ -1933,10 +2137,7 @@ class _BiddingserviceproviderworkdetailState
                                                         border:
                                                             OutlineInputBorder(
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      width *
-                                                                          0.02),
+                                                              BorderRadius.circular(width * 0.02),
                                                         ),
                                                       ),
                                                     ),
@@ -1945,53 +2146,24 @@ class _BiddingserviceproviderworkdetailState
                                                     Center(
                                                       child: GestureDetector(
                                                         onTap: () {
-                                                          String amount =
-                                                              amountController
-                                                                  .text
-                                                                  .trim();
-                                                          String description =
-                                                              descriptionController
-                                                                  .text
-                                                                  .trim();
-                                                          String duration =
-                                                              durationController
-                                                                  .text
-                                                                  .trim();
-                                                          submitBid(
-                                                              amount,
-                                                              description,
-                                                              duration);
-                                                          Navigator.pop(
-                                                              context);
+                                                          String amount = amountController.text.trim();
+                                                          String description = descriptionController.text.trim();
+                                                          String duration = durationController.text.trim();
+                                                          submitBid(amount, description, duration);
+                                                          Navigator.pop(context);
                                                         },
                                                         child: Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                            horizontal:
-                                                                width * 0.18,
-                                                            vertical:
-                                                                height * 0.012,
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: width * 0.18,
+                                                            vertical: height * 0.012,
                                                           ),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors
-                                                                .green.shade700,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        width *
-                                                                            0.02),
-                                                          ),
+                                                          decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
                                                           child: Text(
                                                             "Bid",
                                                             style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize:
-                                                                  width * 0.04,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              color: Colors.white,
+                                                              fontSize: width * 0.04,
+                                                              fontWeight: FontWeight.bold,
                                                             ),
                                                           ),
                                                         ),
@@ -2028,6 +2200,7 @@ class _BiddingserviceproviderworkdetailState
                           ),
                         ),
                       ),
+
                       SizedBox(height: height * 0.02),
                       NegotiationCard(
                         key: ValueKey(offerPrice),

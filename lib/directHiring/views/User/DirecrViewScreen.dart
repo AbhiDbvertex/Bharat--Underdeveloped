@@ -742,12 +742,20 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    order?['title'] ?? '',
-                    style: GoogleFonts.roboto(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        order?['title'] ?? '',
+                        style: GoogleFonts.roboto(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                Container(
+                  decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                  child: Center(child: Text(order?['project_id'] ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
+                    overflow: TextOverflow.ellipsis,)),)
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Row(

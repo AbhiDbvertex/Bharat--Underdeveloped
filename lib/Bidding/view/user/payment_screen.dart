@@ -1600,8 +1600,8 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
         },
         body: jsonEncode(payload),
       );
-      print("anjali Response Code: ${response.statusCode}");
-      print("anjali Response Body: ${response.body}");
+      print("anjali Response Code: 1 ${response.statusCode}");
+      print("anjali Response Body: 2 ${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
@@ -1695,8 +1695,8 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
         },
         body: jsonEncode(payload),
       );
-      print("anjali Response Code: ${response.statusCode}");
-      print("anjali Response Body: ${response.body}");
+      print("anjali Response Code: 3 ${response.statusCode}");
+      print("anjali Response Body: 4 ${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&

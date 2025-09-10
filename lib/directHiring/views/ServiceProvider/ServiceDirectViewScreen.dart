@@ -3461,42 +3461,51 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      InkWell(
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => MapScreen(
-                          //       latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
-                          //       longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
-                          //     ),
-                          //   ),
-                          // );
-                          openMap(order?['latitude'] ?? 'No lat',
-                            order?['longitude'] ?? 'No long',);
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => MapScreen(
+                              //       latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
+                              //       longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
+                              //     ),
+                              //   ),
+                              // );
+                              openMap(order?['latitude'] ?? 'No lat',
+                                order?['longitude'] ?? 'No long',);
 
-                          print("Abhi:- get oder Details lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
-                        },
-                        child: Container(
-                          height: 24,
-                          width: 160,
-                          // padding: const EdgeInsets.symmetric(
-                          //     horizontal: 18, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3.0),
-                            child: Text(
-                              // "",
-                              order!['address'] ?? '',
-                            // order?['service_provider_id']?['location']?['address'] ?? 'No long',
-                              style: const TextStyle(color: Colors.white),
-                              overflow: TextOverflow.ellipsis,
+                              print("Abhi:- get oder Details lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
+                            },
+                            child: Container(
+                              height: 24,
+                              width: 160,
+                              // padding: const EdgeInsets.symmetric(
+                              //     horizontal: 18, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Text(
+                                  // "",
+                                  order!['address'] ?? '',
+                                // order?['service_provider_id']?['location']?['address'] ?? 'No long',
+                                  style: const TextStyle(color: Colors.white),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          Container(
+                            decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                            child: Center(child: Text(order!['project_id'] ?? '',style: TextStyle(color: Colors.white), maxLines: 1,
+                              overflow: TextOverflow.ellipsis,)),),
+                        ],
                       ),
 
                       const SizedBox(height: 10),

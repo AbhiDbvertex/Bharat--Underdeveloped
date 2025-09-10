@@ -1402,8 +1402,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                   }
                 }
               }
-              print(
-                  '📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})');
+              print('📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})');
               return DirectOrder(
                 id: order.id,
                 title: order.title,
@@ -1482,7 +1481,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   }
 
   Color _getStatusColor(String status) {
-    print("🎨 Checking status color for: $status");
+    // print("🎨 Checking status color for: $status");
     switch (status.toLowerCase()) {
       case 'cancelled':
       case 'cancelleddispute':
@@ -1739,8 +1738,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       child: Row(
         children: [
           Container(
-            color: Colors.grey,
-            child: ClipRRect(
+          color: Colors.grey,
+          child: Stack(
+            children: [ ClipRRect(
               borderRadius: BorderRadius.circular(screenWidth * 0.02),
               child: hasImage
                   ? Image.network(
@@ -1766,7 +1766,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                       fit: BoxFit.cover,
                     ),
             ),
-
+              Positioned(
+                bottom: 10,
+                left: 20,
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                  child: Center(child: Text(data.projectid ?? "",style: TextStyle(color: Colors.white), maxLines: 1,
+                    overflow: TextOverflow.ellipsis,)),),
+              ),
+          ],),
           ),
           SizedBox(width: screenWidth * 0.025),
           Expanded(
@@ -1875,8 +1883,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     double screenWidth,
     double screenHeight,
   ) {
-    print(
-        "🛠 Building card for Task: ${data.title}, Status: ${data.hireStatus}, Project ID: ${data.projectId}, Category ID: ${data.categoryId}, Subcategory IDs: ${data.subcategoryIds}");
+    print("Building card for Task: ${data.title} ,projectId : ${data.projectId}, Status: ${data.hireStatus}, Project ID: ${data.projectId}, Category ID: ${data.categoryId}, Subcategory IDs: ${data.subcategoryIds}");
+
     print("Image URLs: ${data.imageUrls}");
 
     return Container(
@@ -1892,37 +1900,47 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(color: Colors.grey,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(screenWidth * 0.02),
-              child: Container(
-                alignment: Alignment.topCenter,
-                child: data.imageUrls.isNotEmpty
-                    ? Image.network(
-                        data.imageUrls.first,
-                        height: screenHeight * 0.16,
-                        width: screenWidth * 0.32,
-                        // fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          print(
-                              'Error loading image: ${data.imageUrls.first}, Error: $error');
-                          return Image.asset(
-                            'assets/images/chair.png',
-                            height: screenHeight * 0.16,
-                            width: screenWidth * 0.32,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      )
-                    : Image.asset(
-                        'assets/images/chair.png',
-                        height: screenHeight * 0.16,
-                        width: screenWidth * 0.32,
-                        fit: BoxFit.cover,
-                      ),
+          Stack(
+            children:[ Container(color: Colors.grey,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                child: Container(
+                  alignment: Alignment.topCenter,
+                  child: data.imageUrls.isNotEmpty
+                      ? Image.network(
+                          data.imageUrls.first,
+                          height: screenHeight * 0.16,
+                          width: screenWidth * 0.32,
+                          // fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print(
+                                'Error loading image: ${data.imageUrls.first}, Error: $error');
+                            return Image.asset(
+                              'assets/images/chair.png',
+                              height: screenHeight * 0.16,
+                              width: screenWidth * 0.32,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          'assets/images/chair.png',
+                          height: screenHeight * 0.16,
+                          width: screenWidth * 0.32,
+                          fit: BoxFit.cover,
+                        ),
+                ),
               ),
             ),
-          ),
+              Positioned(
+                bottom: 10,
+                left: 20,
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                  child: Center(child: Text(data.projectId,style: TextStyle(color: Colors.white), maxLines: 1,
+                    overflow: TextOverflow.ellipsis,)),),
+              )
+          ],),
           SizedBox(width: screenWidth * 0.025),
           Expanded(
             child: Column(

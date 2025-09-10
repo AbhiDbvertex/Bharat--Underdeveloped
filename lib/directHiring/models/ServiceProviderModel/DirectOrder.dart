@@ -1,10 +1,67 @@
+// class DirectOrder {
+//   final String id;
+//   final String title;
+//   final String description;
+//   final String? projectid;
+//   final String date;
+//   final String status;
+//   final String image; // First image
+//   final String? address;
+//   final double? latitude;
+//   final double? longitude;
+//   final User? user_id;
+//   final List<Offer>? offer_history;
+//
+//   DirectOrder({
+//     required this.id,
+//     required this.title,
+//     this.projectid,
+//     required this.description,
+//     required this.date,
+//     required this.status,
+//     required this.image,
+//     this.address,
+//     this.latitude,
+//     this.longitude,
+//     this.user_id,
+//     this.offer_history,
+//   });
+//
+//   factory DirectOrder.fromJson(Map<String, dynamic> json) {
+//     return DirectOrder(
+//       id: json['_id'] ?? '',
+//       title: json['title'] ?? '',
+//       projectid: json['project_id'] ?? '',
+//       description: json['description'] ?? '',
+//       date: json['deadline'] != null
+//           ? json['deadline'].toString().substring(0, 10)
+//           : '',
+//       status: json['hire_status'] ?? 'pending',
+//       image:
+//           (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
+//               ? json['image_url'][0]
+//               : '',
+//       address: json['address'] ?? '',
+//       latitude: json['latitude'] ?? 0.0,
+//       longitude: json['longitude'] ?? 0.0,
+//       user_id: json['user_id'] != null ? User.fromJson(json['user_id']) : null,
+//       offer_history: json['offer_history'] != null
+//           ? (json['offer_history'] as List)
+//               .map((e) => Offer.fromJson(e))
+//               .toList()
+//           : null,
+//     );
+//   }
+// }
+
 class DirectOrder {
   final String id;
   final String title;
   final String description;
+  final String? projectid; // already hai ✅
   final String date;
   final String status;
-  final String image; // First image
+  final String image;
   final String? address;
   final double? latitude;
   final double? longitude;
@@ -14,6 +71,7 @@ class DirectOrder {
   DirectOrder({
     required this.id,
     required this.title,
+    this.projectid,
     required this.description,
     required this.date,
     required this.status,
@@ -29,27 +87,29 @@ class DirectOrder {
     return DirectOrder(
       id: json['_id'] ?? '',
       title: json['title'] ?? '',
+      projectid: json['project_id'] ?? '',  // ✅ yaha project id parse kar diya
       description: json['description'] ?? '',
       date: json['deadline'] != null
           ? json['deadline'].toString().substring(0, 10)
           : '',
       status: json['hire_status'] ?? 'pending',
       image:
-          (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
-              ? json['image_url'][0]
-              : '',
+      (json['image_url'] is List && (json['image_url'] as List).isNotEmpty)
+          ? json['image_url'][0]
+          : '',
       address: json['address'] ?? '',
       latitude: json['latitude'] ?? 0.0,
       longitude: json['longitude'] ?? 0.0,
       user_id: json['user_id'] != null ? User.fromJson(json['user_id']) : null,
       offer_history: json['offer_history'] != null
           ? (json['offer_history'] as List)
-              .map((e) => Offer.fromJson(e))
-              .toList()
+          .map((e) => Offer.fromJson(e))
+          .toList()
           : null,
     );
   }
 }
+
 
 class User {
   final String? id;
