@@ -150,21 +150,35 @@ class RequestController extends GetxController {
           bwDebug(
               "[assignEmergencyOrder] SUCCESS: ${assignOrderResponse.value.message}",
               tag: tag);
-          await workDetailController.getEmergencyOrder(orderId);
+
         } else {
           errorMessage.value = assignOrderResponse.value.message;
         }
-      } else {
+
+      }
+      else if (response.statusCode == 400) {
+        final data = jsonDecode(response.body);
+        final String message = data['message'] ?? 'Unknown error';
+        if (message.contains("This order is already assigned.")) {
+          errorMessage.value = "This order is already assigned to someone.";
+        }
+
+      }
+      else {
         bwDebug("Error: ${response.body}");
         errorMessage.value =
             "Error: ${response.statusCode} - ${response.reasonPhrase}";
       }
+     // await workDetailController.getEmergencyOrder(orderId);
     } catch (e) {
       bwDebug("[assignEmergencyOrder] error : $e", tag: tag);
       errorMessage.value = "Exception: $e";
     } finally {
       // workDetailController.isLoading.value = false;
-      isHiring.value = false;
+      await workDetailController.getEmergencyOrder(orderId);
+    isHiring.value = false;
+
+
     }
   }
 }

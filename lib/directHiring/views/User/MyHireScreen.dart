@@ -226,12 +226,13 @@ class _MyHireScreenState extends State<MyHireScreen> {
   //   }
   // }
   Color _getStatusColor(String status) {
+    bwDebug("status : $status");
     switch (status.toLowerCase()) {
       case 'cancelled':
         return const Color(0xFFFF3B30); // Vibrant Apple Red
 
-      case 'cancelledDispute':
-        return const Color(0xFF5D6D7E); // Steel Gray
+      case 'cancelleddispute':
+        return const Color(0xFFFF3B30);
 
       case 'accepted':
         return const Color(0xFF34C759); // Fresh Lime Green
@@ -246,7 +247,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
         return const Color(0xFFAF52DE); // Luxury Purple
 
       default:
-        return const Color(0xFF8E8E93); // Neutral Gray
+        return const Color(0xFF8d8E93); // Neutral Gray
     }
   }
 

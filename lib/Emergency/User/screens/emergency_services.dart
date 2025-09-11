@@ -89,7 +89,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                   child: Text(
-                    'Choose your problem',
+                    "Choose you'r problem",
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
@@ -226,17 +226,15 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
 
               // Task Fee
               Obx(() => Container(
+                height: 0.12.toWidthPercent(),
                     width: double.infinity,
                     color: Color(0xfff17773),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text(
-                          "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
-                          style: TextStyle(
-                            fontSize: 0.050.toWidthPercent(),
-                            color: Colors.white,
-                          ),
+                    child: Center(
+                      child: Text(
+                        "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
+                        style: TextStyle(
+                          fontSize: 0.040.toWidthPercent(),
+                          color: Colors.white,
                         ),
                       ),
                     ),
