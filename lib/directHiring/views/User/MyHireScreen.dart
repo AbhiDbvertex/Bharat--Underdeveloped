@@ -254,13 +254,15 @@ class _MyHireScreenState extends State<MyHireScreen> {
   @override
   Widget build(BuildContext context) {
     // print("Abhi:- print data in ui : ${BudingData}");
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
+        toolbarHeight: height*0.013,
         automaticallyImplyLeading: false,
       ),
       body: Column(
@@ -416,7 +418,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             if (dataList.isEmpty)
               Center(
                 child: Text(
-                  "No bidding tasks found",
+                  "No bidding tasks found!",
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
               )

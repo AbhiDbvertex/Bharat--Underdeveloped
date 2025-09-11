@@ -1524,6 +1524,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
 import '../../../Emergency/utils/logger.dart';
+import '../../../Widgets/AppColors.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../User/UserNotificationScreen.dart';
 import '../comm/home_location_screens.dart';
@@ -2074,7 +2075,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.green.shade800,
+        backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
         toolbarHeight: 10,

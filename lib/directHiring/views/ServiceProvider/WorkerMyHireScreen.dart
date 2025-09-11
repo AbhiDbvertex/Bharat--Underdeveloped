@@ -1512,7 +1512,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: screenHeight * 0.02,
+        toolbarHeight: screenHeight * 0.013,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -1525,15 +1525,16 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                 child: Text(
                   "My Work",
                   style: GoogleFonts.roboto(
-                    fontSize: screenWidth * 0.045,
+                    fontSize: screenWidth * 0.05,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
+            SizedBox(height: screenHeight * 0.0035,),
             Container(
               width: double.infinity,
-              height: screenHeight * 0.07,
+              height: screenHeight * 0.063,
               color: Colors.green.shade100,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1643,7 +1644,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         title,
         style: _tabText(
             color: isSelected ? Colors.white : Colors.black,
-            fontSize: screenWidth * 0.03),
+            fontSize: screenWidth * 0.034),
       ),
     );
   }

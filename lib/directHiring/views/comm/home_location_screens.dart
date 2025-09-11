@@ -1811,6 +1811,8 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         final data = jsonDecode(response.body);
         if (data['status'] == true) {
           String newAddressId = data['location']['_id'] ?? addressId;
+
+          if(mounted){
           setState(() {
             savedAddresses.removeWhere((addr) => addr['_id'] == addressId);
             savedAddresses.add({
@@ -1835,6 +1837,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
             // Removed onLocationSelected call to prevent API trigger here
             print("📍 Location in UI: $address, ID: $newAddressId");
           });
+          }
 
           await _saveLocation(
             address,

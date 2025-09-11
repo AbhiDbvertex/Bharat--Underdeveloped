@@ -205,6 +205,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
       if (res.statusCode == 200 || res.statusCode == 201) {
 
       await Future.delayed(const Duration(milliseconds: 500));
+      // Navigator.pop(context, true);
       Navigator.pop(context, true);
 
       switchRoleRequest();

@@ -757,7 +757,8 @@ class PostTaskController extends GetxController {
 
 
   void navigateToLocationScreen() async {
-    final emergencyServiceController = Get.find<EmergencyServiceController>();
+    // final emergencyServiceController = Get.find<EmergencyServiceController>();
+    final emergencyServiceController = Get.put(EmergencyServiceController());
 
     final result = await Get.to(
           () => LocationSelectionScreen(

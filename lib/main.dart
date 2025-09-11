@@ -1,6 +1,4 @@
 import 'package:developer/Widgets/AppColors.dart';
-import 'package:developer/Widgets/Bottombar.dart';
-import 'package:developer/testingfile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'NotificationService.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
-import 'directHiring/views/auth/UserDetailFormScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
