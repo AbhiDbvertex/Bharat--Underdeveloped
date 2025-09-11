@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart' as mime;
 import '../../../../Widgets/AppColors.dart';
+import '../../../Emergency/User/controllers/emergency_service_controller.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../controller/bidding_post_task_controller.dart';
 
 class PostTaskScreen extends StatelessWidget {
-  const PostTaskScreen({super.key});
+   PostTaskScreen({super.key});
+  final emergencyServiceController = Get.put(EmergencyServiceController());
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +89,6 @@ class PostTaskScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // TextButton(onPressed: (){
-                  //   print("Abhi:- print late : ${controller.late} long : ${controller.long}");
-                  // }, child: Text("Print data")),
                   TextFormField(
                     enabled: false,
                     controller: controller.addressController,

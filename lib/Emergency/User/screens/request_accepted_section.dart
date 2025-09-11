@@ -16,7 +16,7 @@ class RequestAcceptedSection extends StatelessWidget {
   final orderId;
   final RequestController controller = Get.put(RequestController());
   // final workController = Get.find<WorkDetailController>();
-  final workController = Get.put(WorkDetailController());
+  final workController = Get.find<WorkDetailController>();
 
   RequestAcceptedSection({super.key, required this.orderId});
 final tag="RequestAcceptedSection";

@@ -18,6 +18,7 @@ import '../../../directHiring/views/comm/home_location_screens.dart';
 import '../../Emergency/User/controllers/emergency_service_controller.dart';
 
 class PostTaskController extends GetxController {
+
   final formKey = GlobalKey<FormState>();
   final dateController = TextEditingController();
   final titleController = TextEditingController();

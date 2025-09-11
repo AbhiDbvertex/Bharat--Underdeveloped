@@ -1470,7 +1470,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
               if (savedAddresses.isNotEmpty) {
                 if (savedAddressId == null ||
                     !savedAddresses.any(
-                          (addr) => addr['_id'] == savedAddressId,
+                      (addr) => addr['_id'] == savedAddressId,
                     )) {
                   savedAddressId = savedAddresses[0]['_id'];
                   savedLocation =
@@ -1525,27 +1525,23 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
     final mergedAddresses = List<dynamic>.from(serverAddresses);
     for (var localAddr in savedAddresses) {
       final index = mergedAddresses.indexWhere(
-            (addr) => addr['_id'] == localAddr['_id'],
+        (addr) => addr['_id'] == localAddr['_id'],
       );
       if (index != -1) {
         mergedAddresses[index] = {
           '_id': localAddr['_id'],
-          'address':
-          localAddr['address'] ??
+          'address': localAddr['address'] ??
               mergedAddresses[index]['address'] ??
               'Unknown',
-          'latitude':
-          localAddr['latitude'] ??
+          'latitude': localAddr['latitude'] ??
               mergedAddresses[index]['latitude'] ??
               0.0,
-          'longitude':
-          localAddr['longitude'] ??
+          'longitude': localAddr['longitude'] ??
               mergedAddresses[index]['longitude'] ??
               0.0,
           'title':
-          localAddr['title'] ?? mergedAddresses[index]['title'] ?? 'N/A',
-          'landmark':
-          localAddr['landmark'] ??
+              localAddr['title'] ?? mergedAddresses[index]['title'] ?? 'N/A',
+          'landmark': localAddr['landmark'] ??
               mergedAddresses[index]['landmark'] ??
               'N/A',
         };
@@ -1553,7 +1549,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           "Debug: Merged address ID: ${mergedAddresses[index]['_id']}, address: ${mergedAddresses[index]['address']}",
         );
       } else if (!mergedAddresses.any(
-            (addr) => addr['_id'] == localAddr['_id'],
+        (addr) => addr['_id'] == localAddr['_id'],
       )) {
         mergedAddresses.add(localAddr);
         print(
@@ -1589,13 +1585,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   }
 
   Future<void> _saveLocation(
-      String location, {
-        double? latitude,
-        double? longitude,
-        String? addressId,
-        String? title,
-        String? landmark,
-      }) async {
+    String location, {
+    double? latitude,
+    double? longitude,
+    String? addressId,
+    String? title,
+    String? landmark,
+  }) async {
     print("Debug: Location save : $location, ID: $addressId");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("selected_location", location);
@@ -1756,13 +1752,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
   }
 
   Future<void> updateLocation(
-      String address,
-      double latitude,
-      double longitude,
-      String addressId,
-      String title,
-      String landmark,
-      ) async {
+    String address,
+    double latitude,
+    double longitude,
+    String addressId,
+    String title,
+    String landmark,
+  ) async {
     if (address.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1812,6 +1808,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
         if (data['status'] == true) {
           String newAddressId = data['location']['_id'] ?? addressId;
 
+
           if(mounted){
           setState(() {
             savedAddresses.removeWhere((addr) => addr['_id'] == addressId);
@@ -1839,6 +1836,32 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           });
           }
 
+          if (mounted) {
+            setState(() {
+              savedAddresses.removeWhere((addr) => addr['_id'] == addressId);
+              savedAddresses.add({
+                '_id': newAddressId,
+                'address': address,
+                'latitude': latitude,
+                'longitude': longitude,
+                'title': title,
+                'landmark': landmark,
+              });
+              selectedLocation = address;
+              selectedAddressId = newAddressId;
+              selectedTitle = title;
+              selectedLandmark = landmark;
+              savedAddresses = _removeDuplicateAddresses(savedAddresses);
+              print(
+                "Debug: Updated address ID: $newAddressId, address: $address",
+              );
+              print(
+                "Debug: Deduplicated savedAddresses after update: $savedAddresses",
+              );
+              // Removed onLocationSelected call to prevent API trigger here
+              print("📍 Location in UI:: $address, ID: $newAddressId");
+            });
+          }
           await _saveLocation(
             address,
             latitude: latitude,
@@ -1883,14 +1906,19 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
       print("Error in updateLocation: $e");
       if (mounted) {
         // ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error updating location: $e")));
-        ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text("Error updating location: ")));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error updating location: ")));
       }
     } finally {
       if (mounted) {
-        setState(() {isLoading = false;});
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
+
   Future<void> deleteAddress(String addressId) async {
     String? token = await _getToken();
     if (token == null) {
@@ -1965,13 +1993,20 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
           if (mounted) {
             setState(() {
               savedAddresses.removeWhere(
-                    (address) => address['_id'] == addressId,
+                (address) => address['_id'] == addressId,
               );
               if (selectedAddressId == addressId) {
-                selectedAddressId = savedAddresses.isNotEmpty ? savedAddresses[0]['_id'] : null;
-                selectedLocation = savedAddresses.isNotEmpty ? savedAddresses[0]['address'] : "Select Location";
-                selectedTitle = savedAddresses.isNotEmpty ? savedAddresses[0]['title']?.toString() ?? 'N/A' : 'N/A';
-                selectedLandmark = savedAddresses.isNotEmpty ? savedAddresses[0]['landmark']?.toString() ?? 'N/A' : 'N/A';
+                selectedAddressId =
+                    savedAddresses.isNotEmpty ? savedAddresses[0]['_id'] : null;
+                selectedLocation = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['address']
+                    : "Select Location";
+                selectedTitle = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['title']?.toString() ?? 'N/A'
+                    : 'N/A';
+                selectedLandmark = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['landmark']?.toString() ?? 'N/A'
+                    : 'N/A';
                 // Removed onLocationSelected call to prevent API trigger here
                 print("📍 Location in UI: $selectedLocation");
               }
@@ -2079,20 +2114,28 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                             builder: (context) => AddressDetailScreen(),
                           ),
                         ).then((result) {
-                          print("Debug: Returned from AddressDetailScreen (Add), result: $result",);
+                          print(
+                            "Debug: Returned from AddressDetailScreen (Add), result: $result",
+                          );
                           if (result != null && !result['isEdit']) {
                             setState(() {
-                              selectedLocation = result['address'] ?? "Select Location";
+                              selectedLocation =
+                                  result['address'] ?? "Select Location";
                               selectedAddressId = result['addressId'];
-                              selectedTitle = result['title']?.toString() ?? 'N/A';
-                              selectedLandmark = result['landmark']?.toString() ?? 'N/A';
-                              if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId,
+                              selectedTitle =
+                                  result['title']?.toString() ?? 'N/A';
+                              selectedLandmark =
+                                  result['landmark']?.toString() ?? 'N/A';
+                              if (!savedAddresses.any(
+                                (addr) => addr['_id'] == selectedAddressId,
                               )) {
                                 savedAddresses.add({
                                   '_id': selectedAddressId,
                                   'address': selectedLocation,
-                                  'latitude': result['latitude']?.toDouble() ?? 0.0,
-                                  'longitude': result['longitude']?.toDouble() ?? 0.0,
+                                  'latitude':
+                                      result['latitude']?.toDouble() ?? 0.0,
+                                  'longitude':
+                                      result['longitude']?.toDouble() ?? 0.0,
                                   'title': selectedTitle,
                                   'landmark': selectedLandmark,
                                 });
@@ -2156,408 +2199,538 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                   ),
                   SizedBox(height: screenHeight * 0.00),
                   Expanded(
-                    child:
-                    isLoading
+                    child: isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (savedAddresses.isNotEmpty) ...[
-                          SizedBox(height: screenHeight * 0.01),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: savedAddresses.length,
-                              itemBuilder: (context, index) {
-                                final address = savedAddresses[index];
-                                print(
-                                  "Debug: Rendering address ID: ${address['_id']}, address: ${address['address']}, title: ${address['title']}, landmark: ${address['landmark']}",
-                                );
-                                return GestureDetector(
-                                  onTap: () {
-                                    final latitude =
-                                    address['latitude']?.toDouble();
-                                    final longitude =
-                                    address['longitude']?.toDouble();
-                                    final addressText =
-                                    address['address']?.toString();
-                                    final title = address['title']?.toString() ?? 'N/A';
-                                    final landmark = address['landmark']?.toString() ?? 'N/A';
-
-                                    if (addressText == null ||
-                                        addressText.isEmpty) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Invalid address!",
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    if (latitude == null ||
-                                        longitude == null ||
-                                        latitude == 0.0 ||
-                                        longitude == 0.0) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Invalid latitude or longitude for this address!",
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-
-                                    setState(() {
-                                      selectedAddressId =
-                                      address['_id'];
-                                      selectedLocation = addressText;
-                                      selectedTitle = title;
-                                      selectedLandmark = landmark;
-                                      // Removed onLocationSelected to prevent API trigger here
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (savedAddresses.isNotEmpty) ...[
+                                SizedBox(height: screenHeight * 0.01),
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: savedAddresses.length,
+                                    itemBuilder: (context, index) {
+                                      final address = savedAddresses[index];
                                       print(
-                                        "📍 Location in UI: $addressText",
+                                        "Debug: Rendering address ID: ${address['_id']}, address: ${address['address']}, title: ${address['title']}, landmark: ${address['landmark']}",
                                       );
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: screenHeight * 0.005,
-                                    ),
-                                    padding: EdgeInsets.all(
-                                      screenWidth * 0.03,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                        screenWidth * 0.02,
-                                      ),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.1),
-                                          spreadRadius: 1,
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        // Text("Abhi check the text"),
-                                        Row(
-                                          children: [
-                                            Radio<String>(
-                                              value: address['_id'],
-                                              groupValue:
-                                              selectedAddressId,
-                                              onChanged: (value) {
-                                                final latitude =
-                                                address['latitude']?.toDouble();
-                                                final longitude =
-                                                address['longitude']?.toDouble();
-                                                final addressText =
-                                                address['address']?.toString();
-                                                final title = address['title']?.toString() ?? 'N/A';
-                                                final landmark = address['landmark']?.toString() ?? 'N/A';
-                                                if (addressText == null || addressText.isEmpty) {
-                                                  ScaffoldMessenger.of(context,).showSnackBar(
-                                                    const SnackBar(content: Text("Invalid address!",),
-                                                    ),
-                                                  );
-                                                  return;
-                                                }
-                                                if (latitude == null ||
-                                                    longitude == null ||
-                                                    latitude == 0.0 ||
-                                                    longitude == 0.0) {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text("Invalid latitude or longitude for this address!",),
-                                                    ),
-                                                  );
-                                                  return;
-                                                }
+                                      return GestureDetector(
+                                        onTap: () {
+                                          final latitude =
+                                              address['latitude']?.toDouble();
+                                          final longitude =
+                                              address['longitude']?.toDouble();
+                                          final addressText =
+                                              address['address']?.toString();
+                                          final title =
+                                              address['title']?.toString() ??
+                                                  'N/A';
+                                          final landmark =
+                                              address['landmark']?.toString() ??
+                                                  'N/A';
 
-                                                setState(() {
-                                                  selectedAddressId = value;
-                                                  selectedLocation = addressText;
-                                                  selectedTitle = title;
-                                                  selectedLandmark = landmark;
-                                                  // Removed onLocationSelected to prevent API trigger here
-                                                  print("📍 Location in UI: $addressText",);
-                                                });
-                                              },
+                                          if (addressText == null ||
+                                              addressText.isEmpty) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  "Invalid address!",
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (latitude == null ||
+                                              longitude == null ||
+                                              latitude == 0.0 ||
+                                              longitude == 0.0) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  "Invalid latitude or longitude for this address!",
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          setState(() {
+                                            selectedAddressId = address['_id'];
+                                            selectedLocation = addressText;
+                                            selectedTitle = title;
+                                            selectedLandmark = landmark;
+                                            // Removed onLocationSelected to prevent API trigger here
+                                            print(
+                                              "📍 Location in UI: $addressText",
+                                            );
+                                          });
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                            vertical: screenHeight * 0.005,
+                                          ),
+                                          padding: EdgeInsets.all(
+                                            screenWidth * 0.03,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
                                             ),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
+                                            borderRadius: BorderRadius.circular(
+                                              screenWidth * 0.02,
+                                            ),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.1),
+                                                spreadRadius: 1,
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
                                                 CrossAxisAlignment.start,
+                                            children: [
+                                              // Text("Abhi check the text"),
+                                              Row(
                                                 children: [
-                                                  Text(address['address'] ?? "Unknown",
-                                                    style: GoogleFonts.roboto(
-                                                      fontSize: 14 * textScaleFactor,
-                                                      fontWeight: FontWeight.bold,),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 1,
+                                                  Radio<String>(
+                                                    value: address['_id'],
+                                                    groupValue:
+                                                        selectedAddressId,
+                                                    onChanged: (value) {
+                                                      final latitude =
+                                                          address['latitude']
+                                                              ?.toDouble();
+                                                      final longitude =
+                                                          address['longitude']
+                                                              ?.toDouble();
+                                                      final addressText =
+                                                          address['address']
+                                                              ?.toString();
+                                                      final title = address[
+                                                                  'title']
+                                                              ?.toString() ??
+                                                          'N/A';
+                                                      final landmark = address[
+                                                                  'landmark']
+                                                              ?.toString() ??
+                                                          'N/A';
+                                                      if (addressText == null ||
+                                                          addressText.isEmpty) {
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                              "Invalid address!",
+                                                            ),
+                                                          ),
+                                                        );
+                                                        return;
+                                                      }
+                                                      if (latitude == null ||
+                                                          longitude == null ||
+                                                          latitude == 0.0 ||
+                                                          longitude == 0.0) {
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                              "Invalid latitude or longitude for this address!",
+                                                            ),
+                                                          ),
+                                                        );
+                                                        return;
+                                                      }
+
+                                                      setState(() {
+                                                        selectedAddressId =
+                                                            value;
+                                                        selectedLocation =
+                                                            addressText;
+                                                        selectedTitle = title;
+                                                        selectedLandmark =
+                                                            landmark;
+                                                        // Removed onLocationSelected to prevent API trigger here
+                                                        print(
+                                                          "📍 Location in UI: $addressText",
+                                                        );
+                                                      });
+                                                    },
                                                   ),
-                                                  SizedBox(
-                                                    height: screenHeight * 0.005,
-                                                  ),
-                                                  Text(
-                                                    "Title: ${address['title'] ?? 'N/A'}",
-                                                    style: GoogleFonts.roboto(
-                                                      fontSize: 12 * textScaleFactor,
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          address['address'] ??
+                                                              "Unknown",
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                            fontSize: 14 *
+                                                                textScaleFactor,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                        SizedBox(
+                                                          height: screenHeight *
+                                                              0.005,
+                                                        ),
+                                                        Text(
+                                                          "Title: ${address['title'] ?? 'N/A'}",
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                            fontSize: 12 *
+                                                                textScaleFactor,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                        Text(
+                                                          "Landmark: ${address['landmark'] ?? 'N/A'}",
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                            fontSize: 12 *
+                                                                textScaleFactor,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                        ),
+                                                      ],
                                                     ),
-                                                    overflow:
-                                                    TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                  Text(
-                                                    "Landmark: ${address['landmark'] ?? 'N/A'}",
-                                                    style: GoogleFonts.roboto(
-                                                      fontSize: 12 * textScaleFactor,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 1,
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: screenHeight * 0.01,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                print(
-                                                  "Debug: Edit button pressed for address ID: ${address['_id']}",
-                                                );
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context,) => AddressDetailScreen(
-                                                      editlocationId:
-                                                      address['_id'] ??
-                                                          "no id",
-                                                      initialAddress:
-                                                      address['address']?.toString() ?? "",
-                                                      initialLocation: LatLng(address['latitude']?.toDouble() ?? 0.0,
-                                                        address['longitude']?.toDouble() ?? 0.0,
+                                              SizedBox(
+                                                height: screenHeight * 0.01,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      print(
+                                                        "Debug: Edit button pressed for address ID: ${address['_id']}",
+                                                      );
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (
+                                                            context,
+                                                          ) =>
+                                                              AddressDetailScreen(
+                                                            editlocationId:
+                                                                address['_id'] ??
+                                                                    "no id",
+                                                            initialAddress:
+                                                                address['address']
+                                                                        ?.toString() ??
+                                                                    "",
+                                                            initialLocation:
+                                                                LatLng(
+                                                              address['latitude']
+                                                                      ?.toDouble() ??
+                                                                  0.0,
+                                                              address['longitude']
+                                                                      ?.toDouble() ??
+                                                                  0.0,
+                                                            ),
+                                                            initialTitle: address[
+                                                                        'title']
+                                                                    ?.toString() ??
+                                                                "",
+                                                            initialLandmark:
+                                                                address['landmark']
+                                                                        ?.toString() ??
+                                                                    "",
+                                                          ),
+                                                        ),
+                                                      ).then((result) {
+                                                        print(
+                                                          "Debug: Returned from AddressDetailScreen (Edit), result: $result",
+                                                        );
+                                                        if (result != null &&
+                                                            result['isEdit']) {
+                                                          setState(() {
+                                                            String
+                                                                oldAddressId =
+                                                                address['_id'];
+                                                            selectedLocation = result[
+                                                                    'address'] ??
+                                                                "Select Location";
+                                                            selectedAddressId =
+                                                                result['addressId'] ??
+                                                                    oldAddressId;
+                                                            selectedTitle = result[
+                                                                        'title']
+                                                                    ?.toString() ??
+                                                                'N/A';
+                                                            selectedLandmark =
+                                                                result['landmark']
+                                                                        ?.toString() ??
+                                                                    'N/A';
+
+                                                            savedAddresses
+                                                                .removeWhere(
+                                                              (addr) =>
+                                                                  addr['_id'] ==
+                                                                  oldAddressId,
+                                                            );
+
+                                                            int index =
+                                                                savedAddresses
+                                                                    .indexWhere(
+                                                              (addr) =>
+                                                                  addr['_id'] ==
+                                                                  selectedAddressId,
+                                                            );
+                                                            if (index == -1) {
+                                                              savedAddresses
+                                                                  .add({
+                                                                '_id':
+                                                                    selectedAddressId,
+                                                                'address':
+                                                                    selectedLocation,
+                                                                'latitude':
+                                                                    result['latitude']
+                                                                            ?.toDouble() ??
+                                                                        0.0,
+                                                                'longitude':
+                                                                    result['longitude']
+                                                                            ?.toDouble() ??
+                                                                        0.0,
+                                                                'title':
+                                                                    selectedTitle,
+                                                                'landmark':
+                                                                    selectedLandmark,
+                                                              });
+                                                              print(
+                                                                "Debug: New address add  ID: $selectedAddressId, address: $selectedLocation",
+                                                              );
+                                                            } else {
+                                                              savedAddresses[
+                                                                  index] = {
+                                                                '_id':
+                                                                    selectedAddressId,
+                                                                'address':
+                                                                    selectedLocation,
+                                                                'latitude':
+                                                                    result['latitude']
+                                                                            ?.toDouble() ??
+                                                                        0.0,
+                                                                'longitude':
+                                                                    result['longitude']
+                                                                            ?.toDouble() ??
+                                                                        0.0,
+                                                                'title':
+                                                                    selectedTitle,
+                                                                'landmark':
+                                                                    selectedLandmark,
+                                                              };
+                                                              print(
+                                                                "Debug: Existing address update  ID: $selectedAddressId, address: $selectedLocation",
+                                                              );
+                                                            }
+
+                                                            savedAddresses =
+                                                                _removeDuplicateAddresses(
+                                                              savedAddresses,
+                                                            );
+                                                            print(
+                                                              "Debug: Deduplicated savedAddresses after edit: $savedAddresses",
+                                                            );
+
+                                                            // Removed onLocationSelected to prevent API trigger here
+                                                          });
+
+                                                          _saveLocation(
+                                                            selectedLocation,
+                                                            latitude: result[
+                                                                    'latitude']
+                                                                ?.toDouble(),
+                                                            longitude: result[
+                                                                    'longitude']
+                                                                ?.toDouble(),
+                                                            addressId:
+                                                                selectedAddressId,
+                                                            title:
+                                                                selectedTitle,
+                                                            landmark:
+                                                                selectedLandmark,
+                                                          );
+
+                                                          _loadSavedLocation();
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                      "Edit",
+                                                      style: GoogleFonts.roboto(
+                                                        color: Colors
+                                                            .green.shade700,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12 *
+                                                            textScaleFactor,
                                                       ),
-                                                      initialTitle:
-                                                      address['title']?.toString() ?? "",
-                                                      initialLandmark: address['landmark']?.toString() ?? "",
                                                     ),
                                                   ),
-                                                ).then((result) {
-                                                  print(
-                                                    "Debug: Returned from AddressDetailScreen (Edit), result: $result",
-                                                  );
-                                                  if (result != null &&
-                                                      result['isEdit']) {
-                                                    setState(() {
-                                                      String
-                                                      oldAddressId =
-                                                      address['_id'];
-                                                      selectedLocation = result['address'] ?? "Select Location";
-                                                      selectedAddressId = result['addressId'] ?? oldAddressId;
-                                                      selectedTitle = result['title']?.toString() ?? 'N/A';selectedLandmark =
-                                                          result['landmark']?.toString() ?? 'N/A';
-
-                                                      savedAddresses.removeWhere(
-                                                            (addr) => addr['_id'] == oldAddressId,
-                                                      );
-
-                                                      int
-                                                      index = savedAddresses.indexWhere((addr) =>
-                                                      addr['_id'] == selectedAddressId,
-                                                      );
-                                                      if (index == -1) {
-                                                        savedAddresses.add({'_id':
-                                                        selectedAddressId, 'address': selectedLocation, 'latitude':
-                                                        result['latitude']?.toDouble() ?? 0.0,
-                                                          'longitude': result['longitude']?.toDouble() ?? 0.0,
-                                                          'title': selectedTitle,
-                                                          'landmark': selectedLandmark,
-                                                        });
-                                                        print(
-                                                          "Debug: New address add  ID: $selectedAddressId, address: $selectedLocation",
-                                                        );
-                                                      } else {
-                                                        savedAddresses[index] = {'_id':
-                                                        selectedAddressId, 'address':
-                                                        selectedLocation, 'latitude':
-                                                        result['latitude']?.toDouble() ?? 0.0,
-                                                          'longitude':
-                                                          result['longitude']?.toDouble() ?? 0.0,
-                                                          'title': selectedTitle, 'landmark': selectedLandmark,
-                                                        };
-                                                        print(
-                                                          "Debug: Existing address update  ID: $selectedAddressId, address: $selectedLocation",
-                                                        );
-                                                      }
-
-                                                      savedAddresses = _removeDuplicateAddresses(
-                                                        savedAddresses,
-                                                      );
+                                                  SizedBox(
+                                                    width: screenWidth * 0.02,
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () async {
                                                       print(
-                                                        "Debug: Deduplicated savedAddresses after edit: $savedAddresses",
+                                                        "Debug: Delete button  pressed for address ID: ${address['_id']}",
                                                       );
-
-                                                      // Removed onLocationSelected to prevent API trigger here
-                                                    });
-
-                                                    _saveLocation(
-                                                      selectedLocation,
-                                                      latitude: result['latitude']?.toDouble(),
-                                                      longitude: result['longitude']?.toDouble(),
-                                                      addressId: selectedAddressId,
-                                                      title: selectedTitle,
-                                                      landmark: selectedLandmark,
-                                                    );
-
-                                                    _loadSavedLocation();
-                                                  }
-                                                });
-                                              },
-                                              child: Text(
-                                                "Edit",
-                                                style: GoogleFonts.roboto(
-                                                  color:
-                                                  Colors.green.shade700,
-                                                  fontWeight: FontWeight.bold, fontSize: 12 * textScaleFactor,
-                                                ),
+                                                      await deleteAddress(
+                                                        address['_id'],
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      "Delete",
+                                                      style: GoogleFonts.roboto(
+                                                        color:
+                                                            Colors.red.shade700,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12 *
+                                                            textScaleFactor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(
-                                              width: screenWidth * 0.02,
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                print(
-                                                  "Debug: Delete button  pressed for address ID: ${address['_id']}",
-                                                );
-                                                await deleteAddress(address['_id'],);
-                                              },
-                                              child: Text(
-                                                "Delete",
-                                                style: GoogleFonts.roboto(color:
-                                                Colors.red.shade700,
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                  fontSize:
-                                                  12 * textScaleFactor,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                        if (locationSuggestions.isNotEmpty) ...[
-                          SizedBox(height: screenHeight * 0.02),
-                          Text(
-                            "Search Suggestions",
-                            style: GoogleFonts.roboto(
-                              fontSize: 16 * textScaleFactor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: screenHeight * 0.01),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: locationSuggestions.length,
-                              itemBuilder: (context, index) {
-                                final suggestion =
-                                locationSuggestions[index];
-                                return ListTile(
-                                  title: Text(
-                                    suggestion['description'] ??
-                                        "Unknown",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14 * textScaleFactor,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  onTap: () async {
-                                    final locationData =
-                                    await fetchLocationDetails(
-                                      suggestion['place_id'],
-                                    );
-                                    if (locationData != null) {
-                                      setState(() {
-                                        selectedLocation =
-                                        locationData['address'];
-                                        selectedAddressId =
-                                        suggestion['place_id'];
-                                        selectedTitle =
-                                            locationData['title']?.toString() ?? 'N/A';
-                                        selectedLandmark = locationData['landmark']?.toString() ?? 'N/A';
-                                        if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId,
-                                        )) {
-                                          savedAddresses.add({'_id': selectedAddressId,
-                                            'address': selectedLocation,
-                                            'latitude': locationData['latitude']?.toDouble() ?? 0.0,
-                                            'longitude': locationData['longitude']?.toDouble() ?? 0.0,
-                                            'title': selectedTitle,
-                                            'landmark': selectedLandmark,
-                                          });
-                                          print(
-                                            "Debug: Suggestion se naya address add kiya: $selectedLocation, ID: $selectedAddressId",
-                                          );
-                                        }
-                                        savedAddresses = _removeDuplicateAddresses(savedAddresses,
-                                        );
-                                        print("Debug: Deduplicated savedAddresses after suggestion add: $savedAddresses",);
-                                        // Removed onLocationSelected, _saveLocation, _loadSavedLocation to prevent API trigger here
-                                        print(
-                                          "📍 Location in UI: $selectedLocation",
-                                        );
-                                      });
-                                    } else {
-                                      if (mounted) {
-                                        ScaffoldMessenger.of(context,).showSnackBar(
-                                          const SnackBar(
-                                            content: Text("Failed to fetch location details!",),
+                                            ],
                                           ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                );
-                              },
-                            ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                              if (locationSuggestions.isNotEmpty) ...[
+                                SizedBox(height: screenHeight * 0.02),
+                                Text(
+                                  "Search Suggestions",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 16 * textScaleFactor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: screenHeight * 0.01),
+                                Expanded(
+                                  child: ListView.builder(
+                                    itemCount: locationSuggestions.length,
+                                    itemBuilder: (context, index) {
+                                      final suggestion =
+                                          locationSuggestions[index];
+                                      return ListTile(
+                                        title: Text(
+                                          suggestion['description'] ??
+                                              "Unknown",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 14 * textScaleFactor,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        onTap: () async {
+                                          final locationData =
+                                              await fetchLocationDetails(
+                                            suggestion['place_id'],
+                                          );
+                                          if (locationData != null) {
+                                            setState(() {
+                                              selectedLocation =
+                                                  locationData['address'];
+                                              selectedAddressId =
+                                                  suggestion['place_id'];
+                                              selectedTitle =
+                                                  locationData['title']
+                                                          ?.toString() ??
+                                                      'N/A';
+                                              selectedLandmark =
+                                                  locationData['landmark']
+                                                          ?.toString() ??
+                                                      'N/A';
+                                              if (!savedAddresses.any(
+                                                (addr) =>
+                                                    addr['_id'] ==
+                                                    selectedAddressId,
+                                              )) {
+                                                savedAddresses.add({
+                                                  '_id': selectedAddressId,
+                                                  'address': selectedLocation,
+                                                  'latitude':
+                                                      locationData['latitude']
+                                                              ?.toDouble() ??
+                                                          0.0,
+                                                  'longitude':
+                                                      locationData['longitude']
+                                                              ?.toDouble() ??
+                                                          0.0,
+                                                  'title': selectedTitle,
+                                                  'landmark': selectedLandmark,
+                                                });
+                                                print(
+                                                  "Debug: Suggestion se naya address add kiya: $selectedLocation, ID: $selectedAddressId",
+                                                );
+                                              }
+                                              savedAddresses =
+                                                  _removeDuplicateAddresses(
+                                                savedAddresses,
+                                              );
+                                              print(
+                                                "Debug: Deduplicated savedAddresses after suggestion add: $savedAddresses",
+                                              );
+                                              // Removed onLocationSelected, _saveLocation, _loadSavedLocation to prevent API trigger here
+                                              print(
+                                                "📍 Location in UI: $selectedLocation",
+                                              );
+                                            });
+                                          } else {
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Failed to fetch location details!",
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
-                        ],
-                      ],
-                    ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                 /* GestureDetector(
+                  /* GestureDetector(
                     onTap: () async {
                       print("Debug: Submit button pressed");
                       if (selectedAddressId == null) {
@@ -2681,7 +2854,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                         return;
                       }
                       final selectedAddress = savedAddresses.firstWhere(
-                            (addr) => addr['_id'] == selectedAddressId,
+                        (addr) => addr['_id'] == selectedAddressId,
                         orElse: () => null,
                       );
 
@@ -2698,10 +2871,14 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                       }
 
                       final latitude = selectedAddress['latitude']?.toDouble();
-                      final longitude = selectedAddress['longitude']?.toDouble();
-                      final addressText = selectedAddress['address']?.toString();
-                      final title = selectedAddress['title']?.toString() ?? 'N/A';
-                      final landmark = selectedAddress['landmark']?.toString() ?? 'N/A';
+                      final longitude =
+                          selectedAddress['longitude']?.toDouble();
+                      final addressText =
+                          selectedAddress['address']?.toString();
+                      final title =
+                          selectedAddress['title']?.toString() ?? 'N/A';
+                      final landmark =
+                          selectedAddress['landmark']?.toString() ?? 'N/A';
 
                       if (addressText == null ||
                           addressText.isEmpty ||
@@ -2769,7 +2946,6 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen> {
                       //   textColor: Colors.white,
                       //   fontSize: 14.0,
                       // );
-
                     },
                     child: Container(
                       height: screenHeight * 0.06,

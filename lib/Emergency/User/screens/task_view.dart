@@ -643,7 +643,7 @@ class TaskView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.getEmergencyOrder(orderId);
+    //controller.getEmergencyOrder(orderId);
 
     return SafeArea(
       child: Obx(() {
@@ -685,19 +685,18 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkerDetails(String id,String imageUrl, String name, int fee,context) {
+  Widget _buildWorkerDetails(
+      String id, String imageUrl, String name, int fee, context) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder:
-                (
-                context,
-                ) => ViewServiceProviderProfileScreen(
-              serviceProviderId:
-              id ??
-                  '',
+            builder: (
+              context,
+            ) =>
+                ViewServiceProviderProfileScreen(
+              serviceProviderId: id ?? '',
             ),
           ),
         );
@@ -756,7 +755,7 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildAssignedPerson(AssignedWorker person,BuildContext context) {
+  Widget _buildAssignedPerson(AssignedWorker person, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -812,17 +811,14 @@ class TaskView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (
-                                context,
-                                ) => ViewServiceProviderProfileScreen(
-                              serviceProviderId:
-                              person.id ??
-                                  '',
+                            builder: (
+                              context,
+                            ) =>
+                                ViewServiceProviderProfileScreen(
+                              serviceProviderId: person.id ?? '',
                             ),
                           ),
                         );
-
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -842,7 +838,8 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentSection(WorkDetailController controller, BuildContext context) {
+  Widget _buildPaymentSection(
+      WorkDetailController controller, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -857,7 +854,7 @@ class TaskView extends StatelessWidget {
         ],
       ),
       child: Obx(
-            () => Padding(
+        () => Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -928,65 +925,150 @@ class TaskView extends StatelessWidget {
                         statusText = 'N/A';
                         statusColor = Colors.grey;
                     }
+                    // return Padding(
+                    //   padding:  EdgeInsets.symmetric(vertical: 8.0),
+                    //   child: Row(
+                    //     children: [
+                    //       SizedBox(
+                    //         width: 0.05.toWidthPercent(),
+                    //         child: Text(
+                    //           '${index + 1}.',
+                    //           style: const TextStyle(fontWeight: FontWeight.bold),
+                    //         ),
+                    //       ),
+                    //       SizedBox(
+                    //         width: 0.3.toWidthPercent(),
+                    //         child: Text(
+                    //           payment.description ?? '',
+                    //           overflow: TextOverflow.ellipsis,
+                    //           maxLines: 1,
+                    //           style: const TextStyle(fontWeight: FontWeight.bold),
+                    //         ),
+                    //       ),
+                    //       SizedBox(
+                    //         width: 0.21.toWidthPercent(),
+                    //         child: payment.status == 'success'
+                    //             ?  Text(
+                    //          statusText,
+                    //           style: TextStyle(color: AppColors.primaryGreen),
+                    //         )
+                    //             : const SizedBox(),
+                    //       ),
+                    //       SizedBox(
+                    //         width: 0.21.toWidthPercent(),
+                    //         child: Text(
+                    //           '₹${totalAmount}/-',
+                    //           style: const TextStyle(fontWeight: FontWeight.bold),
+                    //         ),
+                    //       ),
+                    //       SizedBox(
+                    //         width: 0.12.toWidthPercent(),
+                    //         child: payment.releaseStatus == 'pending'
+                    //             ? ElevatedButton(
+                    //           // onPressed: () => controller.selectPaymentToPay(index),
+                    //           onPressed: () {
+                    //             controller.requestPaymentRelease(
+                    //               orderId: controller.orderId.value,
+                    //               paymentId: payment.id!, //
+                    //             );
+                    //             bwDebug("Pay button clicked for pending payment. Payment ID: ${payment.paymentId}");
+                    //           },
+                    //           style: ElevatedButton.styleFrom(
+                    //             backgroundColor: AppColors.primaryGreen,
+                    //             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    //             minimumSize: const Size(0, 35),
+                    //           ),
+                    //           child: const Text(
+                    //             'Pay',
+                    //             style: TextStyle(color: Colors.white, fontSize: 12),
+                    //           ),
+                    //         )
+                    //             : const SizedBox(),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // );
                     return Padding(
-                      padding:  EdgeInsets.symmetric(vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // Index
                           SizedBox(
                             width: 0.05.toWidthPercent(),
                             child: Text(
                               '${index + 1}.',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          SizedBox(
-                            width: 0.3.toWidthPercent(),
+
+                          // Description
+                          Expanded(
+                            flex: 3,
                             child: Text(
                               payment.description ?? '',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           SizedBox(
-                            width: 0.21.toWidthPercent(),
+                            width: 2,
+                          ),
+                          // Status
+                          Expanded(
+                            flex: 2,
                             child: payment.status == 'success'
-                                ?  Text(
-                             statusText,
-                              style: TextStyle(color: AppColors.primaryGreen),
-                            )
+                                ? Text(
+                                    statusText,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: AppColors.primaryGreen),
+                                  )
                                 : const SizedBox(),
                           ),
-                          SizedBox(
-                            width: 0.21.toWidthPercent(),
+
+                          // Amount
+                          Expanded(
+                            flex: 2,
                             child: Text(
                               '₹${totalAmount}/-',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          SizedBox(
-                            width: 0.12.toWidthPercent(),
+
+                          // Pay Button
+                          Expanded(
+                            flex: 1,
                             child: payment.releaseStatus == 'pending'
                                 ? ElevatedButton(
-                              // onPressed: () => controller.selectPaymentToPay(index),
-                              onPressed: () {
-                                controller.requestPaymentRelease(
-                                  orderId: controller.orderId.value,
-                                  paymentId: payment.id!, //
-                                );
-                                bwDebug("Pay button clicked for pending payment. Payment ID: ${payment.paymentId}");
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryGreen,
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                minimumSize: const Size(0, 35),
-                              ),
-                              child: const Text(
-                                'Pay',
-                                style: TextStyle(color: Colors.white, fontSize: 12),
-                              ),
-                            )
-                                : const SizedBox(),
+                                    onPressed: () {
+                                      controller.requestPaymentRelease(
+                                        orderId: controller.orderId.value,
+                                        paymentId: payment.id!,
+                                      );
+                                      bwDebug(
+                                          "Pay button clicked for pending payment. Payment ID: ${payment.paymentId}");
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primaryGreen,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      minimumSize: const Size(0, 25),
+                                    ),
+                                    child: const Text(
+                                      'Pay',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ),
+                                  )
+                                : const SizedBox(
+                                    width: 0,
+                                  ),
                           ),
                         ],
                       ),
@@ -1003,7 +1085,8 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentInput(WorkDetailController controller, BuildContext context) {
+  Widget _buildPaymentInput(
+      WorkDetailController controller, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Container(
@@ -1041,11 +1124,14 @@ class TaskView extends StatelessWidget {
                       hintText: 'Enter description',
                       hintStyle: TextStyle(color: Colors.grey.shade500),
                       counterText: "",
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+                        borderSide: const BorderSide(
+                            color: AppColors.primaryGreen, width: 2),
                       ),
                       isDense: true,
                     ),
@@ -1061,11 +1147,15 @@ class TaskView extends StatelessWidget {
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
                       prefixText: '₹',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.grey)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.grey)),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+                        borderSide: const BorderSide(
+                            color: AppColors.primaryGreen, width: 2),
                       ),
                       isDense: true,
                     ),
@@ -1091,7 +1181,8 @@ class TaskView extends StatelessWidget {
                   onPressed: () => controller.submitPayment(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text(
                     'Submit',
@@ -1149,7 +1240,8 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(WorkDetailController controller, BuildContext context) {
+  Widget _buildActionButtons(
+      WorkDetailController controller, BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 0.05.toWidthPercent()),
       child: Column(
@@ -1158,7 +1250,9 @@ class TaskView extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                bwDebug("Cancel Task and create dispute : orderId: ${controller.orderId.value}", tag: tag);
+                bwDebug(
+                    "Cancel Task and create dispute : orderId: ${controller.orderId.value}",
+                    tag: tag);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -1171,7 +1265,8 @@ class TaskView extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text(
                 'Cancel Task and create dispute',
@@ -1184,15 +1279,16 @@ class TaskView extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () async {
-                bool isMarkCompleteSuccess = await controller.markAsComplete(orderId: controller.orderId.value);
+                bool isMarkCompleteSuccess = await controller.markAsComplete(
+                    orderId: controller.orderId.value);
                 if (isMarkCompleteSuccess) {
                   bwDebug("Mark as complete was successful");
                   if (context.mounted) {
                     Get.to(() => UserFeedback(
-                      providerId: controller.providerId.value,
-                      oderId: controller.orderId.value,
-                      oderType: "emergency",
-                    ));
+                          providerId: controller.providerId.value,
+                          oderId: controller.orderId.value,
+                          oderType: "emergency",
+                        ));
                   }
                 } else {
                   bwDebug("Mark as complete failed");
@@ -1200,7 +1296,8 @@ class TaskView extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text(
                 'Mark as complete',

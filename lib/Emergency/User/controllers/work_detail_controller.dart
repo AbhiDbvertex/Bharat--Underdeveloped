@@ -1012,7 +1012,7 @@ class WorkDetailController extends GetxController {
                           providerId: userId.value,
                               taxAmount: taxAmount,
                               razorpayOrderId: razorOrderIdPlatform.value,
-                              amount: totalAmount,
+                              amount: totalAmount*100,
                               enteredAmount: enteredAmount,
                               description: description,
                               from: "emergencyWorkDetail",
