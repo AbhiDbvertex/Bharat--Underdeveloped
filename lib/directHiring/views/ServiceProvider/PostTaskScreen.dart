@@ -37,6 +37,8 @@ class _PostTaskScreenState extends State<PostTaskScreen> {
   List<Map<String, String>> allSubCategories = [];
   List<String> selectedSubCategoryIds = [];
 
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -330,12 +332,13 @@ class _PostTaskScreenState extends State<PostTaskScreen> {
               _buildImagePicker(),
 
               const SizedBox(height: 24),
-              ElevatedButton(
+              /*ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   minimumSize: const Size.fromHeight(50),
                 ),
-                onPressed: () {
+                onPressed: isLoading ? null : () {
+                  isLoading = true;
                   if (_formKey.currentState!.validate()) {
                     if (selectedSubCategoryIds.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -351,7 +354,45 @@ class _PostTaskScreenState extends State<PostTaskScreen> {
                   }
                 },
                 child: const Text("Post Task", style: TextStyle(fontSize: 16,color: Colors.white)),
-              ),
+              ),*/
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                onPressed: isLoading ? null : () async {
+                  if (_formKey.currentState!.validate()) {
+                    if (selectedSubCategoryIds.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select at least one sub category"),
+                        ),
+                      );
+                      return;
+                    }
+                    isLoading = true;
+                    setState(() {}); // loader dikhane ke liye UI update
+
+                    await _submitTask(); // yahan upload process
+
+                    isLoading = false;
+                    setState(() {}); // upload complete hone ke baad UI update
+                  }
+                },
+                child: isLoading
+                    ? SizedBox(
+                      height: 20,
+                      width: 20,
+                     child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Text(
+                  "Post Task",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              )
             ],
           ),
         ),
@@ -368,7 +409,7 @@ class _PostTaskScreenState extends State<PostTaskScreen> {
         ),
         const SizedBox(width: 86),
         Text(
-          "Post New Task",
+          "Post new bidding",
           style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],

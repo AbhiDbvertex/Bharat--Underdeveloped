@@ -578,13 +578,15 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
+        toolbarHeight: height*0.013,
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -596,7 +598,7 @@ class _AccountScreenState extends State<AccountScreen> {
             }
 
             if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-              return const Center(child: Text("❌ Failed to load user info"));
+              return const Center(child: Text("Failed to load user info"));
             }
 
             final user = snapshot.data!;

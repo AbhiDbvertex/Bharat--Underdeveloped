@@ -1548,47 +1548,30 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(screenWidth * 0.03),
-              child: Card(
-                child: Container(
-                  height: screenHeight * 0.07,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.025,
-                    vertical: screenHeight * 0.015,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search_rounded,
-                          color: Colors.grey, size: screenWidth * 0.06),
-                      SizedBox(width: screenWidth * 0.025),
-                      Expanded(
-                        child: TextField(
-                          controller: selectedTab == 0
-                              ? _biddingSearchController
-                              : selectedTab == 1
-                                  ? _directSearchController
-                                  : _emergencySearchController,
-                          decoration: InputDecoration(
-                            hintText: selectedTab == 0
-                                ? 'Search for bidding tasks'
-                                : selectedTab == 1
-                                    ? 'Search for direct hiring'
-                                    : 'Search for emergency tasks',
-                            hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: screenWidth * 0.04),
-                            border: InputBorder.none,
-                          ),
+              padding: EdgeInsets.all(screenWidth * 0.053),
+              child: Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                        hintText: selectedTab == 0
+                            ? 'Search for bidding tasks'
+                            : selectedTab == 1
+                            ? 'Search for direct hiring'
+                            : 'Search for emergency tasks',
+                        prefixIcon: Icon(Icons.search, color: Colors.green),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
                       ),
-                    ],
+                      controller: selectedTab == 0
+                          ? _biddingSearchController
+                          : selectedTab == 1
+                              ? _directSearchController
+                              : _emergencySearchController,
+                    ),
                   ),
-                ),
-              ),
             ),
             SizedBox(height: screenHeight * 0.015),
             Padding(

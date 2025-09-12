@@ -182,7 +182,7 @@ class PostTaskScreen extends StatelessWidget {
         ),
         const SizedBox(width: 86),
         Text(
-          "Post New Task",
+          "Post new bidding",
           style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],
