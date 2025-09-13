@@ -1649,7 +1649,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                                 error,
                                                                                 stackTrace) =>
                                                                             Image.asset(
-                                                                          'assets/images/account1.png',
+                                                                          'assets/images/d_png/no_profile_image.png',
                                                                           height:
                                                                               90,
                                                                           width:
@@ -1660,7 +1660,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                       )
                                                                     : Image
                                                                         .asset(
-                                                                        'assets/images/account1.png',
+                                                                        'assets/images/d_png/no_profile_image.png',
                                                                         height:
                                                                             90,
                                                                         width:
@@ -2027,7 +2027,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                           stackTrace) =>
                                                                       Image
                                                                           .asset(
-                                                                    'assets/images/account1.png',
+                                                                    'assets/images/d_png/no_profile_image.png',
                                                                     height: 90,
                                                                     width: 90,
                                                                     fit: BoxFit
@@ -2035,7 +2035,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                   ),
                                                                 )
                                                               : Image.asset(
-                                                                  'assets/images/account1.png',
+                                                                  'assets/images/d_png/no_profile_image.png',
                                                                   height: 90,
                                                                   width: 90,
                                                                   fit: BoxFit

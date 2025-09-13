@@ -1249,7 +1249,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                               ),
                             )
                                 : Image.asset(
-                              "assets/images/account1.png",
+                              "assets/images/d_png/no_profile_image.png",
                               height: 80,
                               width: 80,
                               fit: BoxFit.cover,
@@ -1661,7 +1661,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                               ),
                             )
                                 : Image.asset(
-                              "assets/images/account1.png",
+                              "assets/images/d_png/no_profile_image.png",
                               height: 80,
                               width: 80,
                               fit: BoxFit.cover,

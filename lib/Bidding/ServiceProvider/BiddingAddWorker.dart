@@ -52,7 +52,7 @@ class BiddingAddWorker extends StatelessWidget {
                 children: [
                   // Increased size of the image
                   Image.asset(
-                    'assets/images/account1.png',
+                    'assets/images/d_png/no_profile_image.png',
                     height: 100, // Increased height
                     width: 100, // Increased width
                     fit: BoxFit.cover,

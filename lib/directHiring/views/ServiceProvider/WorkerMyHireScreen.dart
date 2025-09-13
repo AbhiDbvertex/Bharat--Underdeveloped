@@ -1353,7 +1353,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       print("❌ API Exception: $e");
       // _showSnackBar("Something went wrong: $e");
     } finally {
-      setState(() => isLoading = false);
+      // setState(() => isLoading = false);
+      isLoading = false;
     }
   }
 

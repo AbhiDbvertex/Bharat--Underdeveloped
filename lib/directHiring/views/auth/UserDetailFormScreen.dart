@@ -315,7 +315,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
                 hint: 'Enter Your Age',
                 formatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(3),
+                  LengthLimitingTextInputFormatter(2),
                 ],
               ),
               buildGenderRadio(), // Added gender radio buttons

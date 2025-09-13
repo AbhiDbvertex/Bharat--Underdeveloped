@@ -1387,7 +1387,7 @@ class _BiddingserviceproviderworkdetailState
                                           print(
                                               '❌ Profile image error: ${biddingOrder!.userId!.profilePic}');
                                           return Image.asset(
-                                            'assets/images/account1.png',
+                                            'assets/images/d_png/no_profile_image.png',
                                             height: 70,
                                             width: 70,
                                             fit: BoxFit.cover,
@@ -1395,7 +1395,7 @@ class _BiddingserviceproviderworkdetailState
                                         },
                                       )
                                     : Image.asset(
-                                        'assets/images/account1.png',
+                                        'assets/images/d_png/no_profile_image.png',
                                         height: 70,
                                         width: 70,
                                         fit: BoxFit.cover,
@@ -1557,7 +1557,7 @@ class _BiddingserviceproviderworkdetailState
                                       print(
                                           '❌ Worker image error: ${assignedWorker!.image}');
                                       return Image.asset(
-                                        'assets/images/account1.png',
+                                        'assets/images/d_png/no_profile_image.png',
                                         height: 70,
                                         width: 70,
                                         fit: BoxFit.cover,
@@ -2372,7 +2372,7 @@ class _BiddingserviceproviderworkdetailState
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                   child: Image.asset(
-                                                    "assets/images/account1.png",
+                                                    "assets/images/d_png/no_profile_image.png",
                                                     height: 90,
                                                     width: 90,
                                                     fit: BoxFit.cover,
@@ -2487,7 +2487,7 @@ class _BiddingserviceproviderworkdetailState
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                   child: Image.asset(
-                                                    "assets/images/account1.png",
+                                                    "assets/images/d_png/no_profile_image.png",
                                                     height: 90,
                                                     width: 90,
                                                     fit: BoxFit.cover,

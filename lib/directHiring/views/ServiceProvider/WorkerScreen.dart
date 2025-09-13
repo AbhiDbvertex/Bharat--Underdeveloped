@@ -32,58 +32,6 @@ class _WorkerScreenState extends State<WorkerScreen> {
     return prefs.getString('token');
   }
 
-  // Future<void> fetchWorkers() async {
-  //   final token = await getToken();
-  //   if (token == null) {
-  //     setState(() => isLoading = false);
-  //     return;
-  //   }
-  //
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         'https://api.thebharatworks.com/api/worker/all',
-  //       ), // Updated to correct API
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //     );
-  //     print('Abhi:- print get worker response: ${response.body}');
-  //     print('Abhi:- print get worker statusCode: ${response.statusCode}');
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       if (data['success'] == true) {
-  //         final List fetchedWorkers = data['workers'];
-  //         setState(() {
-  //           workers =
-  //               fetchedWorkers
-  //                   .map((json) => WorkerListModel.fromJson(json))
-  //                   .toList()
-  //                 ..sort((a, b) => a.verifyStatus == 'approved' ? -1 : 1);
-  //           isLoading = false;
-  //         });
-  //       } else {
-  //         setState(() => isLoading = false);
-  //       }
-  //     } else {
-  //       setState(() => isLoading = false);
-  //       if (!context.mounted) return;
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text("Failed to fetch workers: ${response.statusCode}"),
-  //         ),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching workers: $e');
-  //     setState(() => isLoading = false);
-  //     if (!context.mounted) return;
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text("Error fetching workers: $e")));
-  //   }
-  // }
   Future<void> fetchWorkers() async {
     final token = await getToken();
     if (token == null) {
@@ -264,7 +212,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                         'Error loading image for worker ${worker.name}: $error',
                       );
                       return Image.asset(
-                        'assets/images/account1.png',
+                        'assets/images/d_png/no_profile_image.png',
                         width: 100,
                         height: 100,
                         fit: BoxFit.cover,
@@ -305,7 +253,14 @@ class _WorkerScreenState extends State<WorkerScreen> {
                           worker.createdAt.substring(0, 10),
                           style: GoogleFonts.roboto(color: Colors.white),
                         ),
-                      ),
+                      ),SizedBox(height: 8,),
+                      Container(
+                        height: 25,
+                        width: 85,
+                        decoration: BoxDecoration(color: worker.verifyStatus == 'approved' ? Colors.green : Colors.amber,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Center(child: Text(worker.verifyStatus.toUpperCase(),style: TextStyle(color: Colors.white),)),
+                      )
                     ],
                   ),
                 ),
@@ -331,7 +286,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                       child: Text(
                         "View",
                         style: GoogleFonts.roboto(
-                          fontSize: 14,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
                         ),
@@ -356,6 +311,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                     //     );
                     //   }
                     // }),
+                    SizedBox(height: 10,),
                     _actionButton('Edit', Colors.green.shade700, () async {
                       print(
                         'Navigating to EditWorkerScreen with workerId: ${worker.id}',
@@ -384,6 +340,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                         );
                       }
                     }),
+                    SizedBox(height: 10,),
                     _actionButton('Delete', Colors.green.shade700, () {
                       _confirmDelete(worker.id);
                     }),

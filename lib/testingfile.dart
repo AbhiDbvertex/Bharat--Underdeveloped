@@ -199,14 +199,14 @@
 // // // // //                   width: 90,
 // // // // //                   fit: BoxFit.cover,
 // // // // //                   errorBuilder: (context, error, stackTrace) => Image.asset(
-// // // // //                     'assets/images/account1.png',
+// // // // //                     'assets/images/d_png/no_profile_image.png',
 // // // // //                     height: 90,
 // // // // //                     width: 90,
 // // // // //                     fit: BoxFit.cover,
 // // // // //                   ),
 // // // // //                 )
 // // // // //                     : Image.asset(
-// // // // //                   'assets/images/account1.png',
+// // // // //                   'assets/images/d_png/no_profile_image.png',
 // // // // //                   height: 90,
 // // // // //                   width: 90,
 // // // // //                   fit: BoxFit.cover,

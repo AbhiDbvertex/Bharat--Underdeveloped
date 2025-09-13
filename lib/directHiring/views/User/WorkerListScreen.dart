@@ -239,7 +239,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                               "📷 Image load failed: $imageUrl, Error: $error",
                             );
                             return Image.asset(
-                              "assets/images/account1.png",
+                              "assets/images/d_png/no_profile_image.png",
                               height: 100,
                               width: 100,
                               fit: BoxFit.cover,
@@ -247,7 +247,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                           },
                         )
                             : Image.asset(
-                          "assets/images/account1.png",
+                          "assets/images/d_png/no_profile_image.png",
                           height: 100,
                           width: 100,
                           fit: BoxFit.cover,

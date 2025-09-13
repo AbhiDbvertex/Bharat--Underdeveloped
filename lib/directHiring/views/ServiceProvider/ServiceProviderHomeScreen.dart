@@ -20,7 +20,11 @@ import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../../Emergency/utils/logger.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
+import '../../models/userModel/WorkCategoryModel.dart';
+import '../User/SubCategories.dart';
+import '../User/UserHomeScreen.dart';
 import '../User/UserNotificationScreen.dart';
+import '../User/WorkerCategories.dart';
 import '../comm/home_location_screens.dart';
 
 // Bidding Order Model
@@ -64,15 +68,59 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
   List<BiddingOrder> biddingOrders = [];
   final controller = Get.put(SpEmergencyServiceController());
   bool? verified;
-
+  List<WorkCategoryModel> allCategories = [];
   @override
   void initState() {
     super.initState();
     _loadEmergencyTask();
+    fetchCategories(); // Fetch categories
     _initializeLocation();
     _fetchBiddingOrders();
     fetchProfile();
     controller.getEmergencySpOrderList();
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        debugPrint("❌ No token found");
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final uri = Uri.parse('https://api.thebharatworks.com/api/work-category');
+      final response = await http.get(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData["status"] == true && jsonData["data"] is List) {
+          setState(() {
+            allCategories =
+                (jsonData["data"] as List)
+                    .map((item) => WorkCategoryModel.fromJson(item))
+                    .toList();
+            isLoading = false;
+          });
+        } else {
+          setState(() => isLoading = false);
+        }
+      } else {
+        debugPrint("❌ Error: ${response.statusCode}");
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("❗ Exception: $e");
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> _loadEmergencyTask() async {
@@ -647,13 +695,172 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                 fit: BoxFit.cover,
               ),
               SizedBox(height: height * 0.015),
-              emergencyWork("WORK CATEGORIES", false, () {} ,profile?.verified ?? false),
+              emergencyWork("WORK CATEGORIES",
+                  false, () {
+                // if(profile?.verified == true) {
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => const WorkerCategories(),
+                //     ),
+                //   );
+                // }else {
+                //   showDialog(
+                //     context: context,
+                //     builder: (BuildContext context) {
+                //       return AlertDialog(
+                //         title: const Text("Request Submitted"),
+                //         content: Column(
+                //           mainAxisSize: MainAxisSize.min,
+                //           mainAxisAlignment: MainAxisAlignment.center,
+                //           crossAxisAlignment: CrossAxisAlignment.center,
+                //           children: [
+                //             /*Image.asset(
+                //               "assets/images/rolechangeConfim.png",
+                //               height: 90,
+                //             ),*/
+                //             SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                //             const SizedBox(height: 8),
+                //             const Text(
+                //               "Request Status",
+                //               style: TextStyle(
+                //                 fontWeight: FontWeight.bold,
+                //                 fontSize: 18,
+                //               ),
+                //             ),
+                //             const SizedBox(height: 2),
+                //             Text(
+                //               "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
+                //               textAlign: TextAlign.center,
+                //             ),
+                //             const SizedBox(height: 8),
+                //           ],
+                //         ),
+                //         actions: [
+                //           Center(
+                //             child: Container(
+                //               width: 100,
+                //               height: 35,
+                //               decoration: BoxDecoration(
+                //                 borderRadius: BorderRadius.circular(8),
+                //                 color: Colors.green,
+                //               ),
+                //               child: TextButton(
+                //                 child: const Text(
+                //                   "OK",
+                //                   style: TextStyle(color: Colors.white),
+                //                 ),
+                //                 onPressed: () {
+                //                   Navigator.of(context).pop();
+                //                 },
+                //               ),
+                //             ),
+                //           ),
+                //         ],
+                //       );
+                //     },
+                //   );
+                // }
+
+              } ,profile?.verified ?? false),
+              // SizedBox(height: height * 0.015),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 10),
+              //   child: isLoading
+              //       ? const Center(child: CircularProgressIndicator())
+              //       : Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: allCategories.take(6).map((category) {
+              //       return SizedBox(
+              //         width: MediaQuery.of(context).size.width / 6 - 10,
+              //         child: GestureDetector(
+              //           onTap: () {
+              //             if(profile?.verified == true){
+              //               Navigator.push(
+              //                 context,
+              //                 MaterialPageRoute(
+              //                   builder: (_) => SubCategories(
+              //                     categoryId: category.id,
+              //                     categoryName: '',
+              //                   ),
+              //                 ),
+              //               );
+              //             }else {
+              //               showDialog(
+              //                 context: context,
+              //                 builder: (BuildContext context) {
+              //                   return AlertDialog(
+              //                     title: const Text("Request Submitted"),
+              //                     content: Column(
+              //                       mainAxisSize: MainAxisSize.min,
+              //                       mainAxisAlignment: MainAxisAlignment.center,
+              //                       crossAxisAlignment: CrossAxisAlignment.center,
+              //                       children: [
+              //                         /*Image.asset(
+              //                 "assets/images/rolechangeConfim.png",
+              //                 height: 90,
+              //               ),*/
+              //                         SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+              //                         const SizedBox(height: 8),
+              //                         const Text(
+              //                           "Request Status",
+              //                           style: TextStyle(
+              //                             fontWeight: FontWeight.bold,
+              //                             fontSize: 18,
+              //                           ),
+              //                         ),
+              //                         const SizedBox(height: 2),
+              //                         Text(
+              //                           "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
+              //                           textAlign: TextAlign.center,
+              //                         ),
+              //                         const SizedBox(height: 8),
+              //                       ],
+              //                     ),
+              //                     actions: [
+              //                       Center(
+              //                         child: Container(
+              //                           width: 100,
+              //                           height: 35,
+              //                           decoration: BoxDecoration(
+              //                             borderRadius: BorderRadius.circular(8),
+              //                             color: Colors.green,
+              //                           ),
+              //                           child: TextButton(
+              //                             child: const Text(
+              //                               "OK",
+              //                               style: TextStyle(color: Colors.white),
+              //                             ),
+              //                             onPressed: () {
+              //                               Navigator.of(context).pop();
+              //                             },
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   );
+              //                 },
+              //               );
+              //             }
+              //           },
+              //           child: CategoryItemWidget(
+              //             id: category.id,
+              //             name: category.name,
+              //             imagePath: category.image,
+              //             subtitle: category.subtitle ?? '',
+              //           ),
+              //         ),
+              //       );
+              //     }).toList(),
+              //   ),
+              // ),
               SizedBox(height: height * 0.015),
               Center(
                 child: Container(
                   width: width * 0.85,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade50,
                       shape: RoundedRectangleBorder(
