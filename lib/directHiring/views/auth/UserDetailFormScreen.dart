@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/CustomButton.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../models/RoleModel.dart';
 import 'AddressDetailScreen.dart';
 
@@ -87,6 +88,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
         SizedBox(
           height: 50,
           child: TextFormField(
+            textCapitalization: TextCapitalization.words,
             controller: controllerField,
             textAlign: TextAlign.center,
             inputFormatters: formatters,
@@ -207,8 +209,8 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
     if (ageController.text.trim().isEmpty) {
       _errorTexts['age'] = 'Please enter your age.';
     } else if (int.tryParse(ageController.text.trim()) == null ||
-        int.parse(ageController.text.trim()) < 1) {
-      _errorTexts['age'] = 'Please enter a valid age.';
+        int.parse(ageController.text.trim()) <18) {
+      _errorTexts['age'] = 'Age must be at least 18.';
     }
 
     // Validate Role
@@ -234,11 +236,16 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
   void onSubmit() async {
     if (!validateForm()) {
       setState(() {});
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all required fields correctly.'),
-          duration: Duration(seconds: 2),
-        ),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text('Please fill in all required fields correctly.'),
+      //     duration: Duration(seconds: 2),
+      //   ),
+      // );
+      CustomSnackBar.show(
+          context,
+          message: 'Please fill in all required fields correctly.',
+          type: SnackBarType.warning
       );
       return;
     }
@@ -264,11 +271,18 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.green,
+      appBar:  AppBar(
         elevation: 0,
-        toolbarHeight: 10,
+        backgroundColor: Colors.white,
         centerTitle: true,
+        title: const Text("Complete Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -276,24 +290,24 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back_outlined, size: 22),
-                  ),
-                  const SizedBox(width: 60),
-                  Text(
-                    'Complete Profile',
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.black,
-                    ),
-                  ),
-                ],
-              ),
+              // const SizedBox(height: 10),
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () => Navigator.pop(context),
+              //       child: const Icon(Icons.arrow_back_outlined, size: 22),
+              //     ),
+              //     const SizedBox(width: 60),
+              //     Text(
+              //       'Complete Profile',
+              //       style: GoogleFonts.poppins(
+              //         fontSize: 18,
+              //         fontWeight: FontWeight.bold,
+              //         color: AppColors.black,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 50),
               buildLabel("Enter Your Name"),
               const SizedBox(height: 5),

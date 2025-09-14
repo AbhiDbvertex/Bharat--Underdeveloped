@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:developer/directHiring/views/Account/user_profile/user_role_profile_update.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -780,29 +781,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
-                      child: Text(
-                        "User Profile",
-                        style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     IconButton(
+            //       padding: EdgeInsets.zero,
+            //       icon: const Icon(Icons.arrow_back, size: 25),
+            //       onPressed: () => Navigator.pop(context),
+            //     ),
+            //     Expanded(
+            //       child: Center(
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(right: 18.0),
+            //           child: Text(
+            //             "User Profile",
+            //             style: GoogleFonts.roboto(
+            //               fontSize: 18,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             // const SizedBox(height: 5),
             // (role == "both")
             //     ? SizedBox()
@@ -1168,12 +1169,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
+      appBar:AppBar(
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF9DF89D),
+        centerTitle: true,
+        title: const Text("User Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

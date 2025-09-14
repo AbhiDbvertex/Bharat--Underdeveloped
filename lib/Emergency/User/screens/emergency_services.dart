@@ -71,7 +71,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
-        systemOverlayStyle: const SystemUiOverlayStyle(
+        systemOverlayStyle:  SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
           statusBarIconBrightness: Brightness.light,
         ),

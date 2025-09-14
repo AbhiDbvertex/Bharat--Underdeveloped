@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utility/custom_snack_bar.dart';
 import 'LoginScreen.dart';
 import 'RoleSelectionScreen.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -86,17 +87,17 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     super.dispose();
   }
 
-  void _showMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 2,
-      backgroundColor: Colors.black.withOpacity(0.7),
-      textColor: Colors.white,
-      fontSize: 14.0,
-    );
-  }
+  // void _showMessage(String message) {
+  //   Fluttertoast.showToast(
+  //     msg: message,
+  //     toastLength: Toast.LENGTH_SHORT,
+  //     gravity: ToastGravity.BOTTOM,
+  //     timeInSecForIosWeb: 2,
+  //     backgroundColor: Colors.black.withOpacity(0.7),
+  //     textColor: Colors.white,
+  //     fontSize: 14.0,
+  //   );
+  // }
   void _showMessageSuccessAddress(String message) {
     Fluttertoast.showToast(
       msg: message,
@@ -112,7 +113,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      _showMessage('Please enable location services.');
+      // _showMessage('Please enable location services.');
+      CustomSnackBar.show(
+          context,
+          message:'Please enable location services.' ,
+          type: SnackBarType.error
+      );
       return;
     }
 
@@ -120,7 +126,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        _showMessage('Location permission denied.');
+        // _showMessage('Location permission denied.');
+        CustomSnackBar.show(
+            context,
+            message: 'Location permission denied.',
+            type: SnackBarType.warning
+        );
         return;
       }
     }
@@ -139,7 +150,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         await _getAddressFromLatLng(position.latitude, position.longitude);
       }
     } catch (e) {
-      _showMessage('Unable to get location: $e');
+      // _showMessage('Unable to get location: $e');
+      CustomSnackBar.show(
+          context,
+          message: 'Unable to get location: $e',
+          type: SnackBarType.error
+      );
     }
   }
 
@@ -172,7 +188,13 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           _isLoadingAddress = false;
           addressController.text = 'Coordinates: $lat, $lng (No address found)';
         });
-        _showMessage('Error fetching address: $e');
+        // _showMessage('Error fetching address: $e');
+        CustomSnackBar.show(
+            context,
+            message:'Error fetching address: $e' ,
+            type: SnackBarType.error
+        );
+
       }
     }
   }
@@ -223,6 +245,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         Container(
           height: 50,
           child: TextFormField(
+            textCapitalization: TextCapitalization.sentences,
             controller: controllerField,
             textAlign: TextAlign.center,
             inputFormatters: formatters,
@@ -257,7 +280,13 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         final token = prefs.getString('token');
         if (token == null || token.isEmpty) {
           if (mounted) {
-            _showMessage('Token not found. Please log in.');
+            // _showMessage('Token not found. Please log in.');
+            CustomSnackBar.show(
+                context,
+                message: 'Token not found. Please log in.',
+                type: SnackBarType.warning
+            );
+
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
@@ -318,7 +347,13 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           await prefs.setString('selected_address_id', widget.editlocationId ?? '');
 
           if (mounted) {
-            _showMessage('Address updated successfully.');
+            // _showMessage('Address updated successfully.');
+            CustomSnackBar.show(
+                context,
+                message:'Address updated successfully.' ,
+                type: SnackBarType.success
+            );
+
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pop(context, {
@@ -331,17 +366,35 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           }
         } else {
           if (mounted) {
-            _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            CustomSnackBar.show(
+                context,
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
+
           }
         }
       } catch (e) {
         if (mounted) {
-          _showMessage('Error updating address: $e');
+          // _showMessage('Error updating address: $e');
+          CustomSnackBar.show(
+              context,
+              message:'Error updating address: $e' ,
+              type: SnackBarType.error
+          );
+
           print("Error in _updateAddress: $e");
         }
       }
     } else {
-      _showMessage('Please fill all fields correctly.');
+      // _showMessage('Please fill all fields correctly.');
+      CustomSnackBar.show(
+          context,
+          message: 'Please fill all fields correctly.',
+          type: SnackBarType.warning
+      );
+
     }
   }
 
@@ -353,7 +406,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         final role = prefs.getString('role');
         if (token == null || token.isEmpty) {
           if (mounted) {
-            _showMessage('Token not found. Please log in.');
+            // _showMessage('Token not found. Please log in.');
+            CustomSnackBar.show(
+                context,
+                message: 'Token not found. Please log in.',
+                type: SnackBarType.warning
+            );
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
@@ -414,7 +472,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           await prefs.setString('selected_address_id', responseData['addressId'] ?? '');
 
           if (mounted) {
-            _showMessage('Address added successfully.');
+            // _showMessage('Address added successfully.');
+            CustomSnackBar.show(
+                context,
+                message: 'Address added successfully.',
+                type: SnackBarType.success
+            );
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
@@ -430,17 +493,34 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           }
         } else {
           if (mounted) {
-            _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            CustomSnackBar.show(
+                context,
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
+
           }
         }
       } catch (e) {
         if (mounted) {
-          _showMessage('Error adding address: $e');
+          // _showMessage('Error adding address: $e');
+          CustomSnackBar.show(
+              context,
+              message: 'Error adding address: $e',
+              type: SnackBarType.error
+          );
+
           print("Error in _addAddress: $e");
         }
       }
     } else {
-      _showMessage('Please fill all fields correctly.');
+      // _showMessage('Please fill all fields correctly.');
+      CustomSnackBar.show(
+          context,
+          message:'Please fill all fields correctly.' ,
+          type: SnackBarType.warning
+      );
     }
   }
 
@@ -459,7 +539,12 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
 
         if (token == null || token.isEmpty) {
           if (mounted) {
-            _showMessage('Token not found. Please log in.');
+            // _showMessage('Token not found. Please log in.');
+            CustomSnackBar.show(
+                context,
+                message: 'Token not found. Please log in.',
+                type: SnackBarType.warning
+            );
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
@@ -540,12 +625,22 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
           }
         } else {
           if (mounted) {
-            _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+            CustomSnackBar.show(
+                context,
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
           }
         }
       } catch (e) {
         if (mounted) {
-          _showMessage('Error calling API: $e');
+          // _showMessage('Error calling API: $e');
+          CustomSnackBar.show(
+              context,
+              message:'Error calling API: $e' ,
+              type: SnackBarType.error
+          );
           print("❌ Error: $e");
         }
       } finally {
@@ -556,7 +651,13 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         }
       }
     } else {
-      _showMessage('Please fill all fields correctly.');
+      // _showMessage('Please fill all fields correctly.');
+      CustomSnackBar.show(
+          context,
+          message: 'Please fill all fields correctly.',
+          type: SnackBarType.warning
+      );
+
     }
   }
 
@@ -565,14 +666,22 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     print("Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}");
     print("Debug: get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
     return Scaffold(
-      backgroundColor: AppColors.white,
+     // backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.green,
         elevation: 0,
-        toolbarHeight: 10,
+        backgroundColor: Colors.white,
         centerTitle: true,
+        title: const Text("Location",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
+
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -580,27 +689,26 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 18.0),
-                        child: Icon(Icons.arrow_back_outlined, size: 22),
-                      ),
-                    ),
-                    const SizedBox(width: 90),
-                    Text(
-                      'Location',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                // Row(
+                //   children: [
+                //     GestureDetector(
+                //       onTap: () => Navigator.pop(context),
+                //       child: const Padding(
+                //         padding: EdgeInsets.only(left: 18.0),
+                //         child: Icon(Icons.arrow_back_outlined, size: 22),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 90),
+                //     Text(
+                //       'Location',
+                //       style: GoogleFonts.poppins(
+                //         fontSize: 18,
+                //         fontWeight: FontWeight.bold,
+                //         color: AppColors.black,
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 Center(
                   child: Text(
                     widget.editlocationId != null ? 'Edit Location' : 'Select your location',

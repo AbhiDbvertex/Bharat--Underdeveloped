@@ -243,6 +243,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/Bottombar.dart';
+import '../../../utility/custom_snack_bar.dart';
 import 'UserDetailFormScreen.dart';
 
 /*class RoleSelectionScreen extends StatefulWidget {
@@ -516,10 +517,18 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
 
   Future<void> navigateToForm(BuildContext context) async {
     if (selectedRole.isEmpty) {
-      // Agar role select nahi hua, toh user ko alert karo
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role')),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Please select a role')),
+      // );
+      Future.delayed(Duration.zero, () {
+        if (context.mounted) {
+      CustomSnackBar.show(
+          context,
+          message: "Please select a role.",
+          type: SnackBarType.warning
       );
+        }
+      });
       return;
     }
 

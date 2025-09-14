@@ -1528,13 +1528,17 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../auth/AddressDetailScreen.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
@@ -1565,7 +1569,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
   @override
   void initState() {
     super.initState();
-    print("Debug: initState chala, initial load shuru...");
+    bwDebug("Debug: initState chala, initial load shuru...");
     _loadSavedLocation();
   }
 
@@ -1578,7 +1582,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
   @override
   void dispose() {
-    print("Debug: dispose chala, cleaning up...");
+    bwDebug("Debug: dispose chala, cleaning up...");
     locationController.dispose();
     _debounce?.cancel();
     routeObserver.unsubscribe(this);
@@ -1655,32 +1659,52 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           } else {
             print("Debug: API failed: ${data['message']}");
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("API failed: ${data['message'] ?? 'Unknown error'}")),
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(content: Text("API failed: ${data['message'] ?? 'Unknown error'}")),
+              // );
+              CustomSnackBar.show(
+                  context,
+                  message: "API failed: ${data['message'] ?? 'Unknown error'}",
+                  type: SnackBarType.error
               );
             }
           }
         } else {
           print("Debug: API server error: ${response.statusCode}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Server error: ${response.statusCode}")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text("Server error: ${response.statusCode}")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message:"Server error:Try Again... ${response.statusCode}" ,
+                type: SnackBarType.warning
             );
           }
         }
       } catch (e) {
         print("Error in _loadSavedLocation: $e");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error fetching location: $e")),
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text("Error fetching location: $e")),
+          // );
+          CustomSnackBar.show(
+              context,
+              message: "Error fetching location: ",
+              type: SnackBarType.error
           );
         }
       }
     } else {
       print("Debug: Token null hai ya widget mounted nahi hai.");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Please login first!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.warning
         );
       }
     }
@@ -1744,8 +1768,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Please login first!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Please login first!" ,
+            type: SnackBarType.warning
         );
       }
       return;
@@ -1783,8 +1812,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     } catch (e) {
       print("Error in fetchLocationSuggestions: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching suggestions: $e")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error fetching suggestions: $e")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Error fetching suggestions: $e" ,
+            type: SnackBarType.error
         );
       }
     } finally {
@@ -1800,8 +1834,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Please login first!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.warning
         );
       }
       return null;
@@ -1835,8 +1874,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
           if (address == null || address.isEmpty || latitude == null || longitude == null) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Invalid location data received!")),
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(content: Text("Invalid location data received!")),
+              // );
+              CustomSnackBar.show(
+                  context,
+                  message: "Invalid location data received!",
+                  type: SnackBarType.warning
               );
             }
             return null;
@@ -1853,27 +1897,45 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         } else {
           print("Debug: Location details API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message: "API error: ${data['message'] ?? 'Unknown error'}",
+                type: SnackBarType.error
             );
+
           }
           return null;
         }
       } else {
         print("Debug: Location details server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // );
+          CustomSnackBar.show(
+              context,
+              message:"Server error: ${response.statusCode}" ,
+              type: SnackBarType.error
           );
+
         }
         return null;
       }
     } catch (e) {
       print("Error in fetchLocationDetails: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching location details: $e")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error fetching location details: $e")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message: "Error fetching location details: $e",
+            type: SnackBarType.error
         );
+
       }
       return null;
     } finally {
@@ -1895,9 +1957,15 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       ) async {
     if (address.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid address or coordinates!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Invalid address or coordinates!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Invalid address or coordinates!" ,
+            type: SnackBarType.error
         );
+
       }
       return;
     }
@@ -1905,8 +1973,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Please login first!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.warning
         );
       }
       return;
@@ -1972,31 +2045,51 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           );
 
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(data['message'] ?? "Location updated successfully!")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text(data['message'] ?? "Location updated successfully!")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message:data['message'] ?? "Location updated successfully!" ,
+                type: SnackBarType.success
             );
           }
         } else {
           print("Debug: Update location API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message:"API error: ${data['message'] ?? 'Unknown error'}" ,
+                type: SnackBarType.error
             );
           }
         }
       } else {
         print("Debug: Update location server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // );
+          CustomSnackBar.show(
+              context,
+              message:"Server error: ${response.statusCode}" ,
+              type: SnackBarType.error
           );
         }
       }
     } catch (e) {
       print("Error in updateLocation: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error updating location: $e")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error updating location: $e")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Error updating location: $e",
+            type: SnackBarType.error
         );
       }
     } finally {
@@ -2012,8 +2105,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Please login first!")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Please login first!",
+            type: SnackBarType.warning
         );
       }
       return;
@@ -2102,31 +2200,51 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               }
               print("Debug: Address deleted, updated savedAddresses: $savedAddresses");
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(data['message'] ?? "Address deleted successfully!")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text(data['message'] ?? "Address deleted successfully!")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message:data['message'] ?? "Address deleted successfully!",
+                type: SnackBarType.success
             );
           }
         } else {
           print("Debug: Delete address API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+            // );
+            CustomSnackBar.show(
+                context,
+                message:"API error: ${data['message'] ?? 'Unknown error'}",
+                type: SnackBarType.error
             );
           }
         }
       } else {
         print("Debug: Delete address server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text("Server error: ${response.statusCode}")),
+          // );
+          CustomSnackBar.show(
+              context,
+              message:"Server error: ${response.statusCode}",
+              type: SnackBarType.error
           );
         }
       }
     } catch (e) {
       print("Error in deleteAddress: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error deleting address: $e")),
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text("Error deleting address: $e")),
+        // );
+        CustomSnackBar.show(
+            context,
+            message:"Error deleting address: $e",
+            type: SnackBarType.error
         );
       }
     } finally {
@@ -2148,11 +2266,82 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green.shade800,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: screenHeight * 0.03,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true, // Use false to control alignment
+        leading: const BackButton(color: Colors.black),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Select Location',
+                style: GoogleFonts.roboto(
+                  fontSize: 18 * textScaleFactor,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                print("Debug: Add button pressed, opening AddressDetailScreen");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddressDetailScreen(),
+                  ),
+                ).then((result) {
+                  print("Debug: Returned from AddressDetailScreen (Add), result: $result");
+                  if (result != null && !result['isEdit']) {
+                    setState(() {
+                      selectedLocation = result['address'] ?? "Select Location";
+                      selectedAddressId = result['addressId'];
+                      selectedTitle = result['title']?.toString() ?? 'N/A';
+                      selectedLandmark = result['landmark']?.toString() ?? 'N/A';
+                      if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId)) {
+                        savedAddresses.add({
+                          '_id': selectedAddressId,
+                          'address': selectedLocation,
+                          'latitude': result['latitude']?.toDouble() ?? 0.0,
+                          'longitude': result['longitude']?.toDouble() ?? 0.0,
+                          'title': selectedTitle,
+                          'landmark': selectedLandmark,
+                        });
+                        print("Debug: Added new address: $selectedLocation, ID: $selectedAddressId");
+                      }
+                      savedAddresses = _removeDuplicateAddresses(savedAddresses);
+                      print("Debug: Deduplicated savedAddresses after add: $savedAddresses");
+                    });
+                    _loadSavedLocation();
+                  }
+                });
+              },
+              child: Container(
+                height: screenHeight * 0.04,
+                width: screenWidth * 0.15,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade700,
+                  borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                ),
+                child: Center(
+                  child: Text(
+                    "Add",
+                    style: GoogleFonts.roboto(
+                      fontSize: 10 * textScaleFactor,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: Stack(
@@ -2161,91 +2350,91 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               padding: EdgeInsets.all(screenWidth * 0.04),
               child: Column(
                 children: [
-                  SizedBox(height: screenHeight * 0.02),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          print("Debug: Back button pressed");
-                          Navigator.pop(context);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.only(left: screenWidth * 0.03),
-                          child: Icon(
-                            Icons.arrow_back_outlined,
-                            size: screenWidth * 0.06,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.2),
-                      Expanded(
-                        child: Text(
-                          'Select Location',
-                          style: GoogleFonts.roboto(
-                            fontSize: 18 * textScaleFactor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        print("Debug: Add button pressed, opening AddressDetailScreen");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddressDetailScreen(),
-                          ),
-                        ).then((result) {
-                          print("Debug: Returned from AddressDetailScreen (Add), result: $result");
-                          if (result != null && !result['isEdit']) {
-                            setState(() {
-                              selectedLocation = result['address'] ?? "Select Location";
-                              selectedAddressId = result['addressId'];
-                              selectedTitle = result['title']?.toString() ?? 'N/A';
-                              selectedLandmark = result['landmark']?.toString() ?? 'N/A';
-                              if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId)) {
-                                savedAddresses.add({
-                                  '_id': selectedAddressId,
-                                  'address': selectedLocation,
-                                  'latitude': result['latitude']?.toDouble() ?? 0.0,
-                                  'longitude': result['longitude']?.toDouble() ?? 0.0,
-                                  'title': selectedTitle,
-                                  'landmark': selectedLandmark,
-                                });
-                                print("Debug: Added new address: $selectedLocation, ID: $selectedAddressId");
-                              }
-                              savedAddresses = _removeDuplicateAddresses(savedAddresses);
-                              print("Debug: Deduplicated savedAddresses after add: $savedAddresses");
-                            });
-                            _loadSavedLocation(); // Server se sync karo
-                          }
-                        });
-                      },
-                      child: Container(
-                        height: screenHeight * 0.04,
-                        width: screenWidth * 0.15,
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade700,
-                          borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Add",
-                            style: GoogleFonts.roboto(
-                              fontSize: 10 * textScaleFactor,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(height: screenHeight * 0.02),
+                  // Row(
+                  //   children: [
+                  //     GestureDetector(
+                  //       onTap: () {
+                  //         print("Debug: Back button pressed");
+                  //         Navigator.pop(context);
+                  //       },
+                  //       child: Padding(
+                  //         padding: EdgeInsets.only(left: screenWidth * 0.03),
+                  //         child: Icon(
+                  //           Icons.arrow_back_outlined,
+                  //           size: screenWidth * 0.06,
+                  //           color: Colors.black,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     SizedBox(width: screenWidth * 0.2),
+                  //     Expanded(
+                  //       child: Text(
+                  //         'Select Location',
+                  //         style: GoogleFonts.roboto(
+                  //           fontSize: 18 * textScaleFactor,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //         overflow: TextOverflow.ellipsis,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // Align(
+                  //   alignment: Alignment.bottomRight,
+                  //   child: GestureDetector(
+                  //     onTap: () {
+                  //       print("Debug: Add button pressed, opening AddressDetailScreen");
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder: (context) => AddressDetailScreen(),
+                  //         ),
+                  //       ).then((result) {
+                  //         print("Debug: Returned from AddressDetailScreen (Add), result: $result");
+                  //         if (result != null && !result['isEdit']) {
+                  //           setState(() {
+                  //             selectedLocation = result['address'] ?? "Select Location";
+                  //             selectedAddressId = result['addressId'];
+                  //             selectedTitle = result['title']?.toString() ?? 'N/A';
+                  //             selectedLandmark = result['landmark']?.toString() ?? 'N/A';
+                  //             if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId)) {
+                  //               savedAddresses.add({
+                  //                 '_id': selectedAddressId,
+                  //                 'address': selectedLocation,
+                  //                 'latitude': result['latitude']?.toDouble() ?? 0.0,
+                  //                 'longitude': result['longitude']?.toDouble() ?? 0.0,
+                  //                 'title': selectedTitle,
+                  //                 'landmark': selectedLandmark,
+                  //               });
+                  //               print("Debug: Added new address: $selectedLocation, ID: $selectedAddressId");
+                  //             }
+                  //             savedAddresses = _removeDuplicateAddresses(savedAddresses);
+                  //             print("Debug: Deduplicated savedAddresses after add: $savedAddresses");
+                  //           });
+                  //           _loadSavedLocation(); // Server se sync karo
+                  //         }
+                  //       });
+                  //     },
+                  //     child: Container(
+                  //       height: screenHeight * 0.04,
+                  //       width: screenWidth * 0.15,
+                  //       decoration: BoxDecoration(
+                  //         color: Colors.green.shade700,
+                  //         borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                  //       ),
+                  //       child: Center(
+                  //         child: Text(
+                  //           "Add",
+                  //           style: GoogleFonts.roboto(
+                  //             fontSize: 10 * textScaleFactor,
+                  //             color: Colors.white,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(height: 5),
                   Row(
                     children: [
@@ -2258,7 +2447,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                             fontWeight: FontWeight.w400,
                           ),
                           overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                          maxLines: 2,
                         ),
                       ),
                     ],
@@ -2289,14 +2478,24 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     final landmark = address['landmark']?.toString() ?? 'N/A';
 
                                     if (addressText == null || addressText.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Invalid address!")),
+                                      // ScaffoldMessenger.of(context).showSnackBar(
+                                      //   const SnackBar(content: Text("Invalid address!")),
+                                      // );
+                                      CustomSnackBar.show(
+                                          context,
+                                          message: "Invalid address!",
+                                          type: SnackBarType.error
                                       );
                                       return;
                                     }
                                     if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+                                      // ScaffoldMessenger.of(context).showSnackBar(
+                                      //   const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+                                      // );
+                                      CustomSnackBar.show(
+                                          context,
+                                          message: "Invalid latitude or longitude for this address!",
+                                          type: SnackBarType.error
                                       );
                                       return;
                                     }
@@ -2340,14 +2539,24 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                 final title = address['title']?.toString() ?? 'N/A';
                                                 final landmark = address['landmark']?.toString() ?? 'N/A';
                                                 if (addressText == null || addressText.isEmpty) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Invalid address!")),
+                                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                                  //   const SnackBar(content: Text("Invalid address!")),
+                                                  // );
+                                                  CustomSnackBar.show(
+                                                      context,
+                                                      message: "Invalid address!",
+                                                      type: SnackBarType.error
                                                   );
                                                   return;
                                                 }
                                                 if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+                                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                                  //   const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+                                                  // );
+                                                  CustomSnackBar.show(
+                                                      context,
+                                                      message: "Invalid latitude or longitude for this address!",
+                                                      type: SnackBarType.error
                                                   );
                                                   return;
                                                 }
@@ -2552,8 +2761,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                       });
                                     } else {
                                       if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text("Failed to fetch location details!")),
+                                        // ScaffoldMessenger.of(context).showSnackBar(
+                                        //   const SnackBar(content: Text("Failed to fetch location details!")),
+                                        // );
+                                        CustomSnackBar.show(
+                                            context,
+                                            message:"Failed to fetch location details!" ,
+                                            type: SnackBarType.error
                                         );
                                       }
                                     }
@@ -2652,16 +2866,16 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                         landmark: landmark,
                       );
 
-                      Navigator.pop(context);
+                 //    Navigator.pop(context);
 
-                      Fluttertoast.showToast(
-                        msg: "Location submitted successfully!",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 14.0,
-                      );
+                      // Fluttertoast.showToast(
+                      //   msg: "Location submitted successfully!",
+                      //   toastLength: Toast.LENGTH_SHORT,
+                      //   gravity: ToastGravity.BOTTOM,
+                      //   backgroundColor: Colors.black,
+                      //   textColor: Colors.white,
+                      //   fontSize: 14.0,
+                      // );
                     },
                     child: Container(
                       height: screenHeight * 0.06,
