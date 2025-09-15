@@ -233,6 +233,8 @@
 
                    ///     upar vala code allmost sahi hai
 
+import 'dart:async';
+
 import 'package:developer/Widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -626,7 +628,8 @@ class GetXRoleController extends GetxController {
   final RxString categoryId = 'default_category_id'.obs;
   final RxString subCategoryId = 'default_sub_category_id'.obs;
   final RxBool isRoleLoading = true.obs;
-
+  final RxBool isRoleSwitching = false.obs; // 👈 GetX reactive bool, Obx se sync hoga
+  Timer? _debounce;
   @override
   void onInit() {
     super.onInit();
@@ -676,44 +679,3 @@ class GetXRoleController extends GetxController {
     print("Abhi:- Category updated to: $catId, SubCategory: $subCatId");
   }
 }
-/*
-class GetXRoleController extends GetxController {
-  // Reactive role variable
-  final RxString role = ''.obs;
-  // final RxString role = 'user'.obs;
-  final RxString categoryId = 'default_category_id'.obs;
-  final RxString subCategoryId = 'default_sub_category_id'.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadRole(); // Load role on initialization
-  }
-
-  // Load role from SharedPreferences
-  Future<void> loadRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    role.value = prefs.getString('role') ?? 'user';
-    categoryId.value = prefs.getString('category_id') ?? 'default_category_id';
-    subCategoryId.value = prefs.getString('sub_category_id') ?? 'default_sub_category_id';
-    print("Abhi:- Loaded role: ${role.value}, Category: ${categoryId.value}, SubCategory: ${subCategoryId.value}");
-  }
-
-  // Update role and save to SharedPreferences
-  Future<void> updateRole(String newRole) async {
-    role.value = newRole;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('role', newRole);
-    print("Abhi:- Role updated to: $newRole");
-  }
-
-  // Optionally update category and subcategory
-  Future<void> updateCategoryAndSubCategory(String catId, String subCatId) async {
-    categoryId.value = catId;
-    subCategoryId.value = subCatId;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('category_id', catId);
-    await prefs.setString('sub_category_id', subCatId);
-    print("Abhi:- Category updated to: $catId, SubCategory: $subCatId");
-  }
-}*/

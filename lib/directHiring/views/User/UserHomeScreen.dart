@@ -377,7 +377,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             // );
             CustomSnackBar.show(
                 context,
-                message:"Location updated successfully: $newAddress" ,
+                message:"Location updated successfully : $newAddress" ,
                 type: SnackBarType.success
             );
           }

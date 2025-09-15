@@ -16,7 +16,8 @@ class ServiceProviderProfileModel {
   final bool? active;
   final bool? isProfileComplete;
   final String? role;
-  final bool? verified;
+  final String? verificationStatus;
+  final String? rejectionReason;
   final String? categoryId;
   final String? categoryName;
   final List<String>? subCategoryIds;
@@ -47,7 +48,8 @@ class ServiceProviderProfileModel {
     this.active,
     this.isProfileComplete,
     this.role,
-    this.verified,
+    this.verificationStatus,
+    this.rejectionReason,
     this.categoryId,
     this.categoryName,
     this.subCategoryIds,
@@ -82,7 +84,8 @@ class ServiceProviderProfileModel {
       isProfileComplete: json['isProfileComplete'] == true,
       role: json['role']?.toString(),
       requestStatus: json['requestStatus']?.toString(),
-      verified: json['verified'] == true,
+      rejectionReason: json['rejectionReason']?.toString(),
+      verificationStatus: json['verificationStatus'] ?? "",
       categoryId: json['category_id']?.toString(),
       categoryName: json['category_name']?.toString(),
       subCategoryIds:

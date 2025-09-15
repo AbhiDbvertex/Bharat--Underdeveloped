@@ -21,6 +21,7 @@ class RoleEditProfileScreen extends StatefulWidget {
   final String? documentUrl;
   final updateBothrequest;
   final role;
+  final comeEditScreen;
 
   const RoleEditProfileScreen({
     super.key,
@@ -31,6 +32,7 @@ class RoleEditProfileScreen extends StatefulWidget {
     this.documentUrl,
     this.updateBothrequest,
     this.role,
+    this.comeEditScreen,
   });
 
   @override
@@ -205,9 +207,8 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
       if (res.statusCode == 200 || res.statusCode == 201) {
 
       await Future.delayed(const Duration(milliseconds: 500));
-      // Navigator.pop(context, true);
+      widget.comeEditScreen == "editScreen" ? Navigator.pop(context, true) : SizedBox() ;
       Navigator.pop(context, true);
-
       switchRoleRequest();
        // widget.role == "user" ? switchRoleRequest() : SizedBox();
 

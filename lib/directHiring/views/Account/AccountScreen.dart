@@ -402,6 +402,7 @@
 import 'dart:io';
 
 import 'package:developer/directHiring/views/Account/service_provider_profile/first_time_serviceprovider_profile.dart';
+import 'package:developer/directHiring/views/Account/user_profile/both_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -515,7 +516,7 @@ class _AccountScreenState extends State<AccountScreen> {
       }
 
       // Apna actual API endpoint daalo
-      final String profileUrl = "https://api.thebharatworks.com/api/user/service-provider-profile";
+      final String profileUrl = "https://api.thebharatworks.com/api/user/getUserProfileData";
       final response = await http.get(
         Uri.parse(profileUrl),
         headers: {
@@ -532,7 +533,7 @@ class _AccountScreenState extends State<AccountScreen> {
           profile = ServiceProviderProfileModel.fromJson(jsonData); // Apna parsing logic daalo
         });
         // toJson ke bajaye direct fields print karo
-        print("🔍 Profile fetched: verified=${profile?.verified}, other fields=${jsonData}");
+        print("🔍 Profile fetched: verified=${profile?.verificationStatus == 'pending'}, other fields=${jsonData}");
       } else {
         print("🔍 Failed to fetch profile: ${response.statusCode} - ${response.body}");
       }
@@ -684,15 +685,17 @@ class _AccountScreenState extends State<AccountScreen> {
                                 final role = (prefs.getString('role') ?? '').toLowerCase().trim();
 
                                 print("🔍 Role from prefs: '$role'");
-                                print("🔍 Profile: $profile");
-                                print("🔍 Profile verified: ${profile?.verified}");
+                                print("🔍 Profile sadfas: ${profile?.verificationStatus}");
+                                print("🔍 Profile verified: ${profile?.verificationStatus == 'pending'}");
 
                                 Widget screen;
 
                                 // Condition for service_provider with unverified profile
-                                if (role == "service_provider" && profile != null && profile!.verified == false) {
+                                if (role == "service_provider" && profile != null && profile!.verificationStatus == 'pending') {
                                   print("🔍 Calling switchRoleRequest for unverified service provider");
                                   // await switchRoleRequest();
+                                  screen = const FirstTimeServiceProviderProfileScreen();
+                                } else if (profile!.verificationStatus == 'rejected'){
                                   screen = const FirstTimeServiceProviderProfileScreen();
                                 } else if (role == "customer") {
                                   print("🔍 Navigating to ProfileScreen for customer");

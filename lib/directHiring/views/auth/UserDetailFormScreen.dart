@@ -8,6 +8,7 @@ import '../../../Widgets/CustomButton.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../models/RoleModel.dart';
 import 'AddressDetailScreen.dart';
+import 'Signup_Address_Detail_Screen.dart';
 
 class UserDetailFormScreen extends StatefulWidget {
   final String role;
@@ -253,7 +254,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AddressDetailScreen(
+        builder: (_) => SignupAddressDetailScreen(
           name: nameController.text,
           refralCode: referralController.text,
           role: widget.role,
@@ -308,7 +309,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
               //     ),
               //   ],
               // ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
               buildLabel("Enter Your Name"),
               const SizedBox(height: 5),
               buildCustomField(

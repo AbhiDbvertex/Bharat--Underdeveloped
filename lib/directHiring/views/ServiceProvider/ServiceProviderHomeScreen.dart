@@ -1014,7 +1014,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                 //   );
                 // }
 
-              } ,profile?.verified ?? false),
+              } ,profile?.verificationStatus == 'pending'),
               // SizedBox(height: height * 0.015),
               // Padding(
               //   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1207,7 +1207,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => WorkerRecentPostedScreen(),
                   ),
-                ),profile?.verified ?? false
+                ),profile?.verificationStatus == 'pending'
               ),
               SizedBox(height: height * 0.015),
               Container(
@@ -1248,7 +1248,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => SpEmergencyWorkPage(),
                   ),
-                ),profile?.verified ?? false
+                ),profile?.verificationStatus == 'pending'
               ),
               SizedBox(height: height * 0.015),
               Container(
@@ -1300,7 +1300,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                     );
                   })),
               SizedBox(height: height * 0.025),
-              emergencyWork("FEATURE WORKER", false, () {},profile?.verified ?? false),
+              emergencyWork("FEATURE WORKER", false, () {},profile?.verificationStatus == 'pending'),
               SizedBox(height: height * 0.015),
               Container(
                 height: height * 0.18,

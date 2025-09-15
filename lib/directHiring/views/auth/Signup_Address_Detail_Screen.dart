@@ -18,7 +18,7 @@ import 'RoleSelectionScreen.dart';
 import '../../../../Widgets/AppColors.dart';
 import 'package:developer/Widgets/CustomButton.dart';
 
-class AddressDetailScreen extends StatefulWidget {
+class SignupAddressDetailScreen extends StatefulWidget {
   final String? initialAddress;
   final LatLng? initialLocation;
   final String? initialTitle;
@@ -31,7 +31,7 @@ class AddressDetailScreen extends StatefulWidget {
   final  age;
   final  dataHide;
 
-  const AddressDetailScreen({
+  const SignupAddressDetailScreen({
     super.key,
     this.initialAddress,
     this.initialLocation,
@@ -47,10 +47,10 @@ class AddressDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<AddressDetailScreen> createState() => _AddressDetailScreenState();
+  State<SignupAddressDetailScreen> createState() => _SignupAddressDetailScreenState();
 }
 
-class _AddressDetailScreenState extends State<AddressDetailScreen> {
+class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
   late GoogleMapController mapController;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -612,25 +612,25 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             widget.dataHide == "hide" ? _showMessageSuccessAddress('Sign up successful.',) : _showMessageSuccessAddress('Address saved successfully.');
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
-              // Navigator.pushAndRemoveUntil(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => (role == 'user' || role == 'service_provider')
-              //         ? const Bottombar()
-              //         : const RoleSelectionScreen(),
-              //   ),
-              //       (route) => false,
-              // );
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => (role == 'user' || role == 'service_provider')
+                      ? const Bottombar()
+                      : const RoleSelectionScreen(),
+                ),
+                    (route) => false,
+              );
 
-              Navigator.pop(context, {
-                              'address': _selectedAddress ?? addressController.text,
-                              'addressId': responseData['addressId'] ?? widget.editlocationId ?? '',
-                              'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-                              'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
-                              'title': titleController.text,
-                              'landmark': landmarkController.text,
-                              'isEdit': widget.editlocationId != null, // true if editing, false if adding
-                            });
+              // Navigator.pop(context, {
+              //   'address': _selectedAddress ?? addressController.text,
+              //   'addressId': responseData['addressId'] ?? widget.editlocationId ?? '',
+              //   'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
+              //   'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+              //   'title': titleController.text,
+              //   'landmark': landmarkController.text,
+              //   'isEdit': widget.editlocationId != null, // true if editing, false if adding
+              // });
 
             }
           }
@@ -677,7 +677,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     print("Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}");
     print("Debug: get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
     return Scaffold(
-     // backgroundColor: AppColors.white,
+      // backgroundColor: AppColors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,

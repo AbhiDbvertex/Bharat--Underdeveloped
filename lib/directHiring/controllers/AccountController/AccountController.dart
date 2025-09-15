@@ -19,6 +19,7 @@ import '../../views/Account/TermsScreen.dart';
 import '../../views/Account/dispute/screens/disputes_screen.dart';
 import '../../views/Account/promotion/screens/promotion_banner_screen.dart';
 import '../../views/Account/service_provider_profile/ServiceProviderProfileScreen.dart';
+import '../../views/Account/user_profile/both_profile_screen.dart';
 
 class AccountController {
   void handleOptionTap(String option, BuildContext context) {
