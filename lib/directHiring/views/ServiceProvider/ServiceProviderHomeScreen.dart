@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Bidding/ServiceProvider/WorkerRecentPostedScreen.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_emergency_work_page.dart';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -26,6 +28,7 @@ import '../User/UserHomeScreen.dart';
 import '../User/UserNotificationScreen.dart';
 import '../User/WorkerCategories.dart';
 import '../comm/home_location_screens.dart';
+import '../comm/view_images_screen.dart';
 
 // Bidding Order Model
 class BiddingOrder {
@@ -69,6 +72,12 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
   final controller = Get.put(SpEmergencyServiceController());
   bool? verified;
   List<WorkCategoryModel> allCategories = [];
+  int _currentIndex = 0;
+  final CarouselSliderController _carouselController =
+  CarouselSliderController();
+  List<String> bannerImages = [];
+  bool isBannerLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -78,8 +87,60 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     _fetchBiddingOrders();
     fetchProfile();
     controller.getEmergencySpOrderList();
+    // fetchBanners();
+    setupStaticBanners();
   }
-
+  void setupStaticBanners() {
+    setState(() {
+      bannerImages = [
+        'https://picsum.photos/id/1018/800/400',
+        'https://picsum.photos/id/1025/800/400',
+        'https://picsum.photos/id/1069/800/400',
+      ];
+      isBannerLoading = false;
+    });
+  }
+  Future<void> fetchBanners() async {
+    setState(() {
+      isBannerLoading = true;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        debugPrint("❌ No token found for fetching banners");
+        setState(() => isBannerLoading = false);
+        return;
+      }
+      final url =
+      Uri.parse('https://api.thebharatworks.com/api/user/getbanners');
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true && data['data'] is List) {
+          setState(() {
+            bannerImages = (data['data'] as List)
+                .map((item) => item['image'].toString())
+                .toList();
+            isBannerLoading = false;
+          });
+        } else {
+          debugPrint("❌ API response for banners not in expected format.");
+          setState(() => isBannerLoading = false);
+        }
+      } else {
+        debugPrint(
+            "❌ Failed to load banners. Status code: ${response.statusCode}");
+        setState(() => isBannerLoading = false);
+      }
+    } catch (e) {
+      debugPrint("❗ Exception while fetching banners: $e");
+      setState(() => isBannerLoading = false);
+    }
+  }
   Future<void> fetchCategories() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -621,20 +682,74 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: /*AppBar(
         backgroundColor: AppColors.primaryGreen,
         centerTitle: true,
         elevation: 0,
         toolbarHeight: 10,
         automaticallyImplyLeading: false,
+      ),*/
+      AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false, // Ensures content starts from the left
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: _navigateToLocationScreen,
+              child: SvgPicture.asset(
+                'assets/svg_images/LocationIcon.svg',
+
+              ),
+            ),
+            const SizedBox(width: 5),
+            Expanded(
+              child: GestureDetector(
+                onTap: _navigateToLocationScreen,
+                child: Text(
+                  userLocation??'Select Location',
+                  style: GoogleFonts.roboto(
+                    fontSize: 12,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            const SizedBox(width: 5),
+            SvgPicture.asset(
+              'assets/svg_images/homepageLogo.svg',
+            ),
+            const Spacer(),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserNotificationScreen(),
+                  ),
+                );
+              },
+              child: SvgPicture.asset(
+                'assets/svg_images/notificationIcon.svg',
+
+              ),
+            ),
+          ],
+        ),
+        actions: [],
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: height * 0.01),
-              Padding(
+             /* Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
@@ -686,14 +801,151 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                     ),
                   ],
                 ),
-              ),
+              ),*/
               SizedBox(height: height * 0.01),
-              Image.asset(
-                'assets/images/banner.png',
-                height: height * 0.2,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              // Image.asset(
+              //   'assets/images/banner.png',
+              //   height: height * 0.2,
+              //   width: double.infinity,
+              //   fit: BoxFit.cover,
+              // ),
+
+              isBannerLoading
+                  ? Container(
+                height: 151,
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              )
+                  : bannerImages.isEmpty
+                  ? Container(
+                height: 151,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[200],
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.image_not_supported,
+                        size: 50,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "No Banners Available",
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+                  : Column(
+                children: [
+                  CarouselSlider.builder(
+                    carouselController: _carouselController,
+                    itemCount: bannerImages.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final image = bannerImages[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ViewImage(
+                                imageUrl: image,
+                                title: "Banner Image",
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              image,
+                              fit: BoxFit.fill,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.image_not_supported,
+                                          size: 40,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          "Image Failed to Load",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    options: CarouselOptions(
+                      height: 170,
+                      viewportFraction: 0.9,
+                      initialPage: 0,
+                      enableInfiniteScroll: true,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 3),
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: bannerImages.map((image) {
+                      int index = bannerImages.indexOf(image);
+                      return Container(
+                        width: _currentIndex == index ? 16.0 : 8.0,
+                        height: 8.0,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: _currentIndex == index
+                              ? Colors.green.shade800
+                              : Colors.grey,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
+
               SizedBox(height: height * 0.015),
               emergencyWork("WORK CATEGORIES",
                   false, () {

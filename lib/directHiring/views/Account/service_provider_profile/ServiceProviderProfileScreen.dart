@@ -1464,6 +1464,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1488,7 +1489,9 @@ import 'ReviewImagesScreen.dart';
 
 class SellerScreen extends StatefulWidget {
   final iconsHide;
+
   const SellerScreen({super.key, this.iconsHide});
+
   @override
   State<SellerScreen> createState() => _SellerScreenState();
 }
@@ -1510,7 +1513,8 @@ class _SellerScreenState extends State<SellerScreen> {
     loadSavedLocation();
     _loadEmergencyTask();
     fetchProfile().then((_) {
-      print("Checking role: ${profile?.role}, verified: ${profile?.verified} request status: ${profile?.requestStatus}");
+      print(
+          "Checking role: ${profile?.role}, verified: ${profile?.verified} request status: ${profile?.requestStatus}");
       if (profile?.verified == false) {
         print("Showing verification dialog for service_provider");
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1520,7 +1524,11 @@ class _SellerScreenState extends State<SellerScreen> {
               builder: (BuildContext context) {
                 print("Inside dialog builder");
                 return _buildServiceproviderVerification(
-                    context, profile?.role, profile?.requestStatus, profile?.verified ?? false, profile?.categoryId);
+                    context,
+                    profile?.role,
+                    profile?.requestStatus,
+                    profile?.verified ?? false,
+                    profile?.categoryId);
               },
             );
           } else {
@@ -1555,7 +1563,8 @@ class _SellerScreenState extends State<SellerScreen> {
       String newAddress, double latitude, double longitude) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse("https://api.thebharatworks.com/api/user/updateLocation");
+    final url =
+        Uri.parse("https://api.thebharatworks.com/api/user/updateLocation");
     final response = await http.put(
       url,
       headers: {
@@ -1599,15 +1608,18 @@ class _SellerScreenState extends State<SellerScreen> {
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("🔐 Token not found. Please login again.")),
+          const SnackBar(
+              content: Text("🔐 Token not found. Please login again.")),
         );
         return;
       }
-      final url = Uri.parse("https://api.thebharatworks.com/api/user/updateProfilePic");
+      final url =
+          Uri.parse("https://api.thebharatworks.com/api/user/updateProfilePic");
       try {
         var request = http.MultipartRequest("PUT", url)
           ..headers['Authorization'] = 'Bearer $token'
-          ..files.add(await http.MultipartFile.fromPath('profilePic', pickedFile.path));
+          ..files.add(
+              await http.MultipartFile.fromPath('profilePic', pickedFile.path));
         final response = await request.send();
         if (response.statusCode == 200) {
           final responseData = await response.stream.bytesToString();
@@ -1641,7 +1653,8 @@ class _SellerScreenState extends State<SellerScreen> {
   }
 
   Future<void> switchRoleRequest() async {
-    final String url = "https://api.thebharatworks.com/api/user/request-role-upgrade";
+    final String url =
+        "https://api.thebharatworks.com/api/user/request-role-upgrade";
     print("Abhi:- switchRoleRequest url :$url");
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -1658,7 +1671,8 @@ class _SellerScreenState extends State<SellerScreen> {
         print("Abhi:- switchRoleRequest statusCode ${response.statusCode}");
       } else {
         print("Abhi:- else switchRoleRequest response ${response.body}");
-        print("Abhi:- else switchRoleRequest statusCode ${response.statusCode}");
+        print(
+            "Abhi:- else switchRoleRequest statusCode ${response.statusCode}");
       }
     } catch (e) {
       print("Abhi:- get Exception $e");
@@ -1669,7 +1683,8 @@ class _SellerScreenState extends State<SellerScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
-      final url = Uri.parse("https://api.thebharatworks.com/api/user/getUserProfileData");
+      final url = Uri.parse(
+          "https://api.thebharatworks.com/api/user/getUserProfileData");
       final response = await http.get(
         url,
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
@@ -1681,9 +1696,10 @@ class _SellerScreenState extends State<SellerScreen> {
         print("Data: $data");
 
         if (data['status'] == true) {
-          final fetchedAddress = data['data'] != null && data['data']['location'] != null
-              ? (data['data']['location']['address'] ?? 'Select Location')
-              : 'Select Location';
+          final fetchedAddress =
+              data['data'] != null && data['data']['location'] != null
+                  ? (data['data']['location']['address'] ?? 'Select Location')
+                  : 'Select Location';
 
           await prefs.setString("address", fetchedAddress);
 
@@ -1719,7 +1735,8 @@ class _SellerScreenState extends State<SellerScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
-      final url = Uri.parse("https://api.thebharatworks.com/api/user/emergency");
+      final url =
+          Uri.parse("https://api.thebharatworks.com/api/user/emergency");
 
       final response = await http.post(
         url,
@@ -1768,192 +1785,230 @@ class _SellerScreenState extends State<SellerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[100],
+        //  backgroundColor: Colors.grey[100],
         appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
-        elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
-    ),
-    body: SafeArea(
-    child: isLoading
-    ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-    child: Column(
-    children: [
-    _buildHeader(context, profile),
-    Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-    Stack(
-    clipBehavior: Clip.none,
-    children: [
-    InkWell(
-    onTap: _pickImageFromCamera,
-    child: Container(
-    padding: EdgeInsets.all(3),
-    decoration: BoxDecoration(
-    shape: BoxShape.circle,
-    border: Border.all(color: Colors.green.shade700, width: 3.0),
-    ),
-    child: CircleAvatar(
-    radius: 50,
-    backgroundColor: Colors.grey.shade300,
-    backgroundImage: _pickedImage != null
-    ? FileImage(_pickedImage!)
-        : (profile?.profilePic != null
-    ? NetworkImage(profile!.profilePic!)
-        : null) as ImageProvider?,
-    child: _pickedImage == null && profile?.profilePic == null
-    ? const Icon(Icons.person, size: 50, color: Colors.white)
-        : null,
-    ),
-    ),
-    ),
-    profile?.verified == true
-    ? Positioned(
-    bottom: 4,
-    right: 4,
-    child: InkWell(
-    onTap: _pickImageFromCamera,
-    child: const Icon(Icons.camera_alt, size: 20, color: Colors.black),
-    ),
-    )
-        : SizedBox(),
-    ],
-    ),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text(
-    '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase() ?? ''}',
-    style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.bold),
-    ),
-    widget.iconsHide == 'hide'
-    ? SizedBox()
-        : GestureDetector(
-    onTap: () async {
-    final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => EditProfileScreen(
-    fullName: profile?.fullName,
-    age: profile?.age,
-    gender: profile?.gender,
-    skill: profile?.skill,
-    categoryId: profile?.categoryId,
-    subCategoryIds: profile?.subCategoryIds?.map((e) => e.toString()).toList(),
-    documentUrl: profile?.documents,
-    ),
-    ),
-    );
-    if (result == true) {
-    fetchProfile();
-    }
-    },
-    child: profile?.verified == true
-    ? Container(
-    padding: const EdgeInsets.all(6),
-    width: 32,
-    height: 32,
-    child: SvgPicture.asset("assets/svg_images/editicon.svg"))
-        : SizedBox(),
-    ),
-    ],
-    ),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text(
-    'Age: ${profile?.age ?? 0}',
-    style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.w600),
-    ),
-    SizedBox(width: 6),
-    Text(
-    'Gender: ${profile?.gender?[0].toUpperCase() ?? "No data"}${profile?.gender?.substring(1).toLowerCase() ?? ''}',
-    style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.w600),
-    ),
-    ],
-    ),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Icon(Icons.location_on, color: Colors.green.shade700, size: 16),
-    const SizedBox(width: 4),
-    GestureDetector(
-    onTap: () async {
-    final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => LocationSelectionScreen(
-    onLocationSelected: (String) {},
-    ),
-    ),
-    );
-    if (result != null) {
-    setState(() {
-    address = result;
-    });
-    await updateLocationOnServer(result, 30.73508469999999, 79.0668788);
-    }
-    },
-    child: Text(
-    address ?? 'Select Location',
-    style: GoogleFonts.roboto(
-    fontSize: 12,
-    color: Colors.black,
-    fontWeight: FontWeight.w500,
-    ),
-    ),
-    ),
-    const SizedBox(width: 8),
-    ],
-    ),
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text(
-    "${profile?.totalReview ?? 0} Reviews",
-    style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
-    ),
-    const SizedBox(width: 4),
-    Row(
-    children: [
-    Text(
-    '(${profile?.rating ?? 0.0} ',
-    style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
-    ),
-    Icon(Icons.star, color: Colors.amber, size: 14),
-    Text(
-    ')',
-    style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
-    ),
-    ],
-    ),
-    ],
-    ),
-    ],
-    ),
-    const SizedBox(height: 10),
-    _buildProfileCard(),
-    const SizedBox(height: 16),
-    _buildHisWorkSection(),
-    const SizedBox(height: 12),
-    _buildDocumentCard(),
-    const SizedBox(height: 12),
-    widget.iconsHide == 'hide' ? SizedBox() : _buildAddAsapPersonTile(context),
-    const SizedBox(height: 12),
-    _buildCustomerReviews(),
-    const SizedBox(height: 30),
-    ],
-    ),
-    ),
-    ));
+          elevation: 0,
+          backgroundColor: Color(0xFF9DF89D),
+          centerTitle: true,
+          title: const Text("Worker Profile",
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: const BackButton(color: Colors.black),
+          actions: [],
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
+        ),
+        body: SafeArea(
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildHeader(context, profile),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              InkWell(
+                                onTap: _pickImageFromCamera,
+                                child: Container(
+                                  padding: EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.green.shade700,
+                                        width: 3.0),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.grey.shade300,
+                                    backgroundImage: _pickedImage != null
+                                        ? FileImage(_pickedImage!)
+                                        : (profile?.profilePic != null
+                                            ? NetworkImage(profile!.profilePic!)
+                                            : null) as ImageProvider?,
+                                    child: _pickedImage == null &&
+                                            profile?.profilePic == null
+                                        ? const Icon(Icons.person,
+                                            size: 50, color: Colors.white)
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              profile?.verified == true
+                                  ? Positioned(
+                                      bottom: 4,
+                                      right: 4,
+                                      child: InkWell(
+                                        onTap: _pickImageFromCamera,
+                                        child: const Icon(Icons.camera_alt,
+                                            size: 20, color: Colors.black),
+                                      ),
+                                    )
+                                  : SizedBox(),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase() ?? ''}',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              widget.iconsHide == 'hide'
+                                  ? SizedBox()
+                                  : GestureDetector(
+                                      onTap: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditProfileScreen(
+                                              fullName: profile?.fullName,
+                                              age: profile?.age,
+                                              gender: profile?.gender,
+                                              skill: profile?.skill,
+                                              categoryId: profile?.categoryId,
+                                              subCategoryIds: profile
+                                                  ?.subCategoryIds
+                                                  ?.map((e) => e.toString())
+                                                  .toList(),
+                                              documentUrl: profile?.documents,
+                                            ),
+                                          ),
+                                        );
+                                        if (result == true) {
+                                          fetchProfile();
+                                        }
+                                      },
+                                      child: profile?.verified == true
+                                          ? Container(
+                                              padding: const EdgeInsets.all(6),
+                                              width: 32,
+                                              height: 32,
+                                              child: SvgPicture.asset(
+                                                  "assets/svg_images/editicon.svg"))
+                                          : SizedBox(),
+                                    ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Age: ${profile?.age ?? 0}',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Gender: ${profile?.gender?[0].toUpperCase() ?? "No data"}${profile?.gender?.substring(1).toLowerCase() ?? ''}',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on,
+                                  color: Colors.green.shade700, size: 16),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            LocationSelectionScreen(
+                                          onLocationSelected: (String) {},
+                                        ),
+                                      ),
+                                    );
+                                    if (result != null) {
+                                      setState(() {
+                                        address = result;
+                                      });
+                                      await updateLocationOnServer(
+                                          result, 30.73508469999999, 79.0668788);
+                                    }
+                                  },
+                                  child: Text(
+                                    address ?? 'Select Location',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "${profile?.totalReview ?? 0} Reviews",
+                                style: GoogleFonts.roboto(
+                                    fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 4),
+                              Row(
+                                children: [
+                                  Text(
+                                    '(${profile?.rating ?? 0.0} ',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Icon(Icons.star,
+                                      color: Colors.amber, size: 14),
+                                  Text(
+                                    ')',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      _buildProfileCard(),
+                      const SizedBox(height: 16),
+                      _buildHisWorkSection(),
+                      const SizedBox(height: 12),
+                      _buildDocumentCard(),
+                      const SizedBox(height: 12),
+                      widget.iconsHide == 'hide'
+                          ? SizedBox()
+                          : _buildAddAsapPersonTile(context),
+                      const SizedBox(height: 12),
+                      _buildCustomerReviews(),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+        ));
   }
 
   Widget _buildHeader(BuildContext context, dynamic profile) {
-    final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
+    final ServiceProviderProfileModel data =
+        profile as ServiceProviderProfileModel;
     return ClipPath(
       clipper: BottomCurveClipper(),
       child: Container(
@@ -1963,38 +2018,41 @@ class _SellerScreenState extends State<SellerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(Icons.arrow_back, size: 25),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
-                      child: Text(
-                        "Worker Profile",
-                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     GestureDetector(
+            //       onTap: () => Navigator.pop(context),
+            //       child: const Padding(
+            //         padding: EdgeInsets.only(left: 8.0),
+            //         child: Icon(Icons.arrow_back, size: 25),
+            //       ),
+            //     ),
+            //     Expanded(
+            //       child: Center(
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(right: 18.0),
+            //           child: Text(
+            //             "Worker Profile",
+            //             style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.bold),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             SizedBox(height: 16),
-            Center(child: data.verified == true ? _buildRoleSwitcher(context, profile) : SizedBox()),
+            Center(
+                child: data.verified == true
+                    ? _buildRoleSwitcher(context, profile)
+                    : SizedBox()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildServiceproviderVerification(
-      BuildContext context, String? role, String? requestStatus, bool status, String? categoryId) {
+  Widget _buildServiceproviderVerification(BuildContext context, String? role,
+      String? requestStatus, bool status, String? categoryId) {
     print("Abhi:- print requestStatus : $requestStatus");
     if (categoryId == null && status == false) {
       return AlertDialog(
@@ -2009,7 +2067,8 @@ class _SellerScreenState extends State<SellerScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 2),
-            const Text("If you’d like to become a service provider, kindly complete and submit the document form."),
+            const Text(
+                "If you’d like to become a service provider, kindly complete and submit the document form."),
             const SizedBox(height: 8),
           ],
         ),
@@ -2018,12 +2077,15 @@ class _SellerScreenState extends State<SellerScreen> {
             child: Container(
               width: 100,
               height: 35,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8), color: Colors.green),
               child: TextButton(
-                child: const Text("Confirm", style: TextStyle(color: Colors.white)),
+                child: const Text("Confirm",
+                    style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  Get.off(() => RoleEditProfileScreen(updateBothrequest: true, role: profile?.role));
+                  Get.off(() => RoleEditProfileScreen(
+                      updateBothrequest: true, role: profile?.role));
                 },
               ),
             ),
@@ -2043,7 +2105,8 @@ class _SellerScreenState extends State<SellerScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 2),
-            const Text("Profile has been submitted\nwaiting for admin approval"),
+            const Text(
+                "Profile has been submitted\nwaiting for admin approval"),
             const SizedBox(height: 8),
           ],
         ),
@@ -2052,7 +2115,8 @@ class _SellerScreenState extends State<SellerScreen> {
             child: Container(
               width: 100,
               height: 35,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8), color: Colors.green),
               child: TextButton(
                 child: const Text("OK", style: TextStyle(color: Colors.white)),
                 onPressed: () {
@@ -2068,7 +2132,8 @@ class _SellerScreenState extends State<SellerScreen> {
   }
 
   Widget _buildRoleSwitcher(BuildContext context, dynamic profile) {
-    final ServiceProviderProfileModel data = profile as ServiceProviderProfileModel;
+    final ServiceProviderProfileModel data =
+        profile as ServiceProviderProfileModel;
     const roleMap = {'User': 'user', 'Worker': 'service_provider'};
     final GetXRoleController roleController = Get.find<GetXRoleController>();
 
@@ -2081,7 +2146,8 @@ class _SellerScreenState extends State<SellerScreen> {
           InkWell(
             child: _roleButton("User", selectedRole == "user", () async {
               if (selectedRole == "user") return;
-              if (data.role == "both" && (data.requestStatus == null || data.requestStatus!.isEmpty)) {
+              if (data.role == "both" &&
+                  (data.requestStatus == null || data.requestStatus!.isEmpty)) {
                 await roleController.updateRole('user');
                 Get.off(() => ProfileScreen());
               } else {
@@ -2098,14 +2164,17 @@ class _SellerScreenState extends State<SellerScreen> {
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                            SvgPicture.asset(
+                                "assets/svg_images/ConfirmationIcon.svg"),
                             const SizedBox(height: 8),
                             const Text(
                               "Request Status",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             const SizedBox(height: 2),
-                            const Text("Your app request has been submitted, please wait 2–3 days."),
+                            const Text(
+                                "Your app request has been submitted, please wait 2–3 days."),
                             const SizedBox(height: 8),
                           ],
                         ),
@@ -2113,9 +2182,12 @@ class _SellerScreenState extends State<SellerScreen> {
                           Container(
                             width: 100,
                             height: 35,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.green),
                             child: TextButton(
-                              child: const Text("OK", style: TextStyle(color: Colors.white)),
+                              child: const Text("OK",
+                                  style: TextStyle(color: Colors.white)),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -2131,9 +2203,11 @@ class _SellerScreenState extends State<SellerScreen> {
           ),
           const SizedBox(width: 16),
           InkWell(
-            child: _roleButton("Worker", selectedRole == "service_provider", () async {
+            child: _roleButton("Worker", selectedRole == "service_provider",
+                () async {
               if (selectedRole == "service_provider") return;
-              if (data.role == "both" && (data.requestStatus == null || data.requestStatus!.isEmpty)) {
+              if (data.role == "both" &&
+                  (data.requestStatus == null || data.requestStatus!.isEmpty)) {
                 await roleController.updateRole('service_provider');
                 Get.off(() => SellerScreen());
               } else {
@@ -2146,14 +2220,17 @@ class _SellerScreenState extends State<SellerScreen> {
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                            SvgPicture.asset(
+                                "assets/svg_images/ConfirmationIcon.svg"),
                             const SizedBox(height: 8),
                             const Text(
                               "Confirmation",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             const SizedBox(height: 2),
-                            const Text("Are you sure you want to switch\n                your profile?"),
+                            const Text(
+                                "Are you sure you want to switch\n                your profile?"),
                             const SizedBox(height: 8),
                           ],
                         ),
@@ -2161,12 +2238,16 @@ class _SellerScreenState extends State<SellerScreen> {
                           Container(
                             width: 100,
                             height: 35,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.green),
                             child: TextButton(
-                              child: const Text("Confirm", style: TextStyle(color: Colors.white)),
+                              child: const Text("Confirm",
+                                  style: TextStyle(color: Colors.white)),
                               onPressed: () async {
                                 if (data.role == "both") {
-                                  await roleController.updateRole('service_provider');
+                                  await roleController
+                                      .updateRole('service_provider');
                                 } else {
                                   await switchRoleRequest();
                                 }
@@ -2178,9 +2259,12 @@ class _SellerScreenState extends State<SellerScreen> {
                           Container(
                             width: 100,
                             height: 35,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.green)),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.green)),
                             child: TextButton(
-                              child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+                              child: const Text("Cancel",
+                                  style: TextStyle(color: Colors.black)),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -2199,14 +2283,17 @@ class _SellerScreenState extends State<SellerScreen> {
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset("assets/images/rolechangeConfim.png", height: 90),
+                            Image.asset("assets/images/rolechangeConfim.png",
+                                height: 90),
                             const SizedBox(height: 8),
                             const Text(
                               "Request Status",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             const SizedBox(height: 2),
-                            const Text("Your request has been submitted please for admin approval"),
+                            const Text(
+                                "Your request has been submitted please for admin approval"),
                             const SizedBox(height: 8),
                           ],
                         ),
@@ -2214,9 +2301,12 @@ class _SellerScreenState extends State<SellerScreen> {
                           Container(
                             width: 100,
                             height: 35,
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.green),
                             child: TextButton(
-                              child: const Text("OK", style: TextStyle(color: Colors.white)),
+                              child: const Text("OK",
+                                  style: TextStyle(color: Colors.white)),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -2318,11 +2408,12 @@ class _SellerScreenState extends State<SellerScreen> {
                             ),
                           ),
                           TextSpan(
-                            text: profile?.subCategoryNames?.join(', ') ?? 'N/A',
+                            text:
+                                profile?.subCategoryNames?.join(', ') ?? 'N/A',
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
-                              fontSize:12,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -2336,7 +2427,6 @@ class _SellerScreenState extends State<SellerScreen> {
           const SizedBox(height: 10),
           _buildEmergencyCard(),
           const SizedBox(height: 15),
-
           Container(
             decoration: const BoxDecoration(
               color: Color(0xffeaffea),
@@ -2347,12 +2437,17 @@ class _SellerScreenState extends State<SellerScreen> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 9,right: 8),
+                    padding: const EdgeInsets.only(bottom: 9, right: 8),
                     child: Align(
                       alignment: Alignment.topRight,
                       child: InkWell(
-                        onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> GalleryScreen(images: profile?.hisWork ?? [], serviceProviderId: profile?.id ?? "") ))  ;
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GalleryScreen(
+                                      images: profile?.hisWork ?? [],
+                                      serviceProviderId: profile?.id ?? "")));
                         },
                         child: Container(
                           width: 120,
@@ -2361,8 +2456,8 @@ class _SellerScreenState extends State<SellerScreen> {
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.green,width: 3)
-                          ),
+                              border:
+                                  Border.all(color: Colors.green, width: 3)),
                         ),
                       ),
                     ),
@@ -2374,38 +2469,52 @@ class _SellerScreenState extends State<SellerScreen> {
                       enlargeCenterPage: true,
                       aspectRatio: 16 / 9,
                       autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
                       viewportFraction: 0.8,
                     ),
-                    items: (_showReviews ? (profile?.hisWork?.isNotEmpty ?? false) ? profile!.hisWork! : ['assets/images/d_png/No_Image_Available.jpg']
-                        : (profile?.customerReview?.isNotEmpty ?? false) ? profile!.customerReview! : ['assets/images/d_png/No_Image_Available.jpg'])
+                    items: (_showReviews
+                            ? (profile?.hisWork?.isNotEmpty ?? false)
+                                ? profile!.hisWork!
+                                : ['assets/images/d_png/No_Image_Available.jpg']
+                            : (profile?.customerReview?.isNotEmpty ?? false)
+                                ? profile!.customerReview!
+                                : [
+                                    'assets/images/d_png/No_Image_Available.jpg'
+                                  ])
                         .map((imageUrl) {
                       return Builder(
                         builder: (BuildContext context) {
                           return GestureDetector(
-                            onTap: imageUrl.startsWith('assets/') ? null : () {
-                              Get.to(() => FullImageScreen(
-                                imageUrl: imageUrl,
-                              )); /*_showReviews
+                            onTap: imageUrl.startsWith('assets/')
+                                ? null
+                                : () {
+                                    Get.to(() => FullImageScreen(
+                                          imageUrl: imageUrl,
+                                        )); /*_showReviews
                                   ? GalleryScreen(images: profile?.hisWork ?? [], serviceProviderId: profile?.id ?? "")
                                   : ReviewImagesScreen(images: profile?.customerReview ?? []));*/
-                            },
+                                  },
                             child: Container(
                               width: MediaQuery.of(context).size.width,
-                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8)),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: imageUrl.startsWith('assets/')
                                     ? Image.asset(imageUrl, fit: BoxFit.cover)
                                     : Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                                    'assets/images/d_png/No_Image_Available.jpg',
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Image.asset(
+                                          'assets/images/d_png/No_Image_Available.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                               ),
                             ),
                           );
@@ -2441,7 +2550,8 @@ class _SellerScreenState extends State<SellerScreen> {
           const Icon(Icons.warning_amber_rounded, color: Colors.red),
           const SizedBox(width: 10),
           Expanded(
-            child: Text("Emergency task.", style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
+            child: Text("Emergency task.",
+                style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
           ),
           SizedBox(
             width: 40,
@@ -2457,8 +2567,8 @@ class _SellerScreenState extends State<SellerScreen> {
                     onChanged: _isToggling
                         ? null
                         : (bool value) {
-                      _checkEmergencyTask();
-                    },
+                            _checkEmergencyTask();
+                          },
                     activeColor: Colors.red,
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: Colors.grey.shade300,
@@ -2492,7 +2602,8 @@ class _SellerScreenState extends State<SellerScreen> {
           Container(
             padding: const EdgeInsets.only(bottom: 4),
             decoration: BoxDecoration(),
-            child: Text("About My Skill", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            child: Text("About My Skill",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 8),
           Container(
@@ -2502,7 +2613,8 @@ class _SellerScreenState extends State<SellerScreen> {
               border: Border.all(color: Colors.green.shade700, width: 1.4),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(profile?.skill ?? '', style: GoogleFonts.poppins(fontSize: 14)),
+            child: Text(profile?.skill ?? '',
+                style: GoogleFonts.poppins(fontSize: 14)),
           ),
         ],
       ),
@@ -2527,16 +2639,21 @@ class _SellerScreenState extends State<SellerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Document", style: GoogleFonts.roboto(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text("Document",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold, fontSize: 16)),
               profile?.verified == true
                   ? Container(
-                width: 100,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2), borderRadius: BorderRadius.circular(10)),
-                child: Center(
-                    child: Text("Verified",
-                        style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600))),
-              )
+                      width: 100,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.green, width: 2),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(
+                          child: Text("Verified",
+                              style: TextStyle(
+                                  color: Colors.green.shade700,
+                                  fontWeight: FontWeight.w600))),
+                    )
                   : SizedBox(),
             ],
           ),
@@ -2545,7 +2662,9 @@ class _SellerScreenState extends State<SellerScreen> {
             children: [
               SvgPicture.asset("assets/svg_images/adharicon.svg"),
               const SizedBox(width: 20),
-              Text("Valid Id Proof", style: GoogleFonts.roboto(fontWeight: FontWeight.w400, fontSize: 14)),
+              Text("Valid Id Proof",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w400, fontSize: 14)),
               const SizedBox(width: 50),
               if (profile?.documents != null && profile!.documents!.isNotEmpty)
                 InkWell(
@@ -2571,7 +2690,10 @@ class _SellerScreenState extends State<SellerScreen> {
               else
                 Text(
                   "(Not uploaded)",
-                  style: TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.italic, fontSize: 12),
+                  style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12),
                 ),
             ],
           ),
@@ -2583,17 +2705,20 @@ class _SellerScreenState extends State<SellerScreen> {
   Widget _buildAddAsapPersonTile(BuildContext context) {
     return profile?.verified == true
         ? Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: SvgPicture.asset('assets/svg_images/bottombar/profile-circle.svg'),
-        title: Text("Add Assign Person", style: GoogleFonts.roboto(fontSize: 13)),
-        trailing: const Icon(Icons.arrow_forward, size: 20),
-        onTap: () {
-          Get.to(() => const WorkerScreen());
-        },
-      ),
-    )
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              leading: SvgPicture.asset(
+                  'assets/svg_images/bottombar/profile-circle.svg'),
+              title: Text("Add Assign Person",
+                  style: GoogleFonts.roboto(fontSize: 13)),
+              trailing: const Icon(Icons.arrow_forward, size: 20),
+              onTap: () {
+                Get.to(() => const WorkerScreen());
+              },
+            ),
+          )
         : SizedBox();
   }
 
@@ -2646,7 +2771,8 @@ class _SellerScreenState extends State<SellerScreen> {
       } else if (i == fullStars && hasHalfStar) {
         stars.add(const Icon(Icons.star_half, color: Colors.orange, size: 18));
       } else {
-        stars.add(const Icon(Icons.star_border, color: Colors.orange, size: 18));
+        stars
+            .add(const Icon(Icons.star_border, color: Colors.orange, size: 18));
       }
     }
     return Row(children: stars);
@@ -2667,13 +2793,14 @@ class _SellerScreenState extends State<SellerScreen> {
           Center(
             child: Text(
               "Rate & Reviews",
-              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
           const SizedBox(height: 8),
           if (profile?.rateAndReviews?.isNotEmpty ?? false)
             ...profile!.rateAndReviews!.map(
-                  (r) => Column(
+              (r) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -2692,23 +2819,26 @@ class _SellerScreenState extends State<SellerScreen> {
                   if ((r.images ?? []).isNotEmpty)
                     Wrap(
                       spacing: 8,
-                      children: (r.images ?? []).map(
+                      children: (r.images ?? [])
+                          .map(
                             (img) => ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: Image.network(
-                            img,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Image.asset(
-                              'assets/images/d_png/No_Image_Available.jpg',
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                img,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.asset(
+                                  'assets/images/d_png/No_Image_Available.jpg',
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ).toList(),
+                          )
+                          .toList(),
                     )
                   else
                     ClipRRect(
@@ -2737,7 +2867,8 @@ class BottomCurveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     return Path()
       ..lineTo(0, size.height - 40)
-      ..quadraticBezierTo(size.width / 2, size.height, size.width, size.height - 30)
+      ..quadraticBezierTo(
+          size.width / 2, size.height, size.width, size.height - 30)
       ..lineTo(size.width, 0)
       ..close();
   }

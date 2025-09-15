@@ -16,29 +16,18 @@ class ViewImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-
-          title??"Profile Image",
-
-          style: GoogleFonts.roboto(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        systemOverlayStyle: SystemUiOverlayStyle(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title:  Text(title??"Profile Image",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
           statusBarIconBrightness: Brightness.light,
         ),
-
       ),
-      backgroundColor: Colors.black,
       body: Center(child: _buildImageView()),
     );
   }

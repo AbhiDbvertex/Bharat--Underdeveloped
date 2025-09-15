@@ -5,6 +5,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/CustomButton.dart';
 import '../../../Widgets/CustomLogoWidget.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../controllers/authController/OtpController.dart';
 import '../../models/OtpModel.dart';
 import 'LoginScreen.dart';
@@ -227,19 +228,26 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                CustomButton(
+    ValueListenableBuilder<bool>(
+    valueListenable: controller.isVerifying,
+    builder: (context, isVerifying, _) {
+    return   CustomButton(
                   label: "Verify",
                   onPressed: () {
                     final enteredOtp = pinController.text.trim();
 
                     if (enteredOtp.length != 4) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please enter the 4-digit OTP"),
-                          backgroundColor: Colors.black,
-                        ),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(
+                      //     content: Text("Please enter the 4-digit OTP"),
+                      //     backgroundColor: Colors.black,
+                      //   ),
+                      // );
+                      CustomSnackBar.show(
+                      context,
+                      message: "Please enter the 4-digit OTP",
+                      type: SnackBarType.error
+    );
                       _resetInputField();
                       return;
                     }
@@ -251,6 +259,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                       _resetInputField();
                     });
                   },
+    isLoading: isVerifying,
+    enabled: !isVerifying,
+    );
+    },
+
                 ),
                 const SizedBox(height: 12),
               ],

@@ -113,10 +113,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        CustomButton(
-                          label: 'Send OTP',
-                          onPressed: () => controller.login(context),
-                        ),
+                        // CustomButton(
+                        //   label: 'Send OTP',
+                        //   onPressed: () => controller.login(context),
+                        // ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: controller.isLoading,
+                          builder: (context, isLoading, _) {
+                            return CustomButton(
+                              label: 'Send OTP',
+                              onPressed: () => controller.login(context),
+                              isLoading: isLoading,
+                              enabled: !isLoading,
+                            );
+                          },
+                        )
+
                       ],
                     ),
                   ),

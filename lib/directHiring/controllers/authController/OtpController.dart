@@ -1,12 +1,13 @@
-
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // Added fluttertoast import
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Added fluttertoast import
 
 import '../../../Widgets/Bottombar.dart';
 import '../../Consent/ApiEndpoint.dart';
@@ -16,10 +17,10 @@ import '../../views/auth/RoleSelectionScreen.dart';
 
 class OtpController {
   final OtpModel model;
-
+  final ValueNotifier<bool> isVerifying = ValueNotifier(false);
   final List<TextEditingController> textControllers = List.generate(
     4,
-        (_) => TextEditingController(),
+    (_) => TextEditingController(),
   );
 
   final List<FocusNode> focusNodes = List.generate(4, (_) => FocusNode());
@@ -47,7 +48,7 @@ class OtpController {
       model.otpDigits[index] = value;
       animControllers[index].forward().then(
             (_) => animControllers[index].reverse(),
-      );
+          );
       if (index < 3) focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       focusNodes[index - 1].requestFocus();
@@ -69,10 +70,15 @@ class OtpController {
     final GetXRoleController roleController = Get.find<GetXRoleController>();
 
     if (enteredOtp.length != 4 || !RegExp(r'^\d{4}$').hasMatch(enteredOtp)) {
-      _showMessage("Please enter a valid 4-digit OTP.");
+     // _showMessage("Please enter a valid 4-digit OTP.");
+      CustomSnackBar.show(
+          context,
+          message: 'Please enter a valid 4-digit OTP.',
+      type: SnackBarType.error
+      );
       return;
     }
-
+    isVerifying.value = true;
     try {
       final response = await http.post(
         Uri.parse('https://api.thebharatworks.com/api/user/verifyOtp'),
@@ -108,29 +114,53 @@ class OtpController {
               (role == 'user' || role == 'service_provider')) {
             nextScreen = const Bottombar();
           }
-          _showMessage(data['message'] ?? "OTP verified successfully");
-
+          // _showMessage(data['message'] ?? "OTP verified successfully");
+          CustomSnackBar.show(
+              context,
+              message: data['message'] ?? "OTP verified successfully",
+              type: SnackBarType.success
+          );
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => nextScreen),
-                (route) => false,
+            (route) => false,
           );
         } else {
-          _showMessage(data['message'] ?? "Invalid OTP or authentication failed.");
+          // _showMessage(
+          //     data['message'] ?? "Invalid OTP or authentication failed.");
+          CustomSnackBar.show(
+              context,
+              message: data['message'] ?? "Invalid OTP or authentication failed.",
+              type: SnackBarType.error
+          );
         }
       } else {
-        _showMessage(data['message'] ?? "Server error occurred. Please try again.");
+        // _showMessage(
+        //     data['message'] ?? "Server error occurred. Please try again.");
+        CustomSnackBar.show(
+            context,
+            message: data['message'] ?? "Server error occurred. Please try again.",
+            type: SnackBarType.warning
+        );
       }
     } catch (e) {
       print('❌ Network Error: $e');
-      _showMessage("Network error. Please check your connection.");
+      // _showMessage("Network error. Please check your connection.");
+      CustomSnackBar.show(
+          context,
+          message: "Network error. Please check your connection.",
+          type: SnackBarType.warning
+      );
+    }
+    finally {
+      isVerifying.value = false; // Stop loading
     }
   }
 
   Future<void> resendOtp(
-      BuildContext context,
-      TextEditingController pinController,
-      Function(String?) refreshUI,
-      ) async {
+    BuildContext context,
+    TextEditingController pinController,
+    Function(String?) refreshUI,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('https://api.thebharatworks.com/api/user/register'),
@@ -162,21 +192,46 @@ class OtpController {
             model.otpDigits = newOtp.split('');
           }
           refreshUI(newOtp);
-          _showMessage(data['message'] ?? "OTP sent successfully");
+          // _showMessage(data['message'] ?? "OTP sent successfully");
+          CustomSnackBar.show(
+              context,
+              message: data['message'] ?? "OTP sent successfully",
+              type: SnackBarType.success
+          );
+
         } else {
-          _showMessage(data['message'] ?? "Failed to resend OTP. Please try again.");
+          //   _showMessage(
+          //       data['message'] ?? "Failed to resend OTP. Please try again.");
+
+          CustomSnackBar.show(
+              context,
+              message: data['message'] ??
+                  "Failed to resend OTP. Please try again.",
+              type: SnackBarType.error
+          );
         }
       } else {
-        _showMessage(data['message'] ?? "Server error occurred. Please try again.");
+        // _showMessage(
+        //     data['message'] ?? "Server error occurred. Please try again.");
+        CustomSnackBar.show(
+            context,
+            message:data['message'] ?? "Server error occurred. Please try again." ,
+            type: SnackBarType.error
+        );
       }
     } catch (e) {
       print('❌ Resend OTP Error: $e');
-      _showMessage("Network error. Please check your connection.");
+      // _showMessage("Network error. Please check your connection.");
+      CustomSnackBar.show(
+          context,
+          message:"Network error. Please check your connection." ,
+          type: SnackBarType.warning
+      );
     }
   }
 
   Future<void> fetchAndSaveProfileData(String token) async {
-    bwDebug("[fetchAndSaveProfileData],  call: ",tag: "otp COntroller ");
+    bwDebug("[fetchAndSaveProfileData],  call: ", tag: "otp COntroller ");
     final profileUrl = Uri.parse(
       '${AppConstants.baseUrl}${ApiEndpoint.otpVerificationScreen}',
     );
@@ -216,6 +271,7 @@ class OtpController {
   }
 
   void dispose() {
+    isVerifying.dispose();
     for (final c in textControllers) {
       c.dispose();
     }
@@ -227,14 +283,15 @@ class OtpController {
     }
   }
 
-  void _showMessage(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG, // Maps to ~2 seconds
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.black87,
-      textColor: Colors.white,
-      fontSize: 12.0,
-    );
-  }
+  // void _showMessage(String message) {
+  //   Fluttertoast.showToast(
+  //     msg: message,
+  //     toastLength: Toast.LENGTH_LONG,
+  //     // Maps to ~2 seconds
+  //     gravity: ToastGravity.BOTTOM,
+  //     backgroundColor: Colors.black87,
+  //     textColor: Colors.white,
+  //     fontSize: 12.0,
+  //   );
+  // }
 }
