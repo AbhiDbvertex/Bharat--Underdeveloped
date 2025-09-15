@@ -188,7 +188,9 @@
 
 import 'dart:convert';
 
+import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -312,11 +314,17 @@ class _ViewWorkerScreenState extends State<ViewWorkerScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("View Details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body:
       isLoading
@@ -327,47 +335,37 @@ class _ViewWorkerScreenState extends State<ViewWorkerScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.arrow_back_outlined,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 90),
-                Text(
-                  "View Details",
-                  style: GoogleFonts.roboto(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
             Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.green.shade700, // Green border color
-                    width: 3.0, // Border width
+              child: GestureDetector(
+                onTap: () {
+                  // Only navigate if image is not default
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewImage(imageUrl: imageUrl,title: "Profile",),
+                      ),
+                    );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.green.shade700, // Green border color
+                      width: 3.0, // Border width
+                    ),
                   ),
-                ),
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: NetworkImage(imageUrl),
-                  onBackgroundImageError: (error, stackTrace) {
-                    print('Error loading worker image: $error');
-                  },
-                  child:
-                  imageUrl.contains('default.jpg')
-                      ? const Icon(Icons.person, size: 60)
-                      : null,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: NetworkImage(imageUrl),
+                    onBackgroundImageError: (error, stackTrace) {
+                      print('Error loading worker image: $error');
+                    },
+                    child:
+                    imageUrl.contains('default.jpg')
+                        ? const Icon(Icons.person, size: 60)
+                        : null,
+                  ),
                 ),
               ),
             ),

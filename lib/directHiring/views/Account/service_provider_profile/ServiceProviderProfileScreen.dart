@@ -1883,7 +1883,7 @@ class _SellerScreenState extends State<SellerScreen> {
                                           ),
                                         );
                                         if (result == true) {
-                                          fetchProfile();
+                                          await fetchProfile();
                                         }
                                       },
                                       child: profile?.verified == true
@@ -2441,13 +2441,17 @@ class _SellerScreenState extends State<SellerScreen> {
                     child: Align(
                       alignment: Alignment.topRight,
                       child: InkWell(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async{
+                          final result=await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => GalleryScreen(
                                       images: profile?.hisWork ?? [],
                                       serviceProviderId: profile?.id ?? "")));
+                          if(result == true){
+                            setState(() => isLoading = true);
+                            await fetchProfile();
+                          }
                         },
                         child: Container(
                           width: 120,
@@ -2703,8 +2707,8 @@ class _SellerScreenState extends State<SellerScreen> {
   }
 
   Widget _buildAddAsapPersonTile(BuildContext context) {
-    return profile?.verified == true
-        ? Container(
+    return /*profile?.verified == true
+        ?*/ Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -2718,8 +2722,8 @@ class _SellerScreenState extends State<SellerScreen> {
                 Get.to(() => const WorkerScreen());
               },
             ),
-          )
-        : SizedBox();
+          );
+       /* : SizedBox();*/
   }
 
   Widget _buildTabButtons() {

@@ -372,10 +372,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../controllers/AccountController/AddWorkerController.dart';
 
 class AddWorkerScreen extends StatefulWidget {
@@ -421,7 +421,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     if (picked != null) {
       setState(() {
         dateController.text =
-        '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
@@ -457,6 +457,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   Widget _buildFormField({
     required TextEditingController controller,
     required String hint,
+    required String label,
     required String? Function(String?) validator,
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
@@ -465,11 +466,15 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
+        textCapitalization: TextCapitalization.sentences,
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          labelText: label,
           hintText: hint,
           hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
           border: _textFieldBorder,
@@ -477,9 +482,10 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
           focusedBorder: _textFieldBorder,
           suffixIcon: isDateField
               ? IconButton(
-            icon: const Icon(Icons.calendar_today, color: Colors.grey),
-            onPressed: () => _selectDate(controller),
-          )
+                  icon: const Icon(Icons.calendar_today,
+                      color: AppColors.primaryGreen),
+                  onPressed: () => _selectDate(controller),
+                )
               : null,
         ),
       ),
@@ -489,276 +495,322 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Add Worker Details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: controller.formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Icon(Icons.arrow_back, size: 25),
-                    ),
-                  ),
-                  const SizedBox(width: 70),
-                  Text(
-                    "Add Worker Details",
-                    style: GoogleFonts.roboto(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () => controller.pickImage(() => setState(() {})),
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.green.shade700,
-                          width: 2.7,
-                        ),
-                      ),
-                      child: ClipOval(
-                        child: controller.selectedImage != null
-                            ? Image.file(
-                          controller.selectedImage!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-                        )
-                            : _buildPlaceholder(),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: Container(
-                        decoration: const BoxDecoration(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            key: controller.formKey,
+            child: Column(
+              children: [
+                // const SizedBox(height: 20),
+                // Row(
+                //   children: [
+                //     GestureDetector(
+                //       onTap: () => Navigator.pop(context),
+                //       child: const Padding(
+                //         padding: EdgeInsets.only(left: 8.0),
+                //         child: Icon(Icons.arrow_back, size: 25),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 70),
+                //     Text(
+                //       "Add Worker Details",
+                //       style: GoogleFonts.roboto(
+                //         fontSize: 18,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.black,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  // onTap: () => controller.pickImage(() => setState(() {})),
+                  onTap: () => controller.pickProfileImage(context, () => setState(() {})),
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.green.shade700,
+                            width: 2.7,
+                          ),
                         ),
-                        padding: const EdgeInsets.all(4),
-                        child: Image.asset(
-                          'assets/images/edit1.png',
-                          width: 24,
-                          height: 24,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.edit, size: 24),
+                        child: ClipOval(
+                          child: controller.selectedImage != null
+                              ? Image.file(
+                                  controller.selectedImage!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      _buildPlaceholder(),
+                                )
+                              : _buildPlaceholder(),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildFormField(
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-z A-Z]')),
-                ],
-                controller: controller.nameController,
-                hint: 'Name',
-                validator: (value) => value!.trim().isEmpty ? 'Please enter a name' : null,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: IntlPhoneField(
-                  controller: controller.phoneController, // New controller for phone
-                  decoration: const InputDecoration(
-                    hintText: 'Phone Number',
-                    hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
-                    border: _textFieldBorder,
-                    enabledBorder: _textFieldBorder,
-                    focusedBorder: _textFieldBorder,
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: Image.asset(
+                            'assets/images/edit1.png',
+                            width: 24,
+                            height: 24,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.edit, size: 24),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  initialCountryCode: 'IN',
-                  disableLengthCheck: true,
-                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 20),
+                _buildFormField(
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-z A-Z]')),
                   ],
-                  onChanged: (phone) {
-                    controller.phone = phone.number;
-                    // Trigger validation on change
-                    if (controller.formKey.currentState != null) {
-                      controller.formKey.currentState!.validate();
-                    }
-                  },
-                  validator: (phone) {
-                    final number = phone?.number ?? '';
-                    if (number.trim().isEmpty) {
-                      return 'Please enter a phone number';
-                    }
-                    if (!RegExp(r'^\d{10}$').hasMatch(number)) {
-                      return 'Please enter a valid 10-digit phone number';
+                  controller: controller.nameController,
+                  hint: 'Enter name',
+                  label: 'Name',
+                  validator: (value) => value!.trim().isEmpty
+                      ? 'Please enter a name'
+                      : value.trim().length < 3
+                          ? 'Name should be 3 character'
+                          : null,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: IntlPhoneField(
+                    controller: controller.phoneController,
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Enter phone number',
+                      labelText: "Phone",
+                      hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                      border: _textFieldBorder,
+                      enabledBorder: _textFieldBorder,
+                      focusedBorder: _textFieldBorder,
+                    ),
+                    initialCountryCode: 'IN',
+                    disableLengthCheck: true,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    onChanged: (phone) {
+                      controller.phone = phone.number;
+                      // Trigger validation on change
+                      // if (controller.formKey.currentState != null) {
+                      //   controller.formKey.currentState!.validate();
+                      // }
+                    },
+                    validator: (phone) {
+                      final number = phone?.number ?? '';
+                      if (number.trim().isEmpty) {
+                        return 'Please enter a phone number';
+                      }
+                      if (!RegExp(r'^\d{10}$').hasMatch(number)) {
+                        return 'Please enter a valid 10-digit phone number';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                _buildFormField(
+                  controller: controller.aadhaarController,
+                  hint: 'Aadhaar Number',
+                  label: 'Aadhaar Number',
+                  validator: (value) {
+                    if (value!.isEmpty) return 'Please enter Aadhaar number';
+                    if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
+                      return 'Please enter a valid 12-digit Aadhaar number';
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(12),
+                  ],
                 ),
-              ),
-              _buildFormField(
-                controller: controller.aadhaarController,
-                hint: 'Aadhaar Number',
-                validator: (value) {
-                  if (value!.isEmpty) return 'Please enter Aadhaar number';
-                  if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
-                    return 'Please enter a valid 12-digit Aadhaar number';
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(12),
-                ],
-              ),
-              _buildFormField(
-                controller: controller.dobController,
-                hint: 'Date of Birth (YYYY-MM-DD)',
-                validator: _validateDate,
-                keyboardType: TextInputType.datetime,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
-                  DateInputFormatter(),
-                  LengthLimitingTextInputFormatter(10),
-                ],
-                isDateField: true,
-              ),
-              _buildFormField(
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-z,/.0-9A-Z]')),
-                ],
-                controller: controller.addressController,
-                hint: 'Address',
-                validator: (value) => value!.isEmpty ? 'Please enter an address' : null,
-              ),
-              // Aadhaar Upload Button
-              // const SizedBox(height: 16),
-              // Align(
-              //   alignment: Alignment.centerLeft,
-              //   child: Text(
-              //     "Upload Aadhaar Card",
-              //     style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w600),
-              //   ),
-              // ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: const Text("Upload Aadhaar Card"),
-                onPressed: () {
-                  controller.pickAadhaarImages(context, () => setState(() {}));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                _buildFormField(
+                  controller: controller.dobController,
+                  hint: 'Date of Birth (YYYY-MM-DD)',
+                  label: "DOB",
+                  validator: _validateDate,
+                  keyboardType: TextInputType.datetime,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
+                    DateInputFormatter(),
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                  isDateField: true,
                 ),
-              ),
-
-// Selected Aadhaar Images
-              if (controller.aadhaarImages.isNotEmpty) ...[
+                _buildFormField(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'[a-z,/.0-9A-Z]')),
+                  ],
+                  controller: controller.addressController,
+                  hint: 'Enter address',
+                  label: 'Address',
+                  validator: (value) =>
+                      value!.isEmpty ? 'Please enter an address' :value.length<3? "Enter valid address":null,
+                ),
+                // Aadhaar Upload Button
+                // const SizedBox(height: 16),
+                // Align(
+                //   alignment: Alignment.centerLeft,
+                //   child: Text(
+                //     "Upload Aadhaar Card",
+                //     style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w600),
+                //   ),
+                // ),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: List.generate(controller.aadhaarImages.length, (index) {
-                    final file = controller.aadhaarImages[index];
-                    return Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(file.path),
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Positioned(
-                          top: 2,
-                          right: 2,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.removeAadhaarImage(index, () => setState(() {}));
-                            },
-                            child: const CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Colors.red,
-                              child: Icon(Icons.close, size: 14, color: Colors.white),
-                            ),
-                          ),
-                        )
-                      ],
-                    );
-                  }),
-                ),
-              ],
-
-              const SizedBox(height: 30),
-              SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting
-                      ? null
-                      : () async {
-                    setState(() => _isSubmitting = true);
-                    if (controller.validateInputs()) {
-                      final success = await controller.submitWorkerToAPI(context);
-                      if (success) {
-                        Navigator.pop(context, true);
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please file all required filed")),
-                      );
-                    }
-                    setState(() => _isSubmitting = false);
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add,color: Colors.white,),
+                  label: const Text(
+                    "Upload Aadhaar Card",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    controller.pickAadhaarImages(
+                        context, () => setState(() {}));
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(Colors.white),
-                    ),
-                  )
-                      : const Text(
-                    'Add',
-                    style: TextStyle(fontSize: 15, color: Colors.white),
+                    backgroundColor: AppColors.green, // or your custom green: e.g., Colors.green
                   ),
                 ),
-              ),
-            ],
+
+                // Selected Aadhaar Images
+                if (controller.aadhaarImages.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children:
+                        List.generate(controller.aadhaarImages.length, (index) {
+                      final file = controller.aadhaarImages[index];
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              File(file.path),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 2,
+                            right: 2,
+                            child: GestureDetector(
+                              onTap: () {
+                                controller.removeAadhaarImage(
+                                    index, () => setState(() {}));
+                              },
+                              child: const CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.red,
+                                child: Icon(Icons.close,
+                                    size: 14, color: Colors.white),
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    }),
+                  ),
+                ],
+
+                const SizedBox(height: 30),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isSubmitting
+                        ? null
+                        : () /*async {
+                            setState(() => _isSubmitting = true);
+                            if (controller.validateInputs()) {
+                              final success =
+                                  await controller.submitWorkerToAPI(context);
+                              if (success) {
+                                Navigator.pop(context, true);
+                              }
+                            } else {
+                              CustomSnackBar.show(context,
+                                  message: "Please fill all required fields",
+                                  type: SnackBarType.warning);
+                            }
+                            setState(() => _isSubmitting = false);
+                          },*/
+                    async {
+                      setState(() => _isSubmitting = true);
+                      final errorMessage = controller.validateInputs();
+                      if (errorMessage == null) {
+                        final success =
+                        await controller.submitWorkerToAPI(context);
+                        if (success) {
+                          Navigator.pop(context, true);
+                        }
+                      } else {
+                        CustomSnackBar.show(
+                          context,
+                          message: errorMessage,
+                          type: SnackBarType.error,
+                        );
+                      }
+                      setState(() => _isSubmitting = false);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Add',
+                            style: TextStyle(fontSize: 15, color: Colors.white),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -769,16 +821,17 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
 class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     String text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
     if (text.length > 8) text = text.substring(0, 8);
     String formatted = '';
     if (text.isNotEmpty) {
       formatted += text.substring(0, text.length >= 4 ? 4 : text.length);
       if (text.length > 4) {
-        formatted += '-' + text.substring(4, text.length >= 6 ? 6 : text.length);
+        formatted +=
+            '-' + text.substring(4, text.length >= 6 ? 6 : text.length);
       }
       if (text.length > 6) {
         formatted += '-' + text.substring(6);
