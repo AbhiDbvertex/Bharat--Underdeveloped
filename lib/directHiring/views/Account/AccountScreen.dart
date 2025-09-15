@@ -691,6 +691,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 Widget screen;
 
                                 // Condition for service_provider with unverified profile
+
                                 if (role == "service_provider" && profile != null && profile!.verificationStatus == 'pending') {
                                   print("🔍 Calling switchRoleRequest for unverified service provider");
                                   // await switchRoleRequest();
@@ -698,6 +699,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                 } else if (profile!.verificationStatus == 'rejected'){
                                   screen = const FirstTimeServiceProviderProfileScreen();
                                 } else if (role == "customer") {
+
                                   print("🔍 Navigating to ProfileScreen for customer");
                                   screen = const ProfileScreen();
                                 } else if (role == "service_provider") {

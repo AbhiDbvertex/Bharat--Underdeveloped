@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../models/userModel/WorkerListModel.dart';
 import 'AddWorkerScreen.dart';
 import 'EditWorkerScreen.dart';
@@ -66,27 +69,32 @@ class _WorkerScreenState extends State<WorkerScreen> {
           print("❌ API error: ${data['message']}");
           setState(() => isLoading = false);
           if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("API error: ${data['message']}")),
+          CustomSnackBar.show(
+              context,
+              message: "API error: ${data['message']}",
+              type: SnackBarType.error
           );
         }
       } else {
         print("❌ Server error: ${response.statusCode}");
         setState(() => isLoading = false);
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to fetch workers: ${response.statusCode}"),
-          ),
+        CustomSnackBar.show(
+            context,
+            message:"Failed to fetch workers: ${response.statusCode}" ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print('❌ Error fetching workers: $e');
       setState(() => isLoading = false);
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error fetching workers: $e")));
+      CustomSnackBar.show(
+          context,
+          message:"Error fetching workers: $e" ,
+          type: SnackBarType.error
+      );
     }
   }
 
@@ -94,16 +102,64 @@ class _WorkerScreenState extends State<WorkerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          "Worker List",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        leading: const BackButton(color: Colors.black),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: GestureDetector(
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddWorkerScreen()),
+                );
+                if (result == true) {
+                  setState(() => isLoading = true);
+                  await fetchWorkers();
+                  if (!context.mounted) return;
+                  CustomSnackBar.show(
+                      context,
+                      message:"Worker added successfully" ,
+                      type: SnackBarType.success
+                  );
+                }
+              },
+              child: Container(
+                height: 27,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade700,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    "Add Worker",
+                    style: GoogleFonts.roboto(fontSize: 10, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: Column(
         children: [
-          const SizedBox(height: 20),
-          _buildTopBar(context),
+         // const SizedBox(height: 20),
+          // _buildTopBar(context),
           Expanded(
             child:
             isLoading
@@ -144,11 +200,11 @@ class _WorkerScreenState extends State<WorkerScreen> {
               if (result == true) {
                 fetchWorkers();
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Worker added successfully"),
-                    backgroundColor: Colors.green,
-                  ),
+
+                CustomSnackBar.show(
+                    context,
+                    message: "Worker added successfully",
+                    type: SnackBarType.success
                 );
               }
             },
@@ -183,169 +239,253 @@ class _WorkerScreenState extends State<WorkerScreen> {
             : worker.image.startsWith('http')
             ? worker.image.replaceFirst('http://', 'https://')
             : 'https://api.thebharatworks.com${worker.image}';
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      print(
-                        'Error loading image for worker ${worker.name}: $error',
-                      );
-                      return Image.asset(
-                        'assets/images/d_png/no_profile_image.png',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      );
-                    },
+        return GestureDetector(
+          onTap: () {
+          if (worker.verifyStatus == 'pending' || worker.verifyStatus == 'rejected') {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Center(
+                    child: Text(
+                      worker.verifyStatus == 'rejected' ? 'Rejection Reason' : 'Pending Approval',
+                      style: GoogleFonts.roboto(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                      const SizedBox(height: 8),
+
                       Text(
-                        worker.name,
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        worker.verifyStatus == 'rejected'
+                            ? (worker.rejectionReason != null && worker.rejectionReason.isNotEmpty
+                            ? worker.rejectionReason
+                            : 'Admin has rejected.')
+                            : 'Admin has not approved yet.',
+                        style: GoogleFonts.roboto(fontSize: 16),
                       ),
-                      Text(
-                        worker.address,
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF27773),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          worker.createdAt.substring(0, 10),
-                          style: GoogleFonts.roboto(color: Colors.white),
-                        ),
-                      ),SizedBox(height: 8,),
-                      Container(
-                        height: 25,
-                        width: 85,
-                        decoration: BoxDecoration(color: worker.verifyStatus == 'approved' ? Colors.green : Colors.amber,
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Center(child: Text(worker.verifyStatus.toUpperCase(),style: TextStyle(color: Colors.white),)),
-                      )
+                      const SizedBox(height: 8),
                     ],
                   ),
-                ),
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        print(
-                          'Navigating to ViewWorkerScreen with workerId: ${worker.id}',
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => ViewWorkerScreen(workerId: worker.id),
-                          ),
-                        ).then((_) {
-                          print(
-                            'Returned from ViewWorkerScreen for workerId: ${worker.id}',
-                          );
-                        });
-                      },
-                      child: Text(
-                        "View",
-                        style: GoogleFonts.roboto(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
+
+                  actions: [
+                    Center(
+                      child: Container(
+                        width: 100,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
                           color: Colors.green,
+                        ),
+                        child: TextButton(
+                          child: const Text(
+                            "OK",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
                         ),
                       ),
                     ),
+                  ],
+                );
+              },
+            );
+          }
 
-                    // _actionButton('Edit', Colors.green.shade700, () async {
-                    //   final result = await Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (_) => EditWorkerScreen(workerId: worker.id),
-                    //     ),
-                    //   );
-                    //   if (result == true) {
-                    //     fetchWorkers();
-                    //     if (!context.mounted) return;
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       const SnackBar(
-                    //         content: Text("Worker updated successfully"),
-                    //         backgroundColor: Colors.green,
-                    //       ),
-                    //     );
-                    //   }
-                    // }),
-                    SizedBox(height: 10,),
-                    _actionButton('Edit', Colors.green.shade700, () async {
-                      print(
-                        'Navigating to EditWorkerScreen with workerId: ${worker.id}',
-                      );
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EditWorkerScreen(workerId: worker.id),
+          },
+          child: Card(
+
+            margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 80,
+                    width: 80,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        imageUrl,
+                        // width: 100,
+                        // height: 100,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          print(
+                            'Error loading image for worker ${worker.name}: $error',
+                          );
+                          return Image.asset(
+                            'assets/images/d_png/no_profile_image.png',
+                            // width: 100,
+                            // height: 100,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          worker.name,
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      );
-                      if (result == true) {
+                        Text(
+                          worker.address,
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF27773),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: Text(
+                              worker.createdAt.substring(0, 10),
+                              style: GoogleFonts.roboto(color: Colors.white),
+                            ),
+                          ),
+                        ),SizedBox(height: 8,),
+                        // Container(
+                        //   height: 25,
+                        //   width: 85,
+                        //   decoration: BoxDecoration(color: worker.verifyStatus == 'approved' ? Colors.green : worker.verifyStatus == 'rejected' ? Colors.red:Colors.amber,
+                        //       borderRadius: BorderRadius.circular(5)),
+                        //   child: Center(child: Text(worker.verifyStatus.toUpperCase(),style: TextStyle(color: Colors.white),)),
+                        // )
+                        Text(
+                          worker.verifyStatus.toUpperCase(),
+                          style: TextStyle(
+                            color: worker.verifyStatus == 'approved'
+                                ? Colors.green
+                                : worker.verifyStatus == 'rejected'
+                                ? Colors.red
+                                : Colors.amber,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          print(
+                            'Navigating to ViewWorkerScreen with workerId: ${worker.id}',
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => ViewWorkerScreen(workerId: worker.id),
+                            ),
+                          ).then((_) {
+                            print(
+                              'Returned from ViewWorkerScreen for workerId: ${worker.id}',
+                            );
+                          });
+                        },
+                        child: Text(
+                          "View",
+                          style: GoogleFonts.roboto(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ),
+
+                      // _actionButton('Edit', Colors.green.shade700, () async {
+                      //   final result = await Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (_) => EditWorkerScreen(workerId: worker.id),
+                      //     ),
+                      //   );
+                      //   if (result == true) {
+                      //     fetchWorkers();
+                      //     if (!context.mounted) return;
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       const SnackBar(
+                      //         content: Text("Worker updated successfully"),
+                      //         backgroundColor: Colors.green,
+                      //       ),
+                      //     );
+                      //   }
+                      // }),
+                      SizedBox(height: 10,),
+                      worker.verifyStatus == 'approved' ?
+                      _actionButton('Edit', Colors.green.shade700, () async {
                         print(
-                          'Refreshing workers after edit for workerId: ${worker.id}',
+                          'Navigating to EditWorkerScreen with workerId: ${worker.id}',
                         );
-                        setState(() {
-                          isLoading =
-                          true; // Show loading indicator during refresh
-                        });
-                        await fetchWorkers();
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Worker updated successfully"),
-                            backgroundColor: Colors.green,
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditWorkerScreen(workerId: worker.id),
                           ),
                         );
-                      }
-                    }),
-                    SizedBox(height: 10,),
-                    _actionButton('Delete', Colors.green.shade700, () {
-                      _confirmDelete(worker.id);
-                    }),
-                  ],
-                ),
-              ],
+                        if (result == true) {
+                          print(
+                            'Refreshing workers after edit for workerId: ${worker.id}',
+                          );
+                          setState(() {
+                            isLoading =
+                            true; // Show loading indicator during refresh
+                          });
+                          await fetchWorkers();
+                          if (!context.mounted) return;
+
+                          CustomSnackBar.show(
+                              context,
+                              message: "Worker updated successfully",
+                              type: SnackBarType.success
+                          );
+
+                        }
+                      })
+                          :SizedBox()
+                      ,
+                      SizedBox(height: 10,),
+                      worker.verifyStatus == 'approved' ? _actionButton('Delete', Colors.green.shade700, () {
+                        _confirmDelete(worker.id);
+                      }):SizedBox(),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -432,9 +572,12 @@ class _WorkerScreenState extends State<WorkerScreen> {
       final token = await getToken();
       if (token == null) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("User not logged in")));
+        CustomSnackBar.show(
+            context,
+            message: "User not logged in",
+            type: SnackBarType.warning
+        );
+
         return;
       }
 
@@ -448,25 +591,28 @@ class _WorkerScreenState extends State<WorkerScreen> {
           workers.removeWhere((w) => w.id == workerId);
         });
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Worker deleted successfully"),
-            backgroundColor: Colors.green,
-          ),
+        CustomSnackBar.show(
+            context,
+            message:"Worker deleted successfully" ,
+            type: SnackBarType.success
         );
       } else {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to delete worker: ${response.statusCode}"),
-          ),
+        CustomSnackBar.show(
+            context,
+            message: "Failed to delete worker: ${response.statusCode}",
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      CustomSnackBar.show(
+          context,
+          message: "Error: $e",
+          type: SnackBarType.error
+      );
+
     }
   }
 }

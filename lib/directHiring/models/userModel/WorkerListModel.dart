@@ -5,6 +5,7 @@ class WorkerListModel {
   final String address;
   final String image;
   final String verifyStatus;
+  final String rejectionReason;
   final String createdAt;
 
   WorkerListModel({
@@ -14,6 +15,7 @@ class WorkerListModel {
     required this.address,
     required this.image,
     required this.verifyStatus,
+    required this.rejectionReason,
     required this.createdAt,
   });
 
@@ -24,13 +26,14 @@ class WorkerListModel {
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
       image: json['image'] ?? '',
-      verifyStatus: json['verifyStatus'] ?? 'pending',
+      verifyStatus: json['verifyStatus'] ?? '',
+      rejectionReason: json['rejectionReason'] ?? '',
       createdAt: json['createdAt'] ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'Worker(id: $id, name: $name, phone: $phone, status: $verifyStatus)';
+    return 'Worker(id: $id, name: $name, phone: $phone, status: $verifyStatus,Reasion: $rejectionReason)';
   }
 }

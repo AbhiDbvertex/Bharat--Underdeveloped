@@ -87,8 +87,8 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     _fetchBiddingOrders();
     fetchProfile();
     controller.getEmergencySpOrderList();
-    // fetchBanners();
-    setupStaticBanners();
+    fetchBanners();
+    // setupStaticBanners();
   }
   void setupStaticBanners() {
     setState(() {
@@ -101,6 +101,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     });
   }
   Future<void> fetchBanners() async {
+    bwDebug("[fetchBanners] called : ",tag:"ServiceProviderHomeScreen");
     setState(() {
       isBannerLoading = true;
     });
@@ -108,22 +109,23 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token == null) {
-        debugPrint("❌ No token found for fetching banners");
+        bwDebug("❌ No token found for fetching banners");
         setState(() => isBannerLoading = false);
         return;
       }
       final url =
-      Uri.parse('https://api.thebharatworks.com/api/user/getbanners');
+      Uri.parse('https://api.thebharatworks.com/api/banner/getAllBannerImages');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $token'},
       );
+      bwDebug("[fetchBanners]: statusCode: ${response.statusCode},\n body: ${response.body}");
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['status'] == true && data['data'] is List) {
+        if (data['success'] == true && data['images'] is List) {
           setState(() {
-            bannerImages = (data['data'] as List)
-                .map((item) => item['image'].toString())
+            bannerImages = (data['images'] as List)
+                .map((item) => item.toString())
                 .toList();
             isBannerLoading = false;
           });
@@ -863,6 +865,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                           );
                         },
                         child: Container(
+
                           margin: const EdgeInsets.symmetric(horizontal: 5),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),

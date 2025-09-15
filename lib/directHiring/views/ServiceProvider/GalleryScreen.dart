@@ -1433,6 +1433,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -1440,12 +1441,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/app_constants.dart';
 import 'FullImageScreen.dart';
 
 class GalleryScreen extends StatefulWidget {
-  final List<String> images; // Initial images passed from profile.hisWork
-  final String serviceProviderId; // Dynamic service provider ID
+  final List<String> images;
+  final String serviceProviderId;
 
   const GalleryScreen({
     super.key,
@@ -1461,13 +1463,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
   List<String> _images = [];
   bool _isUploading = false;
   bool _isLoading = true;
+  bool _hasChanges = false;
 
   @override
   void initState() {
     super.initState();
-    // Initial images set karo
     _images = widget.images;
-    _fetchImagesFromApi(); // API se images fetch karo
+    _fetchImagesFromApi();
   }
 
   // Fetch images from API
@@ -1478,9 +1480,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('⚠️ Token not found! Please log in.')),
+        CustomSnackBar.show(
+            context,
+            message:'Token not found! Please log in.' ,
+            type: SnackBarType.warning
         );
+
         setState(() => _isLoading = false);
         return;
       }
@@ -1501,37 +1506,184 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ? cleanPath
               : '${AppConstants.baseImageUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
         }).toList();
-
-        // Merge passed images with API-fetched images, duplicates hatao
         final mergedList = [..._images, ...fullUrls].toSet().toList();
         setState(() => _images = mergedList);
         setState(() {
 
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Failed to fetch images: ${response.statusCode}'),
-          ),
+               CustomSnackBar.show(
+            context,
+            message: 'Failed to fetch images: ${response.statusCode}',
+            type: SnackBarType.warning
         );
+
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('⚠️ Error fetching images: $e')),
+
+      CustomSnackBar.show(
+          context,
+          message: 'Error fetching images: $e',
+          type: SnackBarType.error
       );
+
     } finally {
       setState(() => _isLoading = false);
     }
   }
-
+  Future<void> _showImageSourceBottomSheet() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+                title: Text(
+                  'Camera',
+                  style: GoogleFonts.roboto(fontSize: 16),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _uploadImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: AppColors.primaryGreen),
+                title: Text(
+                  'Gallery',
+                  style: GoogleFonts.roboto(fontSize: 16),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _uploadImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   // Upload images
-  Future<void> _uploadImage() async {
+  // Future<void> _uploadImage() async {
+  //   final picker = ImagePicker();
+  //   final pickedFiles = await picker.pickMultiImage();
+  //   if (pickedFiles.isEmpty) {
+  //
+  //     CustomSnackBar.show(
+  //         context,
+  //         message: 'No images selected',
+  //         type: SnackBarType.warning
+  //     );
+  //
+  //     return;
+  //   }
+  //
+  //   setState(() => _isUploading = true);
+  //
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token');
+  //     if (token == null || token.isEmpty) {
+  //
+  //       CustomSnackBar.show(
+  //           context,
+  //           message:'Token not found! Please log in.',
+  //           type: SnackBarType.warning
+  //       );
+  //
+  //       setState(() => _isUploading = false);
+  //       return;
+  //     }
+  //
+  //     var request = http.MultipartRequest(
+  //       'POST',
+  //       Uri.parse('${AppConstants.baseUrl}/user/updateHisWork'),
+  //     )..headers['Authorization'] = 'Bearer $token';
+  //
+  //     for (var file in pickedFiles) {
+  //       final mimeType =
+  //           lookupMimeType(file.path)?.split('/') ?? ['image', 'jpeg'];
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath(
+  //           'hiswork',
+  //           file.path,
+  //           contentType: MediaType(mimeType[0], mimeType[1]),
+  //         ),
+  //       );
+  //     }
+  //
+  //     final response = await request.send();
+  //     final responseBody = await response.stream.bytesToString();
+  //     final responseData = jsonDecode(responseBody);
+  //
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> hiswork = responseData['data']['hiswork'];
+  //       final List<String> fullUrls = hiswork.map<String>((img) {
+  //         final cleanPath = img.toString().replaceAll('\\', '/');
+  //         return cleanPath.startsWith('http')
+  //             ? cleanPath
+  //             : '${AppConstants.baseImageUrl}/${cleanPath.startsWith('/') ? cleanPath.substring(1) : cleanPath}';
+  //       }).toList();
+  //
+  //       final mergedList = [..._images, ...fullUrls].toSet().toList();
+  //       setState(() => _images = mergedList);
+  //       Navigator.pop(context,true);
+  //       CustomSnackBar.show(
+  //           context,
+  //           message:'Images uploaded successfully' ,
+  //           type: SnackBarType.success
+  //       );
+  //
+  //     } else {
+  //
+  //       CustomSnackBar.show(
+  //           context,
+  //           message: 'Upload failed: ${response.statusCode}',
+  //           type: SnackBarType.error
+  //       );
+  //     }
+  //   } catch (e) {
+  //          CustomSnackBar.show(
+  //         context,
+  //         message:'Error: $e' ,
+  //         type: SnackBarType.error
+  //     );
+  //
+  //   } finally {
+  //     setState(() => _isUploading = false);
+  //   }
+  // }
+
+  // Delete image function - exact relative path bhejo
+
+  Future<void> _uploadImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage();
-    if (pickedFiles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No images selected')),
+    List<XFile>? pickedFiles;
+
+    if (source == ImageSource.camera) {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        pickedFiles = [pickedFile];
+      }
+    } else {
+      pickedFiles = await picker.pickMultiImage();
+    }
+
+    if (pickedFiles == null || pickedFiles.isEmpty) {
+      CustomSnackBar.show(
+          context,
+          message: 'No images selected',
+          type: SnackBarType.error
       );
+
       return;
     }
 
@@ -1541,8 +1693,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Token not found! Please log in.')),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Token not found! Please log in.',
+            type: SnackBarType.warning
         );
         setState(() => _isUploading = false);
         return;
@@ -1580,42 +1735,54 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
         final mergedList = [..._images, ...fullUrls].toSet().toList();
         setState(() => _images = mergedList);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ Images uploaded successfully')),
+        setState(() => _hasChanges = true);
+        Navigator.pop(context, true);
+
+        CustomSnackBar.show(
+            context,
+            message:'Images uploaded successfully' ,
+            type: SnackBarType.success
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Upload failed: ${response.statusCode}')),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Upload failed: ${response.statusCode}',
+            type: SnackBarType.error
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('⚠️ Error: $e')),
+
+      CustomSnackBar.show(
+          context,
+          message:'Error: $e' ,
+          type: SnackBarType.error
       );
     } finally {
       setState(() => _isUploading = false);
     }
   }
 
-  // Delete image function - exact relative path bhejo
   Future<void> deleteImages(String imageUrl) async {
     final String url = 'https://api.thebharatworks.com/api/user/deleteHisworkImage';
     print("Abhi:- deleteImages api url: $url");
 
-    // Full URL se relative path nikalo (exact uploads/hiswork/<filename>.jpg)
     String relativePath = imageUrl.replaceFirst('https://api.thebharatworks.com/', '');
-    // Ensure koi extra leading slash na ho
     relativePath = relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
-    print("Abhi:- Deleting image relative path: $relativePath"); // Debug ke liye relative path print
+    print("Abhi:- Deleting image relative path: $relativePath");
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    await _fetchImagesFromApi();
+    //await _fetchImagesFromApi();
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token not found! Please log in.')),
+
+      CustomSnackBar.show(
+          context,
+          message: 'Token not found! Please log in.',
+          type: SnackBarType.warning
       );
+
+
       return;
     }
 
@@ -1627,7 +1794,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "imagePath": relativePath, // Exact path bhejo: uploads/hiswork/1756978299024.jpg
+          "imagePath": relativePath,
         }),
       );
 
@@ -1639,25 +1806,35 @@ class _GalleryScreenState extends State<GalleryScreen> {
         setState(() {
           _images.remove(imageUrl);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ Image deleted successfully')),
+
+        CustomSnackBar.show(
+            context,
+            message:'Image deleted successfully' ,
+            type: SnackBarType.success
         );
+        setState(() => _hasChanges = true);
+        await _fetchImagesFromApi();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Delete failed: ${response.statusCode} - ${response.body}'),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Delete failed: ${response.statusCode} - ${response.body}',
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print("Abhi:- Exception: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('⚠️ Error deleting image: $e')),
+
+      CustomSnackBar.show(
+          context,
+          message:'Error deleting image: $e' ,
+          type: SnackBarType.error
       );
+
     }
   }
 
-  // Delete confirmation dialog
   void _confirmDelete(int index) {
     showDialog(
       context: context,
@@ -1697,10 +1874,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 children: [
                   InkWell(
                     onTap: () async {
-                      final imageUrl = _images[index]; // Image URL lo
-                      Navigator.pop(context); // Dialog close karo
+                      final imageUrl = _images[index]; 
+                      Navigator.pop(context); 
                       print("Abhi:- delete image url :---> $imageUrl");
-                      await deleteImages(imageUrl); // Delete API call with URL
+                      await deleteImages(imageUrl); 
                     },
                     borderRadius: BorderRadius.circular(8),
                     splashColor: Colors.white.withOpacity(0.2),
@@ -1757,156 +1934,155 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
-        elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          Row(
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.pop(context,_hasChanges);
+        return false;
+      },
+      child: Scaffold(
+       // backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text("Gallery",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          // leading: BackButton(color: Colors.black),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context, _hasChanges),  // Pop with value
+          ),
+          actions: [],
+          systemOverlayStyle:  SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
+        ),
+        body: SafeArea(
+          child: Column(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 18.0),
-                  child: Icon(
-                    Icons.arrow_back_outlined,
-                    size: 22,
-                    color: Colors.black,
+                       const SizedBox(height: 40),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _images.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No images in gallery. Upload some!',
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
                   ),
+                )
+                    : GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 160 / 144,
+                  ),
+                  itemCount: _images.length,
+                  itemBuilder: (context, i) {
+                    return Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FullImageScreen(
+                                  imageUrl: _images[i],
+                                ),
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              _images[i],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: Colors.grey[300],
+                                child: const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => _confirmDelete(i),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2,
+                                    color: Colors.black26,
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(4),
+                              child: Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
-              const SizedBox(width: 100),
-              Text(
-                'Gallery',
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: 300,
+                  child: ElevatedButton(
+                    onPressed: _isUploading ? null : _showImageSourceBottomSheet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: _isUploading
+                        ? SizedBox(
+                      height: 25,
+                          width: 25,
+                          child: const CircularProgressIndicator(
+
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                        )
+                        : Text(
+                      'Upload',
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 40),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _images.isEmpty
-                ? Center(
-              child: Text(
-                'No images in gallery. Upload some!',
-                style: GoogleFonts.roboto(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            )
-                : GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 160 / 144,
-              ),
-              itemCount: _images.length,
-              itemBuilder: (context, i) {
-                return Stack(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => FullImageScreen(
-                              imageUrl: _images[i],
-                            ),
-                          ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          _images[i],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: Colors.grey[300],
-                            child: const Icon(
-                              Icons.broken_image,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () => _confirmDelete(i),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 2,
-                                color: Colors.black26,
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(4),
-                          child: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: Colors.green[700],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: 300,
-              child: ElevatedButton(
-                onPressed: _isUploading ? null : _uploadImage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: _isUploading
-                    ? const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                )
-                    : Text(
-                  'Upload',
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

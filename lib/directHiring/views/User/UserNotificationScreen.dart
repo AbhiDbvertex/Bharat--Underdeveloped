@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -102,98 +103,87 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Notification",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 8.0),
-                  child: Icon(Icons.arrow_back, size: 25),
-                ),
-              ),
-              const SizedBox(width: 90),
-              Text(
-                "Notification",
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          isLoading
-              ? const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              )
-              : notifications.isEmpty
-              ? Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/notification.png', height: 250),
-                    const SizedBox(height: 20),
-                    Text(
-                      'No Notification Available',
-                      style: GoogleFonts.roboto(
-                        color: Colors.grey,
-                        fontSize: 14,
+      body: SafeArea(
+        child: Column(
+          children: [
+        
+            const SizedBox(height: 20),
+            isLoading
+                ? const Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                )
+                : notifications.isEmpty
+                ? Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/images/notification.png', height: 250),
+                      const SizedBox(height: 20),
+                      Text(
+                        'No Notification Available',
+                        style: GoogleFonts.roboto(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-              : Expanded(
-                child: ListView.builder(
-                  itemCount: notifications.length,
-                  padding: const EdgeInsets.all(10),
-                  itemBuilder: (context, index) {
-                    final notif = notifications[index];
-                    final date = DateTime.parse(notif.createdAt).toLocal();
-                    final formatted = DateFormat('yyyy-MM-dd hh:mm a').format(date);
-                    return Card(
-                      elevation: 2,
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      child: ListTile(
-                        title: Text(
-                          notif.title,
-                          style: GoogleFonts.roboto(
-                            fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+                : Expanded(
+                  child: ListView.builder(
+                    itemCount: notifications.length,
+                    padding: const EdgeInsets.all(10),
+                    itemBuilder: (context, index) {
+                      final notif = notifications[index];
+                      final date = DateTime.parse(notif.createdAt).toLocal();
+                      final formatted = DateFormat('yyyy-MM-dd hh:mm a').format(date);
+                      return Card(
+                        color: Colors.white,
+                        elevation: 2,
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: ListTile(
+                          title: Text(
+                            notif.title,
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(notif.message),
+                              const SizedBox(height: 4),
+                              Text(
+                                // notif.createdAt.substring(0, 10),
+                                // "${dateFormat('yyyy-MM-dd – kk:mm').format()}",
+                                "${formatted}",
+        
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(notif.message),
-                            const SizedBox(height: 4),
-                            Text(
-                              // notif.createdAt.substring(0, 10),
-                              // "${dateFormat('yyyy-MM-dd – kk:mm').format()}",
-                              "${formatted}",
-
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-        ],
+          ],
+        ),
       ),
     );
   }

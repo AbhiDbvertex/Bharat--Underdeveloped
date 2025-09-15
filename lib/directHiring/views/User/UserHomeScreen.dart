@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -48,8 +49,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     loadSavedLocation(); // Load saved location first
     fetchCategories(); // Fetch categories
     _fetchLocation();
-    setupStaticBanners();
-    // fetchBanners();
+    // setupStaticBanners();
+    fetchBanners();
   }
 
   void setupStaticBanners() {
@@ -71,22 +72,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token == null) {
-        debugPrint("❌ No token found for fetching banners");
+        bwDebug("❌ No token found for fetching banners");
         setState(() => isBannerLoading = false);
         return;
       }
       final url =
-          Uri.parse('https://api.thebharatworks.com/api/user/getbanners');
+          Uri.parse('https://api.thebharatworks.com/api/banner/getAllBannerImages');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['status'] == true && data['data'] is List) {
+        if (data['success'] == true && data['images'] is List) {
           setState(() {
-            bannerImages = (data['data'] as List)
-                .map((item) => item['image'].toString())
+            bannerImages = (data['images'] as List)
+                .map((item) => item.toString())
                 .toList();
             isBannerLoading = false;
           });
@@ -683,6 +684,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                       );
                                     },
                                     child: Container(
+
                                       margin: const EdgeInsets.symmetric(horizontal: 5),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(8),

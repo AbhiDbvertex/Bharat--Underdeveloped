@@ -414,6 +414,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Emergency/utils/snack_bar_helper.dart';
+import '../../../utility/custom_snack_bar.dart';
 
 class EditWorkerController {
   final nameController = TextEditingController();
@@ -422,8 +423,8 @@ class EditWorkerController {
   final dobController = TextEditingController();
 
   String? phoneNumber;
-  File? selectedImage; // profile image
-  String? imageUrl; // profile image url
+  File? selectedImage;
+  String? imageUrl;
 
   String? nameError;
   String? phoneError;
@@ -463,10 +464,12 @@ class EditWorkerController {
     if (phoneError != null) isValid = false;
 
     aadhaarError = aadhaarController.text.trim().isEmpty
-        ? 'Aadhaar is required'
+        ? (aadhaarSelectedImages.isEmpty && aadhaarImageUrls.isEmpty
+        ? 'Aadhaar number or at least one Aadhaar image is required'
+        : null)
         : (!RegExp(r'^\d{12}$').hasMatch(aadhaarController.text.trim())
-            ? 'Aadhaar must be 12 digits'
-            : null);
+        ? 'Aadhaar must be 12 digits'
+        : null);
     if (aadhaarError != null) isValid = false;
 
     dobError = dobController.text.trim().isEmpty ? 'DOB is required' : null;
@@ -487,8 +490,11 @@ class EditWorkerController {
     final token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      SnackBarHelper.showSnackBar(
-          context, "🔐 Token not found. Please login again.");
+      CustomSnackBar.show(
+          context,
+          message: "Token not found. Please login again.",
+          type: SnackBarType.warning
+      );
       return false;
     }
 
@@ -542,25 +548,38 @@ class EditWorkerController {
 
       if (response.statusCode == 200) {
         if (decoded['success'] == true || decoded['worker'] != null) {
-          SnackBarHelper.showSnackBar(context, "✅ Worker updated successfully");
+          CustomSnackBar.show(
+              context,
+              message: "Worker updated successfully",
+              type: SnackBarType.success
+          );
           return true;
         } else {
-          SnackBarHelper.showSnackBar(
-            context,
-            "❌ Update failed: ${decoded['message'] ?? 'Unknown error'}",
+          CustomSnackBar.show(
+              context,
+              message: "Update failed: ${decoded['message'] ?? 'Unknown error'}",
+              type: SnackBarType.error
           );
           return false;
         }
       } else {
-        SnackBarHelper.showSnackBar(context, "❌ Update failed: $respStr");
-
+        CustomSnackBar.show(
+            context,
+            message:"Update failed: $respStr" ,
+            type: SnackBarType.error
+        );
         return false;
       }
       isSubmitting = false;
     } catch (e) {
       isSubmitting = false; // loader stop
       debugPrint("Exception: $e");
-      SnackBarHelper.showSnackBar(context, "❌ Something went wrong");
+      CustomSnackBar.show(
+          context,
+          message: "Something went wrong",
+          type: SnackBarType.error
+      );
+
       return false;
     }
     finally{
