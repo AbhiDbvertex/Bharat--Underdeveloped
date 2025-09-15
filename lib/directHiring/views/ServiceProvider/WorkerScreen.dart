@@ -183,7 +183,6 @@ class _WorkerScreenState extends State<WorkerScreen> {
             : worker.image.startsWith('http')
             ? worker.image.replaceFirst('http://', 'https://')
             : 'https://api.thebharatworks.com${worker.image}';
-
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
           elevation: 3,
