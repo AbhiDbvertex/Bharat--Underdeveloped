@@ -1665,6 +1665,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -1787,11 +1788,17 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF9DF89D),
+        centerTitle: true,
+        title: const Text("Worker Details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF9DF89D),
+          statusBarIconBrightness: Brightness.dark,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -1805,35 +1812,14 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 ClipPath(
                   clipper: BottomCurveClipper(),
                   child: Container(
+                    width: double.infinity,
                     color: const Color(0xFF9DF89D),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
                     ),
-                    height: 120,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.arrow_back, size: 25),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            const Spacer(),
-                            Text(
-                              "Worker Details",
-                              style: GoogleFonts.roboto(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Spacer(flex: 1),
-                          ],
-                        ),
-                      ],
-                    ),
+                    height: 100,
+
                   ),
                 ),
 

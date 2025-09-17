@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import '../directHiring/views/ServiceProvider/WorkerMyHireScreen.dart';
 import '../directHiring/views/User/MyHireScreen.dart';
 import '../directHiring/views/User/UserHomeScreen.dart';
 import '../directHiring/views/auth/RoleSelectionScreen.dart';
+import 'AppColors.dart';
 
 class Bottombar extends StatefulWidget {
   final int? initialIndex;
@@ -161,7 +163,19 @@ class PlaceholderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(label)),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title:  Text(label,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
+      ),
       body: Center(child: Text('$label Screen')),
     );
   }

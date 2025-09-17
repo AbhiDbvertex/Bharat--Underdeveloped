@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Widgets/AppColors.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import 'SubCategories.dart';
@@ -78,37 +80,19 @@ class _WorkerCategoriesState extends State<WorkerCategories> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Spacer(),
-            Text(
-              "Work Categories",
-              style: GoogleFonts.roboto(
-                fontSize: 20,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Spacer(),
-            InkWell(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.green.shade700,
-                ),
-                padding: const EdgeInsets.all(6),
-                child: const Icon(Icons.close, size: 15, color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
+      //backgroundColor: Colors.white,
+      appBar:AppBar(
         elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Work Categories",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body:
           isLoading

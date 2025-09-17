@@ -1238,6 +1238,7 @@ import 'package:developer/Emergency/User/controllers/emergency_service_controlle
 import 'package:developer/Emergency/User/screens/work_detail.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1521,33 +1522,26 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // print("Abhi:- print data in ui : ${BudingData}");
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: height*0.013,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("My Hire",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Center(
-              child: Text(
-                "My Hire",
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
           Container(
             width: double.infinity,
             height: 50,
@@ -2061,6 +2055,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   print("Abhi:- get bidding userId : ${userId}");
 
                   return Card(
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(color: Colors.green, width: 1.02),

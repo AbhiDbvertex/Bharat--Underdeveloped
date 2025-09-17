@@ -370,12 +370,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Widgets/AppColors.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/userModel/subCategoriesModel.dart';
@@ -579,146 +581,136 @@ class _SubCategoriesState extends State<SubCategories> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green.shade800,
-        centerTitle: true,
+      appBar:AppBar(
         elevation: 0,
-        toolbarHeight: 10,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Sub Categories",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       backgroundColor: Colors.white,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 18.0),
-                  child: Icon(Icons.arrow_back_outlined, size: 22),
-                ),
-              ),
-              const SizedBox(width: 70),
-              Text(
-                "Sub Categories",
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: allSubCategories.isNotEmpty
-                  ? GridView.count(
-                crossAxisCount: 5,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.8,
-                children: List.generate(
-                  allSubCategories.length,
-                      (index) {
-                    final category = allSubCategories[index] as Map<String, dynamic>;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          if (selectedIndexes.contains(index)) {
-                            selectedIndexes.remove(index);
-                          } else {
-                            selectedIndexes.add(index);
-                          }
-                        });
-                      },
-                      child: categoryItemWidget(
-                        category,
-                        selectedIndexes.contains(index),
-                      ),
-                    );
-                  },
-                ),
-              )
-                  : Center(
-                child: Text(
-                  "No subcategories found.",
-                  style: GoogleFonts.roboto(
-                    fontSize: 14,
-                    color: Colors.grey,
+      body: SafeArea(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+           
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: allSubCategories.isNotEmpty
+                    ? GridView.count(
+                  crossAxisCount: 5,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 0.8,
+                  children: List.generate(
+                    allSubCategories.length,
+                        (index) {
+                      final category = allSubCategories[index] as Map<String, dynamic>;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (selectedIndexes.contains(index)) {
+                              selectedIndexes.remove(index);
+                            } else {
+                              selectedIndexes.add(index);
+                            }
+                          });
+                        },
+                        child: categoryItemWidget(
+                          category,
+                          selectedIndexes.contains(index),
+                        ),
+                      );
+                    },
+                  ),
+                )
+                    : Center(
+                  child: Text(
+                    "No subcategories found.",
+                    style: GoogleFonts.roboto(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: selectedIndexes.isNotEmpty
-                          ? () {
-                        // Collect all selected subcategory IDs
-                        final selectedSubCategoryIds = selectedIndexes
-                            .map((index) => allSubCategories[index]['_id'] as String)
-                            .toList();
-                        // Use the first selected subcategory's name for WorkerlistScreen
-                        final firstSelectedSubCategory = allSubCategories[selectedIndexes.first];
-                        fetchServiceProviders(
-                          widget.categoryId,
-                          selectedSubCategoryIds,
-                          firstSelectedSubCategory['name'],
-                        );
-                      }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: selectedIndexes.isNotEmpty
+                            ? () {
+                          // Collect all selected subcategory IDs
+                          final selectedSubCategoryIds = selectedIndexes
+                              .map((index) => allSubCategories[index]['_id'] as String)
+                              .toList();
+                          // Use the first selected subcategory's name for WorkerlistScreen
+                          final firstSelectedSubCategory = allSubCategories[selectedIndexes.first];
+                          fetchServiceProviders(
+                            widget.categoryId,
+                            selectedSubCategoryIds,
+                            firstSelectedSubCategory['name'],
+                          );
+                        }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade700,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        "Submit",
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: BorderSide(color: Colors.green.shade700),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        "Cancel",
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.green.shade700,
+                        child: Text(
+                          "Submit",
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.black,
+                          side: BorderSide(color: Colors.green.shade700),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          "Cancel",
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.green.shade700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
