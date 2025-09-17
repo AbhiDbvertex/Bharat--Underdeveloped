@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -27,12 +28,25 @@ class PostTaskScreen extends StatelessWidget {
         return true; // Allow back navigation
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppColors.primaryGreen,
-          centerTitle: true,
+        appBar:AppBar(
           elevation: 0,
-          toolbarHeight: 20,
-          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text("Post New Bidding",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading:  GestureDetector(
+            onTap: () {
+              controller.resetForm(); // Reset form before navigating back
+              Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
+              Get.back();
+            },
+            child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
+          ),
+          actions: [],
+          systemOverlayStyle:  SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
         ),
         body: Obx(
               () => SingleChildScrollView(
@@ -42,7 +56,7 @@ class PostTaskScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _pageHeader(context, controller),
+                //  _pageHeader(context, controller),
                   _buildLabel("Title"),
                   _buildTextField(controller.titleController, "Enter Title of work"),
                   _buildLabel("Category"),
@@ -169,25 +183,25 @@ class PostTaskScreen extends StatelessWidget {
     );
   }
 
-  Widget _pageHeader(BuildContext context, PostTaskController controller) {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () {
-            controller.resetForm(); // Reset form before navigating back
-            Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
-            Get.back();
-          },
-          child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
-        ),
-        const SizedBox(width: 86),
-        Text(
-          "Post new bidding",
-          style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
+  // Widget _pageHeader(BuildContext context, PostTaskController controller) {
+  //   return Row(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () {
+  //           controller.resetForm(); // Reset form before navigating back
+  //           Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
+  //           Get.back();
+  //         },
+  //         child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
+  //       ),
+  //       const SizedBox(width: 86),
+  //       Text(
+  //         "Post new bidding",
+  //         style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _googleLocationField(PostTaskController controller) {
     return GestureDetector(

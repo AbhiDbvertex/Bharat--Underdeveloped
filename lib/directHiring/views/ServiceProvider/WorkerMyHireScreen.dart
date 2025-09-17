@@ -1155,6 +1155,7 @@ import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -1508,31 +1509,24 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
+    //  backgroundColor: Colors.white,
+      appBar:AppBar(
         elevation: 0,
-        toolbarHeight: screenHeight * 0.013,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("My Work",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: EdgeInsets.all(screenWidth * 0.03),
-              child: Center(
-                child: Text(
-                  "My Work",
-                  style: GoogleFonts.roboto(
-                    fontSize: screenWidth * 0.05,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.0035,),
             Container(
               width: double.infinity,
               height: screenHeight * 0.063,
@@ -1716,6 +1710,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(screenWidth * 0.035),
+        border: Border.all(color: AppColors.primaryGreen),
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
@@ -1723,7 +1718,12 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       child: Row(
         children: [
           Container(
-          color: Colors.grey,
+            decoration: BoxDecoration(
+
+              borderRadius: BorderRadius.circular(screenWidth * 0.03),
+              color: Colors.grey,
+            ),
+
           child: Stack(
             children: [ ClipRRect(
               borderRadius: BorderRadius.circular(screenWidth * 0.02),
@@ -1878,6 +1878,8 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(screenWidth * 0.035),
+        border: Border.all(color: AppColors.primaryGreen),
+
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
@@ -1886,10 +1888,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
-            children:[ Container(color: Colors.grey,
+            children:[ Container(    decoration: BoxDecoration(
+
+              borderRadius: BorderRadius.circular(screenWidth * 0.03),
+              color: Colors.grey,
+            ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(screenWidth * 0.02),
                 child: Container(
+
                   alignment: Alignment.topCenter,
                   child: data.imageUrls.isNotEmpty
                       ? Image.network(

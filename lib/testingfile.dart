@@ -901,21 +901,4 @@ class _DragToPayScreenState extends State<DragToPayScreen> {
     );
   }
 }
-/*1.Currect Account tab alignment, currect top bar ui.
-2.Add bidding post in Service provider
-3.In the service provider tap first time login then provider profile are not completed
-show user are not post the work, and show one dailog box ,
-4.Emergency button show error it is not working
-5.Add Search bar in my hirescreen
-6.Add search bar in my work screen
-7.Change emergenc model .
-8.Post bidding time add loader
-/*
-Name:Rent Mee
-Category: House & Home
-Age - 18+
-Ads - No
-Country - India
- */
 
-*/
