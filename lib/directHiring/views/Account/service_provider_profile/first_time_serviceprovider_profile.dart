@@ -1474,7 +1474,7 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                     child: Padding(
                       padding: const EdgeInsets.only(right: 18.0),
                       child: Text(
-                        "User Profile Abhi",
+                        "User Profile",
                         style: GoogleFonts.roboto(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

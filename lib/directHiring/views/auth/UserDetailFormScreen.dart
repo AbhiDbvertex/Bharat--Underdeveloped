@@ -287,7 +287,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -309,7 +309,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
               //     ),
               //   ],
               // ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               buildLabel("Enter Your Name"),
               const SizedBox(height: 5),
               buildCustomField(

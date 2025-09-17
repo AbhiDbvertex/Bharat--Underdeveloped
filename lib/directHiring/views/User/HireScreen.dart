@@ -310,7 +310,7 @@ class _HireScreenState extends State<HireScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                "Are you Sure want to hire?",
+                "Are you sure you want to hire ?",
                 style: GoogleFonts.roboto(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -331,7 +331,7 @@ class _HireScreenState extends State<HireScreen> {
                       ),
                       onPressed: () => Navigator.pop(context, true),
                       child: const Text(
-                        "Okay",
+                        "Confirm",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
