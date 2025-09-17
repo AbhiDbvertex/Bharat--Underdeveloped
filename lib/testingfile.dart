@@ -833,9 +833,7 @@ class _DragToPayScreenState extends State<DragToPayScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Drag UPI to Pay area", style: TextStyle(fontSize: 18)),
-
             const SizedBox(height: 40),
-
             DragTarget(
               onAccept: (data) {
                 setState(() {
@@ -861,7 +859,6 @@ class _DragToPayScreenState extends State<DragToPayScreen> {
             ),
 
             // ReorderableDelayedDragStartListener(child: Text("Text"), index: index),
-            // p,u,a,d,d,y,a,m,s,t,n,p,a,s,d,m
 
             const SizedBox(height: 50),
 
