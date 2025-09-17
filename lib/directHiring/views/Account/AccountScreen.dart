@@ -686,6 +686,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
                                 print("🔍 Role from prefs: '$role'");
                                 print("🔍 Profile sadfas: ${profile?.verificationStatus}");
+                                // print("🔍 Profile sadfas: ${_futureUser?['']}");
                                 print("🔍 Profile verified: ${profile?.verificationStatus == 'pending'}");
 
                                 Widget screen;

@@ -952,163 +952,163 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
               SizedBox(height: height * 0.015),
               emergencyWork("WORK CATEGORIES",
                   false, () {
-                // if(profile?.verified == true) {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => const WorkerCategories(),
-                //     ),
-                //   );
-                // }else {
-                //   showDialog(
-                //     context: context,
-                //     builder: (BuildContext context) {
-                //       return AlertDialog(
-                //         title: const Text("Request Submitted"),
-                //         content: Column(
-                //           mainAxisSize: MainAxisSize.min,
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           crossAxisAlignment: CrossAxisAlignment.center,
-                //           children: [
-                //             /*Image.asset(
-                //               "assets/images/rolechangeConfim.png",
-                //               height: 90,
-                //             ),*/
-                //             SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-                //             const SizedBox(height: 8),
-                //             const Text(
-                //               "Request Status",
-                //               style: TextStyle(
-                //                 fontWeight: FontWeight.bold,
-                //                 fontSize: 18,
-                //               ),
-                //             ),
-                //             const SizedBox(height: 2),
-                //             Text(
-                //               "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
-                //               textAlign: TextAlign.center,
-                //             ),
-                //             const SizedBox(height: 8),
-                //           ],
-                //         ),
-                //         actions: [
-                //           Center(
-                //             child: Container(
-                //               width: 100,
-                //               height: 35,
-                //               decoration: BoxDecoration(
-                //                 borderRadius: BorderRadius.circular(8),
-                //                 color: Colors.green,
-                //               ),
-                //               child: TextButton(
-                //                 child: const Text(
-                //                   "OK",
-                //                   style: TextStyle(color: Colors.white),
-                //                 ),
-                //                 onPressed: () {
-                //                   Navigator.of(context).pop();
-                //                 },
-                //               ),
-                //             ),
-                //           ),
-                //         ],
-                //       );
-                //     },
-                //   );
-                // }
+                if(profile?.verificationStatus == 'verified') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WorkerCategories(),
+                    ),
+                  );
+                }else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Request Submitted"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            /*Image.asset(
+                              "assets/images/rolechangeConfim.png",
+                              height: 90,
+                            ),*/
+                            SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Request Status",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                        actions: [
+                          Center(
+                            child: Container(
+                              width: 100,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.green,
+                              ),
+                              child: TextButton(
+                                child: const Text(
+                                  "OK",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
 
-              } ,profile?.verificationStatus == 'pending'),
-              // SizedBox(height: height * 0.015),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 10),
-              //   child: isLoading
-              //       ? const Center(child: CircularProgressIndicator())
-              //       : Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: allCategories.take(6).map((category) {
-              //       return SizedBox(
-              //         width: MediaQuery.of(context).size.width / 6 - 10,
-              //         child: GestureDetector(
-              //           onTap: () {
-              //             if(profile?.verified == true){
-              //               Navigator.push(
-              //                 context,
-              //                 MaterialPageRoute(
-              //                   builder: (_) => SubCategories(
-              //                     categoryId: category.id,
-              //                     categoryName: '',
-              //                   ),
-              //                 ),
-              //               );
-              //             }else {
-              //               showDialog(
-              //                 context: context,
-              //                 builder: (BuildContext context) {
-              //                   return AlertDialog(
-              //                     title: const Text("Request Submitted"),
-              //                     content: Column(
-              //                       mainAxisSize: MainAxisSize.min,
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       crossAxisAlignment: CrossAxisAlignment.center,
-              //                       children: [
-              //                         /*Image.asset(
-              //                 "assets/images/rolechangeConfim.png",
-              //                 height: 90,
-              //               ),*/
-              //                         SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
-              //                         const SizedBox(height: 8),
-              //                         const Text(
-              //                           "Request Status",
-              //                           style: TextStyle(
-              //                             fontWeight: FontWeight.bold,
-              //                             fontSize: 18,
-              //                           ),
-              //                         ),
-              //                         const SizedBox(height: 2),
-              //                         Text(
-              //                           "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
-              //                           textAlign: TextAlign.center,
-              //                         ),
-              //                         const SizedBox(height: 8),
-              //                       ],
-              //                     ),
-              //                     actions: [
-              //                       Center(
-              //                         child: Container(
-              //                           width: 100,
-              //                           height: 35,
-              //                           decoration: BoxDecoration(
-              //                             borderRadius: BorderRadius.circular(8),
-              //                             color: Colors.green,
-              //                           ),
-              //                           child: TextButton(
-              //                             child: const Text(
-              //                               "OK",
-              //                               style: TextStyle(color: Colors.white),
-              //                             ),
-              //                             onPressed: () {
-              //                               Navigator.of(context).pop();
-              //                             },
-              //                           ),
-              //                         ),
-              //                       ),
-              //                     ],
-              //                   );
-              //                 },
-              //               );
-              //             }
-              //           },
-              //           child: CategoryItemWidget(
-              //             id: category.id,
-              //             name: category.name,
-              //             imagePath: category.image,
-              //             subtitle: category.subtitle ?? '',
-              //           ),
-              //         ),
-              //       );
-              //     }).toList(),
-              //   ),
-              // ),
+              } ,profile?.verificationStatus == 'verified'),
+              SizedBox(height: height * 0.015),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: allCategories.take(6).map((category) {
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width / 6 - 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          if(profile?.verificationStatus == 'verified'){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SubCategories(
+                                  categoryId: category.id,
+                                  categoryName: '',
+                                ),
+                              ),
+                            );
+                          }else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text("Request Submitted"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      /*Image.asset(
+                              "assets/images/rolechangeConfim.png",
+                              height: 90,
+                            ),*/
+                                      SvgPicture.asset("assets/svg_images/ConfirmationIcon.svg"),
+                                      const SizedBox(height: 8),
+                                      const Text(
+                                        "Request Status",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        "Please complete your profile first. Once your profile is approved by the admin, you will be able to post.",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
+                                  actions: [
+                                    Center(
+                                      child: Container(
+                                        width: 100,
+                                        height: 35,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: Colors.green,
+                                        ),
+                                        child: TextButton(
+                                          child: const Text(
+                                            "OK",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: CategoryItemWidget(
+                          id: category.id,
+                          name: category.name,
+                          imagePath: category.image,
+                          subtitle: category.subtitle ?? '',
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
               SizedBox(height: height * 0.015),
               Center(
                 child: Container(
@@ -1210,7 +1210,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => WorkerRecentPostedScreen(),
                   ),
-                ),profile?.verificationStatus == 'pending'
+                ),profile?.verificationStatus == 'verified'
               ),
               SizedBox(height: height * 0.015),
               Container(
@@ -1251,7 +1251,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => SpEmergencyWorkPage(),
                   ),
-                ),profile?.verificationStatus == 'pending'
+                ),profile?.verificationStatus == 'verified'
               ),
               SizedBox(height: height * 0.015),
               Container(
@@ -1303,7 +1303,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                     );
                   })),
               SizedBox(height: height * 0.025),
-              emergencyWork("FEATURE WORKER", false, () {},profile?.verificationStatus == 'pending'),
+              emergencyWork("FEATURE WORKER", false, () {},profile?.verificationStatus == 'verified'),
               SizedBox(height: height * 0.015),
               Container(
                 height: height * 0.18,
@@ -1381,7 +1381,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           if (showPlus)
             InkWell(
               onTap: (){
-                if(verifaiyStatus == true){
+                if(verifaiyStatus == 'verified'){
                   Navigator.push(context, MaterialPageRoute(builder: (context)=> PostTaskScreen()));
                 }else{
                   showDialog(

@@ -20,6 +20,7 @@ import '../../ServiceProvider/WorkerScreen.dart';
 import '../../auth/RoleSelectionScreen.dart';
 import '../../comm/home_location_screens.dart';
 import '../service_provider_profile/EditProfileScreen.dart';
+import '../service_provider_profile/first_time_serviceprovider_profile.dart';
 import '../user_profile/UserProfileScreen.dart';
 import '../user_profile/user_role_profile_update.dart';
 
@@ -43,37 +44,48 @@ class _SellerScreenState extends State<SellerScreen> {
   final controller = Get.put(SpEmergencyServiceController());
   final GetXRoleController roleController = Get.put(GetXRoleController());
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   loadSavedLocation();
+  //   _loadEmergencyTask();
+  //   fetchProfile();
+  //
+  // }
+
   @override
   void initState() {
     super.initState();
     loadSavedLocation();
     _loadEmergencyTask();
-    fetchProfile();/*.then((_) {
-      print("Checking role: ${profile?.role}, verified: ${profile?.verificationStatus == 'pending'} request status: ${profile?.requestStatus}");
-      if (profile?.verificationStatus == 'pending') {
-        print("Showing verification dialog for service_provider");
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                print("Inside dialog builder");
-                return _buildServiceproviderVerification(
-                    context,
-                    profile?.role,
-                    profile?.requestStatus,
-                    profile?.verificationStatus ?? "",
-                    profile?.categoryId);
-              },
-            );
-          } else {
-            print("Context not mounted");
-          }
-        });
+    _initializeWithChecks();  // Naya function call karenge yahan
+  }
+
+  Future<void> _initializeWithChecks() async {
+    await fetchProfile();  // Await kar, taaki profile load ho jaye
+    final roleController = Get.find<GetXRoleController>();
+    final String currentRole = roleController.role.value;  // Current role fetch kar
+
+    // Condition check kar (rebuild se pehle)
+    if (currentRole == "service_provider" && profile != null) {
+      if (profile!.verificationStatus == 'pending' || profile!.verificationStatus == 'rejected') {
+        // Pending ya rejected: FirstTime screen pe bhej, orders show karne ke liye (assume wahan loader/orders handle hai)
+        Get.off(() => FirstTimeServiceProviderProfileScreen());  // Orders show karwane ke liye, wahan logic add kar lena
+        return;  // Aur kuch mat kar, navigation ho gaya
       } else {
-        print("Dialog not shown: Role or verified condition not met");
+        // Verified service_provider: SellerScreen pe reh (current hi hai)
+        print("Verified SP: Staying on SellerScreen");
       }
-    });*/
+    } else if (currentRole == "user") {
+      // User role: ProfileScreen pe bhej
+      Get.off(() => ProfileScreen());  // Ya jo bhi ProfileScreen ka path hai
+      return;
+    }
+
+    // Agar koi condition nahi match, toh normal UI build kar (setState already fetchProfile mein ho gaya)
+    setState(() {
+      isLoading = false;  // Loader off kar, agar pehle on tha
+    });
   }
 
   Future<void> _loadEmergencyTask() async {
@@ -82,6 +94,7 @@ class _SellerScreenState extends State<SellerScreen> {
     setState(() {
       _isSwitched = saved;
     });
+    print('Abhi:- get verification: ${profile?.verificationStatus ?? "no status"}');
   }
 
   Future<void> loadSavedLocation() async {
@@ -92,6 +105,7 @@ class _SellerScreenState extends State<SellerScreen> {
         address = savedLocation;
       });
     }
+    print('Abhi:- get verification: ${profile?.verificationStatus ?? "no status"}');
   }
 
   Future<void> updateLocationOnServer(
@@ -240,7 +254,7 @@ class _SellerScreenState extends State<SellerScreen> {
 
           setState(() {
             profile = ServiceProviderProfileModel.fromJson(data['data']);
-            isLoading = false;
+            // isLoading = false;
             address = fetchedAddress;
           });
 
@@ -261,6 +275,14 @@ class _SellerScreenState extends State<SellerScreen> {
         const SnackBar(content: Text("Something went wrong, try again!")),
       );
     }
+  }
+  Future<void> _onRefresh() async {
+    setState(() {
+      isLoading = true;  // Loader on kar refresh ke time
+    });
+    await fetchProfile();  // Re-fetch
+    await _initializeWithChecks();  // Re-check conditions (navigation bhi handle karega)
+    // Agar navigate nahi hua, toh setState mein isLoading false already ho gaya
   }
 
   Future<void> _checkEmergencyTask() async {
@@ -338,206 +360,209 @@ class _SellerScreenState extends State<SellerScreen> {
         body: SafeArea(
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildHeader(context, profile),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        InkWell(
-                          onTap: _pickImageFromCamera,
-                          child: Container(
-                            padding: EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.green.shade700,
-                                  width: 3.0),
-                            ),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey.shade300,
-                              backgroundImage: _pickedImage != null
-                                  ? FileImage(_pickedImage!)
-                                  : (profile?.profilePic != null
-                                  ? NetworkImage(profile!.profilePic!)
-                                  : null) as ImageProvider?,
-                              child: _pickedImage == null &&
-                                  profile?.profilePic == null
-                                  ? const Icon(Icons.person,
-                                  size: 50, color: Colors.white)
-                                  : null,
-                            ),
-                          ),
-                        ),
-                        profile?.verificationStatus == 'pending'
-                            ? Positioned(
-                          bottom: 4,
-                          right: 4,
-                          child: InkWell(
+              : RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+                            child: Column(
+                children: [
+                  _buildHeader(context, profile),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          InkWell(
                             onTap: _pickImageFromCamera,
-                            child: const Icon(Icons.camera_alt,
-                                size: 20, color: Colors.black),
-                          ),
-                        )
-                            : SizedBox(),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase() ?? ''}',
-                          style: GoogleFonts.roboto(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        widget.iconsHide == 'hide'
-                            ? SizedBox()
-                            : GestureDetector(
-                          onTap: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    EditProfileScreen(
-                                      fullName: profile?.fullName,
-                                      age: profile?.age,
-                                      gender: profile?.gender,
-                                      skill: profile?.skill,
-                                      categoryId: profile?.categoryId,
-                                      subCategoryIds: profile
-                                          ?.subCategoryIds
-                                          ?.map((e) => e.toString())
-                                          .toList(),
-                                      documentUrl: profile?.documents,
-                                    ),
+                            child: Container(
+                              padding: EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: Colors.green.shade700,
+                                    width: 3.0),
                               ),
-                            );
-                            if (result == true) {
-                              fetchProfile();
-                            }
-                          },
-                          child:profile?.verificationStatus == 'pending'
-                              ? Container(
-                              padding: const EdgeInsets.all(6),
-                              width: 32,
-                              height: 32,
-                              child: SvgPicture.asset(
-                                  "assets/svg_images/editicon.svg"))
-                              : SizedBox(),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Age: ${profile?.age ?? 0}',
-                          style: GoogleFonts.roboto(
-                              fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Gender: ${profile?.gender?[0].toUpperCase() ?? "No data"}${profile?.gender?.substring(1).toLowerCase() ?? ''}',
-                          style: GoogleFonts.roboto(
-                              fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.location_on,
-                            color: Colors.green.shade700, size: 16),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: GestureDetector(
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey.shade300,
+                                backgroundImage: _pickedImage != null
+                                    ? FileImage(_pickedImage!)
+                                    : (profile?.profilePic != null
+                                    ? NetworkImage(profile!.profilePic!)
+                                    : null) as ImageProvider?,
+                                child: _pickedImage == null &&
+                                    profile?.profilePic == null
+                                    ? const Icon(Icons.person,
+                                    size: 50, color: Colors.white)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          /*profile?.verificationStatus == 'pending'
+                              ?*/ Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: InkWell(
+                              onTap: _pickImageFromCamera,
+                              child: const Icon(Icons.camera_alt,
+                                  size: 20, color: Colors.black),
+                            ),
+                          )
+                            /*  : SizedBox(),*/
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${profile?.fullName?[0].toUpperCase()}${profile?.fullName?.substring(1).toLowerCase() ?? ''}',
+                            style: GoogleFonts.roboto(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          widget.iconsHide == 'hide'
+                              ? SizedBox()
+                              : GestureDetector(
                             onTap: () async {
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      LocationSelectionScreen(
-                                        onLocationSelected: (String) {},
+                                      EditProfileScreen(
+                                        fullName: profile?.fullName,
+                                        age: profile?.age,
+                                        gender: profile?.gender,
+                                        skill: profile?.skill,
+                                        categoryId: profile?.categoryId,
+                                        subCategoryIds: profile
+                                            ?.subCategoryIds
+                                            ?.map((e) => e.toString())
+                                            .toList(),
+                                        documentUrl: profile?.documents,
                                       ),
                                 ),
                               );
-                              if (result != null) {
-                                setState(() {
-                                  address = result;
-                                });
-                                await updateLocationOnServer(
-                                    result, 30.73508469999999, 79.0668788);
+                              if (result == true) {
+                                fetchProfile();
                               }
                             },
-                            child: Text(
-                              address ?? 'Select Location',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                              style: GoogleFonts.roboto(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            child:/*profile?.verificationStatus == 'pending'
+                                ?*/ Container(
+                                padding: const EdgeInsets.all(6),
+                                width: 32,
+                                height: 32,
+                                child: SvgPicture.asset(
+                                    "assets/svg_images/editicon.svg"))
+                               /* : SizedBox(),*/
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Age: ${profile?.age ?? 0}',
+                            style: GoogleFonts.roboto(
+                                fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Gender: ${profile?.gender?[0].toUpperCase() ?? "No data"}${profile?.gender?.substring(1).toLowerCase() ?? ''}',
+                            style: GoogleFonts.roboto(
+                                fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.location_on,
+                              color: Colors.green.shade700, size: 16),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        LocationSelectionScreen(
+                                          onLocationSelected: (String) {},
+                                        ),
+                                  ),
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    address = result;
+                                  });
+                                  await updateLocationOnServer(
+                                      result, 30.73508469999999, 79.0668788);
+                                }
+                              },
+                              child: Text(
+                                address ?? 'Select Location',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                style: GoogleFonts.roboto(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
 
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${profile?.totalReview ?? 0} Reviews",
-                          style: GoogleFonts.roboto(
-                              fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 4),
-                        Row(
-                          children: [
-                            Text(
-                              '(${profile?.rating ?? 0.0} ',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${profile?.totalReview ?? 0} Reviews",
+                            style: GoogleFonts.roboto(
+                                fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 4),
+                          Row(
+                            children: [
+                              Text(
+                                '(${profile?.rating ?? 0.0} ',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Icon(Icons.star,
+                                  color: Colors.amber, size: 14),
+                              Text(
+                                ')',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  _buildProfileCard(),
+                  const SizedBox(height: 16),
+                  _buildHisWorkSection(),
+                  const SizedBox(height: 12),
+                  _buildDocumentCard(),
+                  const SizedBox(height: 12),
+                  widget.iconsHide == 'hide'
+                      ? SizedBox()
+                      : _buildAddAsapPersonTile(context),
+                  const SizedBox(height: 12),
+                  _buildCustomerReviews(),
+                  const SizedBox(height: 30),
+                ],
                             ),
-                            Icon(Icons.star,
-                                color: Colors.amber, size: 14),
-                            Text(
-                              ')',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                _buildProfileCard(),
-                const SizedBox(height: 16),
-                _buildHisWorkSection(),
-                const SizedBox(height: 12),
-                _buildDocumentCard(),
-                const SizedBox(height: 12),
-                widget.iconsHide == 'hide'
-                    ? SizedBox()
-                    : _buildAddAsapPersonTile(context),
-                const SizedBox(height: 12),
-                _buildCustomerReviews(),
-                const SizedBox(height: 30),
-              ],
-            ),
-          ),
+                          ),
+              ),
         ));
   }
 
@@ -805,7 +830,7 @@ class _SellerScreenState extends State<SellerScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 const Text(
-                                    "Your request has been submitted please for admin approval"),
+                                    "Your request has been submitted to the admin and will be reverted within 2 to 3 days"),
                                 const SizedBox(height: 8),
                               ],
                             ),
@@ -1154,8 +1179,8 @@ class _SellerScreenState extends State<SellerScreen> {
               Text("Document",
                   style: GoogleFonts.roboto(
                       fontWeight: FontWeight.bold, fontSize: 16)),
-              profile?.verificationStatus == 'pending'
-                  ? Container(
+             /* profile?.verificationStatus == 'pending'
+                  ?*/ Container(
                 width: 100,
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.green, width: 2),
@@ -1166,7 +1191,7 @@ class _SellerScreenState extends State<SellerScreen> {
                             color: Colors.green.shade700,
                             fontWeight: FontWeight.w600))),
               )
-                  : SizedBox(),
+              /*    : SizedBox(),*/
             ],
           ),
           const SizedBox(height: 15),
@@ -1215,8 +1240,8 @@ class _SellerScreenState extends State<SellerScreen> {
   }
 
   Widget _buildAddAsapPersonTile(BuildContext context) {
-    return profile?.verificationStatus == 'pending'
-        ? Container(
+    return /*profile?.verificationStatus == 'pending'
+        ?*/ Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(12)),
@@ -1230,8 +1255,8 @@ class _SellerScreenState extends State<SellerScreen> {
           Get.to(() => const WorkerScreen());
         },
       ),
-    )
-        : SizedBox();
+    );
+       /* : SizedBox();*/
   }
 
   Widget _buildTabButtons() {
@@ -1387,4 +1412,7 @@ class BottomCurveClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+
 }
+
+
