@@ -1384,12 +1384,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Widgets/AppColors.dart';
 import '../auth/AddressDetailScreen.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
@@ -2008,12 +2010,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     print("Debug: Building UI, savedAddresses length: ${savedAddresses.length}");
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green.shade800,
-        centerTitle: true,
+      appBar:AppBar(
         elevation: 0,
-        toolbarHeight: screenHeight * 0.008,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Select Location",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: Stack(
@@ -2022,36 +2030,6 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               padding: EdgeInsets.all(screenWidth * 0.04),
               child: Column(
                 children: [
-                  SizedBox(height: screenHeight * 0.02),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          print("Debug: Back button pressed");
-                          Navigator.pop(context);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.only(left: screenWidth * 0.03),
-                          child: Icon(
-                            Icons.arrow_back_outlined,
-                            size: screenWidth * 0.06,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.2),
-                      Expanded(
-                        child: Text(
-                          'Select Location',
-                          style: GoogleFonts.roboto(
-                            fontSize: 18 * textScaleFactor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: GestureDetector(

@@ -1001,6 +1001,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../../utility/custom_snack_bar.dart';
 import '../../auth/RoleSelectionScreen.dart';
 import '../service_provider_profile/EditProfileScreen.dart';
 import '../service_provider_profile/ServiceProviderProfileScreen.dart';
@@ -1214,20 +1215,21 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
     final nameController = TextEditingController(text: fullName ?? '');
     final ageController  = TextEditingController(text: age ?? '');
     String tempGender = (selectedGender ?? '').toLowerCase(); // 👈 API se jo aaya wahi
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) {
+      builder: (bottomSheetContext) {
+        String? errorMessage;
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             return SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom,
                   left: 16, right: 16, top: 24,
                 ),
                 child: SingleChildScrollView(
@@ -1292,13 +1294,59 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                         ],
                       ),
 
+                      if (errorMessage != null) // Show error message inline
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            errorMessage!,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ),
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text("Save", style: TextStyle(color: Colors.white)),
                         onPressed: () async {
-                          Navigator.pop(context);
+                          final fullNamee = nameController.text.trim();
+                          final ageText = ageController.text.trim();
 
+                          // Check if full name is empty
+                          if (fullNamee.isEmpty) {
+                            setModalState(() => errorMessage = "Full name cannot be empty");
+                            return;
+                          }
+
+                          // Check if full name has at least 3 words
+                          final nameWords = fullNamee.split(' ').where((word) => word.isNotEmpty).toList();
+                          if (nameWords.length < 3) {
+                            setModalState(() => errorMessage = "Full name must contain at least 3 words");
+                            return;
+                          }
+
+                          // Check if age is empty
+                          if (ageText.isEmpty) {
+                            setModalState(() => errorMessage = "Age cannot be empty");
+                            return;
+                          }
+
+                          // Check if age is a valid number and not negative
+                          final ageValue = int.tryParse(ageText);
+                          if (ageValue == null || ageValue < 0) {
+                            setModalState(() => errorMessage = "Please enter a valid age");
+                            return;
+                          }
+
+                          // Check if age is 18 or above
+                          if (ageValue < 18) {
+                            setModalState(() => errorMessage = "Age must be 18 or above");
+                            return;
+                          }
+
+                          // Clear error message if validation passes
+                          setModalState(() => errorMessage = null);
+
+                          // If validation passes, proceed with save
+                          Navigator.pop(bottomSheetContext);
                           // UI state update
                           setState(() {
                             fullName = nameController.text;

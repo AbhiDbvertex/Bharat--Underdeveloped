@@ -754,7 +754,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
                       /// DATE
                       Text(
-                        "Complete - ${controller.deadline.value}",
+                        "Completion  - ${controller.deadline.value}",
                         style: GoogleFonts.roboto(
                             fontSize: 12, color: Colors.grey.shade700),
                       ),

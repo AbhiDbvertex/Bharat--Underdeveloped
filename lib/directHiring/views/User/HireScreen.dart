@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -7,11 +10,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart'; // ✅ Location ke liye
 import 'package:geocoding/geocoding.dart'; // ✅ Address string ke liye
 import '../../../Bidding/controller/bidding_post_task_controller.dart';
+import '../../../Emergency/utils/assets.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -43,12 +49,15 @@ class _HireScreenState extends State<HireScreen> {
   List<XFile> selectedImages = [];
   int? platformFee;
   final controller = Get.put(PostTaskController(), permanent: false);
-  var isLoading = true;
+  var isLoading = false;
   var profile = Rxn<ServiceProviderProfileModel>();
   var late;
   var long;
   var addre;
-
+  String? _goToShopSelection;
+  String get _dynamicShopAddress => profile.value?.businessAddress?.address?.isNotEmpty == true
+      ? profile.value!.businessAddress!.address!
+      : "Shop Address: Not Available";
   @override
   void initState() {
     super.initState();
@@ -289,6 +298,86 @@ class _HireScreenState extends State<HireScreen> {
   }
 
   // ✅ Confirmation dialog
+  // Future<bool> showConfirmationDialog() async {
+  //   return await showDialog<bool>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         backgroundColor: Colors.white,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(20),
+  //         ),
+  //         contentPadding: const EdgeInsets.all(24),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Image.asset(
+  //               'assets/images/success.png',
+  //               height: 120,
+  //               width: 120,
+  //               fit: BoxFit.cover,
+  //             ),
+  //             const SizedBox(height: 20),
+  //             Text(
+  //               "Are you Sure want to hire?",
+  //               style: GoogleFonts.roboto(
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //               textAlign: TextAlign.center,
+  //             ),
+  //             const SizedBox(height: 24),
+  //             Row(
+  //               children: [
+  //                 Expanded(
+  //                   child: ElevatedButton(
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: Colors.green.shade700,
+  //                       padding: const EdgeInsets.symmetric(vertical: 12),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                       ),
+  //                     ),
+  //                     onPressed: () async{
+  //                       final confirmed=await showDetails(context);
+  //                       Navigator.pop(context,confirmed);
+  //                     },
+  //                     child: const Text(
+  //                       "Okay",
+  //                       style: TextStyle(color: Colors.white),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 12),
+  //                 Expanded(
+  //                   child: OutlinedButton(
+  //                     style: OutlinedButton.styleFrom(
+  //                       padding: const EdgeInsets.symmetric(vertical: 12),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                       ),
+  //                       side: BorderSide(color: Colors.green.shade700),
+  //                     ),
+  //                     onPressed: () => Navigator.pop(context, false),
+  //                     child: Text(
+  //                       "Cancel",
+  //                       style: GoogleFonts.roboto(
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Colors.green.shade700,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   ) ??
+  //       false;
+  // }
   Future<bool> showConfirmationDialog() async {
     return await showDialog<bool>(
       context: context,
@@ -297,62 +386,94 @@ class _HireScreenState extends State<HireScreen> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          contentPadding: const EdgeInsets.all(20),
+          contentPadding: const EdgeInsets.all(24),
           content: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/success.png',
-                height: 120,
-                width: 120,
-                fit: BoxFit.cover,
+              Container(
+               // padding: EdgeInsets.only(top: 0.2.toWidthPercent()),
+                width: 0.6.toWidthPercent(),
+                alignment: Alignment.center,
+                child: Image.asset(BharatAssets.paymentConfLogo),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 0.1.toWidthPercent()),
               Text(
-                "Are you Sure want to hire?",
+                'Payment Proceed',
                 style: GoogleFonts.roboto(
-                  fontSize: 16,
+                  fontSize: 22,
                   fontWeight: FontWeight.w500,
+                  color: Colors.black87,
                 ),
-                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 35),
+              Container(
+                width: 169,
+                height: 58,
+                color: Color(0xffB1FDCA),
+                alignment: Alignment.center,
+                child: Text(
+                  platformFee != null ? '₹${platformFee}' : '₹0',
+                  style: GoogleFonts.roboto(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF334247),
+                  ),
+                ),
+              ),
+              SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(BharatAssets.payImage),
+              ),
+              SizedBox(height: 65),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade700,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                  InkWell(
+                    onTap: () async {
+                      final confirmed = await showDetails(context);
+                      Navigator.pop(context, confirmed);
+                    },
+                    child: Container(
+                      height: 35,
+                      width: 0.3.toWidthPercent(),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xff228B22),
                       ),
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text(
-                        "Okay",
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        "Hire",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  InkWell(
+                    onTap: () => Navigator.pop(context, false),
+                    child: Container(
+                      height: 35,
+                      width: 0.3.toWidthPercent(),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Color(0xff228B22),
+                          width: 1.5,
                         ),
-                        side: BorderSide(color: Colors.green.shade700),
                       ),
-                      onPressed: () => Navigator.pop(context, false),
                       child: Text(
                         "Cancel",
                         style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Color(0xff228B22),
                         ),
                       ),
                     ),
@@ -363,13 +484,11 @@ class _HireScreenState extends State<HireScreen> {
           ),
         );
       },
-    ) ??
-        false;
+    ) ?? false;
   }
 
-  // ✅ Form submit karne ka function
   Future<void> submitForm() async {
-    setState(() => isLoading = true);
+
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
     final address = addressController.text.trim();
@@ -378,18 +497,21 @@ class _HireScreenState extends State<HireScreen> {
         description.isEmpty ||
         // address.isEmpty ||
         selectedDate == null ||
-        selectedTime == null || // ✅ Time bhi check karo
+        selectedTime == null ||
         selectedImages.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
+      CustomSnackBar.show(
+          context,
+          message: 'Please fill all fields',
+          type: SnackBarType.error
       );
+
       return;
     }
 
     final confirmed = await showConfirmationDialog();
     if (!mounted || !confirmed) return;
 
-
+    setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
@@ -448,11 +570,13 @@ class _HireScreenState extends State<HireScreen> {
       print("response hire Status: ${response.statusCode}");
       print("📩 Response: $respStr");
 
+      bwDebug("gadge: response: ${respStr}");
+
       if (response.statusCode == 201) {
         final decoded = jsonDecode(respStr);
         final razorpayOrderId = decoded['razorpay_order']['id'];
         final amount = decoded['razorpay_order']['amount'];
-
+final orderId=decoded["order"]["_id"];
         final paymentSuccess = await Navigator.push(
           context,
           MaterialPageRoute(
@@ -460,6 +584,7 @@ class _HireScreenState extends State<HireScreen> {
               razorpayOrderId: razorpayOrderId,
               amount: amount,
               providerId: widget.firstProviderId,
+              orderId: orderId,
               // categoryId: widget.categoryId,
               // subcategoryId: widget.subcategoryId,
             ),
@@ -539,7 +664,8 @@ class _HireScreenState extends State<HireScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Location"),
+
+                  buildLabel("Location"),
                   InkWell(
                     onTap: controller.navigateToLocationScreen,
                     child: Container(
@@ -573,6 +699,62 @@ class _HireScreenState extends State<HireScreen> {
                     ? "Please enter a valid address"
                     : null,
               ),
+              const SizedBox(height: 14),
+
+              buildLabel("Do you want to go to his shop?"),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text("Yes"),
+                      value: "Yes",
+                      groupValue: _goToShopSelection,
+                      activeColor: AppColors.primaryGreen,
+                      onChanged: (value) {
+                        setState(() {
+                          _goToShopSelection = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text("No"),
+                      value: "No",
+                      groupValue: _goToShopSelection,
+                      activeColor: AppColors.primaryGreen,
+                      onChanged: (value) {
+                        setState(() {
+                          _goToShopSelection = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              // Conditional Uneditable Text Field for Shop Address
+              if (_goToShopSelection == "Yes") ...[
+                GestureDetector(
+                  onTap: () {
+                    if(profile.value?.businessAddress !=null){
+                      MapLauncher.openMap(
+                          latitude: profile.value!.businessAddress!.latitude,
+                          longitude: profile.value!.businessAddress!.longitude,
+                          address: profile.value!.businessAddress!.address
+                      );
+                    }
+                  },
+                  child: TextFormField(
+                    enabled: false,
+                    initialValue: _dynamicShopAddress,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 14),
               buildLabel("Add deadline and time"),
               const SizedBox(height: 6),
@@ -822,4 +1004,149 @@ class _HireScreenState extends State<HireScreen> {
       horizontal: 12,
     ),
   );
-}
+
+
+     Future<bool>showDetails(context) async{
+
+      return await showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24,horizontal: 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Title
+                  const Text(
+                    "Payment Confirmation",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Image
+                  Image.asset(BharatAssets.payConfLogo2),
+                  const SizedBox(height: 24),
+
+                  // Details section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Date",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 18),),
+                          Text(
+                           DateFormat("dd-MM-yy").format(
+                              DateTime.now(),
+                            ),
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                          ),                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Time",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 18)),
+                          Text(
+                             DateFormat("hh:mm a").format(
+                              DateTime.now(),),
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                          ),                    ],
+                      ),
+                      // const SizedBox(height: 8),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Text("Amount",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 18)),
+                      //     Text("${responseModel.order?.servicePayment?.amount} RS",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 18)),
+                      //   ],
+                      // ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Platform fees",style: TextStyle(fontWeight: FontWeight.w400,fontSize: 18)),
+                          Text(platformFee != null ? "$platformFee INR" : "N/A",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 18)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Image.asset(BharatAssets.payLine),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Total",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                            ),
+                          ),
+                          Text(
+                            platformFee != null ? "$platformFee /-" : "N/A",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Divider(height: 4,color: Colors.green,),
+                  const SizedBox(height: 20),
+                  // Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () =>Navigator.pop(context, true),
+                        child: Container(
+                          height: 35,
+                          width: 0.28.toWidthPercent(),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Color(0xff228B22)
+                          ),
+                          child: Text("Pay",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,color: Colors.white),),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: ()=>Navigator.pop(context, false),
+                        child: Container(
+                          height: 35,
+                          width: 0.28.toWidthPercent(),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green, // ✅ Green border
+                              width: 1.5,          // thickness of border
+                            ),
+
+                          ),
+                          child: Text("Cancel",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,color: Colors.green),),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+  }
+

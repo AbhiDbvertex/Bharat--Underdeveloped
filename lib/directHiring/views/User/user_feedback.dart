@@ -265,11 +265,13 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -293,25 +295,35 @@ class _UserFeedbackState extends State<UserFeedback> {
   final _formKey = GlobalKey<FormState>();
 
   Future<void> postRatingDarect() async {
-    // Validation checks
     if (selectedRating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a rating")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Please select a rating",
+          type: SnackBarType.error
       );
+
       return;
     }
 
     if (feedController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter feedback")),
+      CustomSnackBar.show(
+          context,
+          message: "Please enter feedback",
+          type: SnackBarType.error
       );
+
       return;
     }
 
     if (feedController.text.trim().length < 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Feedback must be at least 10 characters long")),
+
+      CustomSnackBar.show(
+          context,
+          message:"Feedback must be at least 10 characters long" ,
+          type: SnackBarType.error
       );
+
       return;
     }
 
@@ -363,10 +375,11 @@ class _UserFeedbackState extends State<UserFeedback> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postRatingDarect response ${response.body}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Feedback submitted successfully",),backgroundColor: Colors.green,),
+        CustomSnackBar.show(
+            context,
+            message: "Feedback submitted successfully",
+            type: SnackBarType.success
         );
-        Navigator.pop(context,true);
         Navigator.pop(context,true);
         // Navigator.pushAndRemoveUntil(
         //   context,
@@ -381,18 +394,35 @@ class _UserFeedbackState extends State<UserFeedback> {
           feedController.clear();
           selectedImages.clear();
         });
+      }  if (response.statusCode == 500 ) {
+        print("Abhi:- else postRatingDarect respons 500  ${response.body}");
+
+        CustomSnackBar.show(
+            context,
+            message: "Internal server error.Try again...",
+            type: SnackBarType.error
+        );
+
       } else {
         print("Abhi:- else postRatingDarect response ${response.body}");
         print("Abhi:- else postRatingDarect response ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("You already reviewed this provider.")),
+
+        CustomSnackBar.show(
+            context,
+            message: "You already reviewed this provider.",
+            type: SnackBarType.info
         );
+
       }
     } catch (e) {
       print("Abhi:- Exception postRatingDarect $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("An error occurred while submitting")),
+
+      CustomSnackBar.show(
+          context,
+          message: "An error occurred while submitting",
+          type: SnackBarType.error
       );
+
     } finally {
       setState(() {
         isSubmitting = false;
@@ -404,17 +434,17 @@ class _UserFeedbackState extends State<UserFeedback> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
+      appBar:  AppBar(
         elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text("Feedback", style: TextStyle(color: Colors.white)),
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_outlined, color: Colors.white),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Feedback",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
         ),
       ),
       body: SingleChildScrollView(
@@ -555,9 +585,13 @@ class _UserFeedbackState extends State<UserFeedback> {
         if (selectedImages.length + pickedList.length <= 5) {
           selectedImages.addAll(pickedList);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Maximum 5 images allowed")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Maximum 5 images allowed",
+              type: SnackBarType.error
           );
+
         }
       });
     }

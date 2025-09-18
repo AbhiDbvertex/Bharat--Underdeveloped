@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Bidding/ServiceProvider/BiddingWorkerList.dart';
 import 'package:developer/directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1094,11 +1095,17 @@ class _BiddingserviceproviderworkdetailState
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: height * 0.03,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Work Detail",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -1106,28 +1113,28 @@ class _BiddingserviceproviderworkdetailState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: height * 0.01),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Icon(Icons.arrow_back, size: width * 0.06),
-                    ),
-                  ),
-                  SizedBox(width: width * 0.25),
-                  Text(
-                    "Work detail",
-                    style: GoogleFonts.roboto(
-                      fontSize: width * 0.045,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: height * 0.01),
+              // SizedBox(height: height * 0.01),
+              // Row(
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () => Navigator.pop(context),
+              //       child: Padding(
+              //         padding: EdgeInsets.only(left: width * 0.02),
+              //         child: Icon(Icons.arrow_back, size: width * 0.06),
+              //       ),
+              //     ),
+              //     SizedBox(width: width * 0.25),
+              //     Text(
+              //       "",
+              //       style: GoogleFonts.roboto(
+              //         fontSize: width * 0.045,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: height * 0.01),
               Padding(
                 padding: EdgeInsets.all(width * 0.02),
                 child: Column(
@@ -1235,7 +1242,7 @@ class _BiddingserviceproviderworkdetailState
                     Padding(
                       padding: EdgeInsets.only(left: width * 0.02),
                       child: Text(
-                        'Complete: ${biddingOrder!.deadline.split('T').first}',
+                        'Completion : ${biddingOrder!.deadline.split('T').first}',
                         style: TextStyle(
                           fontSize: width * 0.035,
                           color: Colors.grey,

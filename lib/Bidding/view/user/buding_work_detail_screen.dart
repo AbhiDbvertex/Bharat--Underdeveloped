@@ -632,6 +632,19 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
       },
       child: SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            centerTitle: true,
+            title: const Text("Worker Details",
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            leading: const BackButton(color: Colors.black),
+            actions: [],
+            systemOverlayStyle:  SystemUiOverlayStyle(
+              statusBarColor: AppColors.primaryGreen,
+              statusBarIconBrightness: Brightness.light,
+            ),
+          ),
           backgroundColor: Colors.white,
           body: Container(
             width: width,
@@ -644,29 +657,29 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Padding(
-                                padding: EdgeInsets.only(left: 15.0),
-                                child:
-                                    Icon(Icons.arrow_back_outlined, size: 22),
-                              ),
-                            ),
-                            const SizedBox(width: 90),
-                            Text(
-                              'Worker details',
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: height * 0.01),
+                      //  const SizedBox(height: 10),
+                        // Row(
+                        //   children: [
+                        //     GestureDetector(
+                        //       onTap: () => Navigator.pop(context),
+                        //       child: const Padding(
+                        //         padding: EdgeInsets.only(left: 15.0),
+                        //         child:
+                        //             Icon(Icons.arrow_back_outlined, size: 22),
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 90),
+                        //     Text(
+                        //       'Worker details',
+                        //       style: GoogleFonts.poppins(
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //         color: AppColors.black,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                      //  SizedBox(height: height * 0.01),
                         Container(color: Colors.grey,
                           child: CarouselSlider(
                             options: CarouselOptions(
@@ -785,7 +798,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               ),
                               SizedBox(height: height * 0.002),
                               Text(
-                                "Complete - $deadline",
+                                "Completion  - $deadline",
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../Widgets/AppColors.dart';
 
 class SeeAllScreen extends StatelessWidget {
   const SeeAllScreen({super.key});
@@ -7,10 +10,18 @@ class SeeAllScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Work Categories'),
-        backgroundColor: Colors.green.shade800,
+      appBar:AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
         centerTitle: true,
+        title: const Text("Work Categories",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

@@ -5,6 +5,7 @@ import 'package:developer/Emergency/User/models/emergency_list_model.dart';
 import 'package:developer/Emergency/User/screens/PaymentConformation.dart';
 import 'package:developer/Emergency/utils/ApiUrl.dart';
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -108,8 +109,10 @@ class EmergencyServiceController extends GetxController {
       if (images.length < 5) {
         images.add(File(picked.path));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Max 5 images allowed")),
+        CustomSnackBar.show(
+            context,
+            message: "Max 5 images allowed",
+            type: SnackBarType.warning
         );
       }
     }
@@ -119,16 +122,22 @@ class EmergencyServiceController extends GetxController {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       if (images.length + pickedFiles.length > 5) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("You can upload max 5 images")),
+           CustomSnackBar.show(
+            context,
+            message:"You can upload max 5 images" ,
+            type: SnackBarType.error
         );
+
         return;
       }
       images.addAll(pickedFiles.map((e) => File(e.path)));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${pickedFiles.length} images selected")),
+      CustomSnackBar.show(
+          context,
+          message: "${pickedFiles.length} images selected",
+          type: SnackBarType.info
       );
+
     }
   }
 
@@ -187,7 +196,8 @@ class EmergencyServiceController extends GetxController {
         contactController.text.isEmpty ||
         selectedDateTime.value == null ||
         images.isEmpty) {
-      Get.snackbar("Error", "Please fill all fields",colorText: Colors.red);
+      // Get.snackbar("Error", "Please fill all fields",colorText: Colors.red);
+      CustomSnackBar.show(context, message: "Please fill all fields",type: SnackBarType.error);
       return;
     }
     isLoading.value=true;
@@ -244,11 +254,19 @@ class EmergencyServiceController extends GetxController {
         );
       } else {
         bwDebug("❌ Failed: $body");
-        Get.snackbar("Error", "Something went wrong!");
+        CustomSnackBar.show(
+            context,
+            message: "Something went wrong!",
+            type: SnackBarType.error
+        );
       }
     } catch (e) {
       bwDebug("⚠️ Exception: $e");
-      Get.snackbar("Error", "Failed to submit request!");
+      CustomSnackBar.show(
+          context,
+          message:"Failed to submit request!" ,
+          type: SnackBarType.error
+      );
     }
     isLoading.value=false;
   }
@@ -284,11 +302,12 @@ class EmergencyServiceController extends GetxController {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          // content: Text("❌ Verification Failed: /*${decoded['message']}*/"),
-          content: Text("❌ Verification Failed: */"),
-        ),
+
+      bwDebug("❌ Verification Failed: /*${decoded['message']}*/");
+      CustomSnackBar.show(
+          context,
+          message: "Verification Failed",
+          type: SnackBarType.error
       );
       Navigator.pop(context);
     }

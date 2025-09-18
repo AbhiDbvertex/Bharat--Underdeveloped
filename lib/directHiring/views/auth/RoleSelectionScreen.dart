@@ -237,6 +237,7 @@ import 'dart:async';
 
 import 'package:developer/Widgets/CustomButton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
@@ -559,23 +560,29 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.green,
         elevation: 0,
+        backgroundColor: Colors.white,
         centerTitle: true,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        title: const Text("Select your Role",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 40),
-            Text(
-              'Select your Role',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // Text(
+            //   'Select your Role',
+            //   style: GoogleFonts.poppins(
+            //     fontSize: 20,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),

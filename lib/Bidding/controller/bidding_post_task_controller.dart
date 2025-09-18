@@ -62,7 +62,6 @@ class PostTaskController extends GetxController {
     super.onClose();
   }
 
-  // Helper method to show snackbar with consistent styling
   void showSnackbar(String title, String message, {required BuildContext context}) {
     if (context.mounted) {
       SchedulerBinding.instance.addPostFrameCallback((_) {

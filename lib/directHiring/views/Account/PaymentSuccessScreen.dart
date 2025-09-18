@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../Widgets/Bottombar.dart';
@@ -10,8 +11,10 @@ class PaymentSuccessScreen extends StatefulWidget {
   final String? categreyId;
   final String? subcategreyId;
   final String? providerId;
+  final String? orderId;
   final String? from;
-  const PaymentSuccessScreen({super.key, this.categreyId, this.subcategreyId, this.providerId,this.from});
+
+  const PaymentSuccessScreen({super.key, this.categreyId, this.subcategreyId, this.providerId,this.orderId,this.from});
 
   @override
   State<PaymentSuccessScreen> createState() => _PaymentSuccessScreenState();
@@ -22,6 +25,11 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
 
   @override
   void initState() {
+    bwDebug(
+      "gadge: [initState]  categoryId: ${widget.categreyId} \n"
+          " subCategoryId : ${widget.subcategreyId}\n"
+          "providerId: ${widget.providerId}\n"
+          "orderId: ${widget.orderId}",tag: "PaymentSuccessScreen");
     super.initState();
 
     // ⏳ Set up a timer for 3 seconds to navigate to Bottombar
@@ -52,6 +60,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
     print(
       "Abhi:- paymentScreen screen get categreyId ${widget.categreyId} : subCategreyId : ${widget.subcategreyId}",
     );
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -86,14 +95,14 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  // Cancel the timer when user navigates to feedback screen
-                  _navigationTimer?.cancel();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserFeedback(oderType: 'direct',),
-                    ),
-                  );
+                  // // Cancel the timer when user navigates to feedback screen
+                  // _navigationTimer?.cancel();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => UserFeedback(providerId: widget.providerId , oderId:widget.orderId , oderType: 'direct',),
+                  //   ),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green.shade700,

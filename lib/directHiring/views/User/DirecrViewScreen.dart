@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -643,11 +644,17 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Work details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -659,28 +666,28 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            const SizedBox(height: 30),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 18.0),
-                    child: Icon(Icons.arrow_back_outlined, size: 22),
-                  ),
-                ),
-                const SizedBox(width: 90),
-                Text(
-                  "Work details",
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+            //
+            // const SizedBox(height: 30),
+            // Row(
+            //   children: [
+            //     GestureDetector(
+            //       onTap: () => Navigator.pop(context),
+            //       child: const Padding(
+            //         padding: EdgeInsets.only(left: 18.0),
+            //         child: Icon(Icons.arrow_back_outlined, size: 22),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 90),
+            //     Text(
+            //       "Work details",
+            //       style: GoogleFonts.roboto(
+            //         fontSize: 18,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 20),
             if (order!['image_url'] != null &&
                 order!['image_url'] is List &&
                 (order!['image_url'] as List).isNotEmpty)

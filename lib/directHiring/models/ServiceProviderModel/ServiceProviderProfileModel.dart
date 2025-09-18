@@ -31,7 +31,10 @@ class ServiceProviderProfileModel {
   final int? totalReview;
   final String? rating;
   final BankDetail? bankDetail;
-  final String? documents; // ✅ MISSING FIELD ADDED
+  final String? documents;// ✅ MISSING FIELD ADDED
+  final BusinessAddress? businessAddress;
+  final bool? isShop;
+  final List<String>? businessImage;
 
   ServiceProviderProfileModel({
     this.id,
@@ -63,7 +66,10 @@ class ServiceProviderProfileModel {
     this.rating,
     this.requestStatus,
     this.bankDetail,
-    this.documents, // ✅ ADDED HERE TOO
+    this.documents,
+    this.businessAddress,
+    this.isShop,
+    this.businessImage
   });
   //Keys in Flutter uniquely identify widgets and preserve their state during rebuilds, especially in lists or tree changes
 
@@ -122,6 +128,37 @@ class ServiceProviderProfileModel {
               ? BankDetail.fromJson(json['bankdetail'])
               : null,
       documents: json['documents']?.toString(),
+      businessAddress: json['businessAddress'] != null
+          ? BusinessAddress.fromJson(json['businessAddress'])
+          : null,
+      isShop: json['isShop'] == true,
+      businessImage: (json['businessImage'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ?? [],
+
+    );
+  }
+}
+class BusinessAddress {
+  final String? address;
+  final double? latitude;
+  final double? longitude;
+
+  BusinessAddress({
+    this.address,
+    this.latitude,
+    this.longitude,
+  });
+
+  factory BusinessAddress.fromJson(Map<String, dynamic> json) {
+    return BusinessAddress(
+      address: json['address']?.toString(),
+      latitude: json['latitude'] is double
+          ? json['latitude']
+          : double.tryParse(json['latitude'].toString()),
+      longitude: json['longitude'] is double
+          ? json['longitude']
+          : double.tryParse(json['longitude'].toString()),
     );
   }
 }
