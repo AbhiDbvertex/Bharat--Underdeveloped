@@ -66,7 +66,7 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   fluttertoast:
   flutter_html:
-
+  socket_io_client: ^3.0.0
 
 #  just_audio:
 

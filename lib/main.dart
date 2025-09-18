@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'NotificationService.dart';
+import 'chat/chatScreen.dart';
 import 'directHiring/views/Account/service_provider_profile/EditProfileScreen.dart';
 import 'directHiring/views/Account/user_profile/user_role_profile_update.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
@@ -52,8 +53,8 @@ class MyApp extends StatelessWidget {
     ),),
     debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
-      home: SplashScreen(),
-      // home: EditProfileScreen(),
+      // home: SplashScreen(),
+      home: ChatScreen(),
       // home: DragToPayScreen(),
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );
