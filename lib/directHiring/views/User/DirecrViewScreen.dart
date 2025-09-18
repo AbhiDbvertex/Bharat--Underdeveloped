@@ -599,8 +599,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("❗ API Error: ${response.statusCode} - ${err['message']}");
         Get.snackbar(
           'Error',
-          // '${err['message']}',
-          'Getting error',
+          '${err['message']}',
+          // 'Getting error',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
