@@ -2055,6 +2055,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   print("Abhi:- get bidding userId : ${userId}");
 
                   return Card(
+                    elevation: 2,
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -2062,191 +2063,193 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     ),
                     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0,right: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // left image
-                          Center(
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0,bottom: 8),
-                                  child: Container(
-                                    color: Colors.grey,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: imageUrl.isNotEmpty
-                                          ? Image.network(
-                                        'https://api.thebharatworks.com/${imageUrl}',
-                                        height: 125,
-                                        width: 100,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Icon(Icons.image_not_supported_outlined, size: 100);
-                                        },
-                                      )
-                                          : Icon(Icons.image_not_supported_outlined, size: 100),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 7,
-                                  left: 10,
-                                  right: 5,
-                                  child: Container(
-                                    decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(5)),
-                                    child: Center(
-                                      child: Text(
-                                        buddingprojectid,
-                                        style: TextStyle(color: Colors.white),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                      padding: const EdgeInsets.only(left: 8.0,right: 8,bottom: 10,top: 5),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // left image
+                            Center(
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0,bottom: 8),
+                                    child: Container(
+                                      color: Colors.grey,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: imageUrl.isNotEmpty
+                                            ? Image.network(
+                                          'https://api.thebharatworks.com/${imageUrl}',
+                                          height: 125,
+                                          width: 100,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(Icons.image_not_supported_outlined, size: 100);
+                                          },
+                                        )
+                                            : Icon(Icons.image_not_supported_outlined, size: 100),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          // right content
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  "₹$price",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  description,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 13,
-                                  ),
-                                  maxLines: 2,
-                                ),
-                                SizedBox(height: 3),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "Date: $deadline",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _getStatusColor(status),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Text(
-                                        "$status",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        MapLauncher.openMap(latitude: latitude, longitude: longitude, address: address);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Color(0xffF27773),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
+                                  Positioned(
+                                    bottom: 7,
+                                    left: 10,
+                                    right: 5,
+                                    child: Container(
+                                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(5)),
+                                      child: Center(
                                         child: Text(
-                                          address,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                          ),
+                                          buddingprojectid,
+                                          style: TextStyle(color: Colors.white),
+                                          maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        width: 110,
                                       ),
                                     ),
-                                    Spacer(),
-                                    InkWell(
-                                      onTap: () async {
-                                        final result = await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => BiddingWorkerDetailScreen(
-                                              buddingOderId: buddingOderId,
-                                              userId: userId,
-                                              serviceProviderId: serviceProviderId,
-                                            ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            // right content
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    "₹$price",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    description,
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 13,
+                                    ),
+                                    maxLines: 2,
+                                  ),
+                                  SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Date: $deadline",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                        );
-
-                                        if (result == true) {
-                                          // 👈 refresh function call kar do
-                                          _loadCategoryIdsAndFetchOrders();
-                                          getEmergencyOrder();
-                                          getBudingAllOders();
-                                          setState(() {});
-                                        }
-                                      },
-                                      child: Container(
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 10,
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.green,
+                                          color: _getStatusColor(status),
                                           borderRadius: BorderRadius.circular(5),
                                         ),
                                         child: Text(
-                                          "View Details",
+                                          "$status",
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 12,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                  SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          MapLauncher.openMap(latitude: latitude, longitude: longitude, address: address);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xffF27773),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            address,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          width: 110,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      InkWell(
+                                        onTap: () async {
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => BiddingWorkerDetailScreen(
+                                                buddingOderId: buddingOderId,
+                                                userId: userId,
+                                                serviceProviderId: serviceProviderId,
+                                              ),
+                                            ),
+                                          );
+                        
+                                          if (result == true) {
+                                            // 👈 refresh function call kar do
+                                            _loadCategoryIdsAndFetchOrders();
+                                            getEmergencyOrder();
+                                            getBudingAllOders();
+                                            setState(() {});
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                          child: Text(
+                                            "View Details",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );

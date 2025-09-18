@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,11 +79,17 @@ class _FAQScreenState extends State<FAQScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Help & FAQ",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body:
           isLoading
@@ -91,34 +98,34 @@ class _FAQScreenState extends State<FAQScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AccountScreen(),
-                              ),
-                            );
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_outlined,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 100),
-                        Text(
-                          "Help & FAQ",
-                          style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
+                    // const SizedBox(height: 10),
+                    // Row(
+                    //   children: [
+                    //     GestureDetector(
+                    //       onTap: () {
+                    //         Navigator.pop(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //             builder: (context) => const AccountScreen(),
+                    //           ),
+                    //         );
+                    //       },
+                    //       child: const Icon(
+                    //         Icons.arrow_back_outlined,
+                    //         size: 22,
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 100),
+                    //     Text(
+                    //       "Help & FAQ",
+                    //       style: GoogleFonts.roboto(
+                    //         fontSize: 18,
+                    //         fontWeight: FontWeight.bold,
+                    //         color: Colors.black,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     const SizedBox(height: 20),
                     Image.asset('assets/images/help.png', fit: BoxFit.contain),
                     const SizedBox(height: 30),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,11 +80,17 @@ class _HiredProviderDetailsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Hired Provider Details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body:
           isLoading
@@ -93,28 +100,28 @@ class _HiredProviderDetailsScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Icon(
-                            Icons.arrow_back_outlined,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(width: 86),
-                        Text(
-                          "Hired Provider Details",
-                          style: GoogleFonts.roboto(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
+                    // const SizedBox(height: 20),
+                    // Row(
+                    //   children: [
+                    //     GestureDetector(
+                    //       onTap: () => Navigator.pop(context),
+                    //       child: const Icon(
+                    //         Icons.arrow_back_outlined,
+                    //         color: Colors.black,
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 86),
+                    //     Text(
+                    //       "Hired Provider Details",
+                    //       style: GoogleFonts.roboto(
+                    //         fontSize: 20,
+                    //         fontWeight: FontWeight.bold,
+                    //         color: Colors.black,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    //const SizedBox(height: 20),
                     if (widget.order.image != 'local')
                       Image.network(
                         widget.order.image,

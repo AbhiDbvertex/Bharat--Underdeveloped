@@ -222,6 +222,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../controllers/AccountController/CustomerCareController.dart';
@@ -249,11 +250,17 @@ class _CustomerCareState extends State<CustomerCare> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("User Care",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -262,35 +269,6 @@ class _CustomerCareState extends State<CustomerCare> {
             key: _formKey,
             child: Column(
               children: [
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AccountScreen(),
-                          ),
-                        );
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Icon(Icons.arrow_back, size: 25),
-                      ),
-                    ),
-                    const SizedBox(width: 90),
-                    Text(
-                      "User Care",
-                      style: GoogleFonts.roboto(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
                 Text(
                   'Please Feel Free To Talk To Us If You Have Any\nQuestions. We Endeavour To Answer Within 24 Hours.',
                   textAlign: TextAlign.center,

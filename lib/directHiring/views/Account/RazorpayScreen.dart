@@ -206,7 +206,7 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
 
   @override
   void initState() {
-    bwDebug("\nrazorpayOrderId: ${widget.razorpayOrderId}.\n providerId: ${widget.providerId}, \namount: ${widget.amount}, \n from: ${widget.from},"
+    bwDebug("gadge: \nrazorpayOrderId: ${widget.razorpayOrderId}.\n providerId: ${widget.providerId}, \namount: ${widget.amount}, \n from: ${widget.from},"
         " \n enteredAmount: ${widget.enteredAmount}, \n taxAmount: ${widget.taxAmount}, \n description: ${widget.description},orderId: ${widget.orderId} ");
     super.initState();
     _razorpay = Razorpay();
@@ -289,6 +289,7 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
                 categreyId: widget.categreyId,
                 subcategreyId: widget.subcategreyId,
                 providerId: widget.providerId,
+                orderId: widget.orderId,
               ),
             ),
           );

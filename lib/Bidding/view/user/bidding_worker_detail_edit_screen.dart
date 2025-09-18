@@ -406,6 +406,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -550,11 +551,24 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.primaryGreen,
-          centerTitle: true,
           elevation: 0,
-          toolbarHeight: 20,
-          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text("Edit Post Task",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: GestureDetector(
+            onTap: () {
+              controller.resetForm();
+              Get.delete<PostTaskEditController>();
+              Get.back();
+            },
+            child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
+          ),
+          actions: [],
+          systemOverlayStyle:  SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
         ),
         body: Obx(
               () => SingleChildScrollView(
@@ -564,7 +578,7 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _pageHeader(context, controller),
+                  // _pageHeader(context, controller),
                   _buildLabel("Title"),
                   _buildTextField(controller.titleController, "Enter Title of work"),
                   _buildLabel("Category"),
@@ -690,25 +704,25 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
     );
   }
 
-  Widget _pageHeader(BuildContext context, PostTaskEditController controller) {
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () {
-            controller.resetForm();
-            Get.delete<PostTaskEditController>();
-            Get.back();
-          },
-          child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
-        ),
-        const SizedBox(width: 86),
-        Text(
-          "Edit Post Task",
-          style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
+  // Widget _pageHeader(BuildContext context, PostTaskEditController controller) {
+  //   return Row(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () {
+  //           controller.resetForm();
+  //           Get.delete<PostTaskEditController>();
+  //           Get.back();
+  //         },
+  //         child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
+  //       ),
+  //       const SizedBox(width: 86),
+  //       Text(
+  //         "Edit Post Task",
+  //         style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _googleLocationField(PostTaskEditController controller) {
     return GestureDetector(

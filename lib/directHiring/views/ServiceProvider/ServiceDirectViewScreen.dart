@@ -2855,6 +2855,7 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/directHiring/views/ServiceProvider/view_user_profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -3339,11 +3340,19 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
         "📋 DirectViewScreen categreyId: ${widget.categreyId}, subCategreyId: ${widget.subcategreyId}");
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title:  Text(_isOrderAccepted
+                     ? 'Worker Details'
+                       : 'Work Details',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -3354,32 +3363,32 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Padding(
-                              padding: EdgeInsets.only(left: 6.0),
-                              child: Icon(
-                                Icons.arrow_back_outlined,
-                                size: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 80),
-                          Text(
-                            _isOrderAccepted
-                                ? 'Worker Details'
-                                : 'Work Details',
-                            style: GoogleFonts.roboto(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+                      // Row(
+                      //   children: [
+                      //     GestureDetector(
+                      //       onTap: () => Navigator.pop(context),
+                      //       child: const Padding(
+                      //         padding: EdgeInsets.only(left: 6.0),
+                      //         child: Icon(
+                      //           Icons.arrow_back_outlined,
+                      //           size: 20,
+                      //           color: Colors.black,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     const SizedBox(width: 80),
+                      //     Text(
+                      //       _isOrderAccepted
+                      //           ? 'Worker Details'
+                      //           : 'Work Details',
+                      //       style: GoogleFonts.roboto(
+                      //         fontSize: 18,
+                      //         fontWeight: FontWeight.bold,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 20),
                       // Updated CarouselSlider for full screen width
                       order!['image_url'] != null &&
                               (order!['image_url'] is List &&

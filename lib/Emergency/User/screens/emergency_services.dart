@@ -136,7 +136,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide(
-                                color: AppColors.primaryGreen, width: 1.5),
+                                color: Colors.grey, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
@@ -294,7 +294,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+          borderSide: BorderSide(color: Colors.grey, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -328,7 +328,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+              borderSide: BorderSide(color: AppColors.primaryGreen, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
@@ -367,7 +367,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
   }) {
     return Obx(() => Container(
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+            border: Border.all(color: Colors.grey, width: 1),
             borderRadius: BorderRadius.circular(15),
           ),
           child: ListTile(
@@ -419,14 +419,17 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     return Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                minimumSize: Size(double.infinity, 60),
-                side: BorderSide(color: AppColors.primaryGreen, width: 2),
-                foregroundColor: AppColors.primaryGreen,
+            Center(
+              child: ElevatedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGreen
+                //  minimumSize: Size(double.infinity, 60),
+                 // side: BorderSide(color: AppColors.primaryGreen, width: 2),
+                //  foregroundColor: AppColors.primaryGreen,
+                ),
+                onPressed: onPick,
+                label: Text("+  Upload Image ",style: TextStyle(color: Colors.white),),
               ),
-              onPressed: onPick,
-              label: Text("Upload Image +"),
             ),
             SizedBox(height: 10),
             if (images.isNotEmpty)
@@ -557,23 +560,23 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         // 👇 Common border style
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
+          borderSide: BorderSide(color: Colors.grey, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
+          borderSide: BorderSide(color: AppColors.primaryGreen, width:1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.red, width: 1.5),
+          borderSide: BorderSide(color: Colors.red, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -663,7 +666,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+            border: Border.all(color: Colors.grey, width: 1),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
