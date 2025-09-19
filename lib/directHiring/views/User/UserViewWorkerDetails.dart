@@ -2001,7 +2001,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "About MY Skills",
+                          "About My Skills",
                           style: GoogleFonts.roboto(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
