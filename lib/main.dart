@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'NotificationService.dart';
 import 'chat/chatScreen.dart';
-import 'directHiring/views/Account/service_provider_profile/EditProfileScreen.dart';
-import 'directHiring/views/Account/user_profile/user_role_profile_update.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
 
