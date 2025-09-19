@@ -143,7 +143,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildLabel("Select Your Gender"),
-        const SizedBox(height: 5),
+       // const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -191,7 +191,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
           )
               : null,
         ),
-        const SizedBox(height: 10),
+      //  const SizedBox(height: 10),
       ],
     );
   }
@@ -291,25 +291,6 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // const SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     GestureDetector(
-              //       onTap: () => Navigator.pop(context),
-              //       child: const Icon(Icons.arrow_back_outlined, size: 22),
-              //     ),
-              //     const SizedBox(width: 60),
-              //     Text(
-              //       'Complete Profile',
-              //       style: GoogleFonts.poppins(
-              //         fontSize: 18,
-              //         fontWeight: FontWeight.bold,
-              //         color: AppColors.black,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              const SizedBox(height: 20),
               buildLabel("Enter Your Name"),
               const SizedBox(height: 5),
               buildCustomField(
@@ -346,7 +327,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              CustomButton(label: 'Submit', onPressed: onSubmit),
+              Center(child: CustomButton(label: 'Submit', onPressed: onSubmit)),
             ],
           ),
         ),

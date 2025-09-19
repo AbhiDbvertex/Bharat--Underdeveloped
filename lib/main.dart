@@ -51,8 +51,8 @@ class MyApp extends StatelessWidget {
     ),),
     debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
-      // home: SplashScreen(),
-      home: ChatScreen(),
+      home: SplashScreen(),
+      // home: ChatScreen(),
       // home: DragToPayScreen(),
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );

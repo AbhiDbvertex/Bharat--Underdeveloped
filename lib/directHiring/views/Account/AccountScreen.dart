@@ -443,7 +443,7 @@ class _AccountScreenState extends State<AccountScreen> {
     'Referral',
     'Contact Us',
     'Disputes',
-    'promotion'
+    'Promotions'
   ];
 
   @override

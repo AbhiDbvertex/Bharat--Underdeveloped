@@ -992,6 +992,7 @@ import 'dart:io';
 
 import 'package:developer/directHiring/views/Account/user_profile/user_role_profile_update.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -1215,6 +1216,9 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
     final nameController = TextEditingController(text: fullName ?? '');
     final ageController  = TextEditingController(text: age ?? '');
     String tempGender = (selectedGender ?? '').toLowerCase(); // 👈 API se jo aaya wahi
+    String? nameError;
+    String? ageError;
+    String? genderError;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1242,24 +1246,61 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
 
                       TextField(
                         controller: nameController,
+                        textCapitalization: TextCapitalization.words,
                         maxLength: 20,
-                        decoration: const InputDecoration(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), // Only letters and spaces
+                        ],
+                        decoration: InputDecoration(
                           labelText: 'Full Name',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                           counterText: '',
+                          errorText: nameError,
                         ),
+                        onChanged: (value) {
+                          setModalState(() {
+                            if (value.trim().isEmpty) {
+                              nameError = "Full name cannot be empty";
+                            } else if (fullName!.length < 3) {
+                              nameError = "Full name must contain at least 3 words";
+                            } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                              nameError = "Full name can only contain letters and spaces";
+                            } else {
+                              nameError = null;
+                            }
+                          });
+                        },
                       ),
                       const SizedBox(height: 12),
 
                       TextField(
                         controller: ageController,
                         keyboardType: TextInputType.number,
-                        maxLength: 3,
-                        decoration: const InputDecoration(
+                        maxLength: 2,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // Only allow digits
+                        ],
+                        decoration: InputDecoration(
                           labelText: 'Age',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                           counterText: '',
+                          errorText: ageError,
                         ),
+                        onChanged: (value) {
+                          setModalState(() {
+                            if (value.trim().isEmpty) {
+                              ageError = "Age cannot be empty";
+                            } else if (int.tryParse(value) == null) {
+                              ageError = "Please enter a valid number";
+                            } else if (int.parse(value) < 18) {
+                              ageError = "Age must be 18 or above";
+                            } else if (int.parse(value) > 120) {
+                              ageError = "Age seems unrealistic";
+                            } else {
+                              ageError = null;
+                            }
+                          });
+                        },
                       ),
                       const SizedBox(height: 12),
 
@@ -1271,7 +1312,10 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                             Radio<String>(
                               value: 'male',
                               groupValue: tempGender,
-                              onChanged: (v) => setModalState(() => tempGender = v!),
+                              onChanged: (v) => setModalState(() {
+                                tempGender = v!;
+                                genderError = null;
+                              }),
                             ),
                             const Text('Male'),
                           ]),
@@ -1279,7 +1323,10 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                             Radio<String>(
                               value: 'female',
                               groupValue: tempGender,
-                              onChanged: (v) => setModalState(() => tempGender = v!),
+                              onChanged: (v) => setModalState(() {
+                                tempGender = v!;
+                                genderError = null;
+                              }),
                             ),
                             const Text('Female'),
                           ]),
@@ -1287,19 +1334,22 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                             Radio<String>(
                               value: 'other',
                               groupValue: tempGender,
-                              onChanged: (v) => setModalState(() => tempGender = v!),
+                              onChanged: (v) => setModalState(() {
+                                tempGender = v!;
+                                genderError = null;
+                              }),
                             ),
                             const Text('Other'),
                           ]),
                         ],
                       ),
 
-                      if (errorMessage != null) // Show error message inline
+                      if (genderError != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.only(top: 4, left: 12),
                           child: Text(
-                            errorMessage!,
-                            style: TextStyle(color: Colors.red, fontSize: 12),
+                            genderError!,
+                            style: const TextStyle(color: Colors.red, fontSize: 12),
                           ),
                         ),
                       const SizedBox(height: 20),
@@ -1307,44 +1357,61 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text("Save", style: TextStyle(color: Colors.white)),
                         onPressed: () async {
+                          // Validate Full Name
                           final fullNamee = nameController.text.trim();
-                          final ageText = ageController.text.trim();
-
-                          // Check if full name is empty
                           if (fullNamee.isEmpty) {
-                            setModalState(() => errorMessage = "Full name cannot be empty");
+                            setModalState(() => nameError = "Full name cannot be empty");
                             return;
                           }
 
-                          // Check if full name has at least 3 words
-                          final nameWords = fullNamee.split(' ').where((word) => word.isNotEmpty).toList();
-                          if (nameWords.length < 3) {
-                            setModalState(() => errorMessage = "Full name must contain at least 3 words");
+                          if (fullNamee.length < 3) {
+                            setModalState(() => nameError = "Full name must contain at least 3 words");
+                            return;
+                          }
+                          if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(fullNamee)) {
+                            setModalState(() => nameError = "Full name can only contain letters and spaces");
                             return;
                           }
 
-                          // Check if age is empty
+                          // Validate Age
+                          final ageText = ageController.text.trim();
                           if (ageText.isEmpty) {
-                            setModalState(() => errorMessage = "Age cannot be empty");
+                            setModalState(() => ageError = "Age cannot be empty");
                             return;
                           }
-
-                          // Check if age is a valid number and not negative
                           final ageValue = int.tryParse(ageText);
-                          if (ageValue == null || ageValue < 0) {
-                            setModalState(() => errorMessage = "Please enter a valid age");
+                          if (ageValue == null) {
+                            setModalState(() => ageError = "Please enter a valid number");
                             return;
                           }
-
-                          // Check if age is 18 or above
                           if (ageValue < 18) {
-                            setModalState(() => errorMessage = "Age must be 18 or above");
+                            setModalState(() => ageError = "Age must be 18 or above");
+                            return;
+                          }
+                          if (ageValue > 120) {
+                            setModalState(() => ageError = "Age seems unrealistic");
                             return;
                           }
 
-                          // Clear error message if validation passes
-                          setModalState(() => errorMessage = null);
+                          // Validate Gender
+                          if (tempGender == null || tempGender.isEmpty) {
+                            setModalState(() => genderError = "Please select a gender");
+                            return;
+                          }
 
+                          // If all validations pass, proceed with save
+                          setState(() {
+                            fullName = fullNamee;
+                            age = ageText;
+                            gender = tempGender;
+                            selectedGender = tempGender;
+                          });
+
+                          await _uploadCombinedProfileData(
+                            fullNamee,
+                            aboutUs ?? '',
+                            null,
+                          );
                           // If validation passes, proceed with save
                           Navigator.pop(bottomSheetContext);
                           // UI state update
