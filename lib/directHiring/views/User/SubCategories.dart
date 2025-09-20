@@ -378,6 +378,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/userModel/subCategoriesModel.dart';
@@ -462,9 +463,12 @@ class _SubCategoriesState extends State<SubCategories> {
     final token = prefs.getString('token');
 
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please login first")),
+       CustomSnackBar.show(
+          context,
+          message: "Please login first",
+          type: SnackBarType.error
       );
+
       return;
     }
 
@@ -504,22 +508,32 @@ class _SubCategoriesState extends State<SubCategories> {
             ),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No providers found.")),
+
+          CustomSnackBar.show(
+              context,
+              message:"No providers found." ,
+              type: SnackBarType.error
           );
+
         }
       } else {
         final err = json.decode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error ${response.statusCode}: ${err['message']}"),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: "Error ${response.statusCode}: ${err['message']}",
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+
+      CustomSnackBar.show(
+          context,
+          message:"Something went wrong",
+          type: SnackBarType.error
       );
+
     }
   }
 

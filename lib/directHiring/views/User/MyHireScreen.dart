@@ -1249,6 +1249,7 @@ import '../../../Emergency/User/models/emergency_list_model.dart';
 import '../../../Emergency/utils/map_launcher_lat_long.dart';
 import '../../../Emergency/utils/snack_bar_helper.dart';
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
@@ -1411,15 +1412,21 @@ class _MyHireScreenState extends State<MyHireScreen> {
       } else {
         print("❌ API Error Status: ${res.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error ${res.statusCode}")));
+          CustomSnackBar.show(
+              context,
+              message: "Error ${res.statusCode},Something went wrong",
+              type: SnackBarType.error
+          );
         }
       }
     } catch (e) {
       print("❌ API Exception: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+        CustomSnackBar.show(
+            context,
+            message: "Error: Something went wrong",
+            type: SnackBarType.error
+        );
       }
     } finally {
       setState(() => isLoading = false);
@@ -2709,7 +2716,13 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           // bool success=await MapLauncher.openMap(address: address);
                           bool success=await MapLauncher.openMap(address: address,latitude: data.latitude,longitude: data.longitude);
                           if(!success) {
-                            SnackBarHelper.showSnackBar(context, "Could not open the map");
+                            // SnackBarHelper.showSnackBar(context, "Could not open the map");
+                            CustomSnackBar.show(
+                                context,
+                                message: "Could not open the map",
+                                type: SnackBarType.error
+                            );
+
                           }
                         },
                         child: InkWell(

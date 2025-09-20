@@ -225,8 +225,11 @@ class _HireScreenState extends State<HireScreen> {
         if (selectedImages.length + pickedList.length <= 5) {
           selectedImages.addAll(pickedList);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Maximum 5 images allowed")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Maximum 5 images allowed",
+              type: SnackBarType.error
           );
         }
       });
@@ -241,15 +244,19 @@ class _HireScreenState extends State<HireScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Location permission denied")),
+         CustomSnackBar.show(
+              context,
+              message: "Location permission denied",
+              type: SnackBarType.error
           );
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Location permission permanently denied")),
+              CustomSnackBar.show(
+            context,
+            message: "Location permission permanently denied",
+            type: SnackBarType.error
         );
         return;
       }
@@ -284,15 +291,20 @@ class _HireScreenState extends State<HireScreen> {
           addressController.text = address;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Unable to fetch address")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Unable to fetch address",
+            type: SnackBarType.error
         );
       }
     } catch (e) {
       print("❗ Error fetching location: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        // SnackBar(content: Text("Error fetching location: $e")),
-        SnackBar(content: Text("Error fetching location: ")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Error fetching location: ",
+          type: SnackBarType.error
       );
     }
   }
@@ -523,8 +535,11 @@ class _HireScreenState extends State<HireScreen> {
     final token = prefs.getString('token');
 
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in')),
+
+      CustomSnackBar.show(
+          context,
+          message:'User not logged in' ,
+          type: SnackBarType.warning
       );
       return;
     }
@@ -611,14 +626,19 @@ final orderId=decoded["order"]["_id"];
         }
       } else {
         print("❌ Error Response: $respStr");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: $respStr')),
+
+        CustomSnackBar.show(
+            context,
+            message:'Failed: $respStr' ,
+            type: SnackBarType.error
         );
       }
     } catch (e) {
       print("❗ Exception: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+      CustomSnackBar.show(
+          context,
+          message: "Something went wrong.",
+          type: SnackBarType.error
       );
     }
     finally{

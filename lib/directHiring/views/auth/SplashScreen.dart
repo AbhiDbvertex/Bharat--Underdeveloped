@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/Bottombar.dart';
 import '../../../Widgets/CustomLogoWidget.dart';
+import '../../../utility/network_dialog_manager.dart';
 import 'LoginScreen.dart';
 import 'OnboardingScreen.dart';
 import 'RoleSelectionScreen.dart';
@@ -45,6 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(seconds: 5), () async {
       await _navigateToNextScreen();
     });
+    AutomaticNoConnectionDialog.startListening();
   }
 
   /// ✅ Core navigation logic after splash screen

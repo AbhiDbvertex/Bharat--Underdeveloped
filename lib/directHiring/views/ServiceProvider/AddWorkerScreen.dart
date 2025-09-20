@@ -673,7 +673,8 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                 _buildFormField(
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
-                        RegExp(r'[a-z,/.0-9A-Z]')),
+                      RegExp(r"[a-zA-Z0-9\s,./#()-]"),
+                    ),
                   ],
                   controller: controller.addressController,
                   hint: 'Enter address',

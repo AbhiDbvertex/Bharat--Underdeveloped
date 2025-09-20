@@ -2752,6 +2752,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
+import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../ServiceProvider/ServiceDisputeScreen.dart';
@@ -2830,21 +2831,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Payment failed: ${response.message}"),
-        duration: const Duration(seconds: 3),
-      ),
+
+    CustomSnackBar.show(
+        context,
+        message: "Payment failed: ${response.message}",
+        type: SnackBarType.error
     );
+
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("External wallet selected: ${response.walletName}"),
-        duration: const Duration(seconds: 3),
-      ),
+
+    CustomSnackBar.show(
+        context,
+        message: "External wallet selected: ${response.walletName}",
+        type: SnackBarType.info
     );
+
   }
 
   Future<String?> _getUserId() async {
@@ -2919,21 +2922,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
         );
       } else {
         print("Abhi:- else direct-hire Mark as Complete error :- ${response.body}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to mark as complete: ${response.body}"),
-            duration: const Duration(seconds: 3),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: "Failed to mark as complete: ${response.body}",
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print("Abhi:- Exception Mark as Complete direct-hire : - $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error marking as complete: $e"),
-          duration: const Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message: "Error marking as complete: $e",
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -2959,30 +2964,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postPaymentRequest response : ${response.body}");
         print("Abhi:- postPaymentRequest statuscode : ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(responseData['message'] ?? "Payment request successful"),
-            duration: const Duration(seconds: 3),
-          ),
+
+
+        CustomSnackBar.show(
+            context,
+            message:responseData['message'] != null ? "Payment release request has been successfully sent to the admin.": "Payment request successful" ,
+            type: SnackBarType.success
         );
+
       } else {
         print("Abhi:- else postPaymentRequest response : ${response.body}");
         print("Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(responseData['message'] ?? "Payment request failed"),
-            duration: const Duration(seconds: 3),
-          ),
+        CustomSnackBar.show(
+            context,
+            message:responseData['message'] ?? "Payment request failed" ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print("Abhi:- postPaymentRequest Exception $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error in payment request: $e"),
-          duration: const Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message: "Error in payment request: $e",
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -3451,23 +3459,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             try {
                               _razorpay.open(options);
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Razorpay error: $e"),
-                                  duration: const Duration(seconds: 3),
-                                ),
+
+                              CustomSnackBar.show(
+                                  context,
+                                  message: "Razorpay error: $e",
+                                  type: SnackBarType.error
                               );
+
                             }
                           } else {
                             submitPayment();
                           }
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Please enter a valid description and amount"),
-                              duration: Duration(seconds: 3),
-                            ),
+
+                          CustomSnackBar.show(
+                              context,
+                              message:"Please enter a valid description and amount" ,
+                              type: SnackBarType.error
                           );
+
                         }
                       },
                       child: const Text(
@@ -3511,23 +3521,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Token not found"),
-          duration: Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message:"Token not found" ,
+          type: SnackBarType.warning
       );
+
+
       return;
     }
 
     double baseAmount = double.tryParse(_amount) ?? 0;
     if (baseAmount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter a valid amount"),
-          duration: Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message:"Please enter a valid amount" ,
+          type: SnackBarType.error
       );
+
       return;
     }
 
@@ -3581,37 +3594,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Payment stage added successfully"),
-              duration: Duration(seconds: 3),
-            ),
+
+          CustomSnackBar.show(
+              context,
+              message: "Payment stage added successfully",
+              type: SnackBarType.success
           );
+
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Invalid response structure"),
-              duration: Duration(seconds: 3),
-            ),
+
+          CustomSnackBar.show(
+              context,
+              message:"Invalid response structure" ,
+              type: SnackBarType.error
           );
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            duration: const Duration(seconds: 3),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: errorMessage,
+            type: SnackBarType.error
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error occurred: $e"),
-          duration: const Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message:"Error occurred" ,
+          type: SnackBarType.error
       );
+
       print("Abhi:- submitPayment Exception: $e");
     }
   }
@@ -3625,23 +3640,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Token not found"),
-          duration: Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message: "Token not found",
+          type: SnackBarType.warning
       );
       return;
     }
 
     double baseAmount = double.tryParse(_amount) ?? 0;
     if (baseAmount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Invalid amount"),
-          duration: Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message: "Invalid amount",
+          type: SnackBarType.error
       );
+
+
       return;
     }
 
@@ -3695,39 +3712,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Payment completed successfully"),
-              duration: Duration(seconds: 3),
-            ),
+          CustomSnackBar.show(
+              context,
+              message:"Payment completed successfully" ,
+              type: SnackBarType.success
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Invalid response structure"),
-              duration: Duration(seconds: 3),
-            ),
+          CustomSnackBar.show(
+              context,
+              message:"Invalid response structure" ,
+              type: SnackBarType.error
           );
+
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment update failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            duration: const Duration(seconds: 3),
-          ),
+              CustomSnackBar.show(
+            context,
+            message: errorMessage,
+            type: SnackBarType.error
         );
+
         print("Abhi:- payment screen get Exception ${responseData['message']}");
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          duration: const Duration(seconds: 3),
-        ),
+          CustomSnackBar.show(
+          context,
+          message: "Something went wrong",
+          type: SnackBarType.error
       );
+
       print("Abhi:- payment screen get Exception $e");
     }
   }

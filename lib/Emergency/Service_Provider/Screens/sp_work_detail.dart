@@ -465,6 +465,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../User/screens/request_accepted_section.dart';
 import '../../User/screens/task_view.dart';
 import '../../utils/map_launcher_lat_long.dart';
@@ -727,7 +728,13 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               // bool success=await MapLauncher.openMap(address: address);
                               bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
                               if(!success) {
-                                SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                // SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                CustomSnackBar.show(
+                                    context,
+                                    message:  "Could not open the map",
+                                    type: SnackBarType.error
+                                );
+
                               }
                             },
                             child: Container(

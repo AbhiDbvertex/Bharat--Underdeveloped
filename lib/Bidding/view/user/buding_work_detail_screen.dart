@@ -1003,7 +1003,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             ? Center(
                                 child: Container(
                                   height: 35,
-                                  width: 300,
+                                  width: 250,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(color: Colors.red)),
@@ -1014,7 +1014,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                     children: [
                                       Icon(Icons.warning_amber,color: Colors.red),
                                       Text(
-                                        "The order is Cancelled",
+                                        "This order is Cancelled",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             color: Colors.red),
@@ -1027,7 +1027,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                         data?['hire_status'] == 'cancelledDispute'
                             ? Center(
                                 child: Container(
-                                  height: 35,
+                                  height: 40,
                                   width: 300,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
@@ -1039,11 +1039,15 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                     children: [
                                       Icon(Icons.warning_amber,
                                           color: Colors.red),
-                                      Text(
-                                        "The order is dispute Cancelled",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.red),
+                                      Flexible(
+                                        child: Text(
+                                          "The order has been cancelled due to a dispute.",
+                                          maxLines: 2,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1067,7 +1071,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                       Icon(Icons.check_circle_outline,
                                           color: Colors.green),
                                       Text(
-                                        "  The order has been completed",
+                                        "  This order has been completed.",
                                         style: TextStyle(
                                             color: Colors.green,
                                             fontWeight: FontWeight.w600),
