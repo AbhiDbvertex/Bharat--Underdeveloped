@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'NotificationService.dart';
 import 'chat/chatScreen.dart';
+import 'chat/chat_user_list_screen.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
 
@@ -45,14 +46,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
         theme: ThemeData(
-        useMaterial3: true,
+          useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryGreen,
     ),),
     debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
-      home: SplashScreen(),
-      // home: ChatScreen(),
+      // home: SplashScreen(),
+      home: ChatScreen(),
       // home: DragToPayScreen(),
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );
