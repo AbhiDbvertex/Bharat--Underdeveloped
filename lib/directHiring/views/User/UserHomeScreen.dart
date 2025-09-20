@@ -150,12 +150,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       });
       debugPrint("📍 Using saved or default location: $userLocation");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Authentication failed, please log in again!'),
-            duration: Duration(seconds: 2),
-          ),
+        CustomSnackBar.show(
+            context,
+            message:'Authentication failed, please log in again!' ,
+            type: SnackBarType.error
         );
+
       }
       return;
     }
@@ -256,14 +256,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           });
           debugPrint("❌ API error: ${responseData['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  responseData['message'] ?? 'Failed to fetch profile',
-                ),
-                duration: const Duration(seconds: 2),
-              ),
+
+            CustomSnackBar.show(
+                context,
+                message: responseData['message'] ?? 'Failed to fetch profile',
+                type: SnackBarType.error
             );
+
           }
         }
       } else {
@@ -273,12 +272,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to fetch profile data!'),
-              duration: Duration(seconds: 2),
-            ),
+
+          CustomSnackBar.show(
+              context,
+              message:'Failed to fetch profile data!' ,
+              type: SnackBarType.error
           );
+
         }
       }
     } catch (e) {
@@ -288,12 +288,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error fetching location: $e'),
-            duration: const Duration(seconds: 2),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message:'Error fetching location ',
+            type: SnackBarType.error
         );
+
       }
     }
   }
@@ -306,12 +307,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       debugPrint("❌ Invalid location data: $newAddress, $latitude, $longitude");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Invalid location data"),
-            duration: Duration(seconds: 2),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message:"Invalid location data" ,
+            type: SnackBarType.error
         );
+
+
       }
       return;
     }
@@ -370,12 +373,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             "📍 Saved new location and updated UI: $newAddress (ID: $newAddressId)",
           );
           if (mounted) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text("Location updated successfully: $newAddress"),
-            //     duration: const Duration(seconds: 2),
-            //   ),
-            // );
+
             CustomSnackBar.show(
                 context,
                 message:"Location updated successfully : $newAddress" ,
@@ -384,33 +382,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           }
         } else {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Location update failed: ${data['message']}"),
-                duration: const Duration(seconds: 2),
-              ),
+
+            CustomSnackBar.show(
+                context,
+                message: "Location update failed: ${data['message']}",
+                type: SnackBarType.error
             );
+
           }
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Server error, location update failed!"),
-              duration: Duration(seconds: 2),
-            ),
+
+          CustomSnackBar.show(
+              context,
+              message: "Server error, location update failed!",
+              type: SnackBarType.error
           );
+
         }
       }
     } catch (e) {
       debugPrint("❌ Error updating location: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error updating location: $e"),
-            duration: const Duration(seconds: 2),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message:"Error updating location" ,
+            type: SnackBarType.error
         );
+
       }
     }
   }
@@ -450,12 +451,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       } else {
         debugPrint("❌ Invalid location data received: $result");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Invalid location data, please try again!"),
-              duration: Duration(seconds: 2),
-            ),
+
+          CustomSnackBar.show(
+              context,
+              message: "Invalid location data, please try again!",
+              type: SnackBarType.error
           );
+
         }
       }
     }

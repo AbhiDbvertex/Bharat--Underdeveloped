@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Bidding/controller/bidding_post_task_controller.dart';
+import '../../../utility/custom_snack_bar.dart';
 
 class EmergencyScreen extends StatefulWidget {
   @override
@@ -607,10 +608,16 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
       return GestureDetector(
         onTap: () async {
           if (controller.selectedCategoryId.value.isEmpty) {
-            Get.showSnackbar(GetSnackBar(
-              message: "Select a category first",
-              duration: Duration(seconds: 2),
-            ));
+            // Get.showSnackbar(GetSnackBar(
+            //   message: "Select a category first",
+            //   duration: Duration(seconds: 2),
+            // ));
+            CustomSnackBar.show(
+                context,
+                message:  "Select a category first",
+                type: SnackBarType.error
+            );
+
             return;
           }
           // Create a temporary RxList for dialog

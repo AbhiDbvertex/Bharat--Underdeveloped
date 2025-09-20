@@ -466,6 +466,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../utils/map_launcher_lat_long.dart';
 import '../controllers/work_detail_controller.dart';
 
@@ -712,8 +713,12 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               longitude: longitude,
                               address: address);
                           if (!success) {
-                            SnackBarHelper.showSnackBar(
-                                context, "Could not open the map");
+
+                            CustomSnackBar.show(
+                                context,
+                                message:"Could not open the map" ,
+                                type: SnackBarType.error
+                            );
                           }
                         },
                         child: Container(
@@ -830,10 +835,13 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       var orderId = "${controller.orderId}";
                                       String status = await controller
                                           .cancelEmergencyOrder(orderId);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(content: Text("$status")),
+
+                                      CustomSnackBar.show(
+                                          context,
+                                          message: status,
+                                          type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
                                       );
+
 
                                       controller.isLoading.value = false;
                                       // cancel logic
@@ -888,8 +896,13 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     String status =
                                         await controller.acceptUserOrder(
                                             controller.orderId.value);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(status)));
+
+
+                                    CustomSnackBar.show(
+                                        context,
+                                        message: status,
+                                        type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
+                                    );
                                     controller.isLoading.value = false;
                                     // accept logic
                                   },
@@ -913,8 +926,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                     String status =
                                         await controller.rejectUserOrder(
                                             "6871f5b5ed31367eed8d2210");
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(status)));
+                                  CustomSnackBar.show(
+                                        context,
+                                        message: status,
+                                        type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
+                                    );
                                     controller.isLoading.value = false;
                                   },
                                   child: Text(
@@ -937,14 +953,14 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                     :  Center(
                       child: Container(
                                         height: 35,
-                                        width: 300,
+                                        width: 250,
                                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
                                         child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(Icons.warning_amber, color: Colors.red),
-                        Text("The order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                        Text("This order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
                       ],
                                         ),
                                       ),

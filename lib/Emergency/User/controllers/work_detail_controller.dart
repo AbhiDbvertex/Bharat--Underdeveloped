@@ -722,6 +722,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../models/work_detail_model.dart';
 import '../../utils/ApiUrl.dart';
 import '../../utils/logger.dart';
@@ -892,14 +893,24 @@ class WorkDetailController extends GetxController {
   // Submit Payment API call
   Future<void> submitPayment(BuildContext context) async {
     if (descriptionController.text.isEmpty || amountController.text.isEmpty) {
-      Get.snackbar('Error', 'Please enter both description and amount.');
+      CustomSnackBar.show(
+          context,
+          message: 'Error: Please enter both description and amount.',
+          type: SnackBarType.error
+      );
+
       return;
     }
 
     final enteredAmount =
         double.tryParse(amountController.text.replaceAll(',', '')) ?? 0.0;
     if (enteredAmount <= 0) {
-      Get.snackbar('Error', 'Amount must be greater than zero.');
+      CustomSnackBar.show(
+          context,
+          message: 'Error Amount must be greater than zero.',
+          type: SnackBarType.error
+      );
+
       return;
     }
     _showPaymentDialog(
@@ -1194,7 +1205,7 @@ bwDebug("final url: $url");
       }
     } catch (e) {
       bwDebug("[acceptUserOrder]⚠️ Exception: $e", tag: tag);
-      return "Exception: $e";
+      return "Something went wrong";
     } finally {
       isLoading.value = false;
     }
@@ -1237,7 +1248,7 @@ bwDebug("final url: $url");
       }
     } catch (e) {
       bwDebug("[rejectUserOrder] ⚠️ Exception: $e", tag: tag);
-      return "Exception: $e";
+      return "Something went wrong";
     } finally {
       isLoading.value = false;
     }

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../controllers/request_accepted_controller.dart';
 import '../controllers/work_detail_controller.dart';
 import '../models/request_accepted_model.dart';
@@ -513,7 +514,13 @@ final tag="RequestAcceptedSection";
 
                                       bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
                                       if(!success) {
-                                        SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                        // SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                        CustomSnackBar.show(
+                                            context,
+                                            message:"Could not open the map" ,
+                                            type: SnackBarType.error
+                                        );
+
                                       }
                                       },
                                     child: Container(

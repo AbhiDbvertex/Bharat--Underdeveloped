@@ -1392,6 +1392,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../auth/AddressDetailScreen.dart';
 
 class LocationSelectionScreen extends StatefulWidget {
@@ -1512,33 +1513,49 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           } else {
             print("Debug: API failed: ${data['message']}");
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("API failed: ${data['message'] ?? 'Unknown error'}")),
+
+              CustomSnackBar.show(
+                  context,
+                  message: "API failed: ${data['message'] ?? 'Unknown error'}",
+                  type: SnackBarType.error
               );
+
             }
           }
         } else {
           print("Debug: API server error: ${response.statusCode}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Server error: ${response.statusCode}")),
+
+            CustomSnackBar.show(
+                context,
+                message:"Server error: ${response.statusCode}" ,
+                type: SnackBarType.error
             );
+
           }
         }
       } catch (e) {
         print("Error in _loadSavedLocation: $e");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error fetching location: $e")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Error fetching location",
+              type: SnackBarType.error
           );
+
         }
       }
     } else {
       print("Debug: Token null hai ya widget mounted nahi hai.");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+
+        CustomSnackBar.show(
+            context,
+            message:"Please login first!",
+            type: SnackBarType.error
         );
+
       }
     }
   }
@@ -1601,9 +1618,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.error
         );
+
       }
       return;
     }
@@ -1640,8 +1661,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     } catch (e) {
       print("Error in fetchLocationSuggestions: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching suggestions: $e")),
+            CustomSnackBar.show(
+            context,
+            message:"Error fetching suggestions" ,
+            type: SnackBarType.error
         );
       }
     } finally {
@@ -1657,9 +1680,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+
+        CustomSnackBar.show(
+            context,
+            message:"Please login first!" ,
+            type: SnackBarType.error
         );
+
       }
       return null;
     }
@@ -1692,8 +1719,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
           if (address == null || address.isEmpty || latitude == null || longitude == null) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Invalid location data received!")),
+
+              CustomSnackBar.show(
+                  context,
+                  message: "Invalid location data received!",
+                  type: SnackBarType.error
               );
             }
             return null;
@@ -1710,8 +1740,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         } else {
           print("Debug: Location details API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+
+            CustomSnackBar.show(
+                context,
+                message: "API error: ${data['message'] ?? 'Unknown error'}",
+                type: SnackBarType.error
             );
           }
           return null;
@@ -1719,8 +1752,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       } else {
         print("Debug: Location details server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+
+          CustomSnackBar.show(
+              context,
+              message:"Server error: ${response.statusCode}" ,
+              type: SnackBarType.error
           );
         }
         return null;
@@ -1728,8 +1764,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     } catch (e) {
       print("Error in fetchLocationDetails: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching location details: $e")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Error fetching location details: $e",
+            type: SnackBarType.error
         );
       }
       return null;
@@ -1752,8 +1791,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       ) async {
     if (address.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid address or coordinates!")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Invalid address or coordinates!",
+            type: SnackBarType.error
         );
       }
       return;
@@ -1762,8 +1804,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.error
         );
       }
       return;
@@ -1842,24 +1887,33 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         } else {
           print("Debug: Update location API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+
+            CustomSnackBar.show(
+                context,
+                message:"API error: ${data['message'] ?? 'Unknown error'}" ,
+                type: SnackBarType.error
             );
           }
         }
       } else {
         print("Debug: Update location server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Server error: ${response.statusCode}",
+              type: SnackBarType.error
           );
         }
       }
     } catch (e) {
       print("Error in updateLocation: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error updating location: $e")),
+
+        CustomSnackBar.show(
+            context,
+            message:"Error updating location: $e" ,
+            type: SnackBarType.error
         );
       }
     } finally {
@@ -1875,8 +1929,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? token = await _getToken();
     if (token == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please login first!")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Please login first!",
+            type: SnackBarType.error
         );
       }
       return;
@@ -1965,32 +2022,46 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               }
               print("Debug: Address deleted, updated savedAddresses: $savedAddresses");
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(data['message'] ?? "Address deleted successfully!")),
+
+            CustomSnackBar.show(
+                context,
+                message:data['message'] ?? "Address deleted successfully!" ,
+                type: SnackBarType.success
             );
           }
         } else {
           print("Debug: Delete address API failed: ${data['message']}");
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("API error: ${data['message'] ?? 'Unknown error'}")),
+
+            CustomSnackBar.show(
+                context,
+                message: "API error: ${data['message'] ?? 'Unknown error'}",
+                type: SnackBarType.error
             );
+
           }
         }
       } else {
         print("Debug: Delete address server error: ${response.statusCode}");
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Server error: ${response.statusCode}")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Server error: ${response.statusCode}",
+              type: SnackBarType.error
           );
+
         }
       }
     } catch (e) {
       print("Error in deleteAddress: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error deleting address: $e")),
+            CustomSnackBar.show(
+            context,
+            message: "Error deleting address",
+            type: SnackBarType.error
         );
+
       }
     } finally {
       if (mounted) {
@@ -2128,15 +2199,22 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     final landmark = address['landmark']?.toString() ?? 'N/A';
 
                                     if (addressText == null || addressText.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Invalid address!")),
+                                      CustomSnackBar.show(
+                                          context,
+                                          message: "Invalid address!",
+                                          type: SnackBarType.error
                                       );
+
                                       return;
                                     }
                                     if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+
+                                      CustomSnackBar.show(
+                                          context,
+                                          message: "Invalid latitude or longitude for this address!",
+                                          type: SnackBarType.error
                                       );
+
                                       return;
                                     }
 
@@ -2179,15 +2257,24 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                 final title = address['title']?.toString() ?? 'N/A';
                                                 final landmark = address['landmark']?.toString() ?? 'N/A';
                                                 if (addressText == null || addressText.isEmpty) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Invalid address!")),
+
+                                                  CustomSnackBar.show(
+                                                      context,
+                                                      message:"Invalid address!" ,
+                                                      type: SnackBarType.error
                                                   );
+
                                                   return;
                                                 }
                                                 if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Invalid latitude or longitude for this address!")),
+
+
+                                                  CustomSnackBar.show(
+                                                      context,
+                                                      message: "Invalid latitude or longitude for this address!",
+                                                      type: SnackBarType.error
                                                   );
+
                                                   return;
                                                 }
 
@@ -2391,9 +2478,13 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                       });
                                     } else {
                                       if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text("Failed to fetch location details!")),
+
+                                        CustomSnackBar.show(
+                                            context,
+                                            message:"Failed to fetch location details!" ,
+                                            type: SnackBarType.error
                                         );
+
                                       }
                                     }
                                   },
