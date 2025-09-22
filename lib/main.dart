@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:developer/Widgets/AppColors.dart';
+import 'package:developer/testingfile.dart';
 import 'package:developer/utility/network_dialog_manager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -87,8 +88,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     ),),
     debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
-      // home: SplashScreen(),
-      home: ChatScreen(),
+      home: SplashScreen(),
+      // home: ChatScreen(),
       // home: DragToPayScreen(),
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );

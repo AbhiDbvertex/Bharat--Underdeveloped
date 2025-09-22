@@ -263,6 +263,7 @@ class AutomaticNoConnectionDialog {
   /// Stop listening and clean up
   static void dispose() {
     bwDebug('Disposing AutomaticNoConnectionDialog', tag: "InternetCheck");
+    bwDebug('same method can have defrent mining in defrent class', tag: "InternetCheck");
     _listener?.cancel();
     _dismissDialog();
     _pendingStatus = null;
@@ -289,6 +290,7 @@ class AutomaticNoConnectionDialog {
   static void _showNoInternetDialog(BuildContext context) {
     if (_isDialogShowing) return; // already showing
     bwDebug("Showing no internet dialog", tag: "InternetCheck");
+    bwDebug("Showing no internet dialog", tag: "InternetCheck");
 
     _isDialogShowing = true;
 
@@ -296,7 +298,7 @@ class AutomaticNoConnectionDialog {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
-        _currentContext = dialogContext; // store dialog context for dismiss
+        _currentContext = dialogContext;
         return AlertDialog(
           backgroundColor: Colors.grey[900],
           shape: RoundedRectangleBorder(
