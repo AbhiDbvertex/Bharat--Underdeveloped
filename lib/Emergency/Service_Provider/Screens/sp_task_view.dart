@@ -670,7 +670,7 @@ class _SpTaskViewState extends State<SpTaskView> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text(
-                'Cancel Task and Create Dispute',
+                'Cancel Task and create dispute',
                 style: TextStyle(color: Colors.white),
               ),
             ),

@@ -122,11 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context, isLoading, _) {
                             return CustomButton(
                               label: 'Send OTP',
-                              onPressed: () async {
-                                controller.login(context);
-                                if(!mounted)return;
-
-                              },
+                              onPressed: () => controller.login(context),
                               isLoading: isLoading,
                               enabled: !isLoading,
                             );

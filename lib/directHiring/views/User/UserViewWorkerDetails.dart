@@ -1787,7 +1787,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
     }
 
     return Scaffold(
-      // backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Color(0xFF9DF89D),

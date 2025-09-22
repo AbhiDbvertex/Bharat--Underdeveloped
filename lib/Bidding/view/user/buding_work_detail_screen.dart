@@ -618,19 +618,19 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     print(
         "Abhi:- buddingOderId is worker name: ${data?['assignedWorker']?['name']}");
 
-    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    //   systemNavigationBarColor: Colors.green.shade700, // navigation bar color
-    //   statusBarColor: Colors.green.shade700, // status bar color
-    //   statusBarIconBrightness: Brightness.light, // status bar icons' color
-    //   systemNavigationBarIconBrightness:
-    //       Brightness.light, //navigation bar icons' color
-    // ));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.green.shade700, // navigation bar color
+      statusBarColor: Colors.green.shade700, // status bar color
+      statusBarIconBrightness: Brightness.light, // status bar icons' color
+      systemNavigationBarIconBrightness:
+          Brightness.light, //navigation bar icons' color
+    ));
 
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
       },
-
+      child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -645,1039 +645,1027 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
               statusBarIconBrightness: Brightness.light,
             ),
           ),
-          // backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Container(
-              width: width,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                        //  const SizedBox(height: 10),
-                          // Row(
-                          //   children: [
-                          //     GestureDetector(
-                          //       onTap: () => Navigator.pop(context),
-                          //       child: const Padding(
-                          //         padding: EdgeInsets.only(left: 15.0),
-                          //         child:
-                          //             Icon(Icons.arrow_back_outlined, size: 22),
-                          //       ),
-                          //     ),
-                          //     const SizedBox(width: 90),
-                          //     Text(
-                          //       'Worker details',
-                          //       style: GoogleFonts.poppins(
-                          //         fontSize: 18,
-                          //         fontWeight: FontWeight.bold,
-                          //         color: AppColors.black,
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                        //  SizedBox(height: height * 0.01),
-                          Container(color: Colors.grey,
-                            child: CarouselSlider(
-                              options: CarouselOptions(
-                                height: height * 0.25,
-                                enlargeCenterPage: true,
-                                autoPlay: imageUrls.isNotEmpty,
-                                viewportFraction: 0.85,
-                              ),
-                              items: imageUrls.isNotEmpty
-                                  ? imageUrls
-                                      .map((url) => Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              image: DecorationImage(
-                                                image: NetworkImage(url.trim()),
-                                                // fit: BoxFit.cover,
-                                                onError: (exception, stackTrace) =>
-                                                    Image.asset(
-                                                  'assets/images/Bid.png',
-                                                  fit: BoxFit.cover,
-                                                ),
+          backgroundColor: Colors.white,
+          body: Container(
+            width: width,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                      //  const SizedBox(height: 10),
+                        // Row(
+                        //   children: [
+                        //     GestureDetector(
+                        //       onTap: () => Navigator.pop(context),
+                        //       child: const Padding(
+                        //         padding: EdgeInsets.only(left: 15.0),
+                        //         child:
+                        //             Icon(Icons.arrow_back_outlined, size: 22),
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 90),
+                        //     Text(
+                        //       'Worker details',
+                        //       style: GoogleFonts.poppins(
+                        //         fontSize: 18,
+                        //         fontWeight: FontWeight.bold,
+                        //         color: AppColors.black,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                      //  SizedBox(height: height * 0.01),
+                        Container(color: Colors.grey,
+                          child: CarouselSlider(
+                            options: CarouselOptions(
+                              height: height * 0.25,
+                              enlargeCenterPage: true,
+                              autoPlay: imageUrls.isNotEmpty,
+                              viewportFraction: 0.85,
+                            ),
+                            items: imageUrls.isNotEmpty
+                                ? imageUrls
+                                    .map((url) => Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            image: DecorationImage(
+                                              image: NetworkImage(url.trim()),
+                                              // fit: BoxFit.cover,
+                                              onError: (exception, stackTrace) =>
+                                                  Image.asset(
+                                                'assets/images/Bid.png',
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
-                                          ))
-                                      .toList()
-                                  : [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          image: const DecorationImage(
-                                            image:
-                                                AssetImage('assets/images/Bid.png'),
-                                            fit: BoxFit.cover,
                                           ),
+                                        ))
+                                    .toList()
+                                : [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        image: const DecorationImage(
+                                          image:
+                                              AssetImage('assets/images/Bid.png'),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                          ),
+                        ),
+                        SizedBox(height: height * 0.015),
+                        Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: width * 0.05),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => MapScreen(
+                                      //       latitude: data?['user_id']?['location']
+                                      //               ?['latitude'] ??
+                                      //           'N/A',
+                                      //       longitude: data?['user_id']?['location']
+                                      //               ?['longitude'] ??
+                                      //           'N/A',
+                                      //     ),
+                                      //   ),
+                                      // );
+
+                                        openMap(data?['latitude'] ?? 0.0,
+                                            data?['longitude'] ?? 0.0);
+
+                                      print(
+                                          "Abhi:- get oder Details lat for bidding : ${data?['latitude'] ?? 0.0} long : ${data?['longitude'] ?? 0.0} address ${data?['address'] ?? ""}");
+                                    },
+                                    child: Container(
+                                      height: MediaQuery.of(context).size.height *
+                                          0.025,
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.28,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade300,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(3.0),
+                                          child: Text(
+                                            // address.split(',').last.trim(),
+                                            // data?['user_id']?['location']
+                                            // ?['address'] ??
+                                            //     'N/A',
+                                            data?['address'] ?? "",
+                                            style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  MediaQuery.of(context).size.width *
+                                                      0.03,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                                    child: Center(child: Text(data?['project_id'] ?? "",style: TextStyle(color: Colors.white), maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,)),)
+                                ],
+                              ),
+
+                              SizedBox(height: height * 0.005),
+                              Text(
+                                address,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
+                              SizedBox(height: height * 0.002),
+                              Text(
+                                "Completion  - $deadline",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                              SizedBox(height: height * 0.002),
+                              Text(
+                                "Title - $title",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: height * 0.005),
+                              Text(
+                                "₹$cost",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: height * 0.02),
+                        Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: width * 0.05),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Task Details",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: height * 0.01),
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.circle, size: 6),
+                                      SizedBox(width: width * 0.02),
+                                      Expanded(
+                                        child: Text(
+                                          "Description: $description",
+                                          style: const TextStyle(fontSize: 14),
                                         ),
                                       ),
                                     ],
-                            ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          SizedBox(height: height * 0.015),
-                          Padding(
-                            padding:
-                                EdgeInsets.symmetric(horizontal: width * 0.05),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) => MapScreen(
-                                        //       latitude: data?['user_id']?['location']
-                                        //               ?['latitude'] ??
-                                        //           'N/A',
-                                        //       longitude: data?['user_id']?['location']
-                                        //               ?['longitude'] ??
-                                        //           'N/A',
-                                        //     ),
-                                        //   ),
-                                        // );
-            
-                                          openMap(data?['latitude'] ?? 0.0,
-                                              data?['longitude'] ?? 0.0);
-            
-                                        print(
-                                            "Abhi:- get oder Details lat for bidding : ${data?['latitude'] ?? 0.0} long : ${data?['longitude'] ?? 0.0} address ${data?['address'] ?? ""}");
-                                      },
-                                      child: Container(
-                                        height: MediaQuery.of(context).size.height *
-                                            0.025,
-                                        width:
-                                            MediaQuery.of(context).size.width * 0.28,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.shade300,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(3.0),
-                                            child: Text(
-                                              // address.split(',').last.trim(),
-                                              // data?['user_id']?['location']
-                                              // ?['address'] ??
-                                              //     'N/A',
-                                              data?['address'] ?? "",
-                                              style: GoogleFonts.roboto(
-                                                color: Colors.white,
-                                                fontSize:
-                                                    MediaQuery.of(context).size.width *
-                                                        0.03,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
+                        ),
+                        data?['hire_status'] == 'accepted'
+                            ? SizedBox(
+                                height: height * 0.03,
+                              )
+                            : SizedBox(),
+                        //             This is accepted time show this fileds
+                        data?['hire_status'] == 'accepted'
+                            ? Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                elevation: 3,
+                                child: Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Profile Image
+                                      CircleAvatar(
+                                        radius: height * 0.05,
+                                        backgroundImage: data?[
+                                                        'service_provider_id']
+                                                    ?['profile_pic'] !=
+                                                null
+                                            ? NetworkImage(
+                                                data!['service_provider_id']![
+                                                    'profile_pic'])
+                                            : null,
+                                        child: data?['service_provider_id']
+                                                    ?['profile_pic'] ==
+                                                null
+                                            ? Icon(Icons.person,
+                                                size: height * 0.05)
+                                            : null,
+                                      ),
+                                      SizedBox(width: 12),
+
+                                      // Details + Actions
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Name + Message icon
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    data?['service_provider_id']
+                                                    ?['full_name'] ?? "No data",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                CircleAvatar(
+                                                  radius: 15,
+                                                  backgroundColor: Colors.grey.shade200,
+                                                  child: Icon(
+                                                    Icons.message,
+                                                    size: 18,
+                                                    color: Colors.green.shade600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
+                                            SizedBox(height: 6),
+                                            // Phone + Call icon
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  data?['service_provider_id']?['phone'] ?? "No data",
+                                                  style: TextStyle(fontSize: 14,
+                                                      color: Colors.grey[700]),
+                                                ),
+                                                CircleAvatar(
+                                                  radius: 15,
+                                                  backgroundColor: Colors.grey.shade200,
+                                                  child: Icon(
+                                                    Icons.call,
+                                                    size: 18,
+                                                    color: Colors.green.shade600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 8),
+
+                                            // View profile link
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          UserViewWorkerDetails(
+                                                        workerId: data?['service_provider_id']?['_id'],
+                                                        hirebuttonhide: "hide",
+                                                        UserId: widget.userId,
+                                                        hideonly: "hideOnly",
+                                                        // oderId: OderId,
+                                                        // biddingOfferId: biddingofferId,
+                                                      ),
+                                                    ));
+                                              },
+                                              child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                  "View profile",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.green,
+                                                    //decoration: TextDecoration.underline,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-                                      child: Center(child: Text(data?['project_id'] ?? "",style: TextStyle(color: Colors.white), maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,)),)
-                                  ],
-                                ),
-            
-                                SizedBox(height: height * 0.005),
-                                Text(
-                                  address,
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black),
-                                ),
-                                SizedBox(height: height * 0.002),
-                                Text(
-                                  "Completion Date   - $deadline",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey.shade500,
+                                    ],
                                   ),
                                 ),
-                                SizedBox(height: height * 0.002),
-                                Text(
-                                  "Title - $title",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                              )
+                            : SizedBox(),
+
+                        //   This is show all status according filed
+
+                        SizedBox(
+                          height: 15,
+                        ),
+
+                        data?['hire_status'] == 'cancelled'
+                            ? Center(
+                                child: Container(
+                                  height: 35,
+                                  width: 250,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.red)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.warning_amber,color: Colors.red),
+                                      Text(
+                                        "This order is Cancelled",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.red),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(height: height * 0.005),
-                                Text(
-                                  "₹$cost",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green.shade700,
+                              )
+                            : SizedBox(),
+                        data?['hire_status'] == 'cancelledDispute'
+                            ? Center(
+                                child: Container(
+                                  height: 40,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.red)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.warning_amber,
+                                          color: Colors.red),
+                                      Flexible(
+                                        child: Text(
+                                          "The order has been cancelled due to a dispute.",
+                                          maxLines: 2,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: height * 0.02),
-                          Padding(
-                            padding:
-                                EdgeInsets.symmetric(horizontal: width * 0.05),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Task Details",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                              )
+                            : SizedBox(),
+
+                        data?['hire_status'] == 'completed'
+                            ? Center(
+                                child: Container(
+                                  height: 35,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.green)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.check_circle_outline,
+                                          color: Colors.green),
+                                      Text(
+                                        "  This order has been completed.",
+                                        style: TextStyle(
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(height: height * 0.01),
-                                Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.circle, size: 6),
-                                        SizedBox(width: width * 0.02),
-                                        Expanded(
-                                          child: Text(
-                                            "Description: $description",
-                                            style: const TextStyle(fontSize: 14),
+                              )
+                            : SizedBox(),
+                        data?['hire_status'] == 'rejected'
+                            ? Center(
+                                child: Container(
+                                  height: 35,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.grey)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.block, color: Colors.grey),
+                                      Text("The order is rejected"),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+                        data?['hire_status'] == 'accepted'
+                            ? const SizedBox(height: 20)
+                            : SizedBox(),
+
+                        data?['hire_status'] == 'accepted' &&
+                                assignedWorker?['name'] != null
+                            ? Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                elevation: 3,
+                                child: Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Assigned Person",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Profile Image
+                                          CircleAvatar(
+                                            radius: MediaQuery.of(context).size.height * 0.05,
+                                            backgroundImage: assignedWorker?['image'] != null ? NetworkImage(assignedWorker?['image']) : null,
+                                            child: assignedWorker?['image'] == null
+                                                ? Icon(Icons.person, size: MediaQuery.of(context).size.height * 0.05) : null,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          data?['hire_status'] == 'accepted'
-                              ? SizedBox(
-                                  height: height * 0.03,
-                                )
-                              : SizedBox(),
-                          //             This is accepted time show this fileds
-                          data?['hire_status'] == 'accepted'
-                              ? Card(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  elevation: 3,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(12),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Profile Image
-                                        CircleAvatar(
-                                          radius: height * 0.05,
-                                          backgroundImage: data?[
-                                                          'service_provider_id']
-                                                      ?['profile_pic'] !=
-                                                  null
-                                              ? NetworkImage(
-                                                  data!['service_provider_id']![
-                                                      'profile_pic'])
-                                              : null,
-                                          child: data?['service_provider_id']
-                                                      ?['profile_pic'] ==
-                                                  null
-                                              ? Icon(Icons.person,
-                                                  size: height * 0.05)
-                                              : null,
-                                        ),
-                                        SizedBox(width: 12),
-            
-                                        // Details + Actions
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              // Name + Message icon
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      data?['service_provider_id']
-                                                      ?['full_name'] ?? "No data",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold,
+                                          SizedBox(width: 12),
+                                          // Details + Actions
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Name + Message icon
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        assignedWorker?['name'] ?? "No name",
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
                                                       ),
-                                                      overflow: TextOverflow.ellipsis,
                                                     ),
-                                                  ),
-                                                  CircleAvatar(
-                                                    radius: 15,
-                                                    backgroundColor: Colors.grey.shade200,
-                                                    child: Icon(
-                                                      Icons.message,
-                                                      size: 18,
-                                                      color: Colors.green.shade600,
+                                                  ],
+                                                ),
+                                                SizedBox(height: 6),
+                                                // Phone + Call icon
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      assignedWorker?['phone'] ?? "No phone",
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          color:
+                                                              Colors.grey[700]),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 6),
-                                              // Phone + Call icon
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    data?['service_provider_id']?['phone'] ?? "No data",
-                                                    style: TextStyle(fontSize: 14,
-                                                        color: Colors.grey[700]),
-                                                  ),
-                                                  CircleAvatar(
-                                                    radius: 15,
-                                                    backgroundColor: Colors.grey.shade200,
-                                                    child: Icon(
-                                                      Icons.call,
-                                                      size: 18,
-                                                      color: Colors.green.shade600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 8),
-            
-                                              // View profile link
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
+                                                  ],
+                                                ),
+                                                SizedBox(height: 8),
+                                                // View profile link
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            UserViewWorkerDetails(
-                                                          workerId: data?['service_provider_id']?['_id'],
-                                                          hirebuttonhide: "hide",
-                                                          UserId: widget.userId,
-                                                          hideonly: "hideOnly",
-                                                          // oderId: OderId,
-                                                          // biddingOfferId: biddingofferId,
+                                                            WorkerListViewProfileScreen(
+                                                          workerId:
+                                                              assignedWorker?[
+                                                                  '_id'],
+                                                          // hirebuttonhide: "hide",
+                                                          // userId: widget.userId,
+                                                          // UserId: widget.userId,
                                                         ),
-                                                      ));
-                                                },
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: Text(
-                                                    "View profile",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Colors.green,
-                                                      //decoration: TextDecoration.underline,
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                WorkerListViewProfileScreen(
+                                                              workerId:
+                                                                  assignedWorker?[
+                                                                      '_id'],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        height: 29,
+                                                        width: 100,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color: Colors
+                                                              .green.shade700,
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "View profile",
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+
+                        SizedBox(height: height * 0.02),
+                        data?['hire_status'] == 'pending'
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                     /* onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PostTaskEditScreen(
+                                                  title: data?['title'],
+                                                    description: data?['description'],
+                                                    category:  data?['category_id']?['name'],
+                                                    location:  data?['google_address'],
+                                                    selectDeadline:  data?['deadline'],
+                                                    // subcategory:  data?['sub_category_ids']?['sub_category_ids'],
+                                                    cost:  data?['cost'],
+                                                    biddingOderId: widget.buddingOderId),
+                                          ),
+                                        );
+                                      },*/
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PostTaskEditScreen(
+                                              title: data?['title']?.toString(), // "Chair repair"
+                                              description: data?['description']?.toString(), // "Welcome to Gboard clipboard..."
+                                              category: data?['category_id']?['_id']?.toString(), // "68936066cff3b791084d288e"
+                                              location: data?['google_address']?.toString(), // "8, Indore, Madhya Pradesh, India"
+                                              selectDeadline: data?['deadline']?.toString(), // "2025-08-30T00:00:00.000Z"
+                                              subcategory: data?['sub_category_ids'] != null
+                                                  ? (data['sub_category_ids'] as List).map((sub) => sub['_id'].toString()).toList() // ["689453bbe57505b551542c3b"]
+                                                  : [],
+                                              cost: data?['cost']?.toString(), // "5000"
+                                              biddingOderId: widget.buddingOderId?.toString() ?? data?['_id']?.toString(), // "68b1af1ff77872fc186ad308"
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: height * 0.045,
+                                        width: width * 0.40,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.green.shade700,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.edit,
+                                                  color: AppColors.primaryGreen,
+                                                  size: height * 0.024),
+                                              SizedBox(width: width * 0.03),
+                                              Text(
+                                                "Edit",
+                                                style: TextStyle(
+                                                  color: Colors.green.shade700,
+                                                  fontSize: width * 0.045,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                )
-                              : SizedBox(),
-            
-                          //   This is show all status according filed
-            
-                          SizedBox(
-                            height: 15,
-                          ),
-            
-                          data?['hire_status'] == 'cancelled'
-                              ? Center(
-                                  child: Container(
-                                    height: 35,
-                                    width: 250,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.red)),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.warning_amber,color: Colors.red),
-                                        Text(
-                                          "This order is cancelled",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.red),
+                                    InkWell(
+                                      onTap: () async {
+                                        await cancelTask();
+                                        Get.back(result: true);
+                                      },
+                                      child: Container(
+                                        height: height * 0.045,
+                                        width: width * 0.40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
-                          data?['hire_status'] == 'cancelledDispute'
-                              ? Center(
-                                  child: Container(
-                                    height: 40,
-                                    width: 300,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.red)),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.warning_amber,
-                                            color: Colors.red),
-                                        Flexible(
-                                          child: Text(
-                                            "The order has been cancelled due to a dispute.",
-                                            maxLines: 2,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.red),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(
+                                                  Icons
+                                                      .cancel_presentation_rounded,
+                                                  color: Colors.white),
+                                              SizedBox(width: width * 0.02),
+                                              Text(
+                                                "Cancel Task",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: width * 0.04,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : SizedBox(),
+
+                        data?['hire_status'] == 'accepted'
+                            ? SizedBox()
+                            : SizedBox(height: height * 0.02),
+                        data?['hire_status'] == 'pending'
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05),
+                                child: Container(
+                                  height: height * 0.06,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius:
+                                        BorderRadius.circular(width * 0.03),
+                                  ),
+                                  child: TextField(
+                                    controller: _searchController,
+                                    decoration: InputDecoration(
+                                      hintText: "Search for services",
+                                      prefixIcon: const Icon(Icons.search),
+                                      suffixIcon:
+                                          _searchController.text.isNotEmpty
+                                              ? IconButton(
+                                                  icon: const Icon(Icons.clear),
+                                                  onPressed: () {
+                                                    _searchController.clear();
+                                                    _filterLists();
+                                                  },
+                                                )
+                                              : null,
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: height * 0.015,
+                                      ),
                                     ),
                                   ),
-                                )
-                              : SizedBox(),
-            
-                          data?['hire_status'] == 'completed'
-                              ? Center(
-                                  child: Container(
-                                    height: 35,
-                                    width: 300,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.green)),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                ),
+                              )
+                            : SizedBox(),
+                        data?['hire_status'] == 'pending'
+                            ? SizedBox(height: height * 0.015)
+                            : SizedBox(),
+                        data?['hire_status'] == 'pending'
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.05),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: height * 0.015),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Icon(Icons.check_circle_outline,
-                                            color: Colors.green),
-                                        Text(
-                                          "  This order has been completed.",
-                                          style: TextStyle(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
-                          data?['hire_status'] == 'rejected'
-                              ? Center(
-                                  child: Container(
-                                    height: 35,
-                                    width: 300,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey)),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.block, color: Colors.grey),
-                                        Text("The order is rejected"),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
-                          data?['hire_status'] == 'accepted'
-                              ? const SizedBox(height: 20)
-                              : SizedBox(),
-            
-                          data?['hire_status'] == 'accepted' &&
-                                  assignedWorker?['name'] != null
-                              ? Card(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  elevation: 3,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Assigned Person",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(height: 8),
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Profile Image
-                                            CircleAvatar(
-                                              radius: MediaQuery.of(context).size.height * 0.05,
-                                              backgroundImage: assignedWorker?['image'] != null ? NetworkImage(assignedWorker?['image']) : null,
-                                              child: assignedWorker?['image'] == null
-                                                  ? Icon(Icons.person, size: MediaQuery.of(context).size.height * 0.05) : null,
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              isBiddersClicked = true;
+                                              _filterLists();
+                                            });
+                                          },
+                                          child: Container(
+                                            height: height * 0.045,
+                                            width: width * 0.40,
+                                            decoration: BoxDecoration(
+                                              color: isBiddersClicked
+                                                  ? Colors.green.shade700
+                                                  : Colors.grey.shade300,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            SizedBox(width: 12),
-                                            // Details + Actions
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
-                                                  // Name + Message icon
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          assignedWorker?['name'] ?? "No name",
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
-                                                          overflow: TextOverflow.ellipsis,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 6),
-                                                  // Phone + Call icon
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        assignedWorker?['phone'] ?? "No phone",
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.grey[700]),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 8),
-                                                  // View profile link
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              WorkerListViewProfileScreen(
-                                                            workerId:
-                                                                assignedWorker?[
-                                                                    '_id'],
-                                                            // hirebuttonhide: "hide",
-                                                            // userId: widget.userId,
-                                                            // UserId: widget.userId,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  WorkerListViewProfileScreen(
-                                                                workerId:
-                                                                    assignedWorker?[
-                                                                        '_id'],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          height: 29,
-                                                          width: 100,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(8),
-                                                            color: Colors
-                                                                .green.shade700,
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              "View profile",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color:
-                                                                    Colors.white,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
+                                                  SizedBox(width: width * 0.02),
+                                                  Text(
+                                                    "Bidders",
+                                                    style: TextStyle(
+                                                      color: isBiddersClicked
+                                                          ? Colors.white
+                                                          : Colors
+                                                              .grey.shade700,
+                                                      fontSize: width * 0.05,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
-                                          ],
+                                          ),
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              isBiddersClicked = false;
+                                              final categoryId =
+                                                  getBuddingOderByIdResponseData?[
+                                                                  'data']
+                                                              ?['category_id']
+                                                          ?['_id'] ??
+                                                      '';
+                                              final subCategoryIds =
+                                                  (getBuddingOderByIdResponseData?[
+                                                                      'data']?[
+                                                                  'sub_category_ids']
+                                                              as List<dynamic>?)
+                                                          ?.map((sub) =>
+                                                              sub['_id']
+                                                                  as String)
+                                                          .toList() ??
+                                                      [];
+                                              if (categoryId.isNotEmpty &&
+                                                  subCategoryIds.isNotEmpty) {
+                                                getReletedWorker(
+                                                    categoryId, subCategoryIds);
+                                              }
+                                              _filterLists();
+                                            });
+                                          },
+                                          child: Container(
+                                            height: height * 0.045,
+                                            width: width * 0.40,
+                                            decoration: BoxDecoration(
+                                              color: !isBiddersClicked
+                                                  ? Colors.green.shade700
+                                                  : Colors.grey.shade300,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(width: width * 0.02),
+                                                  Text(
+                                                    "Related Worker",
+                                                    style: TextStyle(
+                                                      color: !isBiddersClicked
+                                                          ? Colors.white
+                                                          : Colors
+                                                              .grey.shade700,
+                                                      fontSize: width * 0.04,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                )
-                              : SizedBox(),
-            
-                          SizedBox(height: height * 0.02),
-                          data?['hire_status'] == 'pending'
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: width * 0.05),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      InkWell(
-                                       /* onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PostTaskEditScreen(
-                                                    title: data?['title'],
-                                                      description: data?['description'],
-                                                      category:  data?['category_id']?['name'],
-                                                      location:  data?['google_address'],
-                                                      selectDeadline:  data?['deadline'],
-                                                      // subcategory:  data?['sub_category_ids']?['sub_category_ids'],
-                                                      cost:  data?['cost'],
-                                                      biddingOderId: widget.buddingOderId),
-                                            ),
-                                          );
-                                        },*/
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => PostTaskEditScreen(
-                                                title: data?['title']?.toString(), // "Chair repair"
-                                                description: data?['description']?.toString(), // "Welcome to Gboard clipboard..."
-                                                category: data?['category_id']?['_id']?.toString(), // "68936066cff3b791084d288e"
-                                                location: data?['google_address']?.toString(), // "8, Indore, Madhya Pradesh, India"
-                                                selectDeadline: data?['deadline']?.toString(), // "2025-08-30T00:00:00.000Z"
-                                                subcategory: data?['sub_category_ids'] != null
-                                                    ? (data['sub_category_ids'] as List).map((sub) => sub['_id'].toString()).toList() // ["689453bbe57505b551542c3b"]
-                                                    : [],
-                                                cost: data?['cost']?.toString(), // "5000"
-                                                biddingOderId: widget.buddingOderId?.toString() ?? data?['_id']?.toString(), // "68b1af1ff77872fc186ad308"
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Container(
-                                          height: height * 0.045,
-                                          width: width * 0.40,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.green.shade700,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.edit,
-                                                    color: AppColors.primaryGreen,
-                                                    size: height * 0.024),
-                                                SizedBox(width: width * 0.03),
-                                                Text(
-                                                  "Edit",
-                                                  style: TextStyle(
-                                                    color: Colors.green.shade700,
-                                                    fontSize: width * 0.045,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          await cancelTask();
-                                          Get.back(result: true);
-                                        },
-                                        child: Container(
-                                          height: height * 0.045,
-                                          width: width * 0.40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Icon(
-                                                    Icons
-                                                        .cancel_presentation_rounded,
-                                                    color: Colors.white),
-                                                SizedBox(width: width * 0.02),
-                                                Text(
-                                                  "Cancel Task",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: width * 0.04,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : SizedBox(),
-            
-                          data?['hire_status'] == 'accepted'
-                              ? SizedBox()
-                              : SizedBox(height: height * 0.02),
-                          data?['hire_status'] == 'pending'
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: width * 0.05),
-                                  child: Container(
-                                    height: height * 0.06,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius:
-                                          BorderRadius.circular(width * 0.03),
-                                    ),
-                                    child: TextField(
-                                      controller: _searchController,
-                                      decoration: InputDecoration(
-                                        hintText: "Search for services",
-                                        prefixIcon: const Icon(Icons.search),
-                                        suffixIcon:
-                                            _searchController.text.isNotEmpty
-                                                ? IconButton(
-                                                    icon: const Icon(Icons.clear),
-                                                    onPressed: () {
-                                                      _searchController.clear();
-                                                      _filterLists();
-                                                    },
-                                                  )
-                                                : null,
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          vertical: height * 0.015,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(),
-                          data?['hire_status'] == 'pending'
-                              ? SizedBox(height: height * 0.015)
-                              : SizedBox(),
-                          data?['hire_status'] == 'pending'
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: width * 0.05),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(height: height * 0.015),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                isBiddersClicked = true;
-                                                _filterLists();
-                                              });
-                                            },
-                                            child: Container(
-                                              height: height * 0.045,
-                                              width: width * 0.40,
-                                              decoration: BoxDecoration(
-                                                color: isBiddersClicked
-                                                    ? Colors.green.shade700
-                                                    : Colors.grey.shade300,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Center(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: width * 0.02),
-                                                    Text(
-                                                      "Bidders",
-                                                      style: TextStyle(
-                                                        color: isBiddersClicked
-                                                            ? Colors.white
-                                                            : Colors
-                                                                .grey.shade700,
-                                                        fontSize: width * 0.05,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                isBiddersClicked = false;
-                                                final categoryId =
-                                                    getBuddingOderByIdResponseData?[
-                                                                    'data']
-                                                                ?['category_id']
-                                                            ?['_id'] ??
-                                                        '';
-                                                final subCategoryIds =
-                                                    (getBuddingOderByIdResponseData?[
-                                                                        'data']?[
-                                                                    'sub_category_ids']
-                                                                as List<dynamic>?)
-                                                            ?.map((sub) =>
-                                                                sub['_id']
-                                                                    as String)
-                                                            .toList() ??
-                                                        [];
-                                                if (categoryId.isNotEmpty &&
-                                                    subCategoryIds.isNotEmpty) {
-                                                  getReletedWorker(
-                                                      categoryId, subCategoryIds);
-                                                }
-                                                _filterLists();
-                                              });
-                                            },
-                                            child: Container(
-                                              height: height * 0.045,
-                                              width: width * 0.40,
-                                              decoration: BoxDecoration(
-                                                color: !isBiddersClicked
-                                                    ? Colors.green.shade700
-                                                    : Colors.grey.shade300,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Center(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: width * 0.02),
-                                                    Text(
-                                                      "Related Worker",
-                                                      style: TextStyle(
-                                                        color: !isBiddersClicked
-                                                            ? Colors.white
-                                                            : Colors
-                                                                .grey.shade700,
-                                                        fontSize: width * 0.04,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (isBiddersClicked)
-                                        Padding(
-                                            padding: EdgeInsets.only(
-                                                top: height * 0.01),
-                                            child:
-                                                getBuddingOderByIdResponseDatalist!
-                                                        .isEmpty
-                                                    ? Column(
-                                                        children: [
-                                                          Center(
-                                                            child:
-                                                                SvgPicture.asset(
-                                                              'assets/svg_images/nobidders.svg',
-                                                              height:
-                                                                  height * 0.33,
-                                                            ),
+                                    if (isBiddersClicked)
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: height * 0.01),
+                                          child:
+                                              getBuddingOderByIdResponseDatalist!
+                                                      .isEmpty
+                                                  ? Column(
+                                                      children: [
+                                                        Center(
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/svg_images/nobidders.svg',
+                                                            height:
+                                                                height * 0.33,
                                                           ),
-                                                          SizedBox(
-                                                              height:
-                                                                  height * 0.023),
-                                                          const Text(
-                                                            "No bidders found",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.grey),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.023),
+                                                        const Text(
+                                                          "No bidders found",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : ListView.builder(
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          const NeverScrollableScrollPhysics(),
+                                                      itemCount:
+                                                          getBuddingOderByIdResponseDatalist
+                                                                  ?.length ??
+                                                              0,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        final bidder =
+                                                            getBuddingOderByIdResponseDatalist?[
+                                                                index];
+                                                        final fullName = bidder?[
+                                                                        'provider_id']
+                                                                    [
+                                                                    'full_name']
+                                                                ?.toString() ??
+                                                            'N/A';
+                                                        final rating = bidder?[
+                                                                        'provider_id']
+                                                                    ['rating']
+                                                                ?.toString() ??
+                                                            '0';
+                                                        final bidderId =
+                                                            bidder?['provider_id']
+                                                                        ?['_id']
+                                                                    ?.toString() ??
+                                                                '';
+                                                        final biddingofferId =
+                                                            bidder?['_id']
+                                                                    ?.toString() ??
+                                                                '';
+                                                        final OderId = bidder?[
+                                                                    'order_id']
+                                                                ?.toString() ??
+                                                            '';
+                                                        final bidAmount = bidder?[
+                                                                'bid_amount'] ??
+                                                            '0';
+                                                        final location = bidder?[
+                                                                            'provider_id']
+                                                                        [
+                                                                        'location']
+                                                                    ['address']
+                                                                ?.toString() ??
+                                                            'N/A';
+                                                        final profilePic =
+                                                            bidder?['provider_id']
+                                                                    [
+                                                                    'profile_pic']
+                                                                ?.toString();
+
+                                                        print(
+                                                            "Abhi:- bidder id in bidder list : $bidderId");
+
+                                                        return Container(
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                            vertical:
+                                                                height * 0.01,
+                                                            horizontal:
+                                                                width * 0.01,
                                                           ),
-                                                        ],
-                                                      )
-                                                    : ListView.builder(
-                                                        shrinkWrap: true,
-                                                        physics:
-                                                            const NeverScrollableScrollPhysics(),
-                                                        itemCount:
-                                                            getBuddingOderByIdResponseDatalist
-                                                                    ?.length ??
-                                                                0,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final bidder =
-                                                              getBuddingOderByIdResponseDatalist?[
-                                                                  index];
-                                                          final fullName = bidder?[
-                                                                          'provider_id']
-                                                                      [
-                                                                      'full_name']
-                                                                  ?.toString() ??
-                                                              'N/A';
-                                                          final rating = bidder?[
-                                                                          'provider_id']
-                                                                      ['rating']
-                                                                  ?.toString() ??
-                                                              '0';
-                                                          final bidderId =
-                                                              bidder?['provider_id']
-                                                                          ?['_id']
-                                                                      ?.toString() ??
-                                                                  '';
-                                                          final biddingofferId =
-                                                              bidder?['_id']
-                                                                      ?.toString() ??
-                                                                  '';
-                                                          final OderId = bidder?[
-                                                                      'order_id']
-                                                                  ?.toString() ??
-                                                              '';
-                                                          final bidAmount = bidder?[
-                                                                  'bid_amount'] ??
-                                                              '0';
-                                                          final location = bidder?[
-                                                                              'provider_id']
-                                                                          [
-                                                                          'location']
-                                                                      ['address']
-                                                                  ?.toString() ??
-                                                              'N/A';
-                                                          final profilePic =
-                                                              bidder?['provider_id']
-                                                                      [
-                                                                      'profile_pic']
-                                                                  ?.toString();
-            
-                                                          print(
-                                                              "Abhi:- bidder id in bidder list : $bidderId");
-            
-                                                          return Container(
-                                                            margin: EdgeInsets
-                                                                .symmetric(
-                                                              vertical:
-                                                                  height * 0.01,
-                                                              horizontal:
-                                                                  width * 0.01,
-                                                            ),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    width * 0.02),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .withOpacity(
-                                                                          0.2),
-                                                                  spreadRadius: 1,
-                                                                  blurRadius: 5,
-                                                                  offset:
-                                                                      const Offset(
-                                                                          0, 3),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: Row(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8),
-                                                                  child: profilePic !=
-                                                                              null &&
-                                                                          profilePic
-                                                                              .isNotEmpty
-                                                                      ? Image
-                                                                          .network(
-                                                                          profilePic,
-                                                                          height:
-                                                                              90,
-                                                                          width:
-                                                                              90,
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                          errorBuilder: (context,
-                                                                                  error,
-                                                                                  stackTrace) =>
-                                                                              Image.asset(
-                                                                            'assets/images/d_png/no_profile_image.png',
-                                                                            height:
-                                                                                90,
-                                                                            width:
-                                                                                90,
-                                                                            fit: BoxFit
-                                                                                .cover,
-                                                                          ),
-                                                                        )
-                                                                      : Image
-                                                                          .asset(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  width * 0.02),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.2),
+                                                                spreadRadius: 1,
+                                                                blurRadius: 5,
+                                                                offset:
+                                                                    const Offset(
+                                                                        0, 3),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                child: profilePic !=
+                                                                            null &&
+                                                                        profilePic
+                                                                            .isNotEmpty
+                                                                    ? Image
+                                                                        .network(
+                                                                        profilePic,
+                                                                        height:
+                                                                            90,
+                                                                        width:
+                                                                            90,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        errorBuilder: (context,
+                                                                                error,
+                                                                                stackTrace) =>
+                                                                            Image.asset(
                                                                           'assets/images/d_png/no_profile_image.png',
                                                                           height:
                                                                               90,
@@ -1686,115 +1674,250 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                           fit: BoxFit
                                                                               .cover,
                                                                         ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width: width *
-                                                                        0.03),
-                                                                Expanded(
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment
-                                                                                .spaceBetween,
-                                                                        children: [
-                                                                          Flexible(
-                                                                            child:
-                                                                                Text(
-                                                                              fullName,
-                                                                              style:
-                                                                                  TextStyle(
-                                                                                fontSize: width * 0.045,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                              overflow:
-                                                                                  TextOverflow.ellipsis,
-                                                                              maxLines:
-                                                                                  1,
-                                                                            ),
-                                                                          ),
-                                                                          Row(
-                                                                            children: [
-                                                                              Text(
-                                                                                rating,
-                                                                                style: TextStyle(
-                                                                                  fontSize: width * 0.035,
-                                                                                ),
-                                                                              ),
-                                                                              Icon(
-                                                                                Icons.star,
-                                                                                size: width * 0.04,
-                                                                                color: Colors.yellow.shade700,
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ],
+                                                                      )
+                                                                    : Image
+                                                                        .asset(
+                                                                        'assets/images/d_png/no_profile_image.png',
+                                                                        height:
+                                                                            90,
+                                                                        width:
+                                                                            90,
+                                                                        fit: BoxFit
+                                                                            .cover,
                                                                       ),
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment
-                                                                                .spaceBetween,
-                                                                        children: [
-                                                                          Text(
-                                                                            "₹$bidAmount",
+                                                              ),
+                                                              SizedBox(
+                                                                  width: width *
+                                                                      0.03),
+                                                              Expanded(
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Flexible(
+                                                                          child:
+                                                                              Text(
+                                                                            fullName,
                                                                             style:
                                                                                 TextStyle(
-                                                                              fontSize:
-                                                                                  width * 0.04,
-                                                                              color:
-                                                                                  Colors.black,
-                                                                              fontWeight:
-                                                                                  FontWeight.bold,
+                                                                              fontSize: width * 0.045,
+                                                                              fontWeight: FontWeight.bold,
+                                                                            ),
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                            maxLines:
+                                                                                1,
+                                                                          ),
+                                                                        ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text(
+                                                                              rating,
+                                                                              style: TextStyle(
+                                                                                fontSize: width * 0.035,
+                                                                              ),
+                                                                            ),
+                                                                            Icon(
+                                                                              Icons.star,
+                                                                              size: width * 0.04,
+                                                                              color: Colors.yellow.shade700,
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "₹$bidAmount",
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                width * 0.04,
+                                                                            color:
+                                                                                Colors.black,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                          ),
+                                                                        ),
+                                                                        CircleAvatar(
+                                                                          radius:
+                                                                              13,
+                                                                          backgroundColor: Colors
+                                                                              .grey
+                                                                              .shade300,
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.phone,
+                                                                            size:
+                                                                                18,
+                                                                            color:
+                                                                                Colors.green.shade600,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height: height *
+                                                                            0.005),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Flexible(
+                                                                          child:
+                                                                              Container(
+                                                                            height:
+                                                                                22,
+                                                                            constraints:
+                                                                                BoxConstraints(
+                                                                              maxWidth: width * 0.25,
+                                                                            ),
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: Colors.red.shade300,
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                            ),
+                                                                            child:
+                                                                                Center(
+                                                                              child: Text(
+                                                                                location,
+                                                                                style: TextStyle(
+                                                                                  fontSize: width * 0.033,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                                maxLines: 1,
+                                                                              ),
                                                                             ),
                                                                           ),
-                                                                          CircleAvatar(
+                                                                        ),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                width * 0.03),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              top: 8.0),
+                                                                          child:
+                                                                              CircleAvatar(
                                                                             radius:
                                                                                 13,
-                                                                            backgroundColor: Colors
-                                                                                .grey
-                                                                                .shade300,
+                                                                            backgroundColor:
+                                                                                Colors.grey.shade300,
                                                                             child:
                                                                                 Icon(
-                                                                              Icons.phone,
-                                                                              size:
-                                                                                  18,
-                                                                              color:
-                                                                                  Colors.green.shade600,
+                                                                              Icons.message,
+                                                                              size: 18,
+                                                                              color: Colors.green.shade600,
                                                                             ),
                                                                           ),
-                                                                        ],
-                                                                      ),
-                                                                      SizedBox(
-                                                                          height: height *
-                                                                              0.005),
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment
-                                                                                .spaceBetween,
-                                                                        children: [
-                                                                          Flexible(
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(
+                                                                                builder: (context) => UserViewWorkerDetails(
+                                                                                  workerId: bidderId,
+                                                                                  hirebuttonhide: "hide",
+                                                                                  hideonly: "hideOnly",
+                                                                                  UserId: widget.userId,
+                                                                                  oderId: OderId,
+                                                                                  biddingOfferId: biddingofferId,
+                                                                                ),
+                                                                                // UserViewWorkerDetails(
+                                                                                //   workerId: '68ac07f700315e754a037e56',
+                                                                                // ),
+                                                                              ),
+                                                                            );
+                                                                          },
+                                                                          style:
+                                                                              TextButton.styleFrom(
+                                                                            padding:
+                                                                                EdgeInsets.zero,
+                                                                            minimumSize:
+                                                                                const Size(0, 25),
+                                                                            tapTargetSize:
+                                                                                MaterialTapTargetSize.shrinkWrap,
+                                                                          ),
+                                                                          child:
+                                                                              Text(
+                                                                            "View Profile",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: width * 0.032,
+                                                                              color: Colors.green.shade700,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        Flexible(
+                                                                          child:
+                                                                              InkWell(
+                                                                            // onTap: () async {
+                                                                            //   // acceptBid(bidderId, bidAmount);
+                                                                            //   // Navigator.push(
+                                                                            //   //   context,
+                                                                            //   //   MaterialPageRoute(
+                                                                            //   //     builder: (context) => UserViewWorkerDetails(
+                                                                            //   //       workerId: bidderId,
+                                                                            //   //       hirebuttonhide: "hide",
+                                                                            //   //       UserId: widget.userId,
+                                                                            //   //       oderId: OderId,
+                                                                            //   //       biddingOfferId: biddingofferId,
+                                                                            //   //     ),
+                                                                            //   //     // UserViewWorkerDetails(
+                                                                            //   //     //   workerId: '68ac07f700315e754a037e56',
+                                                                            //   //     // ),
+                                                                            //   //   ),
+                                                                            //   // );
+                                                                            //   await CreatebiddingPlateformfee();
+                                                                            //   // final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';  // Bidder ID yahaan se le
+                                                                            //   // showTotalDialog(context, index, bidAmount, platformFee, bidderId);  // Extra bidderId pass kar
+                                                                            //
+                                                                            //   showTotalDialog(context,index,bidAmount,platformFee);
+                                                                            // },
+                                                                            onTap:
+                                                                                () async {
+                                                                              final bidder = getBuddingOderByIdResponseDatalist?[index];
+                                                                              final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
+                                                                              selectedBidderId = bidderId; // Store kar
+                                                                              await CreatebiddingPlateformfee();
+                                                                              showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
+                                                                            },
                                                                             child:
                                                                                 Container(
-                                                                              height:
-                                                                                  22,
-                                                                              constraints:
-                                                                                  BoxConstraints(
-                                                                                maxWidth: width * 0.25,
+                                                                              height: 32,
+                                                                              constraints: BoxConstraints(
+                                                                                maxWidth: width * 0.2,
                                                                               ),
-                                                                              decoration:
-                                                                                  BoxDecoration(
-                                                                                color: Colors.red.shade300,
-                                                                                borderRadius: BorderRadius.circular(10),
+                                                                              decoration: BoxDecoration(
+                                                                                color: Colors.green.shade700,
+                                                                                borderRadius: BorderRadius.circular(8),
                                                                               ),
-                                                                              child:
-                                                                                  Center(
+                                                                              child: Center(
                                                                                 child: Text(
-                                                                                  location,
+                                                                                  "Accept",
                                                                                   style: TextStyle(
-                                                                                    fontSize: width * 0.033,
+                                                                                    fontSize: width * 0.032,
                                                                                     color: Colors.white,
                                                                                   ),
                                                                                   overflow: TextOverflow.ellipsis,
@@ -1803,569 +1926,444 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                          SizedBox(
-                                                                              width:
-                                                                                  width * 0.03),
-                                                                          Padding(
-                                                                            padding: const EdgeInsets
-                                                                                .only(
-                                                                                top: 8.0),
-                                                                            child:
-                                                                                CircleAvatar(
-                                                                              radius:
-                                                                                  13,
-                                                                              backgroundColor:
-                                                                                  Colors.grey.shade300,
-                                                                              child:
-                                                                                  Icon(
-                                                                                Icons.message,
-                                                                                size: 18,
-                                                                                color: Colors.green.shade600,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment
-                                                                                .spaceBetween,
-                                                                        children: [
-                                                                          TextButton(
-                                                                            onPressed:
-                                                                                () {
-                                                                              Navigator.push(
-                                                                                context,
-                                                                                MaterialPageRoute(
-                                                                                  builder: (context) => UserViewWorkerDetails(
-                                                                                    workerId: bidderId,
-                                                                                    hirebuttonhide: "hide",
-                                                                                    hideonly: "hideOnly",
-                                                                                    UserId: widget.userId,
-                                                                                    oderId: OderId,
-                                                                                    biddingOfferId: biddingofferId,
-                                                                                  ),
-                                                                                  // UserViewWorkerDetails(
-                                                                                  //   workerId: '68ac07f700315e754a037e56',
-                                                                                  // ),
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                            style:
-                                                                                TextButton.styleFrom(
-                                                                              padding:
-                                                                                  EdgeInsets.zero,
-                                                                              minimumSize:
-                                                                                  const Size(0, 25),
-                                                                              tapTargetSize:
-                                                                                  MaterialTapTargetSize.shrinkWrap,
-                                                                            ),
-                                                                            child:
-                                                                                Text(
-                                                                              "View Profile",
-                                                                              style:
-                                                                                  TextStyle(
-                                                                                fontSize: width * 0.032,
-                                                                                color: Colors.green.shade700,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Flexible(
-                                                                            child:
-                                                                                InkWell(
-                                                                              // onTap: () async {
-                                                                              //   // acceptBid(bidderId, bidAmount);
-                                                                              //   // Navigator.push(
-                                                                              //   //   context,
-                                                                              //   //   MaterialPageRoute(
-                                                                              //   //     builder: (context) => UserViewWorkerDetails(
-                                                                              //   //       workerId: bidderId,
-                                                                              //   //       hirebuttonhide: "hide",
-                                                                              //   //       UserId: widget.userId,
-                                                                              //   //       oderId: OderId,
-                                                                              //   //       biddingOfferId: biddingofferId,
-                                                                              //   //     ),
-                                                                              //   //     // UserViewWorkerDetails(
-                                                                              //   //     //   workerId: '68ac07f700315e754a037e56',
-                                                                              //   //     // ),
-                                                                              //   //   ),
-                                                                              //   // );
-                                                                              //   await CreatebiddingPlateformfee();
-                                                                              //   // final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';  // Bidder ID yahaan se le
-                                                                              //   // showTotalDialog(context, index, bidAmount, platformFee, bidderId);  // Extra bidderId pass kar
-                                                                              //
-                                                                              //   showTotalDialog(context,index,bidAmount,platformFee);
-                                                                              // },
-                                                                              onTap:
-                                                                                  () async {
-                                                                                final bidder = getBuddingOderByIdResponseDatalist?[index];
-                                                                                final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
-                                                                                selectedBidderId = bidderId; // Store kar
-                                                                                await CreatebiddingPlateformfee();
-                                                                                showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
-                                                                              },
-                                                                              child:
-                                                                                  Container(
-                                                                                height: 32,
-                                                                                constraints: BoxConstraints(
-                                                                                  maxWidth: width * 0.2,
-                                                                                ),
-                                                                                decoration: BoxDecoration(
-                                                                                  color: Colors.green.shade700,
-                                                                                  borderRadius: BorderRadius.circular(8),
-                                                                                ),
-                                                                                child: Center(
-                                                                                  child: Text(
-                                                                                    "Accept",
-                                                                                    style: TextStyle(
-                                                                                      fontSize: width * 0.032,
-                                                                                      color: Colors.white,
-                                                                                    ),
-                                                                                    overflow: TextOverflow.ellipsis,
-                                                                                    maxLines: 1,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      )),
-                                      if (!isBiddersClicked)
-                                        Padding(
-                                          padding:
-                                              EdgeInsets.only(top: height * 0.03),
-                                          child: filteredRelatedWorkers.isEmpty
-                                              ? Column(
-                                                  children: [
-                                                    Center(
-                                                      child: SvgPicture.asset(
-                                                        'assets/svg_images/norelatedworker.svg',
-                                                        height: height * 0.23,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.023),
-                                                    const Text(
-                                                      "No related worker",
-                                                      style: TextStyle(
-                                                          color: Colors.grey),
-                                                    ),
-                                                  ],
-                                                )
-                                              : ListView.builder(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  itemCount:
-                                                      filteredRelatedWorkers
-                                                          .length,
-                                                  itemBuilder: (context, index) {
-                                                    final worker =
-                                                        filteredRelatedWorkers[
-                                                            index];
-                                                    final workerId = worker['_id']
-                                                            ?.toString() ??
-                                                        'N/A';
-                                                    final fullName =
-                                                        worker['full_name']
-                                                                ?.toString() ??
-                                                            'N/A';
-                                                    final rating =
-                                                        worker['rating']
-                                                                ?.toString() ??
-                                                            '0';
-                                                    final amount =
-                                                        worker['amount']
-                                                                ?.toString() ??
-                                                            '0';
-                                                    final location =
-                                                        worker['location']
-                                                                    ?['address']
-                                                                ?.toString() ??
-                                                            'N/A';
-                                                    final profilePic =
-                                                        worker['profile_pic']
-                                                            ?.toString();
-                                                    print(
-                                                        "Abhi:- get bidding related workerId : $workerId");
-            
-                                                    return Container(
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                        vertical: height * 0.01,
-                                                        horizontal: width * 0.01,
-                                                      ),
-                                                      padding: EdgeInsets.all(
-                                                          width * 0.02),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                12),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.grey
-                                                                .withOpacity(0.2),
-                                                            spreadRadius: 1,
-                                                            blurRadius: 5,
-                                                            offset: const Offset(
-                                                                0, 3),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(8),
-                                                            child: profilePic !=
-                                                                        null &&
-                                                                    profilePic
-                                                                        .isNotEmpty
-                                                                ? Image.network(
-                                                                    profilePic,
-                                                                    height: 90,
-                                                                    width: 90,
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                    errorBuilder: (context,
-                                                                            error,
-                                                                            stackTrace) =>
-                                                                        Image
-                                                                            .asset(
-                                                                      'assets/images/d_png/no_profile_image.png',
-                                                                      height: 90,
-                                                                      width: 90,
-                                                                      fit: BoxFit
-                                                                          .cover,
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                  )
-                                                                : Image.asset(
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    )),
+                                    if (!isBiddersClicked)
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.only(top: height * 0.03),
+                                        child: filteredRelatedWorkers.isEmpty
+                                            ? Column(
+                                                children: [
+                                                  Center(
+                                                    child: SvgPicture.asset(
+                                                      'assets/svg_images/norelatedworker.svg',
+                                                      height: height * 0.23,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                      height: height * 0.023),
+                                                  const Text(
+                                                    "No related worker",
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                ],
+                                              )
+                                            : ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount:
+                                                    filteredRelatedWorkers
+                                                        .length,
+                                                itemBuilder: (context, index) {
+                                                  final worker =
+                                                      filteredRelatedWorkers[
+                                                          index];
+                                                  final workerId = worker['_id']
+                                                          ?.toString() ??
+                                                      'N/A';
+                                                  final fullName =
+                                                      worker['full_name']
+                                                              ?.toString() ??
+                                                          'N/A';
+                                                  final rating =
+                                                      worker['rating']
+                                                              ?.toString() ??
+                                                          '0';
+                                                  final amount =
+                                                      worker['amount']
+                                                              ?.toString() ??
+                                                          '0';
+                                                  final location =
+                                                      worker['location']
+                                                                  ?['address']
+                                                              ?.toString() ??
+                                                          'N/A';
+                                                  final profilePic =
+                                                      worker['profile_pic']
+                                                          ?.toString();
+                                                  print(
+                                                      "Abhi:- get bidding related workerId : $workerId");
+
+                                                  return Container(
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                      vertical: height * 0.01,
+                                                      horizontal: width * 0.01,
+                                                    ),
+                                                    padding: EdgeInsets.all(
+                                                        width * 0.02),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.grey
+                                                              .withOpacity(0.2),
+                                                          spreadRadius: 1,
+                                                          blurRadius: 5,
+                                                          offset: const Offset(
+                                                              0, 3),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          child: profilePic !=
+                                                                      null &&
+                                                                  profilePic
+                                                                      .isNotEmpty
+                                                              ? Image.network(
+                                                                  profilePic,
+                                                                  height: 90,
+                                                                  width: 90,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  errorBuilder: (context,
+                                                                          error,
+                                                                          stackTrace) =>
+                                                                      Image
+                                                                          .asset(
                                                                     'assets/images/d_png/no_profile_image.png',
                                                                     height: 90,
                                                                     width: 90,
                                                                     fit: BoxFit
                                                                         .cover,
                                                                   ),
-                                                          ),
-                                                          SizedBox(
-                                                              width:
-                                                                  width * 0.03),
-                                                          Expanded(
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    Flexible(
-                                                                      child: Text(
-                                                                        fullName,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              width *
-                                                                                  0.045,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
-                                                                        overflow:
-                                                                            TextOverflow
-                                                                                .ellipsis,
-                                                                        maxLines:
-                                                                            1,
-                                                                      ),
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          rating,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                width * 0.035,
-                                                                          ),
-                                                                        ),
-                                                                        Icon(
-                                                                          Icons
-                                                                              .star,
-                                                                          size: width *
-                                                                              0.04,
-                                                                          color: Colors
-                                                                              .yellow
-                                                                              .shade700,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
+                                                                )
+                                                              : Image.asset(
+                                                                  'assets/images/d_png/no_profile_image.png',
+                                                                  height: 90,
+                                                                  width: 90,
+                                                                  fit: BoxFit
+                                                                      .cover,
                                                                 ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    Text(
-                                                                      "₹$amount",
+                                                        ),
+                                                        SizedBox(
+                                                            width:
+                                                                width * 0.03),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Flexible(
+                                                                    child: Text(
+                                                                      fullName,
                                                                       style:
                                                                           TextStyle(
                                                                         fontSize:
                                                                             width *
-                                                                                0.04,
-                                                                        color: Colors
-                                                                            .black,
+                                                                                0.045,
                                                                         fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                    ),
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        rating,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              width * 0.035,
+                                                                        ),
+                                                                      ),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .star,
+                                                                        size: width *
+                                                                            0.04,
+                                                                        color: Colors
+                                                                            .yellow
+                                                                            .shade700,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    "₹$amount",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.04,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  CircleAvatar(
+                                                                    radius: 13,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade300,
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .phone,
+                                                                      size: 18,
+                                                                      color: Colors
+                                                                          .green
+                                                                          .shade600,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                  height:
+                                                                      height *
+                                                                          0.005),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Flexible(
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          22,
+                                                                      constraints:
+                                                                          BoxConstraints(
+                                                                        maxWidth:
+                                                                            width *
+                                                                                0.27,
+                                                                      ),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Colors
+                                                                            .red
+                                                                            .shade300,
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(10),
+                                                                      ),
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              left: 4.0),
+                                                                          child:
+                                                                              Text(
+                                                                            location,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: width * 0.033,
+                                                                              color: Colors.white,
+                                                                            ),
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                            maxLines:
+                                                                                1,
+                                                                          ),
+                                                                        ),
                                                                       ),
                                                                     ),
-                                                                    CircleAvatar(
-                                                                      radius: 13,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .grey
-                                                                              .shade300,
-                                                                      child: Icon(
+                                                                  ),
+                                                                  SizedBox(
+                                                                      width: width *
+                                                                          0.03),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            8.0),
+                                                                    child:
+                                                                        CircleAvatar(
+                                                                      radius:
+                                                                          13,
+                                                                      backgroundColor: Colors
+                                                                          .grey
+                                                                          .shade300,
+                                                                      child:
+                                                                          Icon(
                                                                         Icons
-                                                                            .phone,
-                                                                        size: 18,
+                                                                            .message,
+                                                                        size:
+                                                                            18,
                                                                         color: Colors
                                                                             .green
                                                                             .shade600,
                                                                       ),
                                                                     ),
-                                                                  ],
-                                                                ),
-                                                                SizedBox(
-                                                                    height:
-                                                                        height *
-                                                                            0.005),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    Flexible(
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator
+                                                                          .push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              UserViewWorkerDetails(
+                                                                            workerId:
+                                                                                workerId,
+                                                                            hirebuttonhide:
+                                                                                "hide",
+                                                                                hideonly: "hideOnly",
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                    style: TextButton
+                                                                        .styleFrom(
+                                                                      padding:
+                                                                          EdgeInsets
+                                                                              .zero,
+                                                                      minimumSize:
+                                                                          const Size(
+                                                                              0,
+                                                                              25),
+                                                                      tapTargetSize:
+                                                                          MaterialTapTargetSize
+                                                                              .shrinkWrap,
+                                                                    ),
+                                                                    child: Text(
+                                                                      "View Profile",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            width *
+                                                                                0.032,
+                                                                        color: Colors
+                                                                            .green
+                                                                            .shade700,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Flexible(
+                                                                    child:
+                                                                        InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        inviteproviderId(
+                                                                            workerId);
+                                                                        print(
+                                                                            "Abhi:- tab on invite print workerId : $workerId");
+                                                                      },
                                                                       child:
                                                                           Container(
                                                                         height:
-                                                                            22,
+                                                                            32,
                                                                         constraints:
                                                                             BoxConstraints(
                                                                           maxWidth:
-                                                                              width *
-                                                                                  0.27,
+                                                                              width * 0.2,
                                                                         ),
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           color: Colors
-                                                                              .red
-                                                                              .shade300,
+                                                                              .green
+                                                                              .shade700,
                                                                           borderRadius:
-                                                                              BorderRadius.circular(10),
+                                                                              BorderRadius.circular(8),
                                                                         ),
                                                                         child:
                                                                             Center(
                                                                           child:
-                                                                              Padding(
-                                                                            padding: const EdgeInsets
-                                                                                .only(
-                                                                                left: 4.0),
-                                                                            child:
-                                                                                Text(
-                                                                              location,
-                                                                              style:
-                                                                                  TextStyle(
-                                                                                fontSize: width * 0.033,
-                                                                                color: Colors.white,
-                                                                              ),
-                                                                              overflow:
-                                                                                  TextOverflow.ellipsis,
-                                                                              maxLines:
-                                                                                  1,
+                                                                              Text(
+                                                                            "Invite",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: width * 0.032,
+                                                                              color: Colors.white,
                                                                             ),
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                            maxLines:
+                                                                                1,
                                                                           ),
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    SizedBox(
-                                                                        width: width *
-                                                                            0.03),
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          top:
-                                                                              8.0),
-                                                                      child:
-                                                                          CircleAvatar(
-                                                                        radius:
-                                                                            13,
-                                                                        backgroundColor: Colors
-                                                                            .grey
-                                                                            .shade300,
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .message,
-                                                                          size:
-                                                                              18,
-                                                                          color: Colors
-                                                                              .green
-                                                                              .shade600,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    TextButton(
-                                                                      onPressed:
-                                                                          () {
-                                                                        Navigator
-                                                                            .push(
-                                                                          context,
-                                                                          MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                UserViewWorkerDetails(
-                                                                              workerId:
-                                                                                  workerId,
-                                                                              hirebuttonhide:
-                                                                                  "hide",
-                                                                                  hideonly: "hideOnly",
-                                                                            ),
-                                                                          ),
-                                                                        );
-                                                                      },
-                                                                      style: TextButton
-                                                                          .styleFrom(
-                                                                        padding:
-                                                                            EdgeInsets
-                                                                                .zero,
-                                                                        minimumSize:
-                                                                            const Size(
-                                                                                0,
-                                                                                25),
-                                                                        tapTargetSize:
-                                                                            MaterialTapTargetSize
-                                                                                .shrinkWrap,
-                                                                      ),
-                                                                      child: Text(
-                                                                        "View Profile",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              width *
-                                                                                  0.032,
-                                                                          color: Colors
-                                                                              .green
-                                                                              .shade700,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    Flexible(
-                                                                      child:
-                                                                          InkWell(
-                                                                        onTap:
-                                                                            () {
-                                                                          inviteproviderId(
-                                                                              workerId);
-                                                                          print(
-                                                                              "Abhi:- tab on invite print workerId : $workerId");
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          height:
-                                                                              32,
-                                                                          constraints:
-                                                                              BoxConstraints(
-                                                                            maxWidth:
-                                                                                width * 0.2,
-                                                                          ),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color: Colors
-                                                                                .green
-                                                                                .shade700,
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(8),
-                                                                          ),
-                                                                          child:
-                                                                              Center(
-                                                                            child:
-                                                                                Text(
-                                                                              "Invite",
-                                                                              style:
-                                                                                  TextStyle(
-                                                                                fontSize: width * 0.032,
-                                                                                color: Colors.white,
-                                                                              ),
-                                                                              overflow:
-                                                                                  TextOverflow.ellipsis,
-                                                                              maxLines:
-                                                                                  1,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
                                                           ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                        ),
-                                      SizedBox(height: height * 0.02),
-                                    ],
-                                  ),
-                                )
-                              : SizedBox(),
-                          // TextButton(onPressed: (){
-                          //   print("Abhi:-print data providerId : ${data?['service_provider_id']?['_id']}");
-                          // }, child: Text("print data")),
-                          data?['hire_status'] == 'pending'
-                              ? SizedBox(height: height * 0.04)
-                              : SizedBox(),
-                          data?['hire_status'] == 'accepted'
-                              ? BiddingPaymentScreen(
-                                  orderId: widget.buddingOderId ?? "",
-                                  paymentHistory: data?['service_payment']
-                                      ?['payment_history'],
-                                  orderProviderId: data?['service_provider_id']
-                                      ?['_id'],
-                                )
-                              : SizedBox(),
-                          // Container(color: Colors.white,height: )
-                        ],
-                      ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                      ),
+                                    SizedBox(height: height * 0.02),
+                                  ],
+                                ),
+                              )
+                            : SizedBox(),
+                        // TextButton(onPressed: (){
+                        //   print("Abhi:-print data providerId : ${data?['service_provider_id']?['_id']}");
+                        // }, child: Text("print data")),
+                        data?['hire_status'] == 'pending'
+                            ? SizedBox(height: height * 0.04)
+                            : SizedBox(),
+                        data?['hire_status'] == 'accepted'
+                            ? BiddingPaymentScreen(
+                                orderId: widget.buddingOderId ?? "",
+                                paymentHistory: data?['service_payment']
+                                    ?['payment_history'],
+                                orderProviderId: data?['service_provider_id']
+                                    ?['_id'],
+                              )
+                            : SizedBox(),
+                        // Container(color: Colors.white,height: )
+                      ],
                     ),
-            ),
+                  ),
           ),
         ),
-
+      ),
     );
   }
 

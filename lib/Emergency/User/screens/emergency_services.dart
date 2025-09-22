@@ -77,199 +77,197 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
           statusBarIconBrightness: Brightness.light,
         ),
       ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  width: double.infinity,
-                  color: Color(0xff5abc47).withOpacity(0.1),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                    child: Text(
-                      "Choose you'r problem",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: double.infinity,
+                color: Color(0xff5abc47).withOpacity(0.1),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                  child: Text(
+                    "Choose you'r problem",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-        
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTitle("Work Category"),
-                      Obx(() {
-                        return DropdownButtonFormField<String>(
-                          focusColor: AppColors.primaryGreen,
-                          value: controller.selectedCategoryId.value.isEmpty
-                              ? null
-                              : controller.selectedCategoryId.value,
-                          hint: Text("Select Category", style: fieldHintStyle),
-                          icon: Icon(
-                            Icons.keyboard_arrow_down_sharp,
-                            color: AppColors.primaryGreen,
-                          ),
-                          items: controller.categories
-                              .map((c) => DropdownMenuItem(
-                                    value: c['id'],
-                                    child: Text(
-                                      c['name']!,
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ))
-                              .toList(),
-                          onChanged: (val) {
-                            controller.selectedCategoryId.value = val!;
-                            controller.fetchSubCategories(val);
-                          },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: BorderSide(
-                                  color: Colors.grey, width: 1),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: BorderSide(
-                                  color: AppColors.primaryGreen, width: 2),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 15),
-                          ),
-                        );
-                      }),
-        
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      _buildTitle("Choose your problem ",
-                          otherText: "(Multiple Select)"),
-                      customMultiSelectDropdown(
-                        hint: "Select Subcategories",
-                        items: controller.subCategories,
-                        selectedIds: controller.selectedSubCategoryIds,
-                      ),
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildTitle("Google Address (GPS)"),
-                          InkWell(
-                            onTap: postTaskController.navigateToLocationScreen,
-                            child: Container(
-                              width: 0.35.toWidthPercent(),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryGreen,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  "Change location",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      //customTextField(hint: "Abc gali 145 banglow no. Indore"),
-                      _googleLocationField(controller.googleAddressController),
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      _buildTitle("Detailed Address (Landmark)"),
-                      customTextField(
-                          hint: "Enter address",
-                          controller: controller.detailedAddressController),
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      _buildTitle("Contact"),
-                      customTextField(
-                          hint: "+ 91",
-                          keyboardType: TextInputType.phone,
-                          controller: controller.contactController,
-                          maxLength: 10),
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      _buildTitle("Task Completed by(Date & Time)"),
-                      customDateTimePicker(
-                        context: context,
-                        selectedDateTime: controller.selectedDateTime,
-                      ),
-                      SizedBox(height: .04.toWidthPercent()),
-        
-                      _buildTitle("Upload image"),
-                      customImagePicker(
-                        images: controller.images,
-                        onPick: () async {
-                          // controller.pickImages();
-                          _showImageSourceSheet(context);
-        
-                          bwDebug("select image: call ");
-                          // file picker logic
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTitle("Work Category"),
+                    Obx(() {
+                      return DropdownButtonFormField<String>(
+                        focusColor: AppColors.primaryGreen,
+                        value: controller.selectedCategoryId.value.isEmpty
+                            ? null
+                            : controller.selectedCategoryId.value,
+                        hint: Text("Select Category", style: fieldHintStyle),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_sharp,
+                          color: AppColors.primaryGreen,
+                        ),
+                        items: controller.categories
+                            .map((c) => DropdownMenuItem(
+                                  value: c['id'],
+                                  child: Text(
+                                    c['name']!,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          controller.selectedCategoryId.value = val!;
+                          controller.fetchSubCategories(val);
                         },
-                      ),
-        
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-        
-                // Task Fee
-                Obx(() => Container(
-                  height: 0.12.toWidthPercent(),
-                      width: double.infinity,
-                      color: Color(0xfff17773),
-                      child: Center(
-                        child: Text(
-                          "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
-                          style: TextStyle(
-                            fontSize: 0.040.toWidthPercent(),
-                            color: Colors.white,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                                color: Colors.grey, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                                color: AppColors.primaryGreen, width: 2),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 15),
+                        ),
+                      );
+                    }),
+
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    _buildTitle("Choose your problem ",
+                        otherText: "(Multiple Select)"),
+                    customMultiSelectDropdown(
+                      hint: "Select Subcategories",
+                      items: controller.subCategories,
+                      selectedIds: controller.selectedSubCategoryIds,
+                    ),
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildTitle("Google Address (GPS)"),
+                        InkWell(
+                          onTap: postTaskController.navigateToLocationScreen,
+                          child: Container(
+                            width: 0.35.toWidthPercent(),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Change location",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                    //customTextField(hint: "Abc gali 145 banglow no. Indore"),
+                    _googleLocationField(controller.googleAddressController),
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    _buildTitle("Detailed Address (Landmark)"),
+                    customTextField(
+                        hint: "Enter address",
+                        controller: controller.detailedAddressController),
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    _buildTitle("Contact"),
+                    customTextField(
+                        hint: "+ 91",
+                        keyboardType: TextInputType.phone,
+                        controller: controller.contactController,
+                        maxLength: 10),
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    _buildTitle("Task Completed by(Date & Time)"),
+                    customDateTimePicker(
+                      context: context,
+                      selectedDateTime: controller.selectedDateTime,
+                    ),
+                    SizedBox(height: .04.toWidthPercent()),
+
+                    _buildTitle("Upload image"),
+                    customImagePicker(
+                      images: controller.images,
+                      onPick: () async {
+                        // controller.pickImages();
+                        _showImageSourceSheet(context);
+
+                        bwDebug("select image: call ");
+                        // file picker logic
+                      },
+                    ),
+
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+
+              // Task Fee
+              Obx(() => Container(
+                height: 0.12.toWidthPercent(),
+                    width: double.infinity,
+                    color: Color(0xfff17773),
+                    child: Center(
+                      child: Text(
+                        "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
+                        style: TextStyle(
+                          fontSize: 0.040.toWidthPercent(),
+                          color: Colors.white,
+                        ),
                       ),
-                    )),
-        
-                SizedBox(height: 20),
-        
-                Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: Obx(() => customButton(
-                          onPressed: controller.isLoading.value
-                              ? null
-                              : () async {
-                                  controller.isLoading.value = true;
-                                  try {
-                                    await controller.submitForm(context);
-                                  } finally {
-                                    controller.isLoading.value = false;
-                                  }
-                                },
-                          child: controller.isLoading.value
-                              ? SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.primaryGreen,
-                                  ),
-                                )
-                              : Text("Pay"),
-                        )))
-              ],
-            ),
+                    ),
+                  )),
+
+              SizedBox(height: 20),
+
+              Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: Obx(() => customButton(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : () async {
+                                controller.isLoading.value = true;
+                                try {
+                                  await controller.submitForm(context);
+                                } finally {
+                                  controller.isLoading.value = false;
+                                }
+                              },
+                        child: controller.isLoading.value
+                            ? SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              )
+                            : Text("Pay"),
+                      )))
+            ],
           ),
         ),
       ),

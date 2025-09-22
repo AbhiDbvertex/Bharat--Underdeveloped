@@ -107,6 +107,8 @@ class ApiService {
     final response = await request.send();
     final responseBody = await http.Response.fromStream(response);
     print('Abhi:- Image message API response: ${response.statusCode}, ${responseBody.body}');
+    print('Abhi:- Encapsulation: wrapping data and function into a single class: ${response.statusCode}, ${responseBody.body}');
+    print('Abhi:- Inheritance:One class can inherite property or anthoer class: ${response.statusCode}, ${responseBody.body}');
     if (response.statusCode == 201 || response.statusCode == 200) {
       return json.decode(responseBody.body)['newMessage'];
     }

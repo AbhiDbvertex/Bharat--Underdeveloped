@@ -10,6 +10,7 @@ import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +21,6 @@ import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_con
 import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../../Emergency/utils/logger.dart';
 import '../../../Widgets/AppColors.dart';
-import '../../../utility/custom_snack_bar.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../models/userModel/WorkCategoryModel.dart';
 import '../User/SubCategories.dart';
@@ -221,12 +221,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       final token = prefs.getString('token') ?? '';
       if (token.isEmpty) {
         if (mounted) {
-          CustomSnackBar.show(
-              context,
-              message: "No token found, please log in again!",
-              type: SnackBarType.warning
-          );
-
+          Fluttertoast.showToast(msg: "No token found, please log in again!");
         }
         setState(() {
           isLoading = false;
@@ -282,11 +277,8 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           });
         } else {
           if (mounted) {
-
-            CustomSnackBar.show(
-                context,
-                message:data["message"] ?? "Profile fetch failed" ,
-                type: SnackBarType.error
+            Fluttertoast.showToast(
+              msg: data["message"] ?? "Profile fetch failed",
             );
           }
           setState(() {
@@ -295,13 +287,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
         }
       } else {
         if (mounted) {
-          CustomSnackBar.show(
-              context,
-              message:  "Server error, profile fetch failed!",
-              type: SnackBarType.error
-          );
-
-
+          Fluttertoast.showToast(msg: "Server error, profile fetch failed!");
         }
         setState(() {
           isLoading = false;
@@ -310,12 +296,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
     } catch (e) {
       print("❌ Error fetching profile: $e");
       if (mounted) {
-        CustomSnackBar.show(
-            context,
-            message:"Something went wrong, try again!" ,
-            type: SnackBarType.error
-        );
-
+        Fluttertoast.showToast(msg: "Something went wrong, try again!");
       }
       setState(() {
         isLoading = false;
@@ -329,12 +310,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       final token = prefs.getString('token') ?? '';
       if (token.isEmpty) {
         if (mounted) {
-          CustomSnackBar.show(
-              context,
-              message:"No token found, please log in again!" ,
-              type: SnackBarType.warning
-          );
-
+          Fluttertoast.showToast(msg: "No token found, please log in again!");
         }
         return;
       }
@@ -359,37 +335,20 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           });
         } else {
           if (mounted) {
-
-            CustomSnackBar.show(
-                context,
-                message: data["message"] ?? "Failed to fetch bidding orders",
-                type: SnackBarType.error
+            Fluttertoast.showToast(
+              msg: data["message"] ?? "Failed to fetch bidding orders",
             );
-
-
           }
         }
       } else {
         if (mounted) {
-          CustomSnackBar.show(
-              context,
-              message:  "Server error, failed to fetch orders!",
-              type: SnackBarType.error
-          );
-
-
+          Fluttertoast.showToast(msg: "Server error, failed to fetch orders!");
         }
       }
     } catch (e) {
       print("❌ Error fetching bidding orders: $e");
       if (mounted) {
-        CustomSnackBar.show(
-            context,
-            message:"Error fetching orders!" ,
-            type: SnackBarType.error
-        );
-
-
+        Fluttertoast.showToast(msg: "Error fetching orders!");
       }
     }
   }
@@ -401,13 +360,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
   ) async {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
-        CustomSnackBar.show(
-            context,
-            message:  "Invalid location data!",
-            type: SnackBarType.error
-        );
-
-
+        Fluttertoast.showToast(msg: "Invalid location data!");
       }
       return;
     }
@@ -459,38 +412,22 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
           });
         } else {
           if (mounted) {
-
-            CustomSnackBar.show(
-                context,
-                message:data["message"] ?? "Failed to update location" ,
-                type: SnackBarType.error
+            Fluttertoast.showToast(
+              msg: data["message"] ?? "Failed to update location",
             );
-
-
           }
         }
       } else {
         if (mounted) {
-
-          CustomSnackBar.show(
-              context,
-              message: "Server error, failed to update location!",
-              type: SnackBarType.error
+          Fluttertoast.showToast(
+            msg: "Server error, failed to update location!",
           );
-
-
         }
       }
     } catch (e) {
       print("❌ Error updating location: $e");
       if (mounted) {
-        CustomSnackBar.show(
-            context,
-            message:"Error updating location!" ,
-            type: SnackBarType.error
-        );
-
-
+        Fluttertoast.showToast(msg: "Error updating location!");
       }
     }
   }

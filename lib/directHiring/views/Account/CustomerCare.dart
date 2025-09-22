@@ -238,7 +238,7 @@ class CustomerCare extends StatefulWidget {
 class _CustomerCareState extends State<CustomerCare> {
   final CustomerCareController controller = CustomerCareController();
   final _formKey = GlobalKey<FormState>();
-  bool isLoading = false;
+
   void _refresh() => setState(() {});
 
   @override
@@ -253,7 +253,7 @@ class _CustomerCareState extends State<CustomerCare> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Customer Care",
+        title: const Text("User Care",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
@@ -384,7 +384,7 @@ class _CustomerCareState extends State<CustomerCare> {
                       : null,
                 ),
                 const SizedBox(height: 60),
-              /*  InkWell(
+                InkWell(
                   onTap: () {
                     if (_formKey.currentState!.validate()) {
                       if (controller.model.isEmailSelected) {
@@ -414,53 +414,7 @@ class _CustomerCareState extends State<CustomerCare> {
                       ),
                     ),
                   ),
-                ),*/
-                ElevatedButton(
-                  onPressed:isLoading
-                      ? null
-                      : () async {
-                    if (_formKey.currentState!.validate()) {
-                      setState(() => isLoading = true);
-                      if (controller.model.isEmailSelected) {
-                      await  controller.emailForm(context, _refresh);
-                      } else {
-                      await  controller.callForm(context, _refresh);
-                      }
-                      if (mounted) {
-                        setState(() => isLoading = false);  // Stop loading
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    foregroundColor: Colors.white,
-                      shadowColor: Colors.transparent,
-                    minimumSize: const Size(300, 50), // Width: 300, Height: 50
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    splashFactory: InkRipple.splashFactory,
-
-                  ),
-                  child:  isLoading
-                      ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                      :Text(
-                    controller.model.isEmailSelected ? 'Submit' : 'Schedule a Call',
-                    style: GoogleFonts.roboto(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
                 ),
-
               ],
             ),
           ),

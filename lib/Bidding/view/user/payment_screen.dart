@@ -1398,7 +1398,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
               ),
             ),
             child: const Text(
-              "Cancel Task and Create Dispute",
+              "Cancel Task and create dispute",
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
@@ -1415,7 +1415,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
               ),
             ),
             child: const Text(
-              "Mark as Complete",
+              "Mark as complete",
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),

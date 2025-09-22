@@ -584,26 +584,17 @@
 //   }
 // }
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import '../../Widgets/AppColors.dart';
 
 class BiddingTaskViewDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text("Work detail",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: const BackButton(color: Colors.black),
-        actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
-          statusBarColor: AppColors.primaryGreen,
-          statusBarIconBrightness: Brightness.light,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: Text('Work detail'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -706,7 +697,7 @@ class BiddingTaskViewDetailsScreen extends StatelessWidget {
               // Cancel Button
               ElevatedButton(
                 onPressed: () {},
-                child: Text('Cancel Task and Create Dispute'),
+                child: Text('Cancel Task and create dispute'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   minimumSize: Size(double.infinity, 50),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart'; // Add provider package to pubspec.yaml
 import '../../../Widgets/AppColors.dart';
@@ -16,17 +15,11 @@ class GetPremiumScreen extends StatelessWidget {
       create: (_) => PremiumController(),
       child: Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.primaryGreen,
           centerTitle: true,
-          title: const Text("Get Premium Access",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          leading: const BackButton(color: Colors.black),
-          actions: [],
-          systemOverlayStyle:  SystemUiOverlayStyle(
-            statusBarColor: AppColors.primaryGreen,
-            statusBarIconBrightness: Brightness.light,
-          ),
+          elevation: 0,
+          toolbarHeight: 20,
+          automaticallyImplyLeading: false,
         ),
         body: const Padding(
           padding: EdgeInsets.all(16.0),
@@ -47,32 +40,32 @@ class PremiumView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Row(
-        //   children: [
-        //     GestureDetector(
-        //       onTap: () {
-        //         Navigator.pop(
-        //           context,
-        //           MaterialPageRoute(builder: (_) => AccountScreen()),
-        //         );
-        //       },
-        //       child: const Padding(
-        //         padding: EdgeInsets.only(left: 8.0),
-        //         child: Icon(Icons.arrow_back, size: 25),
-        //       ),
-        //     ),
-        //     const SizedBox(width: 50),
-        //     Text(
-        //       "Get Premium Access",
-        //       style: GoogleFonts.roboto(
-        //         fontSize: 18,
-        //         fontWeight: FontWeight.bold,
-        //         color: Colors.black,
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // const SizedBox(height: 70),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(
+                  context,
+                  MaterialPageRoute(builder: (_) => AccountScreen()),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Icon(Icons.arrow_back, size: 25),
+              ),
+            ),
+            const SizedBox(width: 50),
+            Text(
+              "Get Premium Access",
+              style: GoogleFonts.roboto(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 70),
         Center(
           child: Text(
             'Premium Plans',

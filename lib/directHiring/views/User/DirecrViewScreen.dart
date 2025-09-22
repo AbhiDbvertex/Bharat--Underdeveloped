@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../Widgets/address_map_class.dart';
 import '../../../testingfile.dart';
-import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../../../Widgets/AppColors.dart';
@@ -214,32 +213,41 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("Abhi:- darecthire cancelOder statusCode :- ${response.statusCode}");
         Navigator.pop(context);
         _clearHiredProviders().then((_) => fetchOrderDetail());
-
-        CustomSnackBar.show(
-            context,
-            message:"Order cancelled successfully" ,
-            type: SnackBarType.success
+        Get.snackbar(
+          'Success',
+          'Order cancelled',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
       } else {
         print("Abhi:- else darect-hire cancelOder error :- ${response.body}");
         print("Abhi:- else darect-hire cancelOder statusCode :- ${response.statusCode}");
-
-        CustomSnackBar.show(
-            context,
-            message:   'Failed to cancel order',
-            type: SnackBarType.error
+        Get.snackbar(
+          'Error',
+          // 'Failed to cancel order: ${response.statusCode}',
+          'Failed to cancel order: ',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
-
       }
     } catch (e) {
       print("Abhi:- Exception darect-hire : - $e");
-
-      CustomSnackBar.show(
-          context,
-          message: 'Error cancelling order.',
-          type: SnackBarType.error
+      Get.snackbar(
+        'Error',
+        // 'Error cancelling order: $e',
+        'Error cancelling order: ',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
     }
   }
 
@@ -267,22 +275,29 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("Provider by id response: ${response.body}");
       } else {
         print("❌ Provider fetch failed: ${response.body}");
-
-        CustomSnackBar.show(
-            context,
-            message:  'Failed to fetch provider:',
-            type: SnackBarType.error
+        Get.snackbar(
+          'Error',
+          // 'Failed to fetch provider: ${response.statusCode}',
+          'Failed to fetch provider:',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
-
       }
     } catch (e) {
       print("❗ fetchProviderById Error: $e");
-      CustomSnackBar.show(
-          context,
-          message:'Error fetching provider' ,
-          type: SnackBarType.error
+      Get.snackbar(
+        'Error',
+        // 'Error fetching provider: $e',
+        'Error fetching provider: ',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
     }
   }
 
@@ -314,13 +329,16 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("📤 Refund API response: ${response.body}");
       } catch (e) {
         print("❗ Refund Error: $e");
-
-        CustomSnackBar.show(
-            context,
-            message:'Error processing refund.' ,
-            type: SnackBarType.error
+        Get.snackbar(
+          'Error',
+          // 'Error processing refund: $e',
+          'Error processing refund: ',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
-
       }
     }
   }
@@ -333,13 +351,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     print("🚫 Offer History: ${order?['offer_history']}");
 
     if (token == null) {
-
-      CustomSnackBar.show(
-          context,
-          message:  'Login Required' ,
-          type: SnackBarType.error
+      Get.snackbar(
+        'Login Required',
+        'Login Required',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
       return;
     }
     print("Abhi:- get subCategoryId : $subCategoryId");
@@ -419,33 +439,41 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
           });
         } else {
           print("⚠️ No providers in API response");
-
-          CustomSnackBar.show(
-              context,
-              message:'No provider found!' ,
-              type: SnackBarType.error
+          Get.snackbar(
+            'No Providers',
+            'No provider found!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+            margin: EdgeInsets.all(10),
+            duration: Duration(seconds: 3),
           );
-
         }
       } else {
         print("❌ API Error: ${response.statusCode}");
-
-        CustomSnackBar.show(
-            context,
-            message:"Somthing went wrong." ,
-            type: SnackBarType.error
+        Get.snackbar(
+          '',
+          // 'Error ${response.statusCode}',
+          'Error ',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
-
       }
     } catch (e) {
       print("❗ Error: $e");
-
-      CustomSnackBar.show(
-          context,
-          message:'Error' ,
-          type: SnackBarType.error
+      Get.snackbar(
+        'Error',
+        // 'Error: $e',
+        'Error',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
     }
   }
 
@@ -478,13 +506,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
 
     if (alreadyOffered) {
       print("⚠️ Provider has already been offered.");
-
-      CustomSnackBar.show(
-          context,
-          message: 'Offer already sent to this provider',
-          type: SnackBarType.info
+      Get.snackbar(
+        'Offer Status',
+        'Offer already sent to this provider',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
       return;
     }
 
@@ -542,44 +572,55 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               });
             }
 
-
-            CustomSnackBar.show(
-                context,
-                message: 'Offer sent successfully' ,
-                type: SnackBarType.success
+            Get.snackbar(
+              'Success',
+              'Offer sent successfully',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              margin: EdgeInsets.all(10),
+              duration: Duration(seconds: 3),
             );
-
           }
         } else {
           print("❌ Send offer failed: ${data['message']}");
-
-          CustomSnackBar.show(
-              context,
-              message: 'Something wrong',
-              type: SnackBarType.error
+          Get.snackbar(
+            'Error',
+            // '${data['message']}',
+            'Something wrong',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            margin: EdgeInsets.all(10),
+            duration: Duration(seconds: 3),
           );
-
         }
       } else {
         final err = json.decode(response.body);
         print("❗ API Error: ${response.statusCode} - ${err['message']}");
-
-        CustomSnackBar.show(
-            context,
-            message: '${err['message']}',
-            type: SnackBarType.error
+        Get.snackbar(
+          'Error',
+          '${err['message']}',
+          // 'Getting error',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
         );
-
       }
     } catch (e) {
       print("❗ sendNextOffer Exception: $e");
-      CustomSnackBar.show(
-          context,
-          message:"Something went wrong" ,
-          type: SnackBarType.error
+      Get.snackbar(
+        'Error',
+        // 'Error: $e',
+        'Error: ',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
       );
-
-
     }
   }
 
@@ -774,7 +815,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Completion Date - ${order?['deadline']?.toString().substring(0, 10) ?? ''}",
+                    "Completion: ${order?['deadline']?.toString().substring(0, 10) ?? ''}",
                     style: const TextStyle(color: Colors.black87),
                   ),
                   const SizedBox(height: 8),
@@ -1282,13 +1323,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         final prefs = await SharedPreferences.getInstance();
                                         final token = prefs.getString('token');
                                         if (token == null) {
-
-                                          CustomSnackBar.show(
-                                              context,
-                                              message: 'Login Required, User not logged in.',
-                                              type: SnackBarType.error
+                                          Get.snackbar(
+                                            'Login Required',
+                                            'User not logged in.',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
                                           );
-
                                           return;
                                         }
                                         final response = await http.get(
@@ -1311,22 +1354,26 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                             );
                                           }
                                         } else {
-
-                                          CustomSnackBar.show(
-                                              context,
-                                              message: 'Failed: ${response.statusCode}',
-                                              type: SnackBarType.error
+                                          Get.snackbar(
+                                            'Error',
+                                            'Failed: ${response.statusCode}',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
                                           );
-
                                         }
                                       } catch (e) {
-
-                                        CustomSnackBar.show(
-                                            context,
-                                            message:  'Error: $e',
-                                            type: SnackBarType.error
+                                        Get.snackbar(
+                                          'Error',
+                                          'Error: $e',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          margin: EdgeInsets.all(10),
+                                          duration: Duration(seconds: 3),
                                         );
-
                                       }
                                     },
                                     child: Padding(
@@ -1391,13 +1438,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       if (order?['_id'] != null && worker.id != null) {
                                         await sendNextOffer(order!['_id'], worker.id!);
                                       } else {
-
-                                        CustomSnackBar.show(
-                                            context,
-                                            message: 'Invalid order or provider ID',
-                                            type: SnackBarType.error
+                                        Get.snackbar(
+                                          'Error',
+                                          'Invalid order or provider ID',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          margin: EdgeInsets.all(10),
+                                          duration: Duration(seconds: 3),
                                         );
-
                                       }
                                     },
                                     child: Text(
@@ -1505,7 +1554,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(Icons.warning_amber, color: Colors.red),
-                    Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                    Text("This order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
                   ],
                 ),
               ),
@@ -1689,13 +1738,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         final prefs = await SharedPreferences.getInstance();
                                         final token = prefs.getString('token');
                                         if (token == null) {
-
-                                          CustomSnackBar.show(
-                                              context,
-                                              message: 'Login Required, User not logged in.',
-                                              type: SnackBarType.error
+                                          Get.snackbar(
+                                            'Login Required',
+                                            'User not logged in.',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
                                           );
-
                                           return;
                                         }
                                         final response = await http.get(
@@ -1724,22 +1775,26 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                             );
                                           }
                                         } else {
-
-                                          CustomSnackBar.show(
-                                              context,
-                                              message:'Failed: ${response.statusCode}' ,
-                                              type: SnackBarType.error
+                                          Get.snackbar(
+                                            'Error',
+                                            'Failed: ${response.statusCode}',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
                                           );
-
                                         }
                                       } catch (e) {
-
-                                        CustomSnackBar.show(
-                                            context,
-                                            message:'Error: something wrong' ,
-                                            type: SnackBarType.error
+                                        Get.snackbar(
+                                          'Error',
+                                          'Error: $e',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          margin: EdgeInsets.all(10),
+                                          duration: Duration(seconds: 3),
                                         );
-
                                       }
                                     },
                                     child: Padding(
@@ -1799,12 +1854,15 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       if (order?['_id'] != null && worker.id != null) {
                                         await sendNextOffer(order!['_id'], worker.id!);
                                       } else {
-                                        CustomSnackBar.show(
-                                            context,
-                                            message:  'Invalid order or provider ID' ,
-                                            type: SnackBarType.error
+                                        Get.snackbar(
+                                          'Error',
+                                          'Invalid order or provider ID',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          margin: EdgeInsets.all(10),
+                                          duration: Duration(seconds: 3),
                                         );
-
                                       }
                                     },
                                     child: Text(

@@ -777,20 +777,6 @@ class WorkDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // payments.value = List.generate(15, (index) {
-    //   return PaymentHistory(
-    //     id: "test_payment_${index + 1}",
-    //     description: "Test Payment ${index + 1}",
-    //     amount: 1000 + (index * 100), // Varying amounts: 1000, 1100, 1200, ..., 2400
-    //     tax: ((1000 + (index * 100)) * _taxPercentage).toInt(),
-    //     paymentId: "test_razorpay_id_${index + 1}",
-    //     releaseStatus: "pending",
-    //     status: "success",
-    //     method: "online",
-    //     isCollected: false,
-    //     date: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-    //   );
-    // });
   }
 
   @override
@@ -1099,7 +1085,6 @@ class WorkDetailController extends GetxController {
     required tax,
     required description,
     required String orderId,
-    required context
   }) async {
     isLoading.value = true;
     bwDebug("razorPayPaymentId : $razorPayPaymentId,razorpaySignatureId: $razorpaySignatureId, amount : $amount, tax:$tax, desciption: $description, orderId:${orderId} ");
@@ -1128,30 +1113,16 @@ bwDebug("final url: $url");
 
       if (response.statusCode == 200) {
         bwDebug("API call successful: ${response.body}");
-        CustomSnackBar.show(
-            context,
-            message:'Payment added successfully!' ,
-            type: SnackBarType.success
-        );
+        Get.snackbar('Success', 'Payment added successfully!');
         await getEmergencyOrder(orderId);
         cancelPaymentInput();
       } else {
         bwDebug("API call failed: ${response.statusCode} - ${response.body}");
-        CustomSnackBar.show(
-            context,
-            message:'Failed to add payment.' ,
-            type: SnackBarType.error
-        );
-
+        Get.snackbar('Error', 'Failed to add payment.');
       }
     } catch (e) {
       bwDebug("API call error: $e");
-      CustomSnackBar.show(
-          context,
-          message: 'An error occurred. Please try again.' ,
-          type: SnackBarType.warning
-      );
-
+      Get.snackbar('Error', 'An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -1284,7 +1255,7 @@ bwDebug("final url: $url");
   }
 
   // Mark As Complete API call
-  Future<bool> markAsComplete({required String orderId, required context}) async {
+  Future<bool> markAsComplete({required String orderId}) async {
     final completer = Completer<bool>();
     Get.defaultDialog(
       title: 'Mark as Complete',
@@ -1307,20 +1278,11 @@ bwDebug("final url: $url");
             body: body,
           );
           if (response.statusCode == 200) {
-            CustomSnackBar.show(
-                context,
-                message: 'Task marked as complete.' ,
-                type: SnackBarType.success
-            );
+            Get.snackbar('Task Complete', 'Task marked as complete.');
             await getEmergencyOrder(orderId);
             completer.complete(true);
           } else {
-            CustomSnackBar.show(
-                context,
-                message: 'Task marked as incomplete.',
-                type: SnackBarType.error
-            );
-
+            Get.snackbar('Task failed', 'Task marked as incomplete.');
             completer.complete(false);
           }
         } catch (e) {
@@ -1340,7 +1302,6 @@ bwDebug("final url: $url");
   Future<void> requestPaymentRelease({
     required String orderId,
     required String paymentId,
-    required context
   }) async {
     isActionLoading.value = true;
     bwDebug("requestPaymentRelease called for orderId: $orderId, paymentId: $paymentId", tag: tag);
@@ -1363,30 +1324,18 @@ bwDebug("final url: $url");
       if (response.statusCode == 200) {
         bwDebug("API call successful: ${response.body}", tag: tag);
         final json = jsonDecode(response.body);
-        CustomSnackBar.show(
-            context,
-            message: json['message'] ?? 'Payment request sent successfully!' ,
-            type: SnackBarType.success
-        );
+        Get.snackbar('Success', json['message'] ?? 'Payment request sent successfully!');
+
         await getEmergencyOrder(orderId);
       } else {
         bwDebug("API call failed: ${response.statusCode} - ${response.body}", tag: tag);
         final json = jsonDecode(response.body);
-        CustomSnackBar.show(
-            context,
-            message: 'Error: Failed to send payment request.',
-            type: SnackBarType.error
-        );
-
+        // Get.snackbar('Error', json['message'] ?? 'Failed to send payment request.');
+        Get.snackbar('error','Error: Failed to send payment request.');
       }
     } catch (e) {
       bwDebug("API call error: $e", tag: tag);
-      CustomSnackBar.show(
-          context,
-          message: 'An error occurred. Please try again.' ,
-          type: SnackBarType.error
-      );
-
+      Get.snackbar('Error', 'An error occurred. Please try again.');
     } finally {
       isActionLoading.value = false;
     }

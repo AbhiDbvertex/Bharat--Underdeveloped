@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../chat/chat_user_list_screen.dart';
 import '../directHiring/views/Account/AccountScreen.dart';
 import '../directHiring/views/ServiceProvider/ServiceProviderHomeScreen.dart';
 import '../directHiring/views/ServiceProvider/WorkerMyHireScreen.dart';
@@ -37,7 +38,8 @@ class BottombarState extends State<Bottombar> {
         subcategreyId: 'default_sub_category_id',
       ),
       // const PlaceholderScreen(label: 'My Work'),
-      const PlaceholderScreen(label: 'Message'),
+      // const PlaceholderScreen(label: 'Message'),
+      ChatScreen(),
       const AccountScreen(),
     ];
 
