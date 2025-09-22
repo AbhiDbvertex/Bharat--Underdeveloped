@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -13,9 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Widgets/AppColors.dart';
-import '../../Widgets/address_map_class.dart';
 import '../../directHiring/views/ServiceProvider/view_user_profile_screen.dart';
-import '../../testingfile.dart';
 import '../Models/bidding_order.dart';
 import 'BiddingWorkerDisputeScreen.dart';
 
@@ -116,7 +113,8 @@ class _BiddingserviceproviderworkdetailState
   var address;
 
   Future<void> openMap(double lat, double lng) async {
-    final Uri googleMapUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
+    final Uri googleMapUrl =
+        Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
 
     if (await canLaunchUrl(googleMapUrl)) {
       await launchUrl(googleMapUrl, mode: LaunchMode.externalApplication);
@@ -124,7 +122,6 @@ class _BiddingserviceproviderworkdetailState
       throw "Could not open the map.";
     }
   }
-
 
   Future<void> fetchCurrentUserId() async {
     try {
@@ -651,45 +648,48 @@ class _BiddingserviceproviderworkdetailState
     }
   }
 
- //   edit bid api
-  Future<void> editBid (editbidAmout,editbidduration,editbidmessage) async {
-   final String url = "https://api.thebharatworks.com/api/bidding-order/edit";
-   print("Abhi:- print editbid url : $url");
-   final prefs = await SharedPreferences.getInstance();
-   final token = prefs.getString('token') ?? '';
+  //   edit bid api
+  Future<void> editBid(editbidAmout, editbidduration, editbidmessage) async {
+    final String url = "https://api.thebharatworks.com/api/bidding-order/edit";
+    print("Abhi:- print editbid url : $url");
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
 
     final payload = {
-    'order_id': widget.orderId,
-    'bid_amount': editbidAmout.toString(),
-    'duration': editbidduration,
-    'message': editbidmessage,
+      'order_id': widget.orderId,
+      'bid_amount': editbidAmout.toString(),
+      'duration': editbidduration,
+      'message': editbidmessage,
     };
 
+    var response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      // body: jsonEncode(payload),
+      body: jsonEncode(payload),
+    );
 
-   var response = await http.put(Uri.parse(url),
-     headers: {
-       'Authorization': 'Bearer $token',
-       'Content-Type': 'application/json',
-     },
-     // body: jsonEncode(payload),
-     body: jsonEncode(payload),
-   );
+    print("Abhi:- edit bid amount print : $payload");
 
-   print("Abhi:- edit bid amount print : $payload");
-
-   var responseData = jsonDecode(response.body);
-   try{
-     if (response.statusCode == 200 || response.statusCode == 201) {
-       Get.snackbar("Success", responseData['message'],snackPosition: SnackPosition.BOTTOM,colorText: Colors.white,backgroundColor: Colors.green.shade700);
-       print("Abhi:- editbide response :${response.statusCode}");
-       print("Abhi:- editbide response :${response.body}");
-     }else{
-       print("Abhi:- editbide response :${response.statusCode}");
-       print("Abhi:- editbide response :${response.body}");
-     }
-   }catch(e){
-     print("Abhi:- editbid Exception");
-   }
+    var responseData = jsonDecode(response.body);
+    try {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.snackbar("Success", responseData['message'],
+            snackPosition: SnackPosition.BOTTOM,
+            colorText: Colors.white,
+            backgroundColor: Colors.green.shade700);
+        print("Abhi:- editbide response :${response.statusCode}");
+        print("Abhi:- editbide response :${response.body}");
+      } else {
+        print("Abhi:- editbide response :${response.statusCode}");
+        print("Abhi:- editbide response :${response.body}");
+      }
+    } catch (e) {
+      print("Abhi:- editbid Exception");
+    }
   }
 
   //      Negotiation tab
@@ -754,12 +754,12 @@ class _BiddingserviceproviderworkdetailState
         );
         return;
       }
-
+print("user: ${biddingOrder!.userId?.id}");
       final payload = {
         'order_id': widget.orderId,
         'bidding_offer_id': biddingOfferId,
         'service_provider': currentUserId,
-        'user': biddingOrder!.userId,
+        'user': biddingOrder!.userId?.id,
         'initiator': 'service_provider',
         'offer_amount': offerAmount,
       };
@@ -1102,7 +1102,7 @@ class _BiddingserviceproviderworkdetailState
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
           statusBarIconBrightness: Brightness.light,
         ),
@@ -1185,32 +1185,37 @@ class _BiddingserviceproviderworkdetailState
                       ),
                     ),
                     SizedBox(height: height * 0.015),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
                           child: InkWell(
-                            onTap: (){
-                              openMap(biddingOrder?.latitude ?? 0.0,
-                                biddingOrder?.longitude ?? 0.0,);
-                              print("Abhi:- print latitude : ${biddingOrder?.latitude ?? 0.0} logiture ${biddingOrder?.longitude ?? 0.0}");
+                            onTap: () {
+                              openMap(
+                                biddingOrder?.latitude ?? 0.0,
+                                biddingOrder?.longitude ?? 0.0,
+                              );
+                              print(
+                                  "Abhi:- print latitude : ${biddingOrder?.latitude ?? 0.0} logiture ${biddingOrder?.longitude ?? 0.0}");
                             },
-
                             child: Container(
-                             height:  height * 0.03,
-                             width:  width * 0.4,
+                              height: height * 0.03,
+                              width: width * 0.4,
                               // padding: EdgeInsets.symmetric(
                               //   horizontal: width * 0.06,
                               //   vertical: height * 0.005,
                               // ),
                               decoration: BoxDecoration(
                                 color: Colors.red.shade300,
-                                borderRadius: BorderRadius.circular(width * 0.02),
+                                borderRadius:
+                                    BorderRadius.circular(width * 0.02),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(3.0),
                                 child: Text(
                                   // biddingOrder!.address,
-                                  biddingOrder?.userId?.location?.address ?? "No data",
+                                  biddingOrder?.userId?.location?.address ??
+                                      "No data",
                                   style: GoogleFonts.roboto(
                                     color: Colors.white,
                                     fontSize: width * 0.03,
@@ -1222,9 +1227,17 @@ class _BiddingserviceproviderworkdetailState
                           ),
                         ),
                         Container(
-                          decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-                          child: Center(child: Text(biddingOrder?.projectId ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
-                            overflow: TextOverflow.ellipsis,)),)
+                          decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Center(
+                              child: Text(
+                            biddingOrder?.projectId ?? "No data",
+                            style: TextStyle(color: Colors.white),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                        )
                       ],
                     ),
                     SizedBox(height: height * 0.015),
@@ -1242,7 +1255,7 @@ class _BiddingserviceproviderworkdetailState
                     Padding(
                       padding: EdgeInsets.only(left: width * 0.02),
                       child: Text(
-                        'Completion : ${biddingOrder!.deadline.split('T').first}',
+                        'Completion Date  : ${biddingOrder!.deadline.split('T').first}',
                         style: TextStyle(
                           fontSize: width * 0.035,
                           color: Colors.grey,
@@ -1291,75 +1304,103 @@ class _BiddingserviceproviderworkdetailState
                             .toList(),
                       ),
                     ),
-                    SizedBox(height: height*0.02,),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
                     biddingOrder?.hireStatus == 'cancelled'
                         ? Center(
-                      child: Container(
-                        height: 35,
-                        width: 250,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning_amber, color: Colors.red),
-                            Text("This order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                          ],
-                        ),
-                      ),
-                    )
+                            child: Container(
+                              height: 35,
+                              width: 250,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.red)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.warning_amber, color: Colors.red),
+                                  Text(
+                                    "This order is cancelled",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                         : SizedBox(),
                     biddingOrder?.hireStatus == 'cancelledDispute'
                         ? Center(
-                      child: Container(
-                        height: 40,
-                        width: 300,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning_amber, color: Colors.red),
-                            Flexible(child: Text("The order has been cancelled due to a dispute.", textAlign: TextAlign.center,maxLines: 2, style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),)),
-                          ],
-                        ),
-                      ),
-                    )
+                            child: Container(
+                              height: 40,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.red)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.warning_amber, color: Colors.red),
+                                  Flexible(
+                                      child: Text(
+                                    "The order has been cancelled due to a dispute.",
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.red),
+                                  )),
+                                ],
+                              ),
+                            ),
+                          )
                         : SizedBox(),
-
                     biddingOrder?.hireStatus == 'completed'
                         ? Center(
-                      child: Container(
-                        height: 35,
-                        width: 300,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check_circle_outline, color: Colors.green),
-                            Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
-                          ],
-                        ),
-                      ),
-                    )
+                            child: Container(
+                              height: 35,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.green)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle_outline,
+                                      color: Colors.green),
+                                  Text(
+                                    "  This order has been completed.",
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                         : SizedBox(),
                     biddingOrder?.hireStatus == 'rejected'
                         ? Center(
-                      child: Container(
-                        height: 35,
-                        width: 300,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(Icons.block, color: Colors.grey),
-                            Text("The order is rejected"),
-                          ],
-                        ),
-                      ),
-                    )
+                            child: Container(
+                              height: 35,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.grey)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.block, color: Colors.grey),
+                                  Text("The order is rejected"),
+                                ],
+                              ),
+                            ),
+                          )
                         : SizedBox(),
                     if (isAccepted) ...[
                       Card(
@@ -1457,7 +1498,6 @@ class _BiddingserviceproviderworkdetailState
                                         SizedBox(
                                           width: 17,
                                         ),
-
                                         Spacer(),
                                         Container(
                                           height: 30,
@@ -1477,19 +1517,24 @@ class _BiddingserviceproviderworkdetailState
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: height*0.008,),
+                                    SizedBox(
+                                      height: height * 0.008,
+                                    ),
                                     Align(
                                       alignment: Alignment.centerRight,
-                                           child: GestureDetector(
+                                      child: GestureDetector(
                                         onTap: () {
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       ViewUserProfileScreen(
-                                                        userId: biddingOrder!.userId?.id ??
+                                                        userId: biddingOrder!
+                                                                .userId?.id ??
                                                             'Unknown',
-                                                        profileImage: biddingOrder!.userId?.profilePic ??
+                                                        profileImage: biddingOrder!
+                                                                .userId
+                                                                ?.profilePic ??
                                                             'Unknown',
                                                       )));
                                         },
@@ -1832,382 +1877,452 @@ class _BiddingserviceproviderworkdetailState
                     ],
                     if (isPending) ...[
                       SizedBox(height: height * 0.02),
-                      /*hasAlreadyBid ? */ biddingOrder!.userId == currentUserId ||
-                          hasAlreadyBid ? GestureDetector(
-                        onTap: (){
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              final TextEditingController
-                              editamountController =
-                              TextEditingController();
-                              final TextEditingController
-                              editdescriptionController =
-                              TextEditingController();
-                              final TextEditingController
-                              editdurationController =
-                              TextEditingController();
-                              return AlertDialog(
-                                backgroundColor: Colors.white,
-                                insetPadding: EdgeInsets.symmetric(
-                                    horizontal: width * 0.05),
-                                title: Center(
+                      /*hasAlreadyBid ? */
+                      biddingOrder!.userId == currentUserId || hasAlreadyBid
+                          ? GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    final TextEditingController
+                                        editamountController =
+                                        TextEditingController();
+                                    final TextEditingController
+                                        editdescriptionController =
+                                        TextEditingController();
+                                    final TextEditingController
+                                        editdurationController =
+                                        TextEditingController();
+                                    return AlertDialog(
+                                      backgroundColor: Colors.white,
+                                      insetPadding: EdgeInsets.symmetric(
+                                          horizontal: width * 0.05),
+                                      title: Center(
+                                        child: Text(
+                                          "Bid",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: width * 0.05,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      content: SingleChildScrollView(
+                                        child: SizedBox(
+                                          width: width * 0.8,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Enter Amount",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: width * 0.035,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.005),
+                                              TextField(
+                                                controller:
+                                                    editamountController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  hintText: "₹0.00",
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            width * 0.02),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.01),
+                                              Text(
+                                                "Description",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: width * 0.035,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.005),
+                                              TextField(
+                                                controller:
+                                                    editdescriptionController,
+                                                maxLines: 3,
+                                                decoration: InputDecoration(
+                                                  hintText: "Enter Description",
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            width * 0.02),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.01),
+                                              Text(
+                                                "Duration",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: width * 0.035,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.005),
+                                              TextField(
+                                                controller:
+                                                    editdurationController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  hintText:
+                                                      "Enter Duration (in days)",
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            width * 0.02),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: height * 0.015),
+                                              Center(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    String editbidAmout =
+                                                        editamountController
+                                                            .text
+                                                            .trim();
+                                                    String editbidmessage =
+                                                        editdescriptionController
+                                                            .text
+                                                            .trim();
+                                                    String editbidduration =
+                                                        editdurationController
+                                                            .text
+                                                            .trim();
+                                                    print(
+                                                        "Abhi:- edit bid amount print : amount : $editbidAmout editbidmessage : $editbidmessage editbidduration : $editbidduration");
+                                                    editBid(
+                                                        editbidAmout,
+                                                        editbidduration,
+                                                        editbidmessage);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: width * 0.18,
+                                                      vertical: height * 0.012,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.green.shade700,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              width * 0.02),
+                                                    ),
+                                                    child: Text(
+                                                      "Edit Bid",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: width * 0.04,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Center(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.18,
+                                    vertical: height * 0.012,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.shade700,
+                                    borderRadius:
+                                        BorderRadius.circular(width * 0.02),
+                                  ),
+                                  child: Text(
+                                    "Edit bid",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: GestureDetector(
+                                onTap: biddingOrder!.userId == currentUserId
+                                    ? () {
+                                        Get.snackbar(
+                                          'Error',
+                                          'You cannot bid on your own order',
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                          margin: EdgeInsets.all(10),
+                                          duration: Duration(seconds: 3),
+                                        );
+                                      }
+                                    : hasAlreadyBid
+                                        ? () {
+                                            Get.snackbar(
+                                              'Error',
+                                              'You have already placed a bid on this order',
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM,
+                                              backgroundColor: Colors.red,
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                            );
+                                          }
+                                        : () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                final TextEditingController
+                                                    amountController =
+                                                    TextEditingController();
+                                                final TextEditingController
+                                                    descriptionController =
+                                                    TextEditingController();
+                                                final TextEditingController
+                                                    durationController =
+                                                    TextEditingController();
+                                                return AlertDialog(
+                                                  backgroundColor: Colors.white,
+                                                  insetPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal:
+                                                              width * 0.05),
+                                                  title: Center(
+                                                    child: Text(
+                                                      "Bid",
+                                                      style: GoogleFonts.roboto(
+                                                        fontSize: width * 0.05,
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  content:
+                                                      SingleChildScrollView(
+                                                    child: SizedBox(
+                                                      width: width * 0.8,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "Enter Amount",
+                                                            style: GoogleFonts
+                                                                .roboto(
+                                                              fontSize:
+                                                                  width * 0.035,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.005),
+                                                          TextField(
+                                                            controller:
+                                                                amountController,
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            decoration:
+                                                                InputDecoration(
+                                                              hintText: "₹0.00",
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(width *
+                                                                            0.02),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.01),
+                                                          Text(
+                                                            "Description",
+                                                            style: GoogleFonts
+                                                                .roboto(
+                                                              fontSize:
+                                                                  width * 0.035,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.005),
+                                                          TextField(
+                                                            controller:
+                                                                descriptionController,
+                                                            maxLines: 3,
+                                                            decoration:
+                                                                InputDecoration(
+                                                              hintText:
+                                                                  "Enter Description",
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(width *
+                                                                            0.02),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.01),
+                                                          Text(
+                                                            "Duration",
+                                                            style: GoogleFonts
+                                                                .roboto(
+                                                              fontSize:
+                                                                  width * 0.035,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.005),
+                                                          TextField(
+                                                            controller:
+                                                                durationController,
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            decoration:
+                                                                InputDecoration(
+                                                              hintText:
+                                                                  "Enter Duration (in days)",
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(width *
+                                                                            0.02),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                              height: height *
+                                                                  0.015),
+                                                          Center(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                String amount =
+                                                                    amountController
+                                                                        .text
+                                                                        .trim();
+                                                                String
+                                                                    description =
+                                                                    descriptionController
+                                                                        .text
+                                                                        .trim();
+                                                                String
+                                                                    duration =
+                                                                    durationController
+                                                                        .text
+                                                                        .trim();
+                                                                submitBid(
+                                                                    amount,
+                                                                    description,
+                                                                    duration);
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
+                                                              child: Container(
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                  horizontal:
+                                                                      width *
+                                                                          0.18,
+                                                                  vertical:
+                                                                      height *
+                                                                          0.012,
+                                                                ),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .green
+                                                                      .shade700,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          width *
+                                                                              0.02),
+                                                                ),
+                                                                child: Text(
+                                                                  "Bid",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        width *
+                                                                            0.04,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: width * 0.18,
+                                    vertical: height * 0.012,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        biddingOrder!.userId == currentUserId ||
+                                                hasAlreadyBid
+                                            ? Colors.grey.shade400
+                                            : Colors.green.shade700,
+                                    borderRadius:
+                                        BorderRadius.circular(width * 0.02),
+                                  ),
                                   child: Text(
                                     "Bid",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: width * 0.05,
-                                      color: Colors.black,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: width * 0.04,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                                content: SingleChildScrollView(
-                                  child: SizedBox(
-                                    width: width * 0.8,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Enter Amount",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: width * 0.035,
-                                            fontWeight:
-                                            FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.005),
-                                        TextField(
-                                          controller:
-                                          editamountController,
-                                          keyboardType:
-                                          TextInputType.number,
-                                          decoration:
-                                          InputDecoration(
-                                            hintText: "₹0.00",
-                                            border:
-                                            OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                  width *
-                                                      0.02),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.01),
-                                        Text(
-                                          "Description",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: width * 0.035,
-                                            fontWeight:
-                                            FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.005),
-                                        TextField(
-                                          controller:
-                                          editdescriptionController,
-                                          maxLines: 3,
-                                          decoration:
-                                          InputDecoration(
-                                            hintText:
-                                            "Enter Description",
-                                            border:
-                                            OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                  width *
-                                                      0.02),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.01),
-                                        Text(
-                                          "Duration",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: width * 0.035,
-                                            fontWeight:
-                                            FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.005),
-                                        TextField(
-                                          controller:
-                                          editdurationController,
-                                          keyboardType:
-                                          TextInputType.number,
-                                          decoration:
-                                          InputDecoration(
-                                            hintText:
-                                            "Enter Duration (in days)",
-                                            border:
-                                            OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(width * 0.02),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height: height * 0.015),
-                                        Center(
-                                          child: GestureDetector(
-                                            onTap: () {
-
-                                              String editbidAmout = editamountController.text.trim();
-                                              String editbidmessage = editdescriptionController.text.trim();
-                                              String editbidduration = editdurationController.text.trim();
-                                              print("Abhi:- edit bid amount print : amount : $editbidAmout editbidmessage : $editbidmessage editbidduration : $editbidduration");
-                                              editBid(editbidAmout,editbidduration,editbidmessage);
-                                              Navigator.pop(context);
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: width * 0.18,
-                                                vertical: height * 0.012,
-                                              ),
-                                              decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
-                                              child: Text(
-                                                "Edit Bid",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: width * 0.04,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Center(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.18,
-                              vertical: height * 0.012,
-                            ),
-                            decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
-                            child: Text("Edit bid",style: TextStyle(color: Colors.white),),
-                          ),
-                        ),
-                      ) :  Center(
-                        child: GestureDetector(
-                          onTap: biddingOrder!.userId == currentUserId
-                              ? () {
-                                  Get.snackbar(
-                                    'Error',
-                                    'You cannot bid on your own order',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: Colors.red,
-                                    colorText: Colors.white,
-                                    margin: EdgeInsets.all(10),
-                                    duration: Duration(seconds: 3),
-                                  );
-                                }
-                              : hasAlreadyBid
-                                  ? () {
-                                      Get.snackbar(
-                                        'Error',
-                                        'You have already placed a bid on this order',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: Colors.red,
-                                        colorText: Colors.white,
-                                        margin: EdgeInsets.all(10),
-                                        duration: Duration(seconds: 3),
-                                      );
-                                    }
-                                  : () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          final TextEditingController
-                                              amountController =
-                                              TextEditingController();
-                                          final TextEditingController
-                                              descriptionController =
-                                              TextEditingController();
-                                          final TextEditingController
-                                              durationController =
-                                              TextEditingController();
-                                          return AlertDialog(
-                                            backgroundColor: Colors.white,
-                                            insetPadding: EdgeInsets.symmetric(
-                                                horizontal: width * 0.05),
-                                            title: Center(
-                                              child: Text(
-                                                "Bid",
-                                                style: GoogleFonts.roboto(
-                                                  fontSize: width * 0.05,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            content: SingleChildScrollView(
-                                              child: SizedBox(
-                                                width: width * 0.8,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Enter Amount",
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: width * 0.035,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.005),
-                                                    TextField(
-                                                      controller:
-                                                          amountController,
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText: "₹0.00",
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      width *
-                                                                          0.02),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.01),
-                                                    Text(
-                                                      "Description",
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: width * 0.035,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.005),
-                                                    TextField(
-                                                      controller:
-                                                          descriptionController,
-                                                      maxLines: 3,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            "Enter Description",
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      width *
-                                                                          0.02),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.01),
-                                                    Text(
-                                                      "Duration",
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: width * 0.035,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.005),
-                                                    TextField(
-                                                      controller:
-                                                          durationController,
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            "Enter Duration (in days)",
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(width * 0.02),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                        height: height * 0.015),
-                                                    Center(
-                                                      child: GestureDetector(
-                                                        onTap: () {
-                                                          String amount = amountController.text.trim();
-                                                          String description = descriptionController.text.trim();
-                                                          String duration = durationController.text.trim();
-                                                          submitBid(amount, description, duration);
-                                                          Navigator.pop(context);
-                                                        },
-                                                        child: Container(
-                                                          padding: EdgeInsets.symmetric(
-                                                            horizontal: width * 0.18,
-                                                            vertical: height * 0.012,
-                                                          ),
-                                                          decoration: BoxDecoration(color: Colors.green.shade700, borderRadius: BorderRadius.circular(width * 0.02),),
-                                                          child: Text(
-                                                            "Bid",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: width * 0.04,
-                                                              fontWeight: FontWeight.bold,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.18,
-                              vertical: height * 0.012,
-                            ),
-                            decoration: BoxDecoration(
-                              color: biddingOrder!.userId == currentUserId ||
-                                      hasAlreadyBid
-                                  ? Colors.grey.shade400
-                                  : Colors.green.shade700,
-                              borderRadius: BorderRadius.circular(width * 0.02),
-                            ),
-                            child: Text(
-                              "Bid",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: width * 0.04,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-
                       SizedBox(height: height * 0.02),
                       NegotiationCard(
                         key: ValueKey(offerPrice),
@@ -2612,7 +2727,7 @@ class _BiddingserviceproviderworkdetailState
                           ),
                           child: Center(
                             child: Text(
-                              'Cancel Task and create dispute',
+                              'Cancel Task and Create Dispute',
                               style: GoogleFonts.roboto(
                                 fontSize: 14,
                                 color: Colors.white,

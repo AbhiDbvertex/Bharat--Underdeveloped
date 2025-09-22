@@ -1,22 +1,22 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:mime/mime.dart' as mime;
+
 import '../../../../Widgets/AppColors.dart';
 import '../../../Emergency/User/controllers/emergency_service_controller.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../controller/bidding_post_task_controller.dart';
 
 class PostTaskScreen extends StatelessWidget {
-   PostTaskScreen({super.key});
+  PostTaskScreen({super.key});
+
   final emergencyServiceController = Get.put(EmergencyServiceController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PostTaskController(), permanent: false); // Mark controller as non-permanent
+    final controller = Get.put(PostTaskController(),
+        permanent: false); // Mark controller as non-permanent
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     print("");
@@ -24,41 +24,45 @@ class PostTaskScreen extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         controller.resetForm(); // Reset form before navigating back
-        Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance on re-entry
+        Get.delete<
+            PostTaskController>(); // Delete controller to ensure fresh instance on re-entry
         return true; // Allow back navigation
       },
       child: Scaffold(
-        appBar:AppBar(
+        appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.white,
           centerTitle: true,
           title: const Text("Post New Bidding",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          leading:  GestureDetector(
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: GestureDetector(
             onTap: () {
               controller.resetForm(); // Reset form before navigating back
-              Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
+              Get.delete<
+                  PostTaskController>(); // Delete controller to ensure fresh instance
               Get.back();
             },
             child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
           ),
           actions: [],
-          systemOverlayStyle:  SystemUiOverlayStyle(
+          systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: AppColors.primaryGreen,
             statusBarIconBrightness: Brightness.light,
           ),
         ),
         body: Obx(
-              () => SingleChildScrollView(
+          () => SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Form(
               key: controller.formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                //  _pageHeader(context, controller),
+                  //  _pageHeader(context, controller),
                   _buildLabel("Title"),
-                  _buildTextField(controller.titleController, "Enter Title of work"),
+                  _buildTextField(
+                      controller.titleController, "Enter Title of work"),
                   _buildLabel("Category"),
                   DropdownButtonFormField<String>(
                     decoration: _inputDecoration("Choose category"),
@@ -66,10 +70,10 @@ class PostTaskScreen extends StatelessWidget {
                     items: controller.categories
                         .map(
                           (cat) => DropdownMenuItem(
-                        value: cat['id'],
-                        child: Text(cat['name']!),
-                      ),
-                    )
+                            value: cat['id'],
+                            child: Text(cat['name']!),
+                          ),
+                        )
                         .toList(),
                     onChanged: (val) {
                       controller.selectedCategoryId.value = val;
@@ -77,7 +81,8 @@ class PostTaskScreen extends StatelessWidget {
                       controller.allSubCategories.clear();
                       if (val != null) controller.fetchSubCategories(val);
                     },
-                    validator: (val) => val == null ? "Please select a category" : null,
+                    validator: (val) =>
+                        val == null ? "Please select a category" : null,
                   ),
                   _buildLabel("Sub Category (Multiple selection)"),
                   _subcategorySelector(controller),
@@ -106,15 +111,17 @@ class PostTaskScreen extends StatelessWidget {
                   TextFormField(
                     enabled: false,
                     controller: controller.addressController,
-                    decoration: _inputDecoration(controller.userLocation.value).copyWith(
+                    decoration: _inputDecoration(controller.userLocation.value)
+                        .copyWith(
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.my_location),
                         onPressed: controller.getCurrentLocation,
                       ),
                     ),
-                    validator: (val) => val == null || val.isEmpty || val == 'Select Location'
-                        ? "Please enter a valid address"
-                        : null,
+                    validator: (val) =>
+                        val == null || val.isEmpty || val == 'Select Location'
+                            ? "Please enter a valid address"
+                            : null,
                   ),
                   _buildLabel("Google Address"),
                   _googleLocationField(controller),
@@ -145,35 +152,58 @@ class PostTaskScreen extends StatelessWidget {
                     child: AbsorbPointer(
                       child: TextFormField(
                         controller: controller.dateController,
-                        decoration: _inputDecoration("Select Deadline Date", icon: Icons.calendar_today),
-                        validator: (val) => val == null || val.isEmpty ? "Please pick a deadline" : null,
+                        decoration: _inputDecoration("Select Deadline Date",
+                            icon: Icons.calendar_today),
+                        validator: (val) => val == null || val.isEmpty
+                            ? "Please pick a deadline"
+                            : null,
                       ),
                     ),
                   ),
                   _buildLabel("Upload Task Image"),
                   _buildImagePicker(controller),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      minimumSize: const Size.fromHeight(50),
-                    ),
-                    onPressed: () {
-                      if (controller.formKey.currentState!.validate()) {
-                        if (controller.selectedCategoryId.value == null) {
-                          controller.showSnackbar("Error", "Please select a category", context: context);
-                          return;
-                        }
-                        if (controller.selectedSubCategoryIds.isEmpty) {
-                          controller.showSnackbar("Error", "Please select at least one sub category", context: context);
-                          return;
-                        }
-                        controller.submitTask(context); // Pass context to submitTask
-                        // Get.back();
-                      }
-                    },
-                    child: const Text("Post Task", style: TextStyle(fontSize: 16,color: Colors.white)),
-                  ),
+                  Obx(() {
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size.fromHeight(50),
+                      ),
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : () {
+                              if (controller.formKey.currentState!.validate()) {
+                                if (controller.selectedCategoryId.value ==
+                                    null) {
+                                  controller.showSnackbar(
+                                      "Error", "Please select a category",
+                                      context: context);
+                                  return;
+                                }
+                                if (controller.selectedSubCategoryIds.isEmpty) {
+                                  controller.showSnackbar("Error",
+                                      "Please select at least one sub category",
+                                      context: context);
+                                  return;
+                                }
+                                controller.submitTask(
+                                    context); // Pass context to submitTask
+                                // Get.back();
+                              }
+                            },
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ))
+                          : const Text("Post Task",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white)),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -215,43 +245,48 @@ class PostTaskScreen extends StatelessWidget {
         child: TextFormField(
           controller: controller.googleAddressController,
           decoration: _inputDecoration("Location", icon: Icons.my_location),
-          validator: (val) => val == null || val.isEmpty ? "Please select a Google address" : null,
+          validator: (val) => val == null || val.isEmpty
+              ? "Please select a Google address"
+              : null,
         ),
       ),
     );
   }
 
   Widget _buildLabel(String text) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Text(
-      text,
-      style: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w600),
-    ),
-  );
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          text,
+          style: GoogleFonts.roboto(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      );
 
-  InputDecoration _inputDecoration(String hint, {IconData? icon}) => InputDecoration(
-    hintText: hint,
-    prefixIcon: icon != null ? Icon(icon) : null,
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-    contentPadding: const EdgeInsets.symmetric(
-      vertical: 14,
-      horizontal: 12,
-    ),
-  );
+  InputDecoration _inputDecoration(String hint, {IconData? icon}) =>
+      InputDecoration(
+        hintText: hint,
+        prefixIcon: icon != null ? Icon(icon) : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 14,
+          horizontal: 12,
+        ),
+      );
 
   Widget _buildTextField(
-      TextEditingController controller,
-      String hint, {
-        int maxLines = 1,
-        TextInputType? keyboardType,
-        String? Function(String?)? validator,
-      }) =>
+    TextEditingController controller,
+    String hint, {
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) =>
       TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
         decoration: _inputDecoration(hint),
-        validator: validator ?? (val) => val == null || val.isEmpty ? "This field is required" : null,
+        validator: validator ??
+            (val) =>
+                val == null || val.isEmpty ? "This field is required" : null,
       );
 
   Widget _subcategorySelector(PostTaskController controller) {
@@ -260,7 +295,8 @@ class PostTaskScreen extends StatelessWidget {
         if (controller.selectedCategoryId.value != null) {
           controller.showSubcategoryDialog();
         } else {
-          controller.showSnackbar("Error", "Please select category first", context: Get.context!);
+          controller.showSnackbar("Error", "Please select category first",
+              context: Get.context!);
         }
       },
       child: _buildDropdownTile(controller),
@@ -268,32 +304,35 @@ class PostTaskScreen extends StatelessWidget {
   }
 
   Widget _buildDropdownTile(PostTaskController controller) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-    decoration: BoxDecoration(
-      border: Border.all(color: Colors.grey.shade400),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            controller.selectedSubCategoryIds.isEmpty
-                ? "Choose sub categories"
-                : controller.allSubCategories
-                .where((sub) => controller.selectedSubCategoryIds.contains(sub['id']))
-                .map((sub) => sub['name'])
-                .join(', '),
-            style: TextStyle(
-              fontSize: 14,
-              color: controller.selectedSubCategoryIds.isEmpty ? Colors.grey : Colors.black,
-            ),
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(10),
         ),
-        const Icon(Icons.arrow_drop_down),
-      ],
-    ),
-  );
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                controller.selectedSubCategoryIds.isEmpty
+                    ? "Choose sub categories"
+                    : controller.allSubCategories
+                        .where((sub) => controller.selectedSubCategoryIds
+                            .contains(sub['id']))
+                        .map((sub) => sub['name'])
+                        .join(', '),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: controller.selectedSubCategoryIds.isEmpty
+                      ? Colors.grey
+                      : Colors.black,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down),
+          ],
+        ),
+      );
 
   Widget _buildImagePicker(PostTaskController controller) {
     return Column(
@@ -365,28 +404,28 @@ class PostTaskScreen extends StatelessWidget {
             runSpacing: 8.0,
             children: [
               ...controller.selectedImages.map((img) => Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      img,
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
-                      onPressed: () {
-                        controller.selectedImages.remove(img);
-                      },
-                    ),
-                  ),
-                ],
-              )),
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          img,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red),
+                          onPressed: () {
+                            controller.selectedImages.remove(img);
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
               if (controller.selectedImages.length < 5)
                 GestureDetector(
                   onTap: controller.pickImage,

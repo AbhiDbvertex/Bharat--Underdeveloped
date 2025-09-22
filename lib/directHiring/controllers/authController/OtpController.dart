@@ -283,15 +283,5 @@ class OtpController {
     }
   }
 
-  // void _showMessage(String message) {
-  //   Fluttertoast.showToast(
-  //     msg: message,
-  //     toastLength: Toast.LENGTH_LONG,
-  //     // Maps to ~2 seconds
-  //     gravity: ToastGravity.BOTTOM,
-  //     backgroundColor: Colors.black87,
-  //     textColor: Colors.white,
-  //     fontSize: 12.0,
-  //   );
-  // }
+
 }

@@ -1385,7 +1385,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -2502,13 +2501,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       if (isLoading) return;
                       print("Debug: Submit button pressed");
                       if (selectedAddressId == null) {
-                        Fluttertoast.showToast(
-                          msg: "Please select a location!",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 14.0,
+
+                        CustomSnackBar.show(
+                            context,
+                            message:"Please select a location!" ,
+                            type: SnackBarType.error
                         );
                         return;
                       }
@@ -2519,13 +2516,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       );
 
                       if (selectedAddress == null) {
-                        Fluttertoast.showToast(
-                          msg: "Selected address not found!",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 14.0,
+
+                        CustomSnackBar.show(
+                            context,
+                            message: "Selected address not found!",
+                            type: SnackBarType.error
                         );
                         return;
                       }
@@ -2537,13 +2532,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       final landmark = selectedAddress['landmark']?.toString() ?? 'N/A';
 
                       if (addressText == null || addressText.isEmpty || latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
-                        Fluttertoast.showToast(
-                          msg: "Invalid selected address data!",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 14.0,
+
+                        CustomSnackBar.show(
+                            context,
+                            message: "Invalid selected address data!",
+                            type: SnackBarType.error
                         );
                         return;
                       }
@@ -2583,14 +2576,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       );
 
                       Navigator.pop(context);
-
-                      Fluttertoast.showToast(
-                        msg: "Location submitted successfully!",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        backgroundColor: Colors.green.shade700,
-                        textColor: Colors.white,
-                        fontSize: 14.0,
+                      CustomSnackBar.show(
+                          context,
+                          message: "Location submitted successfully!",
+                          type: SnackBarType.success
                       );
                     },
                     child: Container(

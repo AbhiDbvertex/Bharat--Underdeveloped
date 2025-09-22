@@ -197,30 +197,4 @@ class LoginController {
       isLoading.value = false;
     }
   }
-
-// void _showSnackBar(BuildContext context, String message) {
-//   Future.delayed(Duration.zero, () {
-//     if (context.mounted) {
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(SnackBar(content: Text(message)));
-//     }
-//   });
-// }
-// void _showSnackBar(BuildContext context, String message) {
-//   Future.delayed(Duration.zero, () {
-//     if (context.mounted) {
-//       final messenger = ScaffoldMessenger.of(context);
-//       messenger.hideCurrentSnackBar();
-//
-//       messenger.showSnackBar(
-//         SnackBar(
-//           content: Text(message),
-//           duration: const Duration(seconds: 3), // optional: control display time
-//           behavior: SnackBarBehavior.floating, // optional: make it float
-//         ),
-//       );
-//     }
-//   });
-// }
 }

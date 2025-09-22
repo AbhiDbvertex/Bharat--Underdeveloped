@@ -995,7 +995,7 @@ class TaskView extends StatelessWidget {
                         children: [
                           // Index
                           SizedBox(
-                            width: 0.05.toWidthPercent(),
+                            width: 0.075.toWidthPercent(),
                             child: Text(
                               '${index + 1}.',
                               style:
@@ -1050,6 +1050,7 @@ class TaskView extends StatelessWidget {
                                       controller.requestPaymentRelease(
                                         orderId: controller.orderId.value,
                                         paymentId: payment.id!,
+                                        context: context
                                       );
                                       bwDebug(
                                           "Pay button clicked for pending payment. Payment ID: ${payment.paymentId}");
@@ -1269,7 +1270,7 @@ class TaskView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text(
-                'Cancel Task and create dispute',
+                'Cancel Task and Create Dispute',
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -1280,7 +1281,7 @@ class TaskView extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () async {
                 bool isMarkCompleteSuccess = await controller.markAsComplete(
-                    orderId: controller.orderId.value);
+                    orderId: controller.orderId.value,context: context);
                 if (isMarkCompleteSuccess) {
                   bwDebug("Mark as complete was successful");
                   if (context.mounted) {
@@ -1300,7 +1301,7 @@ class TaskView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text(
-                'Mark as complete',
+                'Mark as Complete',
                 style: TextStyle(color: Colors.white),
               ),
             ),

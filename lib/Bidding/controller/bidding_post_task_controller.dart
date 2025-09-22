@@ -685,6 +685,7 @@ class PostTaskController extends GetxController {
   // }
 
   Future<void> submitTask(BuildContext context) async {
+    isLoading.value=true;
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -750,8 +751,12 @@ class PostTaskController extends GetxController {
         print("Abhi:- post bidding task api statusCode ${response.stream}");
       }
     } catch (e) {
+
       print("Abhi:- post bidding task api statusCode ${e}");
       showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
+    }
+    finally{
+      isLoading.value=false;
     }
   }
 
