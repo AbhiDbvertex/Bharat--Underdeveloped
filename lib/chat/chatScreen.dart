@@ -11,7 +11,7 @@ class ChatScreen extends StatefulWidget {
   _ChatScreenState createState() => _ChatScreenState();
 }
 // 68ac07f700315e754a037e56
-// final receiverId = "68abeca08908c84c7c3769ea"; // TODO: Dynamically set
+final receiverId = "68abeca08908c84c7c3769ea"; // TODO: Dynamically set
 class _ChatScreenState extends State<ChatScreen> {
   final String userId = "68ac07f700315e754a037e56"; // TODO: Auth se le
   List<dynamic> conversations = [];

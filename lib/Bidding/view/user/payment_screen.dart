@@ -867,6 +867,7 @@
 // }
 
 import 'dart:convert';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/directHiring/views/User/user_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -878,6 +879,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../../directHiring/Consent/ApiEndpoint.dart';
 import '../../../directHiring/Consent/app_constants.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
+import '../../../utility/custom_snack_bar.dart';
+import 'buding_work_detail_screen.dart';
 
 class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
@@ -905,6 +908,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController(text: '');
   late Razorpay _razorpay;
+   var isLoading=false;
 
   @override
   void initState() {
@@ -924,6 +928,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
           'status': payment['status']?.toString() ?? 'UNKNOWN',
           'method': payment['method']?.toString() ?? 'cod',
           '_id': payment['_id']?.toString() ?? '',
+          'release_status':payment['release_status']?.toString()??""
         }));
       });
     }
@@ -938,15 +943,24 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Payment failed: ${response.message}")),
+
+    CustomSnackBar.show(
+        context,
+        message:"Payment failed: ${response.message}" ,
+        type: SnackBarType.error
     );
+
+
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("External wallet selected: ${response.walletName}")),
+
+    CustomSnackBar.show(
+        context,
+        message:"External wallet selected: ${response.walletName}" ,
+        type: SnackBarType.info
     );
+
   }
 
   Future<String?> _getUserId() async {
@@ -1027,6 +1041,9 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   String? _currentPaymentMethod;
 
   Future<void> postPaymentRequest(payId) async {
+    setState(() {
+      isLoading=true;
+    });
     print("Abhi:- postPaymentRequest oderId: ${widget.orderId} payId: ${payId}");
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/user/request-release/${widget.orderId}/${payId}';
@@ -1050,15 +1067,23 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postPaymentRequest response : ${response.body}");
         print("Abhi:- postPaymentRequest statuscode : ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${responseData['message']}")),
+
+        CustomSnackBar.show(
+            context,
+            message: "${responseData['message']}",
+            type: SnackBarType.success
         );
+Navigator.pop(context);
       } else {
         print("Abhi:- else postPaymentRequest response : ${response.body}");
         print("Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
       }
     } catch (e) {
       print("Abhi:- postPaymentRequest Exception $e");
+    }finally{
+      setState(() {
+        isLoading=false;
+      });
     }
   }
 
@@ -1275,40 +1300,114 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
+                            // Row(
+                            //   children: [
+                            //     Expanded(
+                            //       child: RichText(
+                            //         text: TextSpan(
+                            //           style: GoogleFonts.roboto(
+                            //             fontSize: 14,
+                            //             color: Colors.black,
+                            //             fontWeight: FontWeight.w500,
+                            //           ),
+                            //           children: [
+                            //             TextSpan(text: "${i + 1}. ${toTitleCase(payment['description'])} "),
+                            //             TextSpan(
+                            //               text: " ${toTitleCase(payment['status'] ?? 'UNKNOWN')}",
+                            //               style: TextStyle(color: Colors.green),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     Text(
+                            //       "₹${payment['amount']}",
+                            //       style: GoogleFonts.roboto(
+                            //         fontSize: 16,
+                            //         color: Colors.black,
+                            //         fontWeight: FontWeight.w500,
+                            //       ),
+                            //     ),
+                            //     const SizedBox(width: 5),
+                            //
+                            //     payment['release_status'] == 'release_requested'
+                            //         ? SizedBox()
+                            //         : GestureDetector(
+                            //       onTap: isLoading==true?null:()async {
+                            //        await postPaymentRequest(payment['_id'] ?? '');
+                            //         print("Abhi:- payment releaseId : ${payment['_id']}");
+                            //       },
+                            //       child: Container(
+                            //         height: 26,
+                            //         width: 40,
+                            //         decoration: BoxDecoration(
+                            //           color: Colors.green,
+                            //           borderRadius: BorderRadius.circular(5),
+                            //         ),
+                            //         child: Center(
+                            //           child:Text(
+                            //             "Pay",
+                            //             style: GoogleFonts.roboto(
+                            //               fontSize: 13,
+                            //               color: Colors.white,
+                            //               fontWeight: FontWeight.w500,
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start, // text top se align hoga
                               children: [
+                                // Description column
                                 Expanded(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      children: [
-                                        TextSpan(text: "${i + 1}. ${toTitleCase(payment['description'])} "),
-                                        TextSpan(
-                                          text: " ${toTitleCase(payment['status'] ?? 'UNKNOWN')}",
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ],
+                                  flex: 3, // jyada space description ko
+                                  child: Text(
+                                    "${i + 1}. ${toTitleCase(payment['description'])}",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  "₹${payment['amount']}",
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+
+                                // Status column
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    toTitleCase(payment['status'] ?? 'UNKNOWN'),
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                payment['release_status'] == 'release'
-                                    ? SizedBox()
+
+                                // Amount column
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    "₹${payment['amount']}",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+
+                                // Button column
+                                payment['release_status'] == 'release_requested'
+                                    ? const SizedBox(width: 36) // empty placeholder
                                     : GestureDetector(
-                                  onTap: () {
-                                    postPaymentRequest(payment['_id'] ?? '');
+                                  onTap: isLoading == true
+                                      ? null
+                                      : () async {
+                                    await postPaymentRequest(payment['_id'] ?? '');
                                     print("Abhi:- payment releaseId : ${payment['_id']}");
                                   },
                                   child: Container(
@@ -1332,6 +1431,9 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
                                 ),
                               ],
                             ),
+
+
+
                             const SizedBox(height: 10),
                           ],
                         ),
@@ -1521,8 +1623,11 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
                             try {
                               _razorpay.open(options);
                             } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Razorpay error: $e")),
+
+                              CustomSnackBar.show(
+                                  context,
+                                  message: "Razorpay error: $e",
+                                  type: SnackBarType.error
                               );
                             }
                           } else {
@@ -1572,9 +1677,13 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Token not found")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Token not found",
+          type: SnackBarType.warning
       );
+
       return;
     }
 
@@ -1629,31 +1738,41 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Payment stage added successfully")),
+
+          CustomSnackBar.show(
+              context,
+              message:"Payment stage added successfully" ,
+              type: SnackBarType.success
           );
+
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid response structure")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Invalid response structure",
+              type: SnackBarType.error
           );
+
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            duration: const Duration(seconds: 4),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message:errorMessage ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("⚠️ Error occurred: $e"),
-          duration: const Duration(seconds: 3),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message: "Error occurred: $e",
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -1666,9 +1785,13 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Token not found")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Token not found",
+          type: SnackBarType.warning
       );
+
       return;
     }
 
@@ -1724,26 +1847,42 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Payment completed successfully")),
+
+          CustomSnackBar.show(
+              context,
+              message:"Payment completed successfully" ,
+              type: SnackBarType.success
           );
+
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid response structure")),
+
+          CustomSnackBar.show(
+              context,
+              message: "Invalid response structure",
+              type: SnackBarType.error
           );
+
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment update failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+
+        CustomSnackBar.show(
+            context,
+            message:errorMessage ,
+            type: SnackBarType.error
         );
+
         print("Abhi:- payment screen get Exception ${responseData['message']}");
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Error: $e",
+          type: SnackBarType.error
       );
+
       print("Abhi:- payment screen get Exception $e");
     }
   }
