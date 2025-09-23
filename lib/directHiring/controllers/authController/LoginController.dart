@@ -1,3 +1,90 @@
+// import 'dart:convert';
+//
+// import 'package:developer/NotificationService.dart';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+//
+// import '../../Consent/ApiEndpoint.dart';
+// import '../../Consent/app_constants.dart';
+// import '../../views/auth/OtpVerificationScreen.dart';
+//
+// class LoginController {
+//   final TextEditingController phoneController;
+//   final FocusNode focusNode = FocusNode();
+//
+//   LoginController(this.phoneController);
+//
+//   void dispose() {
+//     phoneController.dispose();
+//     focusNode.dispose();
+//   }
+//
+//   Future<void> login(BuildContext context) async {
+//     final phone = phoneController.text.trim();
+//
+//     if (phone.length != 10) {
+//       _showSnackBar(context, 'Please enter a valid 10-digit phone number');
+//       return;
+//     }
+//
+//     final url = Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.loginScreen}');
+//     final fcmToken =
+//         await NotificationService.getTokenFromPrefs(); // Await here
+//
+//     print(" Phone: $phone,  FCM Token: $fcmToken");
+//
+//     try {
+//       final response = await http.post(
+//         url,
+//         headers: {'Content-Type': 'application/json'},
+//         body: jsonEncode({
+//           'phone': phone,
+//           'firebase_token': fcmToken ?? '', // Handle null case
+//         }),
+//       );
+//
+//       final responseData = jsonDecode(response.body);
+//       print(
+//         " anjalii Login API Response: ${response.statusCode} - $responseData",
+//       );
+//
+//       if (response.statusCode == 200 && responseData['status'] == true) {
+//         final String? tempOtp = responseData['temp_otp'];
+//
+//         Future.delayed(Duration.zero, () {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder:
+//                   (_) => OtpVerificationScreen(
+//                     phoneNumber: phone,
+//                     receivedOtp: tempOtp,
+//                   ),
+//             ),
+//           );
+//         });
+//       } else {
+//         final errorMsg = responseData['message'] ?? 'Failed to send OTP';
+//         _showSnackBar(context, errorMsg);
+//         print("❌ Error: $errorMsg");
+//       }
+//     } catch (e) {
+//       _showSnackBar(context, 'Network error: $e');
+//       print("❌ Network error: $e");
+//     }
+//   }
+//
+//   void _showSnackBar(BuildContext context, String message) {
+//     Future.delayed(Duration.zero, () {
+//       if (context.mounted) {
+//         ScaffoldMessenger.of(
+//           context,
+//         ).showSnackBar(SnackBar(content: Text(message)));
+//       }
+//     });
+//   }
+// }
+
 import 'dart:convert';
 
 import 'package:developer/NotificationService.dart';
@@ -110,30 +197,4 @@ class LoginController {
       isLoading.value = false;
     }
   }
-
-// void _showSnackBar(BuildContext context, String message) {
-//   Future.delayed(Duration.zero, () {
-//     if (context.mounted) {
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(SnackBar(content: Text(message)));
-//     }
-//   });
-// }
-// void _showSnackBar(BuildContext context, String message) {
-//   Future.delayed(Duration.zero, () {
-//     if (context.mounted) {
-//       final messenger = ScaffoldMessenger.of(context);
-//       messenger.hideCurrentSnackBar();
-//
-//       messenger.showSnackBar(
-//         SnackBar(
-//           content: Text(message),
-//           duration: const Duration(seconds: 3), // optional: control display time
-//           behavior: SnackBarBehavior.floating, // optional: make it float
-//         ),
-//       );
-//     }
-//   });
-// }
 }

@@ -257,7 +257,7 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
     }else if(widget.from =="emergencyWorkDetail"){
 
       final workDetailController = Get.find<WorkDetailController>();
-      workDetailController.addPaymentStage(razorPayPaymentId: razorPayPaymentId,razorpaySignatureId: razorpaySignatureId,amount: widget.enteredAmount,tax: widget.taxAmount, description: widget. description, orderId:widget.orderId!);
+      workDetailController.addPaymentStage(razorPayPaymentId: razorPayPaymentId,razorpaySignatureId: razorpaySignatureId,amount: widget.enteredAmount,tax: widget.taxAmount, description: widget. description, orderId:widget.orderId!,context: context);
       Navigator.pop(context);
     }
     else

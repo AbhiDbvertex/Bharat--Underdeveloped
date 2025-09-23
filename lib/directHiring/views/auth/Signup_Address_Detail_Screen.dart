@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,29 +85,15 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     mapController.dispose();
     super.dispose();
   }
-
-  // void _showMessage(String message) {
-  //   Fluttertoast.showToast(
-  //     msg: message,
-  //     toastLength: Toast.LENGTH_SHORT,
-  //     gravity: ToastGravity.BOTTOM,
-  //     timeInSecForIosWeb: 2,
-  //     backgroundColor: Colors.black.withOpacity(0.7),
-  //     textColor: Colors.white,
-  //     fontSize: 14.0,
-  //   );
-  // }
   void _showMessageSuccessAddress(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 2,
-      backgroundColor: Colors.green.shade700,
-      textColor: Colors.white,
-      fontSize: 14.0,
+    CustomSnackBar.show(
+        context,
+        message: message,
+        type: SnackBarType.success
     );
+
   }
+
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();

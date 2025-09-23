@@ -411,6 +411,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../controllers/AccountController/AccountController.dart';
 import '../../models/AccountModel/AccountModel.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
@@ -487,19 +488,28 @@ class _AccountScreenState extends State<AccountScreen> {
 
           print("Saved address: $fetchedAddress");
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data["message"] ?? "Profile fetch failed")),
+
+          CustomSnackBar.show(
+              context,
+              message: data["message"] ?? "Profile fetch failed",
+              type: SnackBarType.error
           );
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Server error, profile fetch failed!")),
+
+        CustomSnackBar.show(
+            context,
+            message: "Server error, profile fetch failed!",
+            type: SnackBarType.error
         );
       }
     } catch (e) {
       print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong, try again!")),
+
+      CustomSnackBar.show(
+          context,
+          message: "Something went wrong, try again!",
+          type: SnackBarType.error
       );
     }
   }

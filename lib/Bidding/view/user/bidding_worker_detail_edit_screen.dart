@@ -570,132 +570,134 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
             statusBarIconBrightness: Brightness.light,
           ),
         ),
-        body: Obx(
-              () => SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: controller.formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // _pageHeader(context, controller),
-                  _buildLabel("Title"),
-                  _buildTextField(controller.titleController, "Enter Title of work"),
-                  _buildLabel("Category"),
-                  DropdownButtonFormField<String>(
-                    decoration: _inputDecoration("Choose category"),
-                    value: controller.selectedCategoryId.value,
-                    items: controller.categories
-                        .map(
-                          (cat) => DropdownMenuItem(
-                        value: cat['id'],
-                        child: Text(cat['name']!),
-                      ),
-                    )
-                        .toList(),
-                    onChanged: (val) {
-                      controller.selectedCategoryId.value = val;
-                      controller.selectedSubCategoryIds.clear();
-                      controller.allSubCategories.clear();
-                      if (val != null) controller.fetchSubCategories(val);
-                    },
-                    validator: (val) => val == null ? "Please select a category" : null,
-                  ),
-                  _buildLabel("Sub Category (Multiple selection)"),
-                  _subcategorySelector(controller),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildLabel("Location"),
-                      InkWell(
-                        onTap: controller.navigateToLocationScreen,
-                        child: Container(
-                          width: width * 0.35,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Change location",
-                              style: TextStyle(color: Colors.white),
+        body: SafeArea(
+          child: Obx(
+                () => SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: controller.formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // _pageHeader(context, controller),
+                    _buildLabel("Title"),
+                    _buildTextField(controller.titleController, "Enter Title of work"),
+                    _buildLabel("Category"),
+                    DropdownButtonFormField<String>(
+                      decoration: _inputDecoration("Choose category"),
+                      value: controller.selectedCategoryId.value,
+                      items: controller.categories
+                          .map(
+                            (cat) => DropdownMenuItem(
+                          value: cat['id'],
+                          child: Text(cat['name']!),
+                        ),
+                      )
+                          .toList(),
+                      onChanged: (val) {
+                        controller.selectedCategoryId.value = val;
+                        controller.selectedSubCategoryIds.clear();
+                        controller.allSubCategories.clear();
+                        if (val != null) controller.fetchSubCategories(val);
+                      },
+                      validator: (val) => val == null ? "Please select a category" : null,
+                    ),
+                    _buildLabel("Sub Category (Multiple selection)"),
+                    _subcategorySelector(controller),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildLabel("Location"),
+                        InkWell(
+                          onTap: controller.navigateToLocationScreen,
+                          child: Container(
+                            width: width * 0.35,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Change location",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    enabled: false,
-                    controller: controller.addressController,
-                    decoration: _inputDecoration(controller.userLocation.value).copyWith(
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.my_location),
-                        onPressed: controller.getCurrentLocation,
-                      ),
+                      ],
                     ),
-                    validator: (val) => val == null || val.isEmpty || val == 'Select Location'
-                        ? "Please enter a valid address"
-                        : null,
-                  ),
-                  _buildLabel("Google Address"),
-                  _googleLocationField(controller),
-                  _buildLabel("Description"),
-                  _buildTextField(
-                    controller.descriptionController,
-                    "Describe your task",
-                    maxLines: 4,
-                  ),
-                  _buildLabel("Cost"),
-                  _buildTextField(
-                    controller.costController,
-                    "Enter cost in INR",
-                    keyboardType: TextInputType.number,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) {
-                        return "Please enter the cost";
-                      }
-                      if (double.tryParse(val) == null) {
-                        return "Please enter a valid number";
-                      }
-                      return null;
-                    },
-                  ),
-                  _buildLabel("Select Deadline"),
-                  GestureDetector(
-                    onTap: () => controller.selectDate(context),
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        controller: controller.dateController,
-                        decoration: _inputDecoration("Select Deadline Date", icon: Icons.calendar_today),
-                        validator: (val) => val == null || val.isEmpty ? "Please pick a deadline" : null,
+                    TextFormField(
+                      enabled: false,
+                      controller: controller.addressController,
+                      decoration: _inputDecoration(controller.userLocation.value).copyWith(
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.my_location),
+                          onPressed: controller.getCurrentLocation,
+                        ),
                       ),
+                      validator: (val) => val == null || val.isEmpty || val == 'Select Location'
+                          ? "Please enter a valid address"
+                          : null,
                     ),
-                  ),
-                  _buildLabel("Upload Task Image"),
-                  _buildImagePicker(controller),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      minimumSize: const Size.fromHeight(50),
+                    _buildLabel("Google Address"),
+                    _googleLocationField(controller),
+                    _buildLabel("Description"),
+                    _buildTextField(
+                      controller.descriptionController,
+                      "Describe your task",
+                      maxLines: 4,
                     ),
-                    onPressed: () {
-                      if (controller.formKey.currentState!.validate()) {
-                        if (controller.selectedCategoryId.value == null) {
-                          controller.showSnackbar("Error", "Please select a category", context: context);
-                          return;
+                    _buildLabel("Cost"),
+                    _buildTextField(
+                      controller.costController,
+                      "Enter cost in INR",
+                      keyboardType: TextInputType.number,
+                      validator: (val) {
+                        if (val == null || val.isEmpty) {
+                          return "Please enter the cost";
                         }
-                        if (controller.selectedSubCategoryIds.isEmpty) {
-                          controller.showSnackbar("Error", "Please select at least one sub category", context: context);
-                          return;
+                        if (double.tryParse(val) == null) {
+                          return "Please enter a valid number";
                         }
-                        controller.submitTask(context);
-                      }
-                    },
-                    child: const Text("Post Task", style: TextStyle(fontSize: 16, color: Colors.white)),
-                  ),
-                ],
+                        return null;
+                      },
+                    ),
+                    _buildLabel("Select Deadline"),
+                    GestureDetector(
+                      onTap: () => controller.selectDate(context),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: controller.dateController,
+                          decoration: _inputDecoration("Select Deadline Date", icon: Icons.calendar_today),
+                          validator: (val) => val == null || val.isEmpty ? "Please pick a deadline" : null,
+                        ),
+                      ),
+                    ),
+                    _buildLabel("Upload Task Image"),
+                    _buildImagePicker(controller),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size.fromHeight(50),
+                      ),
+                      onPressed: () {
+                        if (controller.formKey.currentState!.validate()) {
+                          if (controller.selectedCategoryId.value == null) {
+                            controller.showSnackbar("Error", "Please select a category", context: context);
+                            return;
+                          }
+                          if (controller.selectedSubCategoryIds.isEmpty) {
+                            controller.showSnackbar("Error", "Please select at least one sub category", context: context);
+                            return;
+                          }
+                          controller.submitTask(context);
+                        }
+                      },
+                      child: const Text("Post Task", style: TextStyle(fontSize: 16, color: Colors.white)),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

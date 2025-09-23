@@ -3519,7 +3519,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
 
                       const SizedBox(height: 10),
                       Text(
-                        "Completion: ${order!['deadline']?.toString().substring(0, 10) ?? 'N/A'}",
+                        "Completion Date - ${order!['deadline']?.toString().substring(0, 10) ?? 'N/A'}",
                         style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 10),
@@ -3552,7 +3552,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               children: [
                                 Icon(Icons.warning_amber, color: Colors.red),
                                 Text(
-                                  "This order is Cancelled",
+                                  "This order is cancelled",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       color: Colors.red),
@@ -4242,7 +4242,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                'Cancel Task and create dispute',
+                                'Cancel Task and Create Dispute',
                                 style: GoogleFonts.roboto(
                                   fontSize: 14,
                                   color: Colors.white,
