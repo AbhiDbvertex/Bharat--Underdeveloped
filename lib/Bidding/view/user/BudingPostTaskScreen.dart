@@ -347,6 +347,7 @@ class PostTaskScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
+
                 Text(
                   "Upload (.png, .jpg, .jpeg) File (300px * 300px)",
                   textAlign: TextAlign.center,

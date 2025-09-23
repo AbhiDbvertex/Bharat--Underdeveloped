@@ -88,8 +88,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     ),),
     debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
-      home: SplashScreen(),
-      // home: ChatScreen(),
+      // home: SplashScreen(),
+      home: ChatScreen(),
       // home: DragToPayScreen(),
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );
