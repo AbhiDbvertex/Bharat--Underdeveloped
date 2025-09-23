@@ -755,6 +755,7 @@ import 'dart:io';
 
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -869,13 +870,19 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      // backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF9DF89D),
+        centerTitle: true,
+        title: const Text("Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF9DF89D),
+          statusBarIconBrightness: Brightness.dark,
+        ),
       ),
       body: SafeArea(
         child: isLoading
@@ -1040,26 +1047,26 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: Icon(Icons.arrow_back, size: 25),
-                  ),
-                ),
-                const SizedBox(width: 100),
-                Text(
-                  "Profile",
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     GestureDetector(
+            //       onTap: () => Navigator.pop(context),
+            //       child: const Padding(
+            //         padding: EdgeInsets.only(left: 8.0),
+            //         child: Icon(Icons.arrow_back, size: 25),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 100),
+            //     Text(
+            //       "Profile",
+            //       style: GoogleFonts.roboto(
+            //         fontSize: 18,
+            //         fontWeight: FontWeight.bold,
+            //         color: Colors.black,
+            //       ),
+            //     ),
+            //   ],
+            // ),
             // Center(child: _buildRoleSwitcher(context)),
           ],
         ),

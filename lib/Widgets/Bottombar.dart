@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../chat/chat_user_list_screen.dart';
 import '../directHiring/views/Account/AccountScreen.dart';
 import '../directHiring/views/ServiceProvider/ServiceProviderHomeScreen.dart';
 import '../directHiring/views/ServiceProvider/WorkerMyHireScreen.dart';

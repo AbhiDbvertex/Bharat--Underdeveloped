@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../Widgets/AppColors.dart';
@@ -16,46 +17,53 @@ class ReferralScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
+      appBar:AppBar(
         elevation: 0,
-        toolbarHeight: 10,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Referral",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
-
-            // Top bar with back button and title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AccountScreen(),
-                        ),
-                      );
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 90),
-                  Text(
-                    "Referral",
-                    style: GoogleFonts.roboto(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // const SizedBox(height: 10),
+            //
+            // // Top bar with back button and title
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            //   child: Row(
+            //     children: [
+            //       GestureDetector(
+            //         onTap: () {
+            //           Navigator.pop(
+            //             context,
+            //             MaterialPageRoute(
+            //               builder: (context) => const AccountScreen(),
+            //             ),
+            //           );
+            //         },
+            //         child: const Icon(Icons.arrow_back),
+            //       ),
+            //       const SizedBox(width: 90),
+            //       Text(
+            //         "Referral",
+            //         style: GoogleFonts.roboto(
+            //           fontSize: 18,
+            //           fontWeight: FontWeight.bold,
+            //           color: Colors.black,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // Image
             SizedBox(

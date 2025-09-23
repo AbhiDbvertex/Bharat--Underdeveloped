@@ -310,86 +310,86 @@ class _HireScreenState extends State<HireScreen> {
   }
 
   // ✅ Confirmation dialog
-  // Future<bool> showConfirmationDialog() async {
-  //   return await showDialog<bool>(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         backgroundColor: Colors.white,
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(20),
-  //         ),
-  //         contentPadding: const EdgeInsets.all(24),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Image.asset(
-  //               'assets/images/success.png',
-  //               height: 120,
-  //               width: 120,
-  //               fit: BoxFit.cover,
-  //             ),
-  //             const SizedBox(height: 20),
-  //             Text(
-  //               "Are you Sure want to hire?",
-  //               style: GoogleFonts.roboto(
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.w500,
-  //               ),
-  //               textAlign: TextAlign.center,
-  //             ),
-  //             const SizedBox(height: 24),
-  //             Row(
-  //               children: [
-  //                 Expanded(
-  //                   child: ElevatedButton(
-  //                     style: ElevatedButton.styleFrom(
-  //                       backgroundColor: Colors.green.shade700,
-  //                       padding: const EdgeInsets.symmetric(vertical: 12),
-  //                       shape: RoundedRectangleBorder(
-  //                         borderRadius: BorderRadius.circular(8),
-  //                       ),
-  //                     ),
-  //                     onPressed: () async{
-  //                       final confirmed=await showDetails(context);
-  //                       Navigator.pop(context,confirmed);
-  //                     },
-  //                     child: const Text(
-  //                       "Okay",
-  //                       style: TextStyle(color: Colors.white),
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 12),
-  //                 Expanded(
-  //                   child: OutlinedButton(
-  //                     style: OutlinedButton.styleFrom(
-  //                       padding: const EdgeInsets.symmetric(vertical: 12),
-  //                       shape: RoundedRectangleBorder(
-  //                         borderRadius: BorderRadius.circular(8),
-  //                       ),
-  //                       side: BorderSide(color: Colors.green.shade700),
-  //                     ),
-  //                     onPressed: () => Navigator.pop(context, false),
-  //                     child: Text(
-  //                       "Cancel",
-  //                       style: GoogleFonts.roboto(
-  //                         fontWeight: FontWeight.bold,
-  //                         color: Colors.green.shade700,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   ) ??
-  //       false;
-  // }
+  Future<bool> showInitialConfirmationDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/success.png',
+                height: 120,
+                width: 120,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Are you sure you want to hire ?",
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () async{
+                        Navigator.pop(context,true);
+                      },
+                      child: const Text(
+                        "Confirm",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        side: BorderSide(color: Colors.green.shade700),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(
+                        "Cancel",
+                        style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    ) ??
+        false;
+  }
+
   Future<bool> showConfirmationDialog() async {
     return await showDialog<bool>(
       context: context,
@@ -526,9 +526,12 @@ class _HireScreenState extends State<HireScreen> {
 
       return;
     }
+    final initialConfirmed = await showInitialConfirmationDialog();
+    if (!mounted || !initialConfirmed) return;
 
-    final confirmed = await showConfirmationDialog();
-    if (!mounted || !confirmed) return;
+
+    final paymentConfirmed = await showConfirmationDialog();
+    if (!mounted || !paymentConfirmed) return;
 
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
@@ -714,13 +717,16 @@ final orderId=decoded["order"]["_id"];
               const SizedBox(height: 6),
               // buildAddressField(),
               TextFormField(
+
                 enabled: false,
                 controller: controller.addressController,
+                style: const TextStyle(fontSize: 16,color: Colors.black87),
                 decoration: _inputDecoration(controller.userLocation.value).copyWith(
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.my_location),
+                    icon: const Icon(Icons.my_location,color: AppColors.primaryGreen,),
                     onPressed: controller.getCurrentLocation,
                   ),
+
                 ),
                 validator: (val) => val == null || val.isEmpty || val == 'Select Location'
                     ? "Please enter a valid address"
@@ -783,13 +789,13 @@ final orderId=decoded["order"]["_id"];
                 ),
               ],
               const SizedBox(height: 14),
-              buildLabel("Add deadline and time"),
+              buildLabel("Add Deadline"),
               const SizedBox(height: 6),
               buildDatePicker(),
               const SizedBox(height: 14),
-              buildLabel("Add time"),
+              buildLabel("Add Time"),
               const SizedBox(height: 6),
-              buildTimePicker(), // ✅ Time picker add kiya
+              buildTimePicker(),
               const SizedBox(height: 14),
               buildLabel("Upload Images"),
               const SizedBox(height: 6),
@@ -916,7 +922,7 @@ final orderId=decoded["order"]["_id"];
         hintText: selectedDate == null
             ? "Select date"
             : "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}",
-        prefixIcon: const Icon(Icons.calendar_today),
+        prefixIcon: const Icon(Icons.calendar_today,color: AppColors.primaryGreen,),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         filled: true,
         fillColor: Colors.grey[100],
@@ -933,7 +939,7 @@ final orderId=decoded["order"]["_id"];
         hintText: selectedTime == null
             ? "Select time"
             : "${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}",
-        prefixIcon: const Icon(Icons.access_time),
+        prefixIcon: const Icon(Icons.access_time,color: AppColors.primaryGreen,),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         filled: true,
         fillColor: Colors.grey[100],
@@ -949,7 +955,9 @@ final orderId=decoded["order"]["_id"];
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade400),
         borderRadius: BorderRadius.circular(10),
+      color: Colors.grey[100]
       ),
+
       child: selectedImages.isEmpty
           ? GestureDetector(
         onTap: pickImages,
@@ -1004,15 +1012,32 @@ final orderId=decoded["order"]["_id"];
                   ),
                 ),
                 Positioned(
-                  top: 0,
-                  right: 0,
-                  child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        selectedImages.removeAt(index);
-                      });
-                    },
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    height: 0.05.toWidthPercent(),
+                    width: 0.05.toWidthPercent(),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: Offset(0,2),
+                        )
+                      ]
+                    
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() {
+                          selectedImages.removeAt(index);
+                        });
+                      },
+                      child: Icon(Icons.close,size: 0.05.toWidthPercent(),color: Colors.white,),
+                    )
                   ),
                 ),
               ],
@@ -1024,12 +1049,23 @@ final orderId=decoded["order"]["_id"];
   }
   InputDecoration _inputDecoration(String hint, {IconData? icon}) => InputDecoration(
     hintText: hint,
+    hintStyle: GoogleFonts.roboto(
+      fontWeight: FontWeight.w700,
+      color: Colors.black,
+      fontSize: 16,
+    ),
     prefixIcon: icon != null ? Icon(icon) : null,
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(15),borderSide: BorderSide(color: Colors.black87)),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.black87),
+      borderRadius: BorderRadius.circular(10),
+    ),
     contentPadding: const EdgeInsets.symmetric(
       vertical: 14,
       horizontal: 12,
     ),
+    filled: true,
+    fillColor: Colors.grey[100],
   );
 
 

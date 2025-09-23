@@ -157,6 +157,7 @@
 
 import 'dart:convert';
 
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -184,21 +185,24 @@ class CustomerCareController {
   bool validateForm(BuildContext context) {
     // Check if subject is selected
     if (model.selectedSubject == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a subject')));
+      CustomSnackBar.show(
+          context,
+          message:'Please select a subject' ,
+          type: SnackBarType.error
+      );
+
       return false;
     }
 
     // Check if contact field is empty
     if (contactController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Please enter ${model.isEmailSelected ? 'email address' : 'contact number'}',
-          ),
-        ),
+
+      CustomSnackBar.show(
+          context,
+          message:  'Please enter ${model.isEmailSelected ? 'email address' : 'contact number'}' ,
+          type: SnackBarType.error
       );
+
       return false;
     }
 
@@ -207,35 +211,48 @@ class CustomerCareController {
       if (!RegExp(
         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
       ).hasMatch(contactController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter a valid email address')),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Please enter a valid email address',
+            type: SnackBarType.error
         );
+
         return false;
       }
     }
     // Phone number validation
     else {
       if (!RegExp(r'^[0-9]+$').hasMatch(contactController.text)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Phone number must contain only digits'),
-          ),
+        CustomSnackBar.show(
+            context,
+            message: 'Phone number must contain only digits',
+            type: SnackBarType.error
         );
+
         return false;
       }
       if (contactController.text.length != 10) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Phone number must be 10 digits')),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Phone number must be 10 digits',
+            type: SnackBarType.error
         );
+
         return false;
       }
     }
 
     // Check if description is empty
     if (descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a description')),
+
+      CustomSnackBar.show(
+          context,
+          message:'Please enter a description' ,
+          type: SnackBarType.error
       );
+
       return false;
     }
 
@@ -253,9 +270,13 @@ class CustomerCareController {
     final token = prefs.getString('token');
 
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token missing. Please login again.')),
+
+      CustomSnackBar.show(
+          context,
+          message: 'Token missing. Please login again.',
+          type: SnackBarType.error
       );
+
       return;
     }
 
@@ -278,26 +299,25 @@ class CustomerCareController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email submitted successfully!')),
+        CustomSnackBar.show(
+            context,
+            message: 'Email submitted successfully!',
+            type: SnackBarType.success
         );
         contactController.clear();
         descriptionController.clear();
         model.reset();
         refreshView();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Server Error: ${response.statusCode}\n${response.body}',
-            ),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Server Error: ${response.statusCode}\n${response.body}',
+            type: SnackBarType.error
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Request Error: $e')));
+      CustomSnackBar.show(context, message: 'Request Error: $e',type: SnackBarType.error);
     }
   }
 
@@ -312,8 +332,11 @@ class CustomerCareController {
     final token = prefs.getString('token');
 
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token missing. Please login again.')),
+
+      CustomSnackBar.show(
+          context,
+          message:'Token missing. Please login again.' ,
+          type: SnackBarType.error
       );
       return;
     }
@@ -339,26 +362,33 @@ class CustomerCareController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Call request submitted successfully!')),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Call request submitted successfully!',
+            type: SnackBarType.success
         );
+
         contactController.clear();
         descriptionController.clear();
         model.reset();
         refreshView();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Server Error: ${response.statusCode}\n${response.body}',
-            ),
-          ),
+
+        CustomSnackBar.show(
+            context,
+            message: 'Server Error: ${response.statusCode}\n${response.body}',
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Request Error: $e')));
+      CustomSnackBar.show(
+          context,
+          message: 'Request Error: $e',
+          type: SnackBarType.error
+      );
+
     }
   }
 }

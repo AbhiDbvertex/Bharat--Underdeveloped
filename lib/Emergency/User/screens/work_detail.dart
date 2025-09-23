@@ -759,7 +759,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
                       /// DATE
                       Text(
-                        "Completion  - ${controller.deadline.value}",
+                        "Completion Date  - ${controller.deadline.value}",
                         style: GoogleFonts.roboto(
                             fontSize: 12, color: Colors.grey.shade700),
                       ),
@@ -946,11 +946,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                     ],
                   ),
                 ),
-                controller.hireStatus != "cancelled" &&
-                        controller.hireStatus != "assigned" &&
+                controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
                         controller.hireStatus != "cancelledDispute"
                     ? RequestAcceptedSection(orderId: controller.orderId.value)
-                    :  Center(
+                    : controller.hireStatus != "assigned"? Center(
                       child: Container(
                                         height: 35,
                                         width: 250,
@@ -960,11 +959,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(Icons.warning_amber, color: Colors.red),
-                        Text("This order is Cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                        Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
                       ],
                                         ),
                                       ),
-                    ),
+                    ):SizedBox(),
 
                 controller.hireStatus.value == "assigned" &&
                         controller.providerName.isNotEmpty
