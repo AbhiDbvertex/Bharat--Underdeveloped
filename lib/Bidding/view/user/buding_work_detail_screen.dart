@@ -868,6 +868,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                           //             This is accepted time show this fileds
                           data?['hire_status'] == 'accepted'
                               ? Card(
+                            color: Colors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                   elevation: 3,
