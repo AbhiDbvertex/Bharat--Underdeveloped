@@ -78,6 +78,7 @@ class AssignedWorker {
   }
 }
 
+
 class BiddingOrder {
   final String id;
   final String projectId;

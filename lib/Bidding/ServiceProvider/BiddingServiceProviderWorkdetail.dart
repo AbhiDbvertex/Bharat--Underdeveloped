@@ -2822,6 +2822,7 @@ class _NegotiationCardState extends State<NegotiationCard> {
                 ),
               ),
             ],
+
             SizedBox(height: widget.height * 0.02),
             GestureDetector(
               onTap: widget.onAccept,
