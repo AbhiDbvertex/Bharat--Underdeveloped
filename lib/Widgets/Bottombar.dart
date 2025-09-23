@@ -38,8 +38,8 @@ class BottombarState extends State<Bottombar> {
         subcategreyId: 'default_sub_category_id',
       ),
       // const PlaceholderScreen(label: 'My Work'),
-      // const PlaceholderScreen(label: 'Message'),
-      ChatScreen(),
+      const PlaceholderScreen(label: 'Message'),
+      // ChatScreen(),
       const AccountScreen(),
     ];
 
