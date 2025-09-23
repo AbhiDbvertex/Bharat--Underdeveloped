@@ -16,7 +16,7 @@ import 'LoginScreen.dart';
 import 'RoleSelectionScreen.dart';
 import '../../../../Widgets/AppColors.dart';
 import 'package:developer/Widgets/CustomButton.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 class SignupAddressDetailScreen extends StatefulWidget {
   final String? initialAddress;
   final LatLng? initialLocation;
@@ -594,7 +594,8 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
           if (mounted) {
             // widget.editlocationId != null ? _showMessageSuccessAddress('Sign up successful.',) : _showMessageSuccessAddress('Sign up successful.',);
-            widget.dataHide == "hide" ? _showMessageSuccessAddress('Sign up successful.',) : _showMessageSuccessAddress('Address saved successfully.');
+
+            // widget.dataHide == "hide" ? _showMessageSuccessAddress('Sign up successful.',) : _showMessageSuccessAddress('Address saved successfully.');
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
@@ -605,6 +606,23 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                       : const RoleSelectionScreen(),
                 ),
                     (route) => false,
+              );
+              widget.dataHide == "hide"
+                  ? Fluttertoast.showToast(
+                msg: "Sign up successful.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 14,
+              )
+                  : Fluttertoast.showToast(
+                msg: "Address saved successfully.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 14,
               );
 
               // Navigator.pop(context, {

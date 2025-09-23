@@ -1,3 +1,516 @@
+//
+// import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:file_picker/file_picker.dart';
+// import 'dart:io';
+// import 'APIServices.dart';
+// import 'SocketService.dart';
+//
+// class ChatScreen extends StatefulWidget {
+//   @override
+//   _ChatScreenState createState() => _ChatScreenState();
+// }
+// // 68ac07f700315e754a037e56
+// final receiverId = "68ac07f700315e754a037e56"; // TODO: Dynamically set
+// class _ChatScreenState extends State<ChatScreen> {
+//   final String userId = "68abeca08908c84c7c3769ea"; // TODO: Auth se le
+//   List<dynamic> conversations = [];
+//   dynamic currentChat;
+//   List<dynamic> messages = [];
+//   final TextEditingController _messageController = TextEditingController();
+//   final TextEditingController _receiverIdController = TextEditingController();
+//   List<String> images = [];
+//   List<String> documents = [];
+//   List<dynamic> onlineUsers = [];
+//   String receiverId = '';
+//   final ScrollController _scrollController = ScrollController();
+//   final ImagePicker _picker = ImagePicker();
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initSocket();
+//     _fetchConversations();
+//   }
+//
+//   void _initSocket() {
+//     print('Initializing socket for userId: $userId');
+//     SocketService.connect(userId);
+//     SocketService.setMessageCallback((parsedMessage) {
+//       print('New message via socket: $parsedMessage');
+//       if (parsedMessage != null && parsedMessage['conversationId'] != null) {
+//         if (currentChat != null && parsedMessage['conversationId'] == currentChat['_id']) {
+//           setState(() {
+//             if (!messages.any((msg) => msg['_id'] == parsedMessage['_id'])) {
+//               messages.add(parsedMessage);
+//             }
+//           });
+//           _scrollToBottom();
+//           print('Received message added to UI: ${parsedMessage['message']}');
+//         } else {
+//           _fetchConversations();
+//           print('Message from other chat: ${parsedMessage['conversationId']}');
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('New message in another chat!')),
+//           );
+//         }
+//       } else {
+//         print('Invalid message data: $parsedMessage');
+//       }
+//     });
+//     SocketService.listenOnlineUsers((users) {
+//       print('Online users: $users');
+//       setState(() => onlineUsers = users);
+//     });
+//   }
+//
+//   Future<void> _fetchConversations() async {
+//     try {
+//       final convs = await ApiService.fetchConversations(userId);
+//       setState(() => conversations = convs);
+//     } catch (e) {
+//       print('Error fetching conversations: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conversations not found!: $e')));
+//     }
+//   }
+//
+//   Future<void> _fetchMessages() async {
+//     if (currentChat == null) return;
+//     try {
+//       final msgs = await ApiService.fetchMessages(currentChat['_id']);
+//       setState(() {
+//         messages = msgs.where((msg) => !messages.any((m) => m['_id'] == msg['_id'])).toList() + messages;
+//       });
+//       _scrollToBottom();
+//     } catch (e) {
+//       print('Error fetching messages: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Messages does not fetch: $e')));
+//     }
+//   }
+//
+//   Future<void> _startConversation() async {
+//     if (receiverId.isEmpty) {
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter Receiver ID!')));
+//       return;
+//     }
+//     try {
+//       final newConv = await ApiService.startConversation(userId, receiverId);
+//       setState(() {
+//         conversations.add(newConv);
+//         currentChat = newConv;
+//         receiverId = '';
+//         _receiverIdController.clear();
+//       });
+//       _fetchMessages();
+//     } catch (e) {
+//       print('Error starting conversation: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conversation not started: $e')));
+//     }
+//   }
+//
+//   Future<void> _pickImages() async {
+//     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+//     if (pickedFiles != null) {
+//       if (pickedFiles.length > 5) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Maximum 5 images allowed!')),
+//         );
+//         return;
+//       }
+//       setState(() {
+//         images = pickedFiles.map((file) => file.path).toList();
+//       });
+//     }
+//   }
+//
+//   Future<void> _pickDocuments() async {
+//     FilePickerResult? result = await FilePicker.platform.pickFiles(
+//       allowMultiple: true,
+//       type: FileType.custom,
+//       allowedExtensions: ['pdf', 'doc', 'docx'],
+//     );
+//     if (result != null && result.files.length <= 5) {
+//       setState(() {
+//         documents = result.files.map((file) => file.path!).toList();
+//       });
+//     } else if (result != null && result.files.length > 5) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Maximum 5 documents allowed!')),
+//       );
+//     }
+//   }
+//
+//   Future<void> _sendMessage() async {
+//     if (_messageController.text.isEmpty && images.isEmpty && documents.isEmpty) {
+//       print('Abhi:- No message, images, or documents to send.');
+//       return;
+//     }
+//     final receiverId = currentChat['members']
+//         ?.firstWhere((m) => m['_id'] != userId, orElse: () => null)?['_id'];
+//     if (receiverId == null || currentChat == null) {
+//       print('Abhi:- Current chat or receiverId is null, cannot send message.');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pehle chat select karo!')));
+//       return;
+//     }
+//
+//     try {
+//       print('Abhi:- Attempting to send message. Message: ${_messageController.text}, Images: $images, Documents: $documents');
+//       dynamic newMsg;
+//       if (images.isNotEmpty) {
+//         newMsg = await ApiService.sendImageMessage(
+//           senderId: userId,
+//           receiverId: receiverId,
+//           conversationId: currentChat['_id'],
+//           imagePaths: images,
+//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//         );
+//         print('Abhi:- Image message sent successfully: $newMsg');
+//       } else if (documents.isNotEmpty) {
+//         newMsg = await ApiService.sendDocumentMessage(
+//           senderId: userId,
+//           receiverId: receiverId,
+//           conversationId: currentChat['_id'],
+//           documentPaths: documents,
+//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//         );
+//         print('Abhi:- Document message sent successfully: $newMsg');
+//       } else {
+//         final msgData = {
+//           'senderId': userId,
+//           'receiverId': receiverId,
+//           'conversationId': currentChat['_id'],
+//           'message': _messageController.text,
+//           'messageType': 'text',
+//         };
+//         newMsg = await ApiService.sendTextMessage(msgData);
+//         print('Abhi:- Text message sent successfully: $newMsg');
+//       }
+//
+//       print('Abhi:- Emitting message via socket: $newMsg');
+//       SocketService.sendMessage(newMsg);
+//       setState(() {
+//         if (!messages.any((msg) => msg['_id'] == newMsg['_id'])) {
+//           messages.add(newMsg);
+//         }
+//         _messageController.clear();
+//         images.clear();
+//         documents.clear();
+//         print('Abhi:- Message added to UI and fields cleared.');
+//       });
+//       _scrollToBottom();
+//     } catch (e) {
+//       print('Abhi:- Error sending message: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Message send nahi hui: $e')));
+//     }
+//   }
+//
+//   void _scrollToBottom() {
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       if (_scrollController.hasClients) {
+//         _scrollController.animateTo(
+//           _scrollController.position.maxScrollExtent,
+//           duration: Duration(milliseconds: 300),
+//           curve: Curves.easeOut,
+//         );
+//       }
+//     });
+//   }
+//
+//   @override
+//   void dispose() {
+//     SocketService.removeMessageCallback();
+//     SocketService.disconnect();
+//     _scrollController.dispose();
+//     _messageController.dispose();
+//     _receiverIdController.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Row(
+//         children: [
+//           Expanded(
+//             flex: 3,
+//             child: Column(
+//               children: [
+//                 Padding(
+//                   padding: EdgeInsets.all(10),
+//                   child: Row(
+//                     children: [
+//                       Expanded(
+//                         flex: 3,
+//                         child: TextField(
+//                           controller: _receiverIdController,
+//                           onChanged: (val) => receiverId = val,
+//                           decoration: InputDecoration(hintText: 'Receiver ID daalo'),
+//                         ),
+//                       ),
+//                       SizedBox(width: 10),
+//                       Expanded(
+//                         flex: 1,
+//                         child: ElevatedButton(
+//                           onPressed: _startConversation,
+//                           child: Text('Start Chat'),
+//                           style: ElevatedButton.styleFrom(
+//                             minimumSize: Size(0, 48),
+//                             padding: EdgeInsets.symmetric(horizontal: 10),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: ListView.builder(
+//                     key: ValueKey(conversations.length),
+//                     itemCount: conversations.length,
+//                     itemBuilder: (ctx, idx) {
+//                       final conv = conversations[idx];
+//                       final members = (conv['members'] as List);
+//                       final otherUser = members.firstWhere(
+//                             (m) => m['_id'] != userId,
+//                         orElse: () => {'name': 'Unknown', '_id': ''},
+//                       );
+//
+//                       return ListTile(
+//                         title: Text(otherUser['name'] ?? 'Unknown'),
+//                         subtitle: Text(conv['lastMessage'] ?? ''),
+//                         onTap: () {
+//                           setState(() => currentChat = conv);
+//                           _fetchMessages();
+//                         },
+//                         selected: currentChat?['_id'] == conv['_id'],
+//                         trailing: onlineUsers.contains(otherUser['_id'])
+//                             ? Icon(Icons.circle, color: Colors.green, size: 12)
+//                             : null,
+//                       );
+//                     },
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Expanded(
+//             flex: 7,
+//             child: Column(
+//               children: [
+//                 if (currentChat != null)
+//                   Padding(
+//                     padding: EdgeInsets.all(10),
+//                     child: Align(
+//                       alignment: Alignment.centerRight,
+//                       child: IconButton(
+//                         icon: Icon(Icons.refresh),
+//                         onPressed: _fetchMessages,
+//                         tooltip: 'Refresh Messages',
+//                       ),
+//                     ),
+//                   ),
+//                 // Expanded(
+//                 //   child: currentChat == null
+//                 //       ? Center(child: Text('Select a conversation'))
+//                 //       : ListView.builder(
+//                 //     key: ValueKey(messages.length),
+//                 //     controller: _scrollController,
+//                 //     itemCount: messages.length,
+//                 //     itemBuilder: (ctx, idx) {
+//                 //       final msg = messages[idx];
+//                 //       final isMe = msg['senderId'] == userId;
+//                 //       return Align(
+//                 //         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+//                 //         child: Container(
+//                 //           margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+//                 //           padding: EdgeInsets.all(10),
+//                 //           decoration: BoxDecoration(
+//                 //             color: isMe ? Colors.green[100] : Colors.grey[200],
+//                 //             borderRadius: BorderRadius.circular(10),
+//                 //           ),
+//                 //           child: Column(
+//                 //             crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+//                 //             children: [
+//                 //
+//                 //               if (msg['messageType'] == 'image' && msg['image'] != null)
+//                 //                 ...msg['image'].map<Widget>((imgUrl) => Image.network(
+//                 //                   'https://api.thebharatworks.com/$imgUrl',
+//                 //                   width: 200,
+//                 //                   height: 200,
+//                 //                   fit: BoxFit.cover,
+//                 //                   errorBuilder: (context, error, stackTrace) => Text('Image load failed'),
+//                 //                 )),
+//                 //               if (msg['messageType'] == 'document' && msg['document'] != null)
+//                 //                 ...msg['document'].map<Widget>((docUrl) => ListTile(
+//                 //                   title: Text('Document'),
+//                 //                   subtitle: Text(docUrl.split('/').last),
+//                 //                   onTap: () {
+//                 //                     print('Open document: $docUrl');
+//                 //                     // TODO: Add url_launcher
+//                 //                   },
+//                 //                 )),
+//                 //               if (msg['message'] != null && msg['message'].isNotEmpty)
+//                 //                 Text(msg['message']),
+//                 //               Text(
+//                 //                 DateTime.parse(msg['createdAt']).toLocal().toString().substring(0, 16),
+//                 //                 style: TextStyle(fontSize: 10, color: Colors.grey),
+//                 //               ),
+//                 //             ],
+//                 //           ),
+//                 //         ),
+//                 //       );
+//                 //     },
+//                 //   ),
+//                 // ),
+//
+//                 Expanded(
+//                   child: ListView.builder(
+//                     controller: _scrollController,
+//                     itemCount: messages.length,
+//                     itemBuilder: (ctx, idx) {
+//                       final msg = messages[idx];
+//                       final isMe = msg['senderId'] == userId;
+//
+//                       // Agar message type image hai
+//                       if (msg['messageType'] == 'image' && msg['image'] != null) {
+//                         final images = List<String>.from(msg['image']);
+//
+//                         // Ek row me multiple images
+//                         return Align(
+//                           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+//                           child: Container(
+//                             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+//                             padding: EdgeInsets.all(8),
+//                             decoration: BoxDecoration(
+//                               color: isMe ? Colors.green[100] : Colors.grey[200],
+//                               borderRadius: BorderRadius.circular(10),
+//                             ),
+//                             child: Row(
+//                               mainAxisSize: MainAxisSize.min,
+//                               children: images.map((imgUrl) {
+//                                 return Padding(
+//                                   padding: EdgeInsets.symmetric(horizontal: 2),
+//                                   child: Image.network(
+//                                     'https://api.thebharatworks.com/$imgUrl',
+//                                     width: 100,
+//                                     height: 100,
+//                                     fit: BoxFit.cover,
+//                                   ),
+//                                 );
+//                               }).toList(),
+//                             ),
+//                           ),
+//                         );
+//                       }
+//
+//                       // Agar message type text ya document hai
+//                       else {
+//                         return Align(
+//                           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+//                           child: Container(
+//                             margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+//                             padding: EdgeInsets.all(10),
+//                             decoration: BoxDecoration(
+//                               color: isMe ? Colors.green[100] : Colors.grey[200],
+//                               borderRadius: BorderRadius.circular(10),
+//                             ),
+//                             child: Column(
+//                               crossAxisAlignment:
+//                               isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+//                               children: [
+//                                 if (msg['message'] != null && msg['message'].isNotEmpty)
+//                                   Text(msg['message']),
+//                                 if (msg['document'] != null)
+//                                   ...msg['document'].map<Widget>((docUrl) => ListTile(
+//                                     title: Text('Document'),
+//                                     subtitle: Text(docUrl.split('/').last),
+//                                   )),
+//                                 Text(
+//                                   DateTime.parse(msg['createdAt'])
+//                                       .toLocal()
+//                                       .toString()
+//                                       .substring(0, 16),
+//                                   style: TextStyle(fontSize: 10, color: Colors.grey),
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         );
+//                       }
+//                     },
+//                   ),
+//                 ),
+//                 if (currentChat != null)
+//                   Padding(
+//                     padding: EdgeInsets.all(10),
+//                     child: Row(
+//                       children: [
+//                         Expanded(
+//                           flex: 3,
+//                           child: TextField(
+//                             controller: _messageController,
+//                             decoration: InputDecoration(hintText: 'Message type karo...'),
+//                           ),
+//                         ),
+//                         SizedBox(width: 10),
+//                         IconButton(
+//                           onPressed: _pickImages,
+//                           icon: Icon(Icons.image),
+//                         ),
+//                         IconButton(
+//                           onPressed: _pickDocuments,
+//                           icon: Icon(Icons.attach_file),
+//                         ),
+//                         SizedBox(width: 10),
+//                         Expanded(
+//                           flex: 1,
+//                           child: ElevatedButton(
+//                             onPressed: _sendMessage,
+//                             child: Text('Send'),
+//                             style: ElevatedButton.styleFrom(
+//                               minimumSize: Size(0, 48),
+//                               padding: EdgeInsets.symmetric(horizontal: 10),
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 // Text("")
+//                 if (images.isNotEmpty || documents.isNotEmpty)
+//                   Container(
+//                     height: 100,
+//                     child: ListView.builder(
+//                       scrollDirection: Axis.horizontal,
+//                       itemCount: images.length + documents.length,
+//                       itemBuilder: (context, index) {
+//                         if (index < images.length) {
+//                           return Padding(
+//                             padding: EdgeInsets.all(8),
+//                             child: Image.file(
+//                               File(images[index]),
+//                               width: 80,
+//                               height: 80,
+//                               fit: BoxFit.cover,
+//                             ),
+//                           );
+//                         } else {
+//                           final docIndex = index - images.length;
+//                           return Padding(
+//                             padding: EdgeInsets.all(8),
+//                             child: Text(documents[docIndex].split('/').last),
+//                           );
+//                         }
+//                       },
+//                     ),
+//                   ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,8 +525,9 @@ class ChatScreen extends StatefulWidget {
 }
 // 68ac07f700315e754a037e56
 // final receiverId = "68abeca08908c84c7c3769ea"; // TODO: Dynamically set
+// final receiverId = "68ac07f700315e754a037e56"; yash // TODO: Dynamically set
 class _ChatScreenState extends State<ChatScreen> {
-  final String userId = "68ac07f700315e754a037e56"; // TODO: Auth se le
+  final String userId = "68abeca08908c84c7c3769ea"; // TODO: Auth se le
   List<dynamic> conversations = [];
   dynamic currentChat;
   List<dynamic> messages = [];
@@ -49,13 +563,13 @@ class _ChatScreenState extends State<ChatScreen> {
           print('✅ Received message added to UI: ${parsedMessage['message']}');
         } else {
           _fetchConversations();
-          print('ℹ️ Message from other chat: ${parsedMessage['conversationId']}');
+          print('Message from other chat: ${parsedMessage['conversationId']}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('New message in another chat!')),
           );
         }
       } else {
-        print('❌ Invalid message data: $parsedMessage');
+        print('Invalid message data: $parsedMessage');
       }
     });
     SocketService.listenOnlineUsers((users) {
@@ -432,440 +946,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:file_picker/file_picker.dart';
-// import 'dart:io';
-// import 'APIServices.dart';
-// import 'SocketService.dart';
-//
-// class ChatScreen extends StatefulWidget {
-//   @override
-//   _ChatScreenState createState() => _ChatScreenState();
-// }
-// // 68ac07f700315e754a037e56
-// // final receiverId = "68abeca08908c84c7c3769ea"; // TODO: Dynamically set
-// class _ChatScreenState extends State<ChatScreen> {
-//   final String userId = "68ac07f700315e754a037e56"; // TODO: Auth se le
-//   List<dynamic> conversations = [];
-//   dynamic currentChat;
-//   List<dynamic> messages = [];
-//   final TextEditingController _messageController = TextEditingController();
-//   final TextEditingController _receiverIdController = TextEditingController();
-//   List<String> images = [];
-//   List<String> documents = [];
-//   List<dynamic> onlineUsers = [];
-//   String receiverId = '';
-//   final ScrollController _scrollController = ScrollController();
-//   final ImagePicker _picker = ImagePicker();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _initSocket();
-//     _fetchConversations();
-//   }
-//
-//   void _initSocket() {
-//     print('Initializing socket for userId: $userId');
-//     SocketService.connect(userId);
-//     SocketService.setMessageCallback((parsedMessage) {
-//       print('New message via socket: $parsedMessage');
-//       if (parsedMessage != null && parsedMessage['conversationId'] != null) {
-//         if (currentChat != null && parsedMessage['conversationId'] == currentChat['_id']) {
-//           setState(() {
-//             if (!messages.any((msg) => msg['_id'] == parsedMessage['_id'])) {
-//               messages.add(parsedMessage);
-//             }
-//           });
-//           _scrollToBottom();
-//           print('✅ Received message added to UI: ${parsedMessage['message']}');
-//         } else {
-//           _fetchConversations();
-//           print('ℹ️ Message from other chat: ${parsedMessage['conversationId']}');
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(content: Text('New message in another chat!')),
-//           );
-//         }
-//       } else {
-//         print('❌ Invalid message data: $parsedMessage');
-//       }
-//     });
-//     SocketService.listenOnlineUsers((users) {
-//       print('Online users: $users');
-//       setState(() => onlineUsers = users);
-//     });
-//   }
-//
-//   Future<void> _fetchConversations() async {
-//     try {
-//       final convs = await ApiService.fetchConversations(userId);
-//       setState(() => conversations = convs);
-//     } catch (e) {
-//       print('Error fetching conversations: $e');
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conversations fetch nahi hui: $e')));
-//     }
-//   }
-//
-//   Future<void> _fetchMessages() async {
-//     if (currentChat == null) return;
-//     try {
-//       final msgs = await ApiService.fetchMessages(currentChat['_id']);
-//       setState(() {
-//         messages = msgs.where((msg) => !messages.any((m) => m['_id'] == msg['_id'])).toList() + messages;
-//       });
-//       _scrollToBottom();
-//     } catch (e) {
-//       print('Error fetching messages: $e');
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Messages fetch nahi hui: $e')));
-//     }
-//   }
-//
-//   Future<void> _startConversation() async {
-//     if (receiverId.isEmpty) {
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Receiver ID daalo!')));
-//       return;
-//     }
-//     try {
-//       final newConv = await ApiService.startConversation(userId, receiverId);
-//       setState(() {
-//         conversations.add(newConv);
-//         currentChat = newConv;
-//         receiverId = '';
-//         _receiverIdController.clear();
-//       });
-//       _fetchMessages();
-//     } catch (e) {
-//       print('Error starting conversation: $e');
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Conversation start nahi hui: $e')));
-//     }
-//   }
-//
-//   Future<void> _pickImages() async {
-//     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-//     if (pickedFiles != null) {
-//       if (pickedFiles.length > 5) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Maximum 5 images allowed!')),
-//         );
-//         return;
-//       }
-//       setState(() {
-//         images = pickedFiles.map((file) => file.path).toList();
-//       });
-//     }
-//   }
-//
-//   Future<void> _pickDocuments() async {
-//     FilePickerResult? result = await FilePicker.platform.pickFiles(
-//       allowMultiple: true,
-//       type: FileType.custom,
-//       allowedExtensions: ['pdf', 'doc', 'docx'],
-//     );
-//     if (result != null && result.files.length <= 5) {
-//       setState(() {
-//         documents = result.files.map((file) => file.path!).toList();
-//       });
-//     } else if (result != null && result.files.length > 5) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Maximum 5 documents allowed!')),
-//       );
-//     }
-//   }
-//
-//   Future<void> _sendMessage() async {
-//     if (_messageController.text.isEmpty && images.isEmpty && documents.isEmpty) {
-//       print('Abhi:- No message, images, or documents to send.');
-//       return;
-//     }
-//     final receiverId = currentChat['members']
-//         ?.firstWhere((m) => m['_id'] != userId, orElse: () => null)?['_id'];
-//     if (receiverId == null || currentChat == null) {
-//       print('Abhi:- Current chat or receiverId is null, cannot send message.');
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pehle chat select karo!')));
-//       return;
-//     }
-//
-//     try {
-//       print('Abhi:- Attempting to send message. Message: ${_messageController.text}, Images: $images, Documents: $documents');
-//       dynamic newMsg;
-//       if (images.isNotEmpty) {
-//         newMsg = await ApiService.sendImageMessage(
-//           senderId: userId,
-//           receiverId: receiverId,
-//           conversationId: currentChat['_id'],
-//           imagePaths: images,
-//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
-//         );
-//         print('Abhi:- Image message sent successfully: $newMsg');
-//       } else if (documents.isNotEmpty) {
-//         newMsg = await ApiService.sendDocumentMessage(
-//           senderId: userId,
-//           receiverId: receiverId,
-//           conversationId: currentChat['_id'],
-//           documentPaths: documents,
-//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
-//         );
-//         print('Abhi:- Document message sent successfully: $newMsg');
-//       } else {
-//         final msgData = {
-//           'senderId': userId,
-//           'receiverId': receiverId,
-//           'conversationId': currentChat['_id'],
-//           'message': _messageController.text,
-//           'messageType': 'text',
-//         };
-//         newMsg = await ApiService.sendTextMessage(msgData);
-//         print('Abhi:- Text message sent successfully: $newMsg');
-//       }
-//
-//       print('Abhi:- Emitting message via socket: $newMsg');
-//       SocketService.sendMessage(newMsg);
-//       setState(() {
-//         if (!messages.any((msg) => msg['_id'] == newMsg['_id'])) {
-//           messages.add(newMsg);
-//         }
-//         _messageController.clear();
-//         images.clear();
-//         documents.clear();
-//         print('Abhi:- Message added to UI and fields cleared.');
-//       });
-//       _scrollToBottom();
-//     } catch (e) {
-//       print('Abhi:- Error sending message: $e');
-//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Message send nahi hui: $e')));
-//     }
-//   }
-//
-//   void _scrollToBottom() {
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       if (_scrollController.hasClients) {
-//         _scrollController.animateTo(
-//           _scrollController.position.maxScrollExtent,
-//           duration: Duration(milliseconds: 300),
-//           curve: Curves.easeOut,
-//         );
-//       }
-//     });
-//   }
-//
-//   @override
-//   void dispose() {
-//     SocketService.removeMessageCallback();
-//     SocketService.disconnect();
-//     _scrollController.dispose();
-//     _messageController.dispose();
-//     _receiverIdController.dispose();
-//     super.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Row(
-//         children: [
-//           Expanded(
-//             flex: 3,
-//             child: Column(
-//               children: [
-//                 Padding(
-//                   padding: EdgeInsets.all(10),
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                         flex: 3,
-//                         child: TextField(
-//                           controller: _receiverIdController,
-//                           onChanged: (val) => receiverId = val,
-//                           decoration: InputDecoration(hintText: 'Receiver ID daalo'),
-//                         ),
-//                       ),
-//                       SizedBox(width: 10),
-//                       Expanded(
-//                         flex: 1,
-//                         child: ElevatedButton(
-//                           onPressed: _startConversation,
-//                           child: Text('Start Chat'),
-//                           style: ElevatedButton.styleFrom(
-//                             minimumSize: Size(0, 48),
-//                             padding: EdgeInsets.symmetric(horizontal: 10),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 Expanded(
-//                   child: ListView.builder(
-//                     key: ValueKey(conversations.length),
-//                     itemCount: conversations.length,
-//                     itemBuilder: (ctx, idx) {
-//                       final conv = conversations[idx];
-//                       final members = (conv['members'] as List);
-//                       final otherUser = members.firstWhere(
-//                             (m) => m['_id'] != userId,
-//                         orElse: () => {'name': 'Unknown', '_id': ''},
-//                       );
-//
-//                       return ListTile(
-//                         title: Text(otherUser['name'] ?? 'Unknown'),
-//                         subtitle: Text(conv['lastMessage'] ?? ''),
-//                         onTap: () {
-//                           setState(() => currentChat = conv);
-//                           _fetchMessages();
-//                         },
-//                         selected: currentChat?['_id'] == conv['_id'],
-//                         trailing: onlineUsers.contains(otherUser['_id'])
-//                             ? Icon(Icons.circle, color: Colors.green, size: 12)
-//                             : null,
-//                       );
-//                     },
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Expanded(
-//             flex: 7,
-//             child: Column(
-//               children: [
-//                 if (currentChat != null)
-//                   Padding(
-//                     padding: EdgeInsets.all(10),
-//                     child: Align(
-//                       alignment: Alignment.centerRight,
-//                       child: IconButton(
-//                         icon: Icon(Icons.refresh),
-//                         onPressed: _fetchMessages,
-//                         tooltip: 'Refresh Messages',
-//                       ),
-//                     ),
-//                   ),
-//                 Expanded(
-//                   child: currentChat == null
-//                       ? Center(child: Text('Select a conversation'))
-//                       : ListView.builder(
-//                     key: ValueKey(messages.length),
-//                     controller: _scrollController,
-//                     itemCount: messages.length,
-//                     itemBuilder: (ctx, idx) {
-//                       final msg = messages[idx];
-//                       final isMe = msg['senderId'] == userId;
-//                       return Align(
-//                         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-//                         child: Container(
-//                           margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-//                           padding: EdgeInsets.all(10),
-//                           decoration: BoxDecoration(
-//                             color: isMe ? Colors.green[100] : Colors.grey[200],
-//                             borderRadius: BorderRadius.circular(10),
-//                           ),
-//                           child: Column(
-//                             crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-//                             children: [
-//                               if (msg['messageType'] == 'image' && msg['image'] != null)
-//                                 ...msg['image'].map<Widget>((imgUrl) => Image.network(
-//                                   'https://api.thebharatworks.com/$imgUrl',
-//                                   width: 200,
-//                                   height: 200,
-//                                   fit: BoxFit.cover,
-//                                   errorBuilder: (context, error, stackTrace) => Text('Image load failed'),
-//                                 )),
-//                               if (msg['messageType'] == 'document' && msg['document'] != null)
-//                                 ...msg['document'].map<Widget>((docUrl) => ListTile(
-//                                   title: Text('Document'),
-//                                   subtitle: Text(docUrl.split('/').last),
-//                                   onTap: () {
-//                                     print('Open document: $docUrl');
-//                                     // TODO: Add url_launcher
-//                                   },
-//                                 )),
-//                               if (msg['message'] != null && msg['message'].isNotEmpty)
-//                                 Text(msg['message']),
-//                               Text(
-//                                 DateTime.parse(msg['createdAt']).toLocal().toString().substring(0, 16),
-//                                 style: TextStyle(fontSize: 10, color: Colors.grey),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 ),
-//                 if (currentChat != null)
-//                   Padding(
-//                     padding: EdgeInsets.all(10),
-//                     child: Row(
-//                       children: [
-//                         Expanded(
-//                           flex: 3,
-//                           child: TextField(
-//                             controller: _messageController,
-//                             decoration: InputDecoration(hintText: 'Message type karo...'),
-//                           ),
-//                         ),
-//                         SizedBox(width: 10),
-//                         IconButton(
-//                           onPressed: _pickImages,
-//                           icon: Icon(Icons.image),
-//                         ),
-//                         IconButton(
-//                           onPressed: _pickDocuments,
-//                           icon: Icon(Icons.attach_file),
-//                         ),
-//                         SizedBox(width: 10),
-//                         Expanded(
-//                           flex: 1,
-//                           child: ElevatedButton(
-//                             onPressed: _sendMessage,
-//                             child: Text('Send'),
-//                             style: ElevatedButton.styleFrom(
-//                               minimumSize: Size(0, 48),
-//                               padding: EdgeInsets.symmetric(horizontal: 10),
-//                             ),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 // Text("")
-//                 if (images.isNotEmpty || documents.isNotEmpty)
-//                   Container(
-//                     height: 100,
-//                     child: ListView.builder(
-//                       scrollDirection: Axis.horizontal,
-//                       itemCount: images.length + documents.length,
-//                       itemBuilder: (context, index) {
-//                         if (index < images.length) {
-//                           return Padding(
-//                             padding: EdgeInsets.all(8),
-//                             child: Image.file(
-//                               File(images[index]),
-//                               width: 80,
-//                               height: 80,
-//                               fit: BoxFit.cover,
-//                             ),
-//                           );
-//                         } else {
-//                           final docIndex = index - images.length;
-//                           return Padding(
-//                             padding: EdgeInsets.all(8),
-//                             child: Text(documents[docIndex].split('/').last),
-//                           );
-//                         }
-//                       },
-//                     ),
-//                   ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 /*
 import 'package:flutter/material.dart';

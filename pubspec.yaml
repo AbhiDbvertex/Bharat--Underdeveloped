@@ -68,6 +68,7 @@ dependencies:
 #  fluttertoast:
   flutter_html:
   socket_io_client: ^3.0.0
+#  firebase_auth:
 
 
 #  just_audio:

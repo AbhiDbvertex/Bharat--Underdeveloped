@@ -3299,12 +3299,12 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
           });
           _showSnackBar("Offer accepted!");
         } else {
-          _showSnackBar("Offer not accepted: ${data['message']}");
+          // _showSnackBar("Offer not accepted: ${data['message']}");
           print("❌ Offer accept fail: ${data['message']}");
         }
       } else {
         final err = json.decode(response.body);
-        _showSnackBar("Error ${response.statusCode}: ${err['message']}");
+        // _showSnackBar("Error ${response.statusCode}: ${err['message']}");
         print(
             "❌ API ka dimaag kharab: ${response.statusCode} - ${err['message']}");
         if (err['message'] == "Invalid acceptance or already handled") {

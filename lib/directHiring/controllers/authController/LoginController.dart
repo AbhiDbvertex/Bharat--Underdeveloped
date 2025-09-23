@@ -95,6 +95,7 @@ import 'package:http/http.dart' as http;
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../views/auth/OtpVerificationScreen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginController {
   final TextEditingController phoneController;
@@ -168,7 +169,7 @@ class LoginController {
           return;
         }
         // _showSnackBar(context, "OTP sent successfully");
-        CustomSnackBar.show(context, message: "OTP sent successfully",type: SnackBarType.success);
+        // CustomSnackBar.show(context, message: "OTP sent successfully",type: SnackBarType.success);
         print("Abhi:- 2 print on success ${fcmToken}");
         // Navigate to OTP screen
         Future.delayed(Duration.zero, () {
@@ -182,6 +183,14 @@ class LoginController {
             ),
           );
         });
+        Fluttertoast.showToast(
+          msg: "OTP sent successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 14,
+        );
       } else {
         final errorMsg = responseData['message'] ?? 'Failed to send OTP';
         // _showSnackBar(context, errorMsg);
