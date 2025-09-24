@@ -14,10 +14,9 @@ class ApiEndpoint {
       '/direct-order/getOrdersByUser';
   static const String WorkerScreen = '/worker/all';
   static const String hireScreen = '/direct-order/create';
-<<<<<<< HEAD
-=======
+
   // static const String MyHireScreen = '/direct-order/apiGetAllDirectOrders';
->>>>>>> origin/yash
+
   static const String MyHireScreen = '/direct-order/getOrdersByUser';
   static const String SubCategories = '/user/getServiceProviders';
   static const String workerCategories = '/work-category';
