@@ -1394,6 +1394,7 @@ class EditProfileScreen extends StatefulWidget {
   final String? skill;
   final String? categoryId;
   final List<String>? subCategoryIds;
+  final List<String>? subEmergencyCategoryIds;
   final String? documentUrl;
   final String? gender;
   final String? age;
@@ -1404,6 +1405,7 @@ class EditProfileScreen extends StatefulWidget {
     this.skill,
     this.categoryId,
     this.subCategoryIds,
+    this.subEmergencyCategoryIds,
     this.documentUrl,
     this.gender,
     this.age,
@@ -1425,8 +1427,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool isLoading = false;
   String? selectedCategory;
   List<String> selectedSubCategories = [];
+  List<String> selectedSubEmergencyCategories = [];
   List<Map<String, String>> categories = [];
   List<Map<String, String>> subcategories = [];
+  List<Map<String, String>> subEmergencyCategories = [];
   String? selectedDocumentType;
   final Map<String, String> _errorTexts = {};
   String? _selectedGender;
@@ -1450,6 +1454,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _selectedGender = widget.gender ?? '';
     skillController.text = widget.skill ?? '';
     selectedSubCategories = widget.subCategoryIds ?? [];
+    selectedSubCategories = widget.subEmergencyCategoryIds ?? [];
     uploadedDocUrl = widget.documentUrl;
     bwDebug("updated doc: $uploadedDocUrl");
 
@@ -1461,21 +1466,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
       if (selectedCategory != null) {
         fetchSubCategories(selectedCategory!);
+        fetchSubEmergencyCategories(selectedCategory!);
       }
     });
 
     SharedPreferences.getInstance().then((prefs) {
-      String? savedLocation = prefs.getString('selected_location') ?? prefs.getString('address');
+      String? savedLocation = prefs.getString('selected_location') ??
+          prefs.getString('address');
       double? savedLatitude = prefs.getDouble('user_latitude');
       double? savedLongitude = prefs.getDouble('user_longitude');
 
       if (savedLocation != null && savedLocation != 'Select Location') {
         setState(() {
-          emergencyServiceController.googleAddressController.text = savedLocation;
+          emergencyServiceController.googleAddressController.text =
+              savedLocation;
           emergencyServiceController.latitude.value = savedLatitude;
           emergencyServiceController.longitude.value = savedLongitude;
-          _selectedLocation = LatLng(savedLatitude ?? 0.0, savedLongitude ?? 0.0);
-          bwDebug("📍 Pre-populated googleAddressController with: $savedLocation");
+          _selectedLocation =
+              LatLng(savedLatitude ?? 0.0, savedLongitude ?? 0.0);
+          bwDebug(
+              "📍 Pre-populated googleAddressController with: $savedLocation");
         });
       } else {
         bwDebug("📍 No valid saved location found");
@@ -1498,13 +1508,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         categories = List<Map<String, String>>.from(
           data['data'].map(
-                (cat) => {
+                (cat) =>
+            {
               'id': cat['_id'].toString(),
               'name': cat['name'].toString(),
             },
           ),
         );
-        print("Processed Categories IDs: ${categories.map((c) => c['id']).toList()}");
+        print("Processed Categories IDs: ${categories.map((c) => c['id'])
+            .toList()}");
       });
     } else {
       print("Failed to fetch categories: ${res.statusCode} - ${res.body}");
@@ -1525,13 +1537,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         subcategories = List<Map<String, String>>.from(
           data['data'].map(
-                (sub) => {
+                (sub) =>
+            {
               'id': sub['_id'].toString(),
               'name': sub['name'].toString(),
             },
           ),
         );
         selectedSubCategories = selectedSubCategories
+            .where((id) => subcategories.any((sub) => sub['id'] == id))
+            .toList();
+      });
+    }
+  }
+
+  Future<void> fetchSubEmergencyCategories(String categoryId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final res = await http.get(
+      Uri.parse(
+          'https://api.thebharatworks.com/api/emergency/subcategories/$categoryId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      setState(() {
+        subEmergencyCategories = List<Map<String, String>>.from(
+          data['data'].map(
+                (sub) =>
+            {
+              'id': sub['_id'].toString(),
+              'name': sub['name'].toString(),
+            },
+          ),
+        );
+        selectedSubEmergencyCategories = selectedSubEmergencyCategories
             .where((id) => subcategories.any((sub) => sub['id'] == id))
             .toList();
       });
@@ -1573,7 +1615,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickBusinessImage(bool fromCamera) async {
     try {
-      final XFile? image = await _picker.pickImage(source: fromCamera ? ImageSource.camera : ImageSource.gallery);
+      final XFile? image = await _picker.pickImage(
+          source: fromCamera ? ImageSource.camera : ImageSource.gallery);
       if (image != null) {
         setState(() {
           businessImage = File(image.path);
@@ -1657,7 +1700,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> pickImages({required bool fromCamera}) async {
     try {
-      int currentCount = selectedImages.length + (uploadedDocUrl != null ? 1 : 0);
+      int currentCount = selectedImages.length +
+          (uploadedDocUrl != null ? 1 : 0);
       if (currentCount >= 2) {
         Get.snackbar(
           'Warning',
@@ -1673,7 +1717,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       if (fromCamera) {
-        final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+        final XFile? image = await _picker.pickImage(
+            source: ImageSource.camera);
         if (image != null) {
           if (currentCount + 1 > 2) {
             Get.snackbar(
@@ -1751,14 +1796,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> onSavePressed() async {
     if (selectedCategory == null ||
         selectedSubCategories.isEmpty ||
+        selectedSubEmergencyCategories.isEmpty ||
         skillController.text.isEmpty ||
         fullNameController.text.isEmpty ||
         ageController.text.isEmpty ||
         _selectedGender == null ||
         selectedDocumentType == null ||
         (selectedImages.isEmpty && uploadedDocUrl == null) ||
-        (_shopVisitChoice == 'yes' && (emergencyServiceController.googleAddressController.text.isEmpty || _selectedLocation == null)) ||
-        (selectedDocumentType == 'govtId' && customDocNameController.text.isEmpty)) {
+        (_shopVisitChoice == 'yes' &&
+            (emergencyServiceController.googleAddressController.text.isEmpty ||
+                _selectedLocation == null)) ||
+        (selectedDocumentType == 'govtId' &&
+            customDocNameController.text.isEmpty)) {
       if (!mounted) return;
       Get.snackbar(
         'Error',
@@ -1825,12 +1874,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (businessImage != null) {
         request.files.add(
-          await http.MultipartFile.fromPath('businessImage', businessImage!.path),
+          await http.MultipartFile.fromPath(
+              'businessImage', businessImage!.path),
         );
       }
 
       request.fields['category_id'] = selectedCategory!;
       request.fields['subcategory_ids'] = jsonEncode(selectedSubCategories);
+      request.fields['emergencySubcategory_ids'] =
+          jsonEncode(selectedSubEmergencyCategories);
       request.fields['skill'] = skillController.text.trim();
       request.fields['full_name'] = fullNameController.text.trim();
       request.fields['age'] = ageController.text.trim();
@@ -1843,8 +1895,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (_shopVisitChoice == 'yes' && _selectedLocation != null) {
         request.fields['businessAddress'] = jsonEncode({
           "address": emergencyServiceController.googleAddressController.text,
-          "latitude": emergencyServiceController.latitude.value?.toString() ?? '',
-          "longitude": emergencyServiceController.longitude.value?.toString() ?? '',
+          "latitude": emergencyServiceController.latitude.value?.toString() ??
+              '',
+          "longitude": emergencyServiceController.longitude.value?.toString() ??
+              '',
         });
       }
 
@@ -1955,6 +2009,62 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  void showSubEmergencyCategoryDialog() {
+    List<String> tempSelected = List.from(selectedSubEmergencyCategories);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Select Emergency Subcategories"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: subEmergencyCategories.length,
+                  itemBuilder: (context, index) {
+                    final sub = subEmergencyCategories[index];
+                    final subId = sub['id']!;
+                    return CheckboxListTile(
+                      title: Text(sub['name'] ?? ''),
+                      value: tempSelected.contains(subId),
+                      onChanged: (bool? value) {
+                        setDialogState(() {
+                          if (value == true) {
+                            tempSelected.add(subId);
+                          } else {
+                            tempSelected.remove(subId);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedSubEmergencyCategories = tempSelected;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Done"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget buildSimpleDropdown({
     required String? value,
     required String hint,
@@ -1979,10 +2089,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         hint: Text(hint, style: const TextStyle(color: Colors.grey)),
         items: items
             .map(
-              (item) => DropdownMenuItem(
-            value: item['id'],
-            child: Text(item['name'] ?? ''),
-          ),
+              (item) =>
+              DropdownMenuItem(
+                value: item['id'],
+                child: Text(item['name'] ?? ''),
+              ),
         )
             .toList(),
         onChanged: onChanged,
@@ -2114,10 +2225,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ViewImage(
-                          imageUrl: businessImage!.path,
-                          title: "Business Image",
-                        ),
+                        builder: (_) =>
+                            ViewImage(
+                              imageUrl: businessImage!.path,
+                              title: "Business Image",
+                            ),
                       ),
                     );
                   },
@@ -2150,7 +2262,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: Colors.black54,
                       ),
                       padding: const EdgeInsets.all(4),
-                      child: const Icon(Icons.close, color: Colors.white, size: 18),
+                      child: const Icon(
+                          Icons.close, color: Colors.white, size: 18),
                     ),
                   ),
                 ),
@@ -2163,7 +2276,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool canAddMore = (selectedImages.length + (uploadedDocUrl != null ? 1 : 0)) < 2;
+    bool canAddMore = (selectedImages.length +
+        (uploadedDocUrl != null ? 1 : 0)) < 2;
 
     print("Abhi: get age: ${widget.age} gender: ${widget.gender}");
     return Scaffold(
@@ -2230,48 +2344,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     buildShopVisitRadio(),
                     const SizedBox(height: 15),
                     if (_shopVisitChoice == 'yes')
-                      // Row(
-                      //   children: [
-                      //     Expanded(
-                      //       child: TextFormField(
-                      //         controller: emergencyServiceController.googleAddressController,
-                      //         readOnly: true,
-                      //         onTap: () => postTaskController.navigateToLocationScreen(),
-                      //         decoration: InputDecoration(
-                      //           labelText: "Shop Address",
-                      //           hintText: 'Select location from map',
-                      //           filled: true,
-                      //           fillColor: Colors.white,
-                      //           border: OutlineInputBorder(
-                      //             borderRadius: BorderRadius.circular(15),
-                      //           ),
-                      //           suffixIcon: const Icon(Icons.map),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     const SizedBox(width: 10),
-                      //     InkWell(
-                      //       onTap: () => postTaskController.navigateToLocationScreen(),
-                      //       child: Container(
-                      //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                      //         decoration: BoxDecoration(
-                      //           color: AppColors.primaryGreen,
-                      //           borderRadius: BorderRadius.circular(10),
-                      //         ),
-                      //         child: const Text(
-                      //           "Change location",
-                      //           style: TextStyle(color: Colors.white, fontSize: 14),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: TextFormField(
+                    //         controller: emergencyServiceController.googleAddressController,
+                    //         readOnly: true,
+                    //         onTap: () => postTaskController.navigateToLocationScreen(),
+                    //         decoration: InputDecoration(
+                    //           labelText: "Shop Address",
+                    //           hintText: 'Select location from map',
+                    //           filled: true,
+                    //           fillColor: Colors.white,
+                    //           border: OutlineInputBorder(
+                    //             borderRadius: BorderRadius.circular(15),
+                    //           ),
+                    //           suffixIcon: const Icon(Icons.map),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 10),
+                    //     InkWell(
+                    //       onTap: () => postTaskController.navigateToLocationScreen(),
+                    //       child: Container(
+                    //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                    //         decoration: BoxDecoration(
+                    //           color: AppColors.primaryGreen,
+                    //           borderRadius: BorderRadius.circular(10),
+                    //         ),
+                    //         child: const Text(
+                    //           "Change location",
+                    //           style: TextStyle(color: Colors.white, fontSize: 14),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                       Column(
                         children: [
                           Align(
                             alignment: Alignment.topRight,
                             child: InkWell(
-                              onTap: () => postTaskController.navigateToLocationScreen(),
+                              onTap: () =>
+                                  postTaskController.navigateToLocationScreen(),
                               child: Container(
                                 height: 25,
                                 width: 120,
@@ -2283,7 +2398,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 child: Center(
                                   child: Text(
                                     "Change location",
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
                                   ),
                                 ),
                               ),
@@ -2291,7 +2407,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           SizedBox(height: 7,),
                           TextFormField(
-                            controller: emergencyServiceController.googleAddressController,
+                            controller: emergencyServiceController
+                                .googleAddressController,
                             readOnly: true,
                             // onTap: () => postTaskController.navigateToLocationScreen(),
                             decoration: InputDecoration(
@@ -2314,13 +2431,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       hint: 'Select Category',
                       value: selectedCategory,
                       items: categories,
-                      onChanged: (val) {
+                      onChanged: (val)  {
                         setState(() {
                           selectedCategory = val;
                           selectedSubCategories.clear();
                           subcategories = [];
                         });
-                        if (val != null) fetchSubCategories(val);
+                        if (val != null) {
+                          fetchSubCategories(val);
+                          fetchSubEmergencyCategories(val);
+                        }
                       },
                     ),
                     GestureDetector(
@@ -2334,7 +2454,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             snackPosition: SnackPosition.TOP,
                             backgroundColor: Colors.orange,
                             colorText: Colors.white,
-                            icon: const Icon(Icons.warning, color: Colors.white),
+                            icon: const Icon(
+                                Icons.warning, color: Colors.white),
                             margin: const EdgeInsets.all(10),
                             duration: const Duration(seconds: 3),
                           );
@@ -2357,9 +2478,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? 'Select Subcategories'
                               : subcategories
                               .where(
-                                (sub) => selectedSubCategories.contains(
-                              sub['id'],
-                            ),
+                                (sub) =>
+                                selectedSubCategories.contains(
+                                  sub['id'],
+                                ),
+                          )
+                              .map((sub) => sub['name'])
+                              .join(', '),
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (selectedCategory != null) {
+                          showSubEmergencyCategoryDialog();
+                        } else {
+                          Get.snackbar(
+                            'Warning',
+                            'Please select category first',
+                            snackPosition: SnackPosition.TOP,
+                            backgroundColor: Colors.orange,
+                            colorText: Colors.white,
+                            icon: const Icon(
+                                Icons.warning, color: Colors.white),
+                            margin: const EdgeInsets.all(10),
+                            duration: const Duration(seconds: 3),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 12,
+                        ),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                        child: Text(
+                          selectedSubEmergencyCategories.isEmpty
+                              ? 'Select Emergency Subcategories'
+                              : subEmergencyCategories
+                              .where(
+                                (sub) =>
+                                selectedSubEmergencyCategories.contains(
+                                  sub['id'],
+                                ),
                           )
                               .map((sub) => sub['name'])
                               .join(', '),
@@ -2370,7 +2538,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     TextFormField(
                       controller: skillController,
                       inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-z,0-9\./ ]')),
+                        FilteringTextInputFormatter.allow(RegExp(
+                            r'[a-z,0-9\./ ]')),
                       ],
                       maxLines: 4,
                       decoration: InputDecoration(
@@ -2405,7 +2574,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       TextFormField(
                         controller: customDocNameController,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-Z0-9 ]')),
                         ],
                         decoration: InputDecoration(
                           labelText: "Custom Document Name",
@@ -2435,7 +2605,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               icon: const Icon(Icons.add, color: Colors.white),
                               label: const Text('Upload Document'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: canAddMore ? Colors.green[700] : Colors.grey,
+                                backgroundColor: canAddMore
+                                    ? Colors.green[700]
+                                    : Colors.grey,
                                 foregroundColor: Colors.white,
                                 minimumSize: const Size(double.infinity, 48),
                               ),
@@ -2453,10 +2625,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => ViewImage(
-                                              imageUrl: uploadedDocUrl!,
-                                              title: "Document",
-                                            ),
+                                            builder: (_) =>
+                                                ViewImage(
+                                                  imageUrl: uploadedDocUrl!,
+                                                  title: "Document",
+                                                ),
                                           ),
                                         );
                                       },
@@ -2467,12 +2640,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           height: 100,
                                           width: 100,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
+                                          errorBuilder: (context, error,
+                                              stackTrace) {
                                             return Container(
                                               height: 100,
                                               width: 100,
                                               color: Colors.grey[300],
-                                              child: const Icon(Icons.broken_image),
+                                              child: const Icon(
+                                                  Icons.broken_image),
                                             );
                                           },
                                         ),
@@ -2489,7 +2664,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             color: Colors.black54,
                                           ),
                                           padding: const EdgeInsets.all(4),
-                                          child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                          child: const Icon(
+                                              Icons.close, color: Colors.white,
+                                              size: 18),
                                         ),
                                       ),
                                     ),
@@ -2503,10 +2680,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => ViewImage(
-                                              imageUrl: file.path,
-                                              title: "Image",
-                                            ),
+                                            builder: (_) =>
+                                                ViewImage(
+                                                  imageUrl: file.path,
+                                                  title: "Image",
+                                                ),
                                           ),
                                         );
                                       },
@@ -2517,12 +2695,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           height: 100,
                                           width: 100,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
+                                          errorBuilder: (context, error,
+                                              stackTrace) {
                                             return Container(
                                               height: 100,
                                               width: 100,
                                               color: Colors.grey[300],
-                                              child: const Icon(Icons.broken_image),
+                                              child: const Icon(
+                                                  Icons.broken_image),
                                             );
                                           },
                                         ),
@@ -2539,7 +2719,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             color: Colors.black54,
                                           ),
                                           padding: const EdgeInsets.all(4),
-                                          child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                          child: const Icon(
+                                              Icons.close, color: Colors.white,
+                                              size: 18),
                                         ),
                                       ),
                                     ),

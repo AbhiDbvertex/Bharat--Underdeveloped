@@ -15,6 +15,9 @@ import 'chat/chat_user_list_screen.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
 
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+GlobalKey<ScaffoldMessengerState>();
+
 final GlobalKey<NavigatorState> bwGlobalContext = GlobalKey<NavigatorState>();
 bool isBwGlobalContextMounted() {
   return bwGlobalContext.currentContext != null && bwGlobalContext.currentContext!.mounted;
@@ -80,6 +83,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     return GetMaterialApp(
       navigatorKey: bwGlobalContext,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: ThemeData(
           useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

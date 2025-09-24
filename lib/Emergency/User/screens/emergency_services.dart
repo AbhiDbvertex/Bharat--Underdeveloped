@@ -634,7 +634,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   hint,
                   style: fieldHintStyle,
                 ),
-                content: Obx(() => SizedBox(
+                content: Obx(() => controller.subCategories.isEmpty?Text("Subcategory not available"):SizedBox(
                       width: double.maxFinite,
                       child: ListView(
                         children: items.map((item) {

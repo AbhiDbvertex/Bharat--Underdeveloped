@@ -8,10 +8,16 @@ class ApiEndpoint {
   static const String galleryScreen = '/user/updateHisWork';
   static const String serviceDirectViewScreen = '/user/getServiceProviders';
   static const String serviceWorkDetails = '/direct-order/accept-offer';
+  // static const String workerMyHireScreen =
+  //     '/direct-order/apiGetAllDirectOrders';
   static const String workerMyHireScreen =
       '/direct-order/getOrdersByUser';
   static const String WorkerScreen = '/worker/all';
   static const String hireScreen = '/direct-order/create';
+<<<<<<< HEAD
+=======
+  // static const String MyHireScreen = '/direct-order/apiGetAllDirectOrders';
+>>>>>>> origin/yash
   static const String MyHireScreen = '/direct-order/getOrdersByUser';
   static const String SubCategories = '/user/getServiceProviders';
   static const String workerCategories = '/work-category';

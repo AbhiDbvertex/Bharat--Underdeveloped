@@ -217,6 +217,10 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
       final res = await http.get(
         Uri.parse(
+<<<<<<< HEAD
+=======
+            // 'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
+>>>>>>> origin/yash
             'https://api.thebharatworks.com/api/direct-order/getOrdersByProvider'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -655,6 +659,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: SizedBox(
         width: 1.toWidthPercent(),
+        height: 2.toWidthPercent(),
         child: ListView.builder(
           itemCount: spEmergencyOrders!.data.length,
           itemBuilder: (context, index) => _buildEmergencyCard(
@@ -1055,13 +1060,15 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
   Widget _buildEmergencyCard(
       dynamic data, double screenWidth, double screenHeight) {
+    bwDebug("hire status: ${data.hireStatus}");
     String displayStatus = data.hireStatus ?? "pending";
+    bwDebug("display status: $displayStatus");
 
     if (data.acceptedByProviders != null &&
         data.acceptedByProviders!.isNotEmpty &&
         displayStatus != 'cancelled' &&
         displayStatus != 'completed') {
-      displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
+    //  displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
     }
 
     final bool hasImage = data.imageUrls != null && data.imageUrls!.isNotEmpty;
@@ -1237,7 +1244,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                     Container(
                       padding: EdgeInsets.symmetric(
                           vertical: screenHeight * 0.01,
-                          horizontal: screenWidth * 0.03),
+                          horizontal: screenWidth * 0.02),
                       decoration: BoxDecoration(
                         color: _getStatusColor(displayStatus),
                         borderRadius:
@@ -1252,7 +1259,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                                     displayStatus.substring(1),
                         style: GoogleFonts.roboto(
                           color: Colors.white,
-                          fontSize: screenWidth * 0.03,
+                          fontSize: screenWidth * 0.029,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

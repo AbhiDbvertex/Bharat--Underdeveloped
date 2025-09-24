@@ -80,7 +80,8 @@ class EmergencyServiceController extends GetxController {
     final token = prefs.getString('token') ?? '';
 
     final res = await http.get(
-      Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
+      // Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
+      Uri.parse('https://api.thebharatworks.com/api/emergency/subcategories/$categoryId'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -197,6 +198,7 @@ class EmergencyServiceController extends GetxController {
         selectedDateTime.value == null ||
         images.isEmpty) {
       // Get.snackbar("Error", "Please fill all fields",colorText: Colors.red);
+      if (!context.mounted) return;
       CustomSnackBar.show(context, message: "Please fill all fields",type: SnackBarType.error);
       return;
     }

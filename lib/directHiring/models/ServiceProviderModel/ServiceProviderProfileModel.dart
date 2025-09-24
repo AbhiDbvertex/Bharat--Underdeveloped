@@ -22,6 +22,8 @@ class ServiceProviderProfileModel {
   final String? categoryName;
   final List<String>? subCategoryIds;
   final List<String>? subCategoryNames;
+  final List<String>? subEmergencyCategoryIds;
+  final List<String>? subEmergencyCategoryNames;
   final String? skill;
   final String? requestStatus;
   late final String? profilePic;
@@ -57,6 +59,8 @@ class ServiceProviderProfileModel {
     this.categoryName,
     this.subCategoryIds,
     this.subCategoryNames,
+    this.subEmergencyCategoryIds,
+    this.subEmergencyCategoryNames,
     this.skill,
     this.profilePic,
     this.hisWork,
@@ -101,6 +105,16 @@ class ServiceProviderProfileModel {
           [],
       subCategoryNames:
           (json['subcategory_names'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      subEmergencyCategoryIds:
+          (json['emergencySubcategory_ids'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      subEmergencyCategoryNames:
+          (json['emergencySubcategory_names'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
