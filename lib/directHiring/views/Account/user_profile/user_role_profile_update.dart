@@ -1320,6 +1320,7 @@ class RoleEditProfileScreen extends StatefulWidget {
   final String? skill;
   final String? categoryId;
   final List<String>? subCategoryIds;
+  final List<String>? emergencySubCategoryIds;
   final String? documentUrl;
   final updateBothrequest;
   final role;
@@ -1331,6 +1332,7 @@ class RoleEditProfileScreen extends StatefulWidget {
     this.skill,
     this.categoryId,
     this.subCategoryIds,
+    this.emergencySubCategoryIds,
     this.documentUrl,
     this.updateBothrequest,
     this.role,
@@ -1352,8 +1354,10 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
   String? selectedDocumentType;
   String? selectedCategory;
   List<String> selectedSubCategories = [];
+  List<String> selectedEmergencySubCategories = [];
   List<Map<String, String>> categories = [];
   List<Map<String, String>> subcategories = [];
+  List<Map<String, String>> emergencySubCategories = [];
   String? uploadedDocUrl;
   String? _selectedGender;
   String? _shopVisitChoice;
@@ -1376,6 +1380,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
     skillController.text = widget.skill ?? '';
     selectedCategory = widget.categoryId;
     selectedSubCategories = widget.subCategoryIds ?? [];
+    selectedEmergencySubCategories = widget.emergencySubCategoryIds ?? [];
     uploadedDocUrl = widget.documentUrl;
 
     fetchCategories().then((_) {
@@ -1386,6 +1391,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
       });
       if (selectedCategory != null) {
         fetchSubCategories(selectedCategory!);
+        fetchEmergencySubCategories(selectedCategory!);
       }
     });
 
@@ -1458,7 +1464,32 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
       });
     }
   }
+  Future<void> fetchEmergencySubCategories(String categoryId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
 
+    final res = await http.get(
+      Uri.parse('https://api.thebharatworks.com/api/emergency/subcategories/$categoryId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      setState(() {
+        emergencySubCategories = List<Map<String, String>>.from(
+          data['data'].map(
+                (sub) => {
+              'id': sub['_id'].toString(),
+              'name': sub['name'].toString(),
+            },
+          ),
+        );
+        selectedEmergencySubCategories = selectedEmergencySubCategories
+            .where((id) => emergencySubCategories.any((sub) => sub['id'] == id))
+            .toList();
+      });
+    }
+  }
   Future<void> pickBusinessImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -1578,6 +1609,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
   Future<void> onSavePressed() async {
     if (selectedCategory == null ||
         selectedSubCategories.isEmpty ||
+        selectedEmergencySubCategories.isEmpty||
         skillController.text.isEmpty ||
         fullNameController.text.isEmpty ||
         ageController.text.isEmpty ||
@@ -1658,6 +1690,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
 
       request.fields['category_id'] = selectedCategory!;
       request.fields['subcategory_ids'] = jsonEncode(selectedSubCategories);
+      request.fields['emergencySubcategory_ids'] = jsonEncode(selectedEmergencySubCategories);
       request.fields['skill'] = skillController.text.trim();
       request.fields['full_name'] = fullNameController.text.trim();
       request.fields['age'] = ageController.text.trim();
@@ -1786,7 +1819,61 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
       },
     );
   }
+  void showEmergencySubcategoryDialog() {
+    List<String> tempSelected = List.from(selectedEmergencySubCategories);
 
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Select Emergency SubCategory"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: emergencySubCategories.length,
+                  itemBuilder: (context, index) {
+                    final sub = emergencySubCategories[index];
+                    final subId = sub['id']!;
+                    return CheckboxListTile(
+                      title: Text(sub['name'] ?? ''),
+                      value: tempSelected.contains(subId),
+                      onChanged: (bool? value) {
+                        setDialogState(() {
+                          if (value == true) {
+                            tempSelected.add(subId);
+                          } else {
+                            tempSelected.remove(subId);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedEmergencySubCategories = tempSelected;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Done"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
   Widget buildSimpleDropdown({
     required String? value,
     required String hint,
@@ -2143,13 +2230,18 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                     buildSimpleDropdown(
                       hint: 'Select Category',
                       value: selectedCategory,
-                      onChanged: (val) {
+                      onChanged: (val)  {
                         setState(() {
                           selectedCategory = val;
                           selectedSubCategories.clear();
+                          selectedEmergencySubCategories.clear();
                           subcategories = [];
+                          emergencySubCategories = [];
                         });
-                        if (val != null) fetchSubCategories(val);
+                        if (val != null){
+                          fetchSubCategories(val);
+                        fetchEmergencySubCategories(val);
+                        }
                       },
                       items: categories,
                     ),
@@ -2188,6 +2280,52 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                               : subcategories
                               .where(
                                 (sub) => selectedSubCategories.contains(
+                              sub['id'],
+                            ),
+                          )
+                              .map((sub) => sub['name'])
+                              .join(', '),
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+
+                 ///////////////////////
+                    GestureDetector(
+                      onTap: () {
+                        if (selectedCategory != null) {
+                          showEmergencySubcategoryDialog();
+                        } else {
+                          Get.snackbar(
+                            'Error',
+                            'Please select category first',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            icon: const Icon(Icons.warning, color: Colors.white),
+                            margin: const EdgeInsets.all(10),
+                            duration: const Duration(seconds: 3),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 12,
+                        ),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                        child: Text(
+                          selectedEmergencySubCategories.isEmpty
+                              ? 'Select Emergency Subcategories'
+                              : emergencySubCategories
+                              .where(
+                                (sub) => selectedEmergencySubCategories.contains(
                               sub['id'],
                             ),
                           )

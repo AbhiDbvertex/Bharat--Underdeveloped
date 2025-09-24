@@ -483,10 +483,10 @@ class SpPaymentHistory {
   String? status;
   String? releaseStatus;
   bool? isCollected;
-  int? commissionAmount;
-  int? providerEarning;
+  double? commissionAmount;
+  double? providerEarning;
   String? commissionType;
-  int? commissionPercentage;
+  double? commissionPercentage;
   String? id;
   String? date;
 
@@ -516,10 +516,10 @@ class SpPaymentHistory {
     status = json['status'];
     releaseStatus = json['release_status'];
     isCollected = json['is_collected'];
-    commissionAmount = json['commission_amount'];
-    providerEarning = json['provider_earning'];
+    commissionAmount = (json['commission_amount'] as num?)?.toDouble();
+    providerEarning =  (json['provider_earning'] as num?)?.toDouble();
     commissionType = json['commissionType'];
-    commissionPercentage = json['commissionPercentage'];
+    commissionPercentage =  (json['commissionPercentage'] as num?)?.toDouble();
     id = json['_id'];
     date = json['date'];
   }

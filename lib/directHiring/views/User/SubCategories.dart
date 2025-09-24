@@ -369,6 +369,7 @@
 
 import 'dart:convert';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -677,6 +678,7 @@ class _SubCategoriesState extends State<SubCategories> {
                               .toList();
                           // Use the first selected subcategory's name for WorkerlistScreen
                           final firstSelectedSubCategory = allSubCategories[selectedIndexes.first];
+                        bwDebug("categoryId: ${widget.categoryId}, sub catecory Id: $selectedSubCategoryIds");
                           fetchServiceProviders(
                             widget.categoryId,
                             selectedSubCategoryIds,

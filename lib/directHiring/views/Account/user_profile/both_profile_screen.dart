@@ -437,7 +437,13 @@ class _SellerScreenState extends State<SellerScreen> {
                                             ?.subCategoryIds
                                             ?.map((e) => e.toString())
                                             .toList(),
+                                        subEmergencyCategoryIds: profile
+                                            ?.subEmergencyCategoryIds
+                                            ?.map((e) => e.toString())
+                                            .toList(),
+
                                         documentUrl: profile?.documents,
+
                                       ),
                                 ),
                               );
@@ -900,8 +906,8 @@ class _SellerScreenState extends State<SellerScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Center(
                   child: RichText(
@@ -958,6 +964,37 @@ class _SellerScreenState extends State<SellerScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 4),
+          /*      (profile?.subEmergencyCategoryNames != null &&
+                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 18.0),
+                    child: RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.poppins(fontSize: 11),
+                        children: [
+                          TextSpan(
+                            text: "Emergency Sub-Category: ",
+                            style: GoogleFonts.roboto(
+                              color: Colors.green.shade800,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                            profile?.subEmergencyCategoryNames?.join(', ') ?? 'N/A',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )/*:SizedBox()*/,
               ],
             ),
           ),

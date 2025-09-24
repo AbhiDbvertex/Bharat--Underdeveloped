@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 enum SnackBarType { success, error, warning, info }
 
 class CustomSnackBar {
   static void show(
-      BuildContext context, {
+      BuildContext? context, {
         required String message,
         SnackBarType type = SnackBarType.info,
         Duration duration = const Duration(seconds: 3),
       }) {
-    if (!context.mounted) return;
+    // if (!context.mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
+    final messenger = (context != null && context.mounted)
+        ? ScaffoldMessenger.of(context)
+        : rootScaffoldMessengerKey.currentState;
+    if (messenger == null) return;
+    // final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar(); // Prevent stacking
 
     final Color bgColor;

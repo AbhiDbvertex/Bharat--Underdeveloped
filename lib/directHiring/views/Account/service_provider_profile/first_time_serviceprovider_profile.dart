@@ -1577,29 +1577,7 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
-                      child: Text(
-                        "User Profile",
-                        style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+
             // const SizedBox(height: 5),
             // (role == "both")
             //     ? SizedBox()
@@ -1962,13 +1940,19 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+   //   backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF9DF89D),
+        centerTitle: true,
+        title: const Text("User Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: SafeArea(
         child: RefreshIndicator(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../Widgets/AppColors.dart';
 import '../../controllers/AccountController/BankController.dart';
 import 'AccountScreen.dart';
 
@@ -26,7 +27,21 @@ class _BankScreenState extends State<BankScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+
+      // backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Bank Details",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -35,31 +50,31 @@ class _BankScreenState extends State<BankScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap:
-                          () => Navigator.pop(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AccountScreen(),
-                            ),
-                          ),
-                      child: const Icon(Icons.arrow_back_outlined),
-                    ),
-                    const SizedBox(width: 90),
-                    Text(
-                      "Bank Details",
-                      style: GoogleFonts.roboto(
-                        fontSize: 19,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
+                // const SizedBox(height: 30),
+                // Row(
+                //   children: [
+                //     GestureDetector(
+                //       onTap:
+                //           () => Navigator.pop(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (context) => const AccountScreen(),
+                //             ),
+                //           ),
+                //       child: const Icon(Icons.arrow_back_outlined),
+                //     ),
+                //     const SizedBox(width: 90),
+                //     Text(
+                //       "Bank Details",
+                //       style: GoogleFonts.roboto(
+                //         fontSize: 19,
+                //         color: Colors.black,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // const SizedBox(height: 10),
                 Center(
                   child: Text(
                     "Add your bank details",
@@ -73,26 +88,31 @@ class _BankScreenState extends State<BankScreen> {
                 const SizedBox(height: 40),
 
                 _buildInputField(
+                  "Enter Bank Name",
                   "Bank Name",
                   controller.bankNameController,
                   InputType.text,
                 ),
                 _buildInputField(
+                  "Enter Account Number",
                   "Account Number",
                   controller.accountNumberController,
                   InputType.number,
                 ),
                 _buildInputField(
+                  "Enter Account Holder Name",
                   "Account Holder Name",
                   controller.accountHolderNameController,
                   InputType.text,
                 ),
                 _buildInputField(
-                  "IFSC Code",
+                  "Enter IFSC Code",
+                  "Enter IFSC Code",
                   controller.ifscCodeController,
                   InputType.ifsc,
                 ),
                 _buildInputField(
+                  "Enter UPI Id",
                   "UPI Id",
                   controller.upiIdController,
                   InputType.text,
@@ -132,6 +152,7 @@ class _BankScreenState extends State<BankScreen> {
 
 
   Widget _buildInputField(
+      String hint,
       String label,
       TextEditingController inputController,
       InputType type,
@@ -174,7 +195,7 @@ class _BankScreenState extends State<BankScreen> {
           type == InputType.ifsc
               ? TextCapitalization.characters
               : TextCapitalization.words,
-          decoration: _inputDecoration(label),
+          decoration: _inputDecoration(hint,label),
           validator: (value) => controller.validateField(label, value),
         ),
       ),
@@ -182,8 +203,9 @@ class _BankScreenState extends State<BankScreen> {
   }
 
 
-  InputDecoration _inputDecoration(String hint) {
+  InputDecoration _inputDecoration(String hint,String label) {
     return InputDecoration(
+      labelText: label,
       hintText: hint,
       filled: true,
       fillColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:developer/Widgets/AppColors.dart';
+import 'package:developer/testingfile.dart';
 import 'package:developer/utility/network_dialog_manager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,9 @@ import 'chat/chat_user_list_screen.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
 
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+GlobalKey<ScaffoldMessengerState>();
 
 final GlobalKey<NavigatorState> bwGlobalContext = GlobalKey<NavigatorState>();
 bool isBwGlobalContextMounted() {
@@ -80,6 +84,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     return GetMaterialApp(
       navigatorKey: bwGlobalContext,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: ThemeData(
           useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

@@ -595,7 +595,7 @@ final tag="RequestAcceptedSection";
                                           : () async {
                                         bwDebug(" [HIRE BUTTON]: press",tag: tag);
                                        await controller.assignEmergencyOrder(orderId:orderId , serviceProviderId: item.providersId);
-
+                                       Get.back();
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primaryGreen,

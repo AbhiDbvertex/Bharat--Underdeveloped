@@ -145,6 +145,7 @@ class OtpController {
     } catch (e) {
       print('❌ Network Error: $e');
       // _showMessage("Network error. Please check your connection.");
+      // if(!context.mounted)return;
       CustomSnackBar.show(
           context,
           message: "Network error. Please check your connection.",
@@ -193,40 +194,48 @@ class OtpController {
           }
           refreshUI(newOtp);
           // _showMessage(data['message'] ?? "OTP sent successfully");
-          CustomSnackBar.show(
-              context,
-              message: data['message'] ?? "OTP sent successfully",
-              type: SnackBarType.success
-          );
-
+          if (context.mounted) {
+            CustomSnackBar.show(
+                context,
+                message: data['message'] ?? "OTP sent successfully",
+                type: SnackBarType.success
+            );
+          }
         } else {
           //   _showMessage(
           //       data['message'] ?? "Failed to resend OTP. Please try again.");
 
-          CustomSnackBar.show(
-              context,
-              message: data['message'] ??
-                  "Failed to resend OTP. Please try again.",
-              type: SnackBarType.error
-          );
+          if (context.mounted) {
+            CustomSnackBar.show(
+                context,
+                message: data['message'] ??
+                    "Failed to resend OTP. Please try again.",
+                type: SnackBarType.error
+            );
+          }
         }
       } else {
         // _showMessage(
         //     data['message'] ?? "Server error occurred. Please try again.");
-        CustomSnackBar.show(
+        if (context.mounted) {
+          CustomSnackBar.show(
             context,
-            message:data['message'] ?? "Server error occurred. Please try again." ,
+            message: data['message'] ??
+                "Server error occurred. Please try again.",
             type: SnackBarType.error
         );
+      }
       }
     } catch (e) {
       print('❌ Resend OTP Error: $e');
       // _showMessage("Network error. Please check your connection.");
+      if (context.mounted) {
       CustomSnackBar.show(
           context,
-          message:"Network error. Please check your connection." ,
+          message: "Network error. Please check your connection.",
           type: SnackBarType.warning
       );
+    }
     }
   }
 
