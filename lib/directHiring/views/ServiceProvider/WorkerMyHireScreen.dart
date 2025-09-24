@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
@@ -10,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../Widgets/AppColors.dart';
 import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/ServiceProvider/BiddingServiceProviderWorkdetail.dart';
@@ -219,7 +217,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
       final res = await http.get(
         Uri.parse(
-            'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
+            'https://api.thebharatworks.com/api/direct-order/getOrdersByProvider'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

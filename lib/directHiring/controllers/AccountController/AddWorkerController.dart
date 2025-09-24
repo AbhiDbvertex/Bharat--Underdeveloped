@@ -139,6 +139,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utility/custom_snack_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddWorkerController {
   final formKey = GlobalKey<FormState>();
@@ -383,20 +384,29 @@ class AddWorkerController {
       if (!context.mounted) return false;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        CustomSnackBar.show(
-            context,
-            message:"Worker added successfully" ,
-            type: SnackBarType.success
+        // CustomSnackBar.show(
+        //     context,
+        //     message:"Worker added successfully" ,
+        //     type: SnackBarType.success
+        // );
+        Fluttertoast.showToast(
+          msg: "Worker added successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM, // TOP, CENTER, BOTTOM
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
+
 
         return true;
       } else {
-
-        CustomSnackBar.show(
-            context,
-            message:"Failed: $body" ,
-            type: SnackBarType.error
-        );
+        print("Abhi:- add worker show error $body");
+        // CustomSnackBar.show(
+        //     context,
+        //     message:"Failed: $body" ,
+        //     type: SnackBarType.error
+        // );
 
         return false;
       }

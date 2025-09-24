@@ -566,7 +566,7 @@ bwDebug("orderId: ${widget.orderId}, call type: ${widget.callType}");
         body: jsonEncode(body),
       );
 
-      print("📤 Assign Status: ${response.statusCode}");
+      print("📤 Assign Status sdfasdf: ${response.statusCode}");
       print("📤 Assign Body: ${response.body}");
 
       if (response.statusCode == 200) {
@@ -575,7 +575,7 @@ bwDebug("orderId: ${widget.orderId}, call type: ${widget.callType}");
         final message = data['message'] ?? 'Worker assigned successfully';
         Get.snackbar(
           "Success",
-          message,
+          'Worker assigned successfully',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
@@ -593,7 +593,7 @@ await controller.getEmergencyOrder(widget.orderId);
         Navigator.pop(context);
       } else {
         final data = json.decode(response.body);
-        final message = data['message'] ?? 'Assignment fail ho gaya!';
+        final message = data['message'] ?? 'Assignment failed!';
         Get.snackbar(
           "Error",
           message,
@@ -605,15 +605,17 @@ await controller.getEmergencyOrder(widget.orderId);
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Error: ${e.toString()}",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(10),
-        borderRadius: 8,
-      );
+      print("Abhi:- print error in assin worker screen $e");
+      Navigator.pop(context);
+      // Get.snackbar(
+      //   "Error",
+      //   "Error: ${e.toString()}",
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.red,
+      //   colorText: Colors.white,
+      //   margin: EdgeInsets.all(10),
+      //   borderRadius: 8,
+      // );
     }
   }
 

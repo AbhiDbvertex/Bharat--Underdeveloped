@@ -20,7 +20,7 @@ class ApiService {
       headers: {'Authorization': 'Bearer ${token['Authorization']}'},
     );
     print('Abhi:- Conversations API response: ${response.statusCode}, ${response.body}');
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final data = json.decode(response.body);
       print('Abhi:- Conversations fetched: ${data['conversations']}');
       return data['conversations'] ?? [];
@@ -36,7 +36,7 @@ class ApiService {
       headers: {'Authorization': 'Bearer ${token['Authorization']}'},
     );
     print('Abhi:- Messages API response: ${response.statusCode}, ${response.body}');
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201 ) {
       final data = json.decode(response.body);
       print('Abhi:- Messages fetched: ${data['messages']}');
       return data['messages'] ?? [];
@@ -53,7 +53,7 @@ class ApiService {
       body: json.encode({'senderId': senderId, 'receiverId': receiverId}),
     );
     print('Abhi:- Start conversation API response: ${response.statusCode}, ${response.body}');
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return json.decode(response.body)['conversation'];
     }
     throw Exception('Failed to start conversation: ${response.body}');
@@ -107,7 +107,7 @@ class ApiService {
     final response = await request.send();
     final responseBody = await http.Response.fromStream(response);
     print('Abhi:- Image message API response: ${response.statusCode}, ${responseBody.body}');
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return json.decode(responseBody.body)['newMessage'];
     }
     throw Exception('Failed to send image message: ${responseBody.body}');
@@ -141,7 +141,7 @@ class ApiService {
     final response = await request.send();
     final responseBody = await http.Response.fromStream(response);
     print('Abhi:- Document message API response: ${response.statusCode}, ${responseBody.body}');
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       return json.decode(responseBody.body)['newMessage'];
     }
     throw Exception('Failed to send document message: ${responseBody.body}');

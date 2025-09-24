@@ -3835,13 +3835,64 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                     ),
                                   ),
                                   SizedBox(height: 10),
-                                  CircleAvatar(
-                                    radius: 14,
-                                    backgroundColor: Colors.grey[300],
-                                    child: Icon(
-                                      Icons.message,
-                                      color: Colors.green,
-                                      size: 18,
+                                  // InkWell(
+                                  //   onTap: (){
+                                  //     final userId = order != null &&
+                                  //         order!['user_id'] != null
+                                  //         ? order!['user_id']['_id'] ??
+                                  //         'Unknown '
+                                  //         : 'Unknown ';
+                                  //     final fullName = order != null &&
+                                  //         order!['user_id'] != null
+                                  //         ? order!['user_id']
+                                  //     ['full_name'] ??
+                                  //         'Unknown '
+                                  //         : 'Unknown ';
+                                  //     print("Abhi:- print userid using chat app reseverId : $userId name: $fullName");
+                                  //   },
+                                  //   child: CircleAvatar(
+                                  //     radius: 14,
+                                  //     backgroundColor: Colors.grey[300],
+                                  //     child: Icon(
+                                  //       Icons.message,
+                                  //       color: Colors.green,
+                                  //       size: 18,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  InkWell(
+                                    onTap: () {
+                                      final receiverId = order != null && order!['user_id'] != null
+                                          ? order!['user_id']['_id']?.toString() ?? 'Unknown'
+                                          : 'Unknown';
+                                      final fullName = order != null && order!['user_id'] != null
+                                          ? order!['user_id']['full_name'] ?? 'Unknown'
+                                          : 'Unknown';
+                                      print("Abhi:- Navigating to ChatScreen with receiverId: $receiverId, name: $fullName");
+
+                                      if (receiverId != 'Unknown') {
+                                        print("Abhi:- Pushing ChatScreen with receiverId: $receiverId");
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) => ChatScreen(initialReceiverId: receiverId),
+                                        //   ),
+                                        // );
+                                      } else {
+                                        print("Abhi:- Error: Invalid receiver ID");
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error: Invalid receiver ID')),
+                                        );
+                                      }
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 14,
+                                      backgroundColor: Colors.grey[300],
+                                      child: Icon(
+                                        Icons.message,
+                                        color: Colors.green,
+                                        size: 18,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(height: 6),
@@ -3891,7 +3942,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Assigned Person asdsa",
+                                  "Assigned Person",
                                   style: GoogleFonts.roboto(
                                     color: Colors.black,
                                     fontSize: 18,

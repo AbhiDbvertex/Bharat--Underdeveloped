@@ -83,7 +83,8 @@ class AccountController {
           context,
           MaterialPageRoute(builder: (_) => DisputeScreen()),
         );
-        case 'promotion':
+        case 'Promotions':
+          print("Abhi:-pressed the button promotionBannerScreen");
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => PromotionBannerScreen()),

@@ -9,10 +9,10 @@ class ApiEndpoint {
   static const String serviceDirectViewScreen = '/user/getServiceProviders';
   static const String serviceWorkDetails = '/direct-order/accept-offer';
   static const String workerMyHireScreen =
-      '/direct-order/apiGetAllDirectOrders';
+      '/direct-order/getOrdersByUser';
   static const String WorkerScreen = '/worker/all';
   static const String hireScreen = '/direct-order/create';
-  static const String MyHireScreen = '/direct-order/apiGetAllDirectOrders';
+  static const String MyHireScreen = '/direct-order/getOrdersByUser';
   static const String SubCategories = '/user/getServiceProviders';
   static const String workerCategories = '/work-category';
   static const String getworker = '/worker/all';
@@ -21,3 +21,5 @@ class ApiEndpoint {
   static const String biddingMarkComplete = '/bidding-order/completeOrderUser';
   static const String postRatingDarect = '/user/add-review';
 }
+
+// pet grooming, pet boarding(overnight),pet walking, vet visit coordination, pet nutrition plans

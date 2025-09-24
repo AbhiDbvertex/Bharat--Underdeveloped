@@ -9,6 +9,7 @@ import '../directHiring/views/ServiceProvider/WorkerMyHireScreen.dart';
 import '../directHiring/views/User/MyHireScreen.dart';
 import '../directHiring/views/User/UserHomeScreen.dart';
 import '../directHiring/views/auth/RoleSelectionScreen.dart';
+import '../testingfile.dart';
 import 'AppColors.dart';
 
 class Bottombar extends StatefulWidget {
@@ -38,7 +39,7 @@ class BottombarState extends State<Bottombar> {
       ),
       // const PlaceholderScreen(label: 'My Work'),
       const PlaceholderScreen(label: 'Message'),
-      // ChatScreen(),
+      // ChatScreen(initialReceiverId: '68abeca08908c84c7c3769ea',),
       const AccountScreen(),
     ];
 
@@ -51,6 +52,7 @@ class BottombarState extends State<Bottombar> {
         subcategreyId: 'default_sub_category_id',
       ),
       const PlaceholderScreen(label: 'Message'),
+      // ChatScreen(initialReceiverId: '68abeca08908c84c7c3769ea',),
       const AccountScreen(),
     ];
   }
