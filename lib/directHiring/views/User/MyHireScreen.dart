@@ -8,7 +8,7 @@
 // import 'package:http/http.dart' as http;
 // import 'package:intl/intl.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-// import '../../../Bidding/view/user/buding_work_detail_screen.dart';
+// import '../../../Bidding/view/user/bidding_work_detail_screen.dart';
 // import '../../../Emergency/User/models/emergency_list_model.dart';
 // import '../../../Emergency/utils/map_launcher_lat_long.dart';
 // import '../../../Emergency/utils/snack_bar_helper.dart';
@@ -1237,6 +1237,7 @@ import 'dart:convert';
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
 import 'package:developer/Emergency/User/screens/work_detail.dart';
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -1244,7 +1245,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../Bidding/view/user/buding_work_detail_screen.dart';
+import '../../../Bidding/view/user/bidding_work_detail_screen.dart';
 import '../../../Emergency/User/models/emergency_list_model.dart';
 import '../../../Emergency/utils/map_launcher_lat_long.dart';
 import '../../../Emergency/utils/snack_bar_helper.dart';
@@ -1600,7 +1601,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                 }
 
                 if (selectedTab == 0) {
-                  return _buildBudingCard(BudingData);
+                  return _buildBiddingCard(BudingData);
                 } else if (selectedTab == 1) {
                   return _buildDirectHiringList();
                 } else {
@@ -1684,7 +1685,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.builder(
         itemCount: displayEmergency.length,
         itemBuilder: (context, index) => _buildEmergencyCard(displayEmergency[index]),
@@ -1983,8 +1984,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
 //     );
 //   }
 
-  Widget _buildBudingCard(dynamic BudingData) {
-    if (BudingData == null) {
+  Widget _buildBiddingCard(dynamic biddingData) {
+    if (biddingData == null) {
       return const Center(
         child: CircularProgressIndicator(
           color: Colors.green,
@@ -1994,10 +1995,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
     // 👈 Yeh line change kar: Filtered data use kar
     final List dataList = searchQuery.isEmpty
-        ? (BudingData['data'] ?? [])
+        ? (biddingData['data'] ?? [])
         : filteredBiddingData;
 
-    print("Abhi:- get bidding oderId : ${BudingData['data'] }");
+    print("Abhi:- get bidding oderId : ${biddingData['data'] }");
 
     return Padding(
       padding: const EdgeInsets.only(left: 12.0,right: 12),
@@ -2556,14 +2557,14 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   hasImage
                       ? Image.network(
                     data.imageUrls!.first, // first image show karenge
-                    height: 200,
-                    width: 110,
+                    height: 0.4.toWidthPercent(),
+                    width: 0.25.toWidthPercent(),
                     // fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Container(
-                        height: 200,
-                        width: 110,
+                        height: 0.4.toWidthPercent(),
+                        width: 0.25.toWidthPercent(),
                         alignment: Alignment.center,
                         child: const CircularProgressIndicator(
                           color: AppColors.primaryGreen,

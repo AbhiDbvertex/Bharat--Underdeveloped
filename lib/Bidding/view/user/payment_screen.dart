@@ -880,7 +880,7 @@ import '../../../directHiring/Consent/ApiEndpoint.dart';
 import '../../../directHiring/Consent/app_constants.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
 import '../../../utility/custom_snack_bar.dart';
-import 'buding_work_detail_screen.dart';
+import 'bidding_work_detail_screen.dart';
 
 class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
@@ -912,6 +912,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   @override
   void initState() {
+    bwDebug("[initsState] Order ID : ${widget.orderId}",tag: "Payment Screen");
     super.initState();
     // Razorpay initialize karo
     _razorpay = Razorpay();
@@ -1102,48 +1103,51 @@ Navigator.pop(context);
         int.parse(_amount) > 0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      // padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Payment",
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Payment",
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              if (!_showForm)
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _showForm = true;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                if (!_showForm)
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showForm = true;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      "Create",
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                      child: Text(
+                        "Create",
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           Card(
             child: Container(
@@ -1151,6 +1155,9 @@ Navigator.pop(context);
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.white,
+                boxShadow: [
+                  BoxShadow(color: Colors.green,blurRadius: 2)
+                ]
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1297,7 +1304,7 @@ Navigator.pop(context);
                       int i = entry.key;
                       var payment = entry.value;
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 3),
                         child: Column(
                           children: [
                             // Row(
@@ -1362,36 +1369,44 @@ Navigator.pop(context);
                               crossAxisAlignment: CrossAxisAlignment.start, // text top se align hoga
                               children: [
                                 // Description column
+                                Text(
+                                  "${i + 1}.",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                                 Expanded(
-                                  flex: 3, // jyada space description ko
+                                  flex:2, // jyada space description ko
                                   child: Text(
-                                    "${i + 1}. ${toTitleCase(payment['description'])}",
+                                    "${toTitleCase(payment['description'])}",
                                     style: GoogleFonts.roboto(
-                                      fontSize: 14,
+                                      fontSize: 13,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
-
                                 // Status column
                                 Expanded(
-                                  flex: 2,
+                                  flex: (2),
                                   child: Text(
-                                    toTitleCase(payment['status'] ?? 'UNKNOWN'),
+                                    toTitleCase(payment['release_status']=="release_requested" ?"Requested":payment['release_status']?? 'UNKNOWN'),
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
+                                      // color: getColor(payment['release_status']),
                                       color: Colors.green,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
 
                                 // Amount column
                                 Expanded(
-                                  flex: 1,
+                                  flex: 2,
                                   child: Text(
-                                    "₹${payment['amount']}",
+                                    "₹${payment['amount']}/-",
                                     style: GoogleFonts.roboto(
                                       fontSize: 16,
                                       color: Colors.black,
@@ -1401,33 +1416,36 @@ Navigator.pop(context);
                                 ),
 
                                 // Button column
-                                payment['release_status'] == 'release_requested'
-                                    ? const SizedBox(width: 36) // empty placeholder
-                                    : GestureDetector(
-                                  onTap: isLoading == true
-                                      ? null
-                                      : () async {
-                                    await postPaymentRequest(payment['_id'] ?? '');
-                                    print("Abhi:- payment releaseId : ${payment['_id']}");
-                                  },
-                                  child: Container(
-                                    height: 26,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "Pay",
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 13,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
+                                Expanded(
+                                  flex: 0,
+                                  child: payment['release_status'] == 'release_requested' || payment['release_status'] == 'released'
+                                      ? const SizedBox(width: 36) // empty placeholder
+                                      : GestureDetector(
+                                                                        onTap: isLoading == true
+                                        ? null
+                                        : () async {
+                                      await postPaymentRequest(payment['_id'] ?? '');
+                                      print("Abhi:- payment releaseId : ${payment['_id']}");
+                                                                        },
+                                                                        child: Container(
+                                      height: 26,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          "Pay",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 13,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
+                                                                        ),
+                                                                      ),
                                 ),
                               ],
                             ),
@@ -1605,7 +1623,7 @@ Navigator.pop(context);
                         Navigator.of(context).pop();
                         if (_description.isNotEmpty && _amount.isNotEmpty) {
                           if (_selectedPayment == 'online') {
-                            // Razorpay ke liye logic
+
                             int razorpayAmount = (int.parse(_amount) * 1.18 * 100).toInt();
                             var options = {
                               'key': 'rzp_test_R7z5O0bqmRXuiH',
@@ -1777,6 +1795,7 @@ Navigator.pop(context);
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    bwDebug("order Id : ${widget.orderId}");
     final url = Uri.parse(
       'https://api.thebharatworks.com/api/bidding-order/addPaymentStage/${widget.orderId}',
     );
@@ -1886,4 +1905,19 @@ Navigator.pop(context);
       print("Abhi:- payment screen get Exception $e");
     }
   }
+
+//   getColor(String? payment) {
+// switch (payment){
+//   case 'pending':
+//     return Colors.red;
+//   case 'released':
+//     return Colors.green;
+//   case 'release_requested':
+//     return Colors.yellow.shade700;
+//   case 'refunded':
+//     return Colors.blue;
+//   default:
+// }
+//
+//   }
 }

@@ -115,10 +115,18 @@ class OtpController {
             nextScreen = const Bottombar();
           }
           // _showMessage(data['message'] ?? "OTP verified successfully");
-          CustomSnackBar.show(
-              context,
-              message: data['message'] ?? "OTP verified successfully",
-              type: SnackBarType.success
+          // CustomSnackBar.show(
+          //     context,
+          //     message: data['message'] ?? "OTP verified successfully",
+          //     type: SnackBarType.success
+          // );
+          Fluttertoast.showToast(
+            msg: data['message'] ?? "OTP verified successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
           );
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => nextScreen),

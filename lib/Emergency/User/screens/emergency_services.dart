@@ -196,9 +196,12 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         
                       _buildTitle("Contact"),
                       customTextField(
-                          hint: "+ 91",
+                          hint: "Enter Number",
                           keyboardType: TextInputType.phone,
                           controller: controller.contactController,
+                          inputFormatters:  [
+                          FilteringTextInputFormatter.digitsOnly,
+                          ],
                           maxLength: 10),
                       SizedBox(height: .04.toWidthPercent()),
         
@@ -283,11 +286,13 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     required String hint,
     TextInputType keyboardType = TextInputType.text,
     int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       maxLength: maxLength,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: fieldHintStyle,

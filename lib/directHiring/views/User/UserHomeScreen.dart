@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Bidding/view/user/BudingPostTaskScreen.dart';
+import '../../../Bidding/view/user/bidding_post_task_screen.dart';
 import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../../utility/custom_snack_bar.dart';
@@ -907,7 +907,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "FEATURE WORKER",
+                        "FEATURED WORKER",
                         style: GoogleFonts.roboto(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
