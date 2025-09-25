@@ -1,170 +1,3 @@
-
-///         This code added by Abhishek new
-/*class ChatListScreen extends StatefulWidget {
-  final List<dynamic> conversations;
-  final String userId;
-  final List<dynamic> onlineUsers;
-  final TextEditingController receiverIdController;
-  final Function(String) onReceiverIdChanged;
-  final VoidCallback onStartConversation;
-  final Function(dynamic) onConversationTap;
-
-  const ChatListScreen({
-    Key? key,
-    required this.conversations,
-    required this.userId,
-    required this.onlineUsers,
-    required this.receiverIdController,
-    required this.onReceiverIdChanged,
-    required this.onStartConversation,
-    required this.onConversationTap,
-  }) : super(key: key);
-
-  @override
-  _ChatListScreenState createState() => _ChatListScreenState();
-}
-
-class _ChatListScreenState extends State<ChatListScreen> {
-  final ScrollController _listScrollController = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Chat',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: widget.receiverIdController,
-                      onChanged: widget.onReceiverIdChanged,
-                      decoration: InputDecoration(
-                        hintText: 'Enter User ID to start chat',
-                        hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
-                        border: InputBorder.none,
-                        contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green[600],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: IconButton(
-                    onPressed: widget.onStartConversation,
-                    icon: Icon(Icons.add_comment, color: Colors.white),
-                    iconSize: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              controller: _listScrollController,
-              padding: EdgeInsets.symmetric(vertical: 8),
-              itemCount: widget.conversations.length,
-              itemBuilder: (ctx, idx) {
-                final conv = widget.conversations[idx];
-                final members = (conv['members'] as List);
-                final otherUser = members.firstWhere(
-                      (m) => m['_id'] != widget.userId,
-                  orElse: () => {'name': 'Unknown', '_id': ''},
-                );
-                final isOnline = widget.onlineUsers.contains(otherUser['_id']);
-
-                return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                    leading: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.grey[300],
-                          backgroundImage: otherUser['avatar'] != null
-                              ? NetworkImage(otherUser['avatar'])
-                              : null,
-                          child: otherUser['avatar'] == null
-                              ? Icon(Icons.person, color: Colors.grey[600], size: 30)
-                              : null,
-                        ),
-                        if (isOnline)
-                          Positioned(
-                            right: 2,
-                            bottom: 2,
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    title: Text(
-                      '${otherUser['name'] ?? 'Unknown'} - Carpenter',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      conv['lastMessage'] ?? 'Tap to start conversation',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: () => widget.onConversationTap(conv),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _listScrollController.dispose();
-    super.dispose();
-  }
-}
-*/
-
 //
 // import 'dart:convert';
 // import 'dart:io';
@@ -175,10 +8,338 @@ class _ChatListScreenState extends State<ChatListScreen> {
 // import 'package:file_picker/file_picker.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter/scheduler.dart';
+// import 'chat/APIServices.dart';
+// import 'chat/SocketService.dart';
 //
-// import 'APIServices.dart';
-// import 'SocketService.dart';
+// class StandaloneChatDetailScreen extends StatefulWidget {
+//   final dynamic initialCurrentChat;
+//   final String initialUserId;
+//   final List<dynamic> initialMessages;
+//   final List<String> initialOnlineUsers;
 //
+//   const StandaloneChatDetailScreen({
+//     Key? key,
+//     required this.initialCurrentChat,
+//     required this.initialUserId,
+//     required this.initialMessages,
+//     required this.initialOnlineUsers,
+//   }) : super(key: key);
+//
+//   @override
+//   _StandaloneChatDetailScreenState createState() => _StandaloneChatDetailScreenState();
+// }
+//
+// class _StandaloneChatDetailScreenState extends State<StandaloneChatDetailScreen> {
+//   late dynamic currentChat;
+//   late String userId;
+//   List<dynamic> messages = [];
+//   List<String> images = [];
+//   List<String> documents = [];
+//   List<String> onlineUsers = [];
+//   final TextEditingController messageController = TextEditingController();
+//   final ScrollController scrollController = ScrollController();
+//   final ImagePicker _picker = ImagePicker();
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     currentChat = widget.initialCurrentChat;
+//     userId = widget.initialUserId;
+//     messages = widget.initialMessages.toList();
+//     onlineUsers = widget.initialOnlineUsers.toList();
+//
+//     // Socket message listener
+//     SocketService.setMessageCallback((parsedMessage) {
+//       if (parsedMessage != null && parsedMessage['conversationId'].toString() == currentChat['_id'].toString()) {
+//         setState(() {
+//           if (!messages.any((msg) => msg['_id'].toString() == parsedMessage['_id'].toString())) {
+//             messages.insert(0, parsedMessage);
+//             print('Abhi:- Received message added to UI: ${parsedMessage['message']}');
+//           } else {
+//             print('Abhi:- Message already exists in UI: ${parsedMessage['_id']}');
+//           }
+//         });
+//         _scrollToBottom();
+//       } else {
+//         print('Abhi:- Received message from other chat or invalid: $parsedMessage');
+//       }
+//     });
+//     SocketService.listenOnlineUsers((users) {
+//       setState(() => onlineUsers = users.map((u) => u.toString()).toList());
+//     });
+//
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       _scrollToBottom();
+//     });
+//   }
+//
+//   void _scrollToBottom() {
+//     if (scrollController.hasClients) {
+//       scrollController.animateTo(
+//         0,
+//         duration: Duration(milliseconds: 300),
+//         curve: Curves.easeOut,
+//       );
+//     }
+//   }
+//   String getIdAsString(dynamic id) {
+//     if (id == null) return '';
+//     if (id is String) return id;
+//     if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+//     print("Abhi:- Warning: Unexpected _id format: $id");
+//     return id.toString();
+//   }
+//   Future<void> _sendMessage() async {
+//     if (messageController.text.trim().isEmpty && images.isEmpty && documents.isEmpty) {
+//       print("Abhi:- Error: No message, images, or documents to send");
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: No message, images, or documents to send')),
+//         );
+//       }
+//       return;
+//     }
+//
+//     String? receiverId;
+//     try {
+//       final members = currentChat['members'] as List? ?? [];
+//       if (members.isEmpty) {
+//         print("Abhi:- Error: Members list is empty");
+//         if (mounted) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Error: No members found in conversation')),
+//           );
+//         }
+//         return;
+//       }
+//
+//       print("Abhi:- Members: $members");
+//       if (members.first is String) {
+//         // Case 1: Members are string IDs (from POST /api/chat/conversations)
+//         receiverId = members.firstWhere(
+//               (m) => m != userId,
+//           orElse: () => null,
+//         );
+//       } else {
+//         // Case 2: Members are full user objects (after fetchUserById)
+//         final matchingMember = members.firstWhere(
+//               (m) => m['_id'].toString() != userId,
+//           orElse: () => <String, dynamic>{}, // Return empty Map<String, dynamic>
+//         );
+//         receiverId = matchingMember.isNotEmpty ? matchingMember['_id'].toString() : null;
+//       }
+//
+//       if (receiverId == null || receiverId.isEmpty) {
+//         print("Abhi:- Error: No matching member found for receiverId");
+//         if (mounted) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Error: Invalid receiver ID')),
+//           );
+//         }
+//         return;
+//       }
+//
+//       print("Abhi:- ReceiverId found: $receiverId");
+//     } catch (e, stackTrace) {
+//       print("Abhi:- Error finding receiverId: $e");
+//       print("Abhi:- Stack trace: $stackTrace");
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Failed to find receiver ID: $e')),
+//         );
+//       }
+//       return;
+//     }
+//
+//     try {
+//       dynamic newMsg;
+//       if (images.isNotEmpty) {
+//         newMsg = await ApiService.sendImageMessage(
+//           senderId: userId,
+//           receiverId: receiverId,
+//           conversationId: currentChat['_id'].toString(),
+//           imagePaths: images,
+//           message: messageController.text.isNotEmpty ? messageController.text : null,
+//         );
+//         print('Abhi:- Image message sent successfully: $newMsg');
+//       } else if (documents.isNotEmpty) {
+//         newMsg = await ApiService.sendDocumentMessage(
+//           senderId: userId,
+//           receiverId: receiverId,
+//           conversationId: currentChat['_id'].toString(),
+//           documentPaths: documents,
+//           message: messageController.text.isNotEmpty ? messageController.text : null,
+//         );
+//         print('Abhi:- Document message sent successfully: $newMsg');
+//       } else {
+//         final msgData = {
+//           'senderId': userId,
+//           'receiverId': receiverId,
+//           'conversationId': currentChat['_id'].toString(),
+//           'message': messageController.text,
+//           'messageType': 'text',
+//         };
+//         newMsg = await ApiService.sendTextMessage(msgData);
+//         print('Abhi:- Text message sent successfully: $newMsg');
+//       }
+//
+//       SocketService.sendMessage(newMsg);
+//       if (mounted) {
+//         setState(() {
+//           if (!messages.any((msg) => msg['_id'].toString() == newMsg['_id'].toString())) {
+//             messages.insert(0, newMsg);
+//             print('Abhi:- Message added to UI: ${newMsg['_id']}');
+//           } else {
+//             print('Abhi:- Message already exists in UI: ${newMsg['_id']}');
+//           }
+//           messageController.clear();
+//           images.clear();
+//           documents.clear();
+//           print('Abhi:- Message fields cleared after sending');
+//         });
+//         _scrollToBottom();
+//       }
+//     } catch (e, stackTrace) {
+//       print('Abhi:- Error sending message: $e');
+//       print('Abhi:- Stack trace: $stackTrace');
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Failed to send message: $e')),
+//         );
+//       }
+//     }
+//   }
+//
+//   Future<void> _pickImages() async {
+//     try {
+//       print("Abhi:- Picking images");
+//       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+//       if (pickedFiles != null) {
+//         if (pickedFiles.length > 5) {
+//           print("Abhi:- Error: More than 5 images selected");
+//           SchedulerBinding.instance.addPostFrameCallback((_) {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               SnackBar(content: Text('Error: Maximum 5 images allowed')),
+//             );
+//           });
+//           return;
+//         }
+//         setState(() {
+//           images = pickedFiles.map((file) => file.path).toList();
+//           print("Abhi:- Images picked successfully: $images");
+//         });
+//       } else {
+//         print("Abhi:- No images selected");
+//       }
+//     } catch (e) {
+//       print("Abhi:- Exception in pickImages: $e");
+//       SchedulerBinding.instance.addPostFrameCallback((_) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Exception while picking images: $e')),
+//         );
+//       });
+//     }
+//   }
+//
+//   Future<void> _pickDocuments() async {
+//     try {
+//       print("Abhi:- Picking documents");
+//       FilePickerResult? result = await FilePicker.platform.pickFiles(
+//         allowMultiple: true,
+//         type: FileType.custom,
+//         allowedExtensions: ['pdf', 'doc', 'docx'],
+//       );
+//       if (result != null && result.files.length <= 5) {
+//         setState(() {
+//           documents = result.files.map((file) => file.path!).toList();
+//           print("Abhi:- Documents picked successfully: $documents");
+//         });
+//       } else if (result != null && result.files.length > 5) {
+//         print("Abhi:- Error: More than 5 documents selected");
+//         SchedulerBinding.instance.addPostFrameCallback((_) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Error: Maximum 5 documents allowed')),
+//           );
+//         });
+//       } else {
+//         print("Abhi:- No documents selected");
+//       }
+//     } catch (e) {
+//       print("Abhi:- Exception in pickDocuments: $e");
+//       SchedulerBinding.instance.addPostFrameCallback((_) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Exception while picking documents: $e')),
+//         );
+//       });
+//     }
+//   }
+//
+//   String _formatTime(String createdAt) {
+//     try {
+//       final DateTime dateTime = DateTime.parse(createdAt).toLocal();
+//       final now = DateTime.now().toLocal();
+//       final today = DateTime(now.year, now.month, now.day);
+//       final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+//       final difference = now.difference(dateTime).inDays;
+//
+//       if (difference == 0) {
+//         return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+//       } else if (difference == 1) {
+//         return "Yesterday ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+//       } else {
+//         return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+//       }
+//     } catch (e) {
+//       print("Abhi:- Error formatting time: $e");
+//       SchedulerBinding.instance.addPostFrameCallback((_) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Exception while formatting time: $e')),
+//         );
+//       });
+//       return "Invalid time";
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return WillPopScope(
+//       onWillPop: () async {
+//         print("Abhi:- Back pressed in StandaloneChatDetailScreen");
+//         SocketService.disconnect();
+//         return true;
+//       },
+//       child: ChatDetailScreen(
+//         currentChat: currentChat,
+//         userId: userId,
+//         messages: messages,
+//         onlineUsers: onlineUsers,
+//         scrollController: scrollController,
+//         messageController: messageController,
+//         images: images,
+//         documents: documents,
+//         onBack: () {
+//           print("Abhi:- onBack called in ChatDetailScreen");
+//           SocketService.disconnect();
+//           Navigator.pop(context);
+//         },
+//         onSendMessage: _sendMessage,
+//         onPickImages: _pickImages,
+//         onPickDocuments: _pickDocuments,
+//         formatTime: _formatTime,
+//       ),
+//     );
+//   }
+//
+//   @override
+//   void dispose() {
+//     print("Abhi:- Disposing StandaloneChatDetailScreen");
+//     SocketService.removeMessageCallback();
+//     SocketService.disconnect();
+//     scrollController.dispose();
+//     messageController.dispose();
+//     super.dispose();
+//   }
+// }
 //
 // class ChatDetailScreen extends StatelessWidget {
 //   final dynamic currentChat;
@@ -223,7 +384,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //       if (members.isEmpty) {
 //         print("Abhi:- Warning: Members list is empty for conversation ${currentChat['_id']}");
 //         otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-//         // Schedule SnackBar to show after build
 //         SchedulerBinding.instance.addPostFrameCallback((_) {
 //           ScaffoldMessenger.of(context).showSnackBar(
 //             SnackBar(content: Text('Warning: No members found in conversation')),
@@ -247,7 +407,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //       print("Abhi:- Error finding other user in members: $e");
 //       print("Abhi:- Stack trace: $stackTrace");
 //       otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-//       // Schedule SnackBar to show after build
 //       SchedulerBinding.instance.addPostFrameCallback((_) {
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(content: Text('Error: Failed to load chat user: $e')),
@@ -349,8 +508,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //                   return Container(
 //                     margin: EdgeInsets.symmetric(vertical: 2),
 //                     child: Row(
-//                       mainAxisAlignment:
-//                       isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+//                       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
 //                       children: [
 //                         Container(
 //                           constraints: BoxConstraints(
@@ -403,8 +561,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //                                     ),
 //                                   ),
 //                                 )),
-//                               if (msg['messageType'] == 'document' &&
-//                                   msg['document'] != null)
+//                               if (msg['messageType'] == 'document' && msg['document'] != null)
 //                                 ...(msg['document'] as List).map<Widget>((docUrl) => Container(
 //                                   margin: EdgeInsets.only(bottom: 8),
 //                                   padding: EdgeInsets.all(8),
@@ -567,8 +724,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //                                     hintText: 'Write a message',
 //                                     hintStyle: TextStyle(color: Colors.grey[600]),
 //                                     border: InputBorder.none,
-//                                     contentPadding:
-//                                     EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                                     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 //                                   ),
 //                                   maxLines: null,
 //                                   onChanged: (value) {
@@ -632,7 +788,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //   final TextEditingController _receiverIdController = TextEditingController();
 //   List<String> images = [];
 //   List<String> documents = [];
-//   List<dynamic> onlineUsers = [];
+//   List<dynamic?> onlineUsers = [];
 //   String receiverId = '';
 //   final ScrollController _detailScrollController = ScrollController();
 //   final ImagePicker _picker = ImagePicker();
@@ -955,7 +1111,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //     }
 //   }
 //
-//   Future<void> _sendMessage() async {
+//   /*Future<void> _sendMessage() async {
 //     if (_messageController.text.isEmpty && images.isEmpty && documents.isEmpty) {
 //       print('Abhi:- Error: No message, images, or documents to send');
 //       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -1032,6 +1188,203 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //           SnackBar(content: Text('Error: Failed to send message: $e')),
 //         );
 //       });
+//     }
+//   }*/
+//
+//   //          this code is working
+//   // Future<void> _sendMessage() async {
+//   //   if (_messageController.text.trim().isEmpty && images.isEmpty && documents.isEmpty) {
+//   //     print("Abhi:- Error: No message, images, or documents to send");
+//   //     if (mounted) {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(content: Text('Error: No message, images, or documents to send')),
+//   //       );
+//   //     }
+//   //     return;
+//   //   }
+//   //
+//   //   dynamic receiverId;
+//   //   if (currentChat['members'][0] is String) {
+//   //     print("Abhi:- Members are IDs, finding receiverId as string");
+//   //     receiverId = currentChat['members'].firstWhere(
+//   //           (m) => m != userId,
+//   //       orElse: () => null,
+//   //     );
+//   //   } else {
+//   //     print("Abhi:- Members are maps, finding receiverId");
+//   //     final matchingMember = currentChat['members'].firstWhere(
+//   //           (m) => m['_id'].toString() != userId,
+//   //       orElse: () => {}, // Fixed: Empty map return
+//   //     );
+//   //     receiverId = matchingMember.isNotEmpty ? matchingMember['_id'] : null;
+//   //   }
+//   //
+//   //   if (receiverId == null) {
+//   //     print("Abhi:- Error: Invalid receiver ID");
+//   //     if (mounted) {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(content: Text('Error: Invalid receiver ID')),
+//   //       );
+//   //     }
+//   //     return;
+//   //   }
+//   //
+//   //   try {
+//   //     dynamic newMsg;
+//   //     if (images.isNotEmpty) {
+//   //       newMsg = await ApiService.sendImageMessage(
+//   //         senderId: userId,
+//   //         receiverId: receiverId.toString(),
+//   //         conversationId: currentChat['_id'].toString(),
+//   //         imagePaths: images,
+//   //         message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//   //       );
+//   //       print("Abhi:- Image message sent successfully: $newMsg");
+//   //     } else if (documents.isNotEmpty) {
+//   //       newMsg = await ApiService.sendDocumentMessage(
+//   //         senderId: userId,
+//   //         receiverId: receiverId.toString(),
+//   //         conversationId: currentChat['_id'].toString(),
+//   //         documentPaths: documents,
+//   //         message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//   //       );
+//   //       print("Abhi:- Document message sent successfully: $newMsg");
+//   //     } else {
+//   //       final msgData = {
+//   //         'senderId': userId,
+//   //         'receiverId': receiverId.toString(),
+//   //         'conversationId': currentChat['_id'].toString(),
+//   //         'message': _messageController.text,
+//   //         'messageType': 'text',
+//   //       };
+//   //       newMsg = await ApiService.sendTextMessage(msgData);
+//   //       print("Abhi:- Text message sent successfully: $newMsg");
+//   //     }
+//   //
+//   //     SocketService.sendMessage(newMsg);
+//   //     if (mounted) {
+//   //       setState(() {
+//   //         if (!messages.any((msg) => msg['_id'].toString() == newMsg['_id'].toString())) {
+//   //           messages.insert(0, newMsg);
+//   //           print("Abhi:- Message added to UI: ${newMsg['_id']}");
+//   //         } else {
+//   //           print("Abhi:- Message already exists in UI: ${newMsg['_id']}");
+//   //         }
+//   //         _messageController.clear();
+//   //         images.clear();
+//   //         documents.clear();
+//   //         print("Abhi:- Message fields cleared after sending");
+//   //       });
+//   //     }
+//   //     _scrollToBottom();
+//   //   } catch (e) {
+//   //     print("Abhi:- Error sending message: $e");
+//   //     if (mounted) {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(content: Text('Error: Failed to send message: $e')),
+//   //       );
+//   //     }
+//   //   }
+//   // }
+//
+//   Future<void> _sendMessage() async {
+//     if (_messageController.text.trim().isEmpty && images.isEmpty && documents.isEmpty) {
+//       print("Abhi:- Error: No message, images, or documents to send");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: No message, images, or documents to send')),
+//       );
+//       return;
+//     }
+//
+//     dynamic receiverId;
+//     /*if (currentChat['members'][0] is String) {
+//       print("Abhi:- Members are IDs, finding receiverId as string");
+//       receiverId = currentChat['members'].firstWhere(
+//             (m) => m != userId,
+//         orElse: () => null,
+//       );
+//     } else {
+//       print("Abhi:- Members are maps, finding receiverId");
+//       final matchingMember = currentChat['members'].firstWhere(
+//             (m) => m['_id'].toString() != userId,
+//         orElse: () => {}, // Fixed: Empty map return
+//       );
+//       receiverId = matchingMember['_id'];
+//     }*/
+//     if (currentChat['members'][0] is String) {
+//       print("Abhi:- Members are IDs, finding receiverId as string");
+//       receiverId = currentChat['members'].firstWhere(
+//             (m) => m != "68d388ada1131cc2e4be05ff",
+//         orElse: () => "68d388ada1131cc2e4be05ff", // ✅ return empty string instead of null
+//       );
+//       if (receiverId.isEmpty) receiverId = null; // ✅ handle invalid case
+//     } else {
+//       print("Abhi:- Members are maps, finding receiverId");
+//       final matchingMember = currentChat['members'].firstWhere(
+//             (m) => m['_id'].toString() != "68d388ada1131cc2e4be05ff",
+//         orElse: () => {}, // ✅ empty map return
+//       );
+//       receiverId = matchingMember.isNotEmpty ? matchingMember['_id'] : null;
+//     }
+//     if (receiverId == null) {
+//       print("Abhi:- Error: Invalid receiver ID");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: Invalid receiver ID')),
+//       );
+//       return;
+//     }
+//
+//     try {
+//       dynamic newMsg;
+//       if (images.isNotEmpty) {
+//         newMsg = await ApiService.sendImageMessage(
+//           senderId: userId,
+//           receiverId: receiverId.toString(),
+//           conversationId: currentChat['_id'].toString(),
+//           imagePaths: images,
+//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//         );
+//         print('Abhi:- Image message sent successfully: $newMsg');
+//       } else if (documents.isNotEmpty) {
+//         newMsg = await ApiService.sendDocumentMessage(
+//           senderId: userId,
+//           receiverId: receiverId.toString(),
+//           conversationId: currentChat['_id'].toString(),
+//           documentPaths: documents,
+//           message: _messageController.text.isNotEmpty ? _messageController.text : null,
+//         );
+//         print('Abhi:- Document message sent successfully: $newMsg');
+//       } else {
+//         final msgData = {
+//           'senderId': userId,
+//           'receiverId': receiverId.toString(),
+//           'conversationId': currentChat['_id'].toString(),
+//           'message': _messageController.text,
+//           'messageType': 'text',
+//         };
+//         newMsg = await ApiService.sendTextMessage(msgData);
+//         print('Abhi:- Text message sent successfully: $newMsg');
+//       }
+//
+//       SocketService.sendMessage(newMsg);
+//       setState(() {
+//         if (!messages.any((msg) => msg['_id'].toString() == newMsg['_id'].toString())) {
+//           messages.insert(0, newMsg);
+//           print('Abhi:- Message added to UI: ${newMsg['_id']}');
+//         } else {
+//           print('Abhi:- Message already exists in UI: ${newMsg['_id']}');
+//         }
+//         _messageController.clear();
+//         images.clear();
+//         documents.clear();
+//         print('Abhi:- Message fields cleared after sending');
+//       });
+//       _scrollToBottom();
+//     } catch (e) {
+//       print('Abhi:- Error sending message: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: Failed to send message: $e')),
+//       );
 //     }
 //   }
 //
@@ -1340,5 +1693,3 @@ class _ChatListScreenState extends State<ChatListScreen> {
 //     super.dispose();
 //   }
 // }
-
-///         This code add by Abhishek new
