@@ -136,6 +136,9 @@ class PostTaskScreen extends StatelessWidget {
                     controller.costController,
                     "Enter cost in INR",
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
                     validator: (val) {
                       if (val == null || val.isEmpty) {
                         return "Please enter the cost";
@@ -278,12 +281,22 @@ class PostTaskScreen extends StatelessWidget {
     int maxLines = 1,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+        List<TextInputFormatter>? inputFormatters,
+
   }) =>
       TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
         decoration: _inputDecoration(hint),
+        textCapitalization: TextCapitalization.words,
+
+        inputFormatters: inputFormatters ??
+            [
+              FilteringTextInputFormatter.allow(
+                RegExp(r'[a-zA-Z0-9_.,\s]'), // Only letters, numbers and space
+              ),
+            ],
         validator: validator ??
             (val) =>
                 val == null || val.isEmpty ? "This field is required" : null,

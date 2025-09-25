@@ -54,7 +54,8 @@ class _HireScreenState extends State<HireScreen> {
   var late;
   var long;
   var addre;
-  String? _goToShopSelection;
+  // String? _goToShopSelection;
+  String? _goToShopSelection='No';
   String get _dynamicShopAddress => profile.value?.businessAddress?.address?.isNotEmpty == true
       ? profile.value!.businessAddress!.address!
       : "Shop Address: Not Available";
@@ -507,7 +508,7 @@ class _HireScreenState extends State<HireScreen> {
   }
 
   Future<void> submitForm() async {
-
+bwDebug("[submitForm]Goto his show? : $_goToShopSelection",tag: "Hire Screen");
     final title = titleController.text.trim();
     final description = descriptionController.text.trim();
     final address = addressController.text.trim();
@@ -517,7 +518,7 @@ class _HireScreenState extends State<HireScreen> {
         // address.isEmpty ||
         selectedDate == null ||
         selectedTime == null ||
-        selectedImages.isEmpty) {
+        selectedImages.isEmpty ) {
       CustomSnackBar.show(
           context,
           message: 'Please fill all fields',
@@ -568,6 +569,7 @@ class _HireScreenState extends State<HireScreen> {
     request.fields['deadline'] = deadline; // ✅ Deadline mein time bhi add kiya
     request.fields['latitude'] = late.toString();
     request.fields['longitude'] = long.toString();
+    request.fields['isShopVisited'] = _goToShopSelection == "Yes" ? 'true' : 'false';
 
     print("📤 Fields being sent: lat : $late long : $long");
     request.fields.forEach((key, value) {
@@ -733,8 +735,8 @@ final orderId=decoded["order"]["_id"];
                     : null,
               ),
               const SizedBox(height: 14),
-
-              buildLabel("Do you want to go to his shop?"),
+//here a filled when user select yes then show address .
+ /*             buildLabel("Do you want to go to his shop?"),
               Row(
                 children: [
                   Expanded(
@@ -769,6 +771,8 @@ final orderId=decoded["order"]["_id"];
               if (_goToShopSelection == "Yes") ...[
                 GestureDetector(
                   onTap: () {
+                    bwDebug("[Hire Screen] latitude: ${profile.value!.businessAddress!.latitude}\n"
+                        "longitude: ${profile.value!.businessAddress!.longitude},\nAddress: ${profile.value!.businessAddress!.address}");
                     if(profile.value?.businessAddress !=null){
                       MapLauncher.openMap(
                           latitude: profile.value!.businessAddress!.latitude,
@@ -787,7 +791,67 @@ final orderId=decoded["order"]["_id"];
                     ),
                   ),
                 ),
-              ],
+              ],*/
+
+              // here remove address field and just show yes or no and pass to api ..
+              buildLabel("Do you want to go to his shop?"),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text("Yes"),
+                      value: "Yes",
+                      groupValue: _goToShopSelection,
+                      activeColor: AppColors.primaryGreen,
+                      onChanged: (value) {
+                        setState(() {
+                          _goToShopSelection = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text("No"),
+                      value: "No",
+                      groupValue: _goToShopSelection,
+                      activeColor: AppColors.primaryGreen,
+                      onChanged: (value) {
+                        setState(() {
+                          _goToShopSelection = value;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              // Conditional Uneditable Text Field for Shop Address
+              // if (_goToShopSelection == "Yes") ...[
+              //   GestureDetector(
+              //     onTap: () {
+              //       bwDebug("[Hire Screen] latitude: ${profile.value!.businessAddress!.latitude}\n"
+              //           "longitude: ${profile.value!.businessAddress!.longitude},\nAddress: ${profile.value!.businessAddress!.address}");
+              //       if(profile.value?.businessAddress !=null){
+              //         MapLauncher.openMap(
+              //             latitude: profile.value!.businessAddress!.latitude,
+              //             longitude: profile.value!.businessAddress!.longitude,
+              //             address: profile.value!.businessAddress!.address
+              //         );
+              //       }
+              //     },
+              //     child: TextFormField(
+              //       enabled: false,
+              //       initialValue: _dynamicShopAddress,
+              //       decoration: InputDecoration(
+              //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              //         filled: true,
+              //         fillColor: Colors.grey[100],
+              //       ),
+              //     ),
+              //   ),
+              // ],
+
+              ///////////////////////////////////////////////////////
               const SizedBox(height: 14),
               buildLabel("Add Deadline"),
               const SizedBox(height: 6),
@@ -851,13 +915,28 @@ final orderId=decoded["order"]["_id"];
   }
 
   // ✅ Text field widget
-  Widget buildTextField(String hint, TextEditingController controller) {
+  Widget buildTextField(
+      String hint,
+      TextEditingController controller,
+  {
+    List<TextInputFormatter>? inputFormatters,
+  }
+
+      ) {
     return TextField(
       controller: controller,
+      textCapitalization: TextCapitalization.words,
+      inputFormatters: inputFormatters ??
+          [
+            FilteringTextInputFormatter.allow(
+              RegExp(r'[a-zA-Z0-9_.,\s]'), // Only letters, numbers and space
+            ),
+          ],
       decoration: InputDecoration(
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         filled: true,
+
         fillColor: Colors.grey[100],
       ),
     );

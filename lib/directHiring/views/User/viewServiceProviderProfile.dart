@@ -1043,6 +1043,7 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
         color: const Color(0xFF9DF89D),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         height: 140,
+        width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

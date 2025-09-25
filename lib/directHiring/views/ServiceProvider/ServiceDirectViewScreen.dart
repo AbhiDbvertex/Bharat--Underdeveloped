@@ -3471,19 +3471,19 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
       });
 
       // Step 8: ChatDetailScreen push karo
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StandaloneChatDetailScreen(
-            initialCurrentChat: currentChat,
-            initialUserId: userId,
-            initialMessages: messages,
-            initialOnlineUsers: onlineUsers,
-          ),
-        ),
-      ).then((_) {
-        SocketService.disconnect();
-      });
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => StandaloneChatDetailScreen(
+      //       initialCurrentChat: currentChat,
+      //       initialUserId: userId,
+      //       initialMessages: messages,
+      //       initialOnlineUsers: onlineUsers,
+      //     ),
+      //   ),
+      // ).then((_) {
+      //   SocketService.disconnect();
+      // });
     } catch (e, stackTrace) {
       print("Abhi:- Error starting conversation: $e");
       print("Abhi:- Stack trace: $stackTrace");
@@ -3683,7 +3683,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        "Work Title",
+                        "Task Details",
                         style: GoogleFonts.roboto(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

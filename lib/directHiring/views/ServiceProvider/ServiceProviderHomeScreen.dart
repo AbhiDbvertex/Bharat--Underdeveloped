@@ -15,7 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Bidding/view/user/BudingPostTaskScreen.dart';
+import '../../../Bidding/view/user/bidding_post_task_screen.dart';
 import '../../../Emergency/Service_Provider/controllers/sp_emergency_service_controller.dart';
 import '../../../Emergency/User/screens/emergency_services.dart';
 import '../../../Emergency/utils/logger.dart';
@@ -1366,7 +1366,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                     );
                   })),
               SizedBox(height: height * 0.025),
-              emergencyWork("FEATURE WORKER", false, () {},profile?.verificationStatus == 'verified'),
+              emergencyWork("FEATURED WORKER", false, () {},profile?.verificationStatus == 'verified'),
               SizedBox(height: height * 0.015),
               Container(
                 height: height * 0.18,

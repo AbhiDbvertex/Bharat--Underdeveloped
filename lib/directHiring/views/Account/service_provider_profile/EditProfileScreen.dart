@@ -1434,7 +1434,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? selectedDocumentType;
   final Map<String, String> _errorTexts = {};
   String? _selectedGender;
-  String? _shopVisitChoice;
+  String? _shopVisitChoice="no";
   LatLng? _selectedLocation;
   final emergencyServiceController = Get.put(EmergencyServiceController());
   final postTaskController = Get.put(PostTaskController(), permanent: false);

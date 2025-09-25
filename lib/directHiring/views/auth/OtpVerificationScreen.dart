@@ -233,7 +233,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
     builder: (context, isVerifying, _) {
     return   CustomButton(
                   label: "Verify",
-                  onPressed: () {
+                  onPressed: () async {
                     final enteredOtp = pinController.text.trim();
 
                     if (enteredOtp.length != 4) {
@@ -255,7 +255,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                     print(
                       "Submitting OTP: $enteredOtp for phone: ${widget.phoneNumber}",
                     );
-                    controller.verifyOtp(context).then((_) {
+                 await   controller.verifyOtp(context).then((_) {
                       _resetInputField();
                     });
                   },

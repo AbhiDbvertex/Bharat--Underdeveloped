@@ -38,8 +38,8 @@ class BottombarState extends State<Bottombar> {
         subcategreyId: 'default_sub_category_id',
       ),
       // const PlaceholderScreen(label: 'My Work'),
-      // const PlaceholderScreen(label: 'Message'),
-      ChatScreen(initialReceiverId: '',),
+      const PlaceholderScreen(label: 'Message'),
+      // ChatScreen(initialReceiverId: '',),
       const AccountScreen(),
     ];
 
@@ -51,8 +51,8 @@ class BottombarState extends State<Bottombar> {
         categreyId: 'default_category_id',
         subcategreyId: 'default_sub_category_id',
       ),
-      // const PlaceholderScreen(label: 'Message'),
-      ChatScreen(initialReceiverId: '',),
+      const PlaceholderScreen(label: 'Message'),
+      // ChatScreen(initialReceiverId: '',),
       const AccountScreen(),
     ];
   }
