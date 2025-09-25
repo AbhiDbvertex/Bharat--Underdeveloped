@@ -1664,6 +1664,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1674,6 +1675,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/view/user/nagotiate_card.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../models/userModel/UserViewWorkerDetailsModel.dart';
 import '../ServiceProvider/FullImageScreen.dart';
@@ -1741,10 +1743,15 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
       final token = prefs.getString('token');
 
       if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No auth token found")));
+        CustomSnackBar.show(
+            context,
+            message:"No auth token found" ,
+            type: SnackBarType.warning
+        );
+
         return;
       }
+
 
       print("Abhi:- worker details screen :-- workerId  : ${widget.workerId}");
 
@@ -1764,17 +1771,24 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
             isLoading = false;
           });
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Worker data not found")),
+          CustomSnackBar.show(
+              context,
+              message:"Worker data not found" ,
+              type: SnackBarType.error
           );
+
         }
       } else {
         throw Exception("Failed to load worker details");
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error loading worker details")),
+      bwDebug("error : $e");
+      CustomSnackBar.show(
+          context,
+          message: "Error loading worker details",
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -2090,12 +2104,15 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                             const Spacer(),
                             InkWell(
                               onTap: () {
-                                if (workerData?.documents != null && workerData!.documents!.isNotEmpty) {
+                                // if (workerData?.documents != null && workerData!.documents!.isNotEmpty) {
+                                final imageUrl = getFirstDocumentImage(workerData?.documents);
+                                if (imageUrl != null) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => FullImageScreen(
-                                        imageUrl: workerData!.documents!,
+                                        // imageUrl: workerData!.documents!,+
+                                        imageUrl: imageUrl,
                                       ),
                                     ),
                                   );
@@ -2110,7 +2127,8 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                                 child: Align(
                                   alignment: Alignment.topRight,
                                   child: Image.network(
-                                    workerData?.documents ?? "",
+                                    //workerData?.documents ?? "",
+                                    getFirstDocumentImage(workerData?.documents) ?? "",
                                     height: 72,
                                     width: 100,
                                     fit: BoxFit.cover,
@@ -2456,6 +2474,26 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
       }).toList(),
     );
   }
+
+  String? getFirstDocumentImage(List<Document>? documents) {
+    if (documents == null || documents.isEmpty) {
+      return null;
+    }
+    final firstDocument = documents.first;
+    if (firstDocument.images != null && firstDocument.images!.isNotEmpty) {
+      return firstDocument.images!.first;
+    }
+    return null;
+  }
+  // List<String> getAllDocumentImages(List<Document>? documents) {
+  //   if (documents == null || documents.isEmpty) {
+  //     return [];
+  //   }
+  //   return documents
+  //       .where((doc) => doc.images != null && doc.images!.isNotEmpty)
+  //       .expand((doc) => doc.images!) // Flatten all images into one list
+  //       .toList();
+  // }
 }
 
 class BottomCurveClipper extends CustomClipper<Path> {

@@ -1360,7 +1360,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
   List<Map<String, String>> emergencySubCategories = [];
   String? uploadedDocUrl;
   String? _selectedGender;
-  String? _shopVisitChoice;
+  String? _shopVisitChoice="no";
   final Map<String, String> _errorTexts = {};
   LatLng? _selectedLocation;
   final emergencyServiceController = Get.put(EmergencyServiceController());

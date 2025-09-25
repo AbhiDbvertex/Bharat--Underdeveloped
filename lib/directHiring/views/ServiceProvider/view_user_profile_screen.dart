@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -166,32 +167,33 @@ class _ViewUserProfileScreenState extends State<ViewUserProfileScreen> {
         color: const Color(0xFF9DF89D),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         height: 140,
+        width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
-                      child: Text(
-                        "Profile",
-                        style: GoogleFonts.roboto(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     IconButton(
+            //       padding: EdgeInsets.zero,
+            //       icon: const Icon(Icons.arrow_back, size: 25),
+            //       onPressed: () => Navigator.pop(context),
+            //     ),
+            //     Expanded(
+            //       child: Center(
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(right: 18.0),
+            //           child: Text(
+            //             "Profile",
+            //             style: GoogleFonts.roboto(
+            //               fontSize: 18,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             // const SizedBox(height: 5),
            // Center(child: _buildRoleSwitcher(context)),
           ],
@@ -240,11 +242,17 @@ class _ViewUserProfileScreenState extends State<ViewUserProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: 20,
-        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF9DF89D),
+        centerTitle: true,
+        title: const Text("Profile",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF9DF89D),
+          statusBarIconBrightness: Brightness.dark,
+        ),
       ),
       body: SafeArea(
         child:

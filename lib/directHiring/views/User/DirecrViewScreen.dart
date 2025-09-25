@@ -779,7 +779,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Work title",
+                    "Task Details",
                     style: GoogleFonts.roboto(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

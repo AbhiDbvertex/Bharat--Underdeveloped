@@ -3524,7 +3524,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        "Work Title",
+                        "Task Details",
                         style: GoogleFonts.roboto(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

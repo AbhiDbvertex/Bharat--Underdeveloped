@@ -57,7 +57,8 @@ class ServiceProviderDetailModel {
   final List<Review>? rateAndReviews;
   final String? categoryName;
   final List<String>? subcategoryNames;  // Yeh new add kiya, puri list
-  final String? documents;
+  // final String? documents;
+  final List<Document>? documents;
   final Map<String, dynamic>? location;  // Location object
   final List<Map<String, dynamic>>? fullAddress;  // Full address list add kiya
   final List<String>? customerReview;
@@ -83,10 +84,11 @@ class ServiceProviderDetailModel {
       profilePic: json["profilePic"],
       hisWork: List<String>.from(json["hiswork"] ?? []),
       rateAndReviews: (json["rateAndReviews"] as List?)?.map((e) => Review.fromJson(e)).toList(),
-      categoryName: json["category_name"],
-      subcategoryNames: List<String>.from(json["subcategory_names"] ?? []),  // Yeh puri list
-      documents: json["documents"],
-      location: json["location"],  // Location object
+      // categoryName: json["category_name"],
+      categoryName: json["category"]?["name"] as String?,
+      subcategoryNames: List<String>.from(json["subcategory_names"] ?? []),
+      // documents: json["documents"],
+      documents: (json["documents"] as List<dynamic>?)?.map((e) => Document.fromJson(e as Map<String, dynamic>)).toList(),      location: json["location"],  // Location object
       fullAddress: (json["full_address"] as List?)?.map((e) => e as Map<String, dynamic>).toList(),  // Full address list
       customerReview: List<String>.from(json["customerReview"] ?? []),
     );
@@ -112,6 +114,18 @@ class Review {
       rating: json["rating"]?.toDouble() ?? 0.0,
       images: List<String>.from(json["images"] ?? []),
       createdAt: json["createdAt"],
+    );
+  }
+}class Document {
+  final String? documentName;
+  final List<String>? images;
+
+  Document({this.documentName, this.images});
+
+  factory Document.fromJson(Map<String, dynamic> json) {
+    return Document(
+      documentName: json["documentName"] as String?,
+      images: List<String>.from(json["images"] ?? []),
     );
   }
 }

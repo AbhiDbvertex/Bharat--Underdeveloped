@@ -121,10 +121,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         break;
       case AppLifecycleState.inactive:
         // TODO: Handle this case.
-        throw UnimplementedError();
+      //  throw UnimplementedError();
       case AppLifecycleState.hidden:
         // TODO: Handle this case.
-        throw UnimplementedError();
+        //throw UnimplementedError();
     } //widget tree,  element tree , render tree
   }
 

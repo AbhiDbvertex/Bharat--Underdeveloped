@@ -964,12 +964,12 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                 ),
                               );
                             } else if (controller.isFirstAccepted) {
-                              return /*Container(
+                              return Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(vertical: 11),
                                 decoration: BoxDecoration(
                                   color: Colors.green,
-                                    borderRadius: BorderRadius.circular(10)
+                                    borderRadius: BorderRadius.circular(3)
 
                                 ),
                                 child: Center(
@@ -981,7 +981,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                         fontWeight: FontWeight.w500),
                                   ),
                                 ),
-                              );*/SizedBox();
+                              );SizedBox();
                             } else {
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

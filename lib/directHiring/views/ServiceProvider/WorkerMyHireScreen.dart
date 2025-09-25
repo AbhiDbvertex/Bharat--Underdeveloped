@@ -217,10 +217,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
 
       final res = await http.get(
         Uri.parse(
-<<<<<<< HEAD
-=======
-            // 'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
->>>>>>> origin/yash
+          // 'https://api.thebharatworks.com/api/direct-order/apiGetAllDirectOrders'),
             'https://api.thebharatworks.com/api/direct-order/getOrdersByProvider'),
         headers: {
           'Authorization': 'Bearer $token',
