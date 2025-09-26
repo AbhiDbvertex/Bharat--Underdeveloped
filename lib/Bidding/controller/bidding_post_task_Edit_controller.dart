@@ -663,7 +663,11 @@
 //         Get.delete<PostTaskEditController>();
 //         Get.back();
 //       } else if (response.statusCode == 401) {
-//         showSnackbar("Error", "Session expired. Please log in again.", context: context);
+//         showSnackbar("Error", " CustomSnackBar.show(
+//           message:  "Session expired. Please log in again.",
+//       type: SnackBarType.error
+//       );
+// ", context: context);
 //         Get.offAllNamed('/login');
 //       } else {
 //         showSnackbar("Error", "Failed to post task. Please try again.", context: context);
@@ -722,6 +726,7 @@ import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
+import '../../utility/custom_snack_bar.dart';
 
 class PostTaskEditController extends GetxController {
   final String biddingOderId;
@@ -832,22 +837,22 @@ class PostTaskEditController extends GetxController {
     super.onClose();
   }
 
-  void showSnackbar(String title, String message, {required BuildContext context}) {
-    if (context.mounted) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        Get.snackbar(
-          title,
-          message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.black,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(10),
-          borderRadius: 10,
-          duration: const Duration(seconds: 3),
-        );
-      });
-    }
-  }
+  // void showSnackbar(String title, String message, {required BuildContext context}) {
+  //   if (context.mounted) {
+  //     SchedulerBinding.instance.addPostFrameCallback((_) {
+  //       Get.snackbar(
+  //         title,
+  //         message,
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.black,
+  //         colorText: Colors.white,
+  //         margin: const EdgeInsets.all(10),
+  //         borderRadius: 10,
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //     });
+  //   }
+  // }
 
   void resetForm() {
     titleController.clear();
@@ -892,7 +897,10 @@ class PostTaskEditController extends GetxController {
       final token = prefs.getString('token') ?? '';
       if (token.isEmpty) {
         if (Get.context != null && Get.context!.mounted) {
-          showSnackbar("Error", "No token found. Please log in again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"No token found. Please log in again." ,
+      type: SnackBarType.error
+      );
         }
         isLoading.value = false;
         return;
@@ -952,20 +960,29 @@ class PostTaskEditController extends GetxController {
           print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
         } else {
           if (Get.context != null && Get.context!.mounted) {
-            showSnackbar("Error", data["message"] ?? "Failed to fetch profile.", context: Get.context!);
+ CustomSnackBar.show(
+          message:data["message"] ?? "Failed to fetch profile.",
+      type: SnackBarType.error
+      );
           }
           isLoading.value = false;
         }
       } else {
         if (Get.context != null && Get.context!.mounted) {
-          showSnackbar("Error", "Server error. Failed to fetch profile.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Server error. Failed to fetch profile.",
+      type: SnackBarType.error
+      );
         }
         isLoading.value = false;
       }
     } catch (e) {
       print("❌ Error fetching profile: $e");
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Something went wrong. Please try again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Something went wrong. Please try again.",
+      type: SnackBarType.error
+      );
       }
       isLoading.value = false;
     }
@@ -974,7 +991,10 @@ class PostTaskEditController extends GetxController {
   Future<void> updateLocationOnServer(String newAddress, double latitude, double longitude) async {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Invalid location data.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Invalid location data.",
+      type: SnackBarType.error
+      );
       }
       return;
     }
@@ -1026,18 +1046,27 @@ class PostTaskEditController extends GetxController {
           print("📍 Location updated: $newAddress (ID: $newAddressId)");
         } else {
           if (Get.context != null && Get.context!.mounted) {
-            showSnackbar("Error", data["message"] ?? "Failed to update location.", context: Get.context!);
+ CustomSnackBar.show(
+          message:data["message"] ?? "Failed to update location.",
+      type: SnackBarType.error
+      );
           }
         }
       } else {
         if (Get.context != null && Get.context!.mounted) {
-          showSnackbar("Error", "Server error. Failed to update location.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Server error. Failed to update location.",
+      type: SnackBarType.error
+      );
         }
       }
     } catch (e) {
       print("❌ Error updating location: $e");
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Failed to update location. Please try again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Failed to update location. Please try again.",
+      type: SnackBarType.error
+      );
       }
     }
   }
@@ -1064,7 +1093,10 @@ class PostTaskEditController extends GetxController {
       isLoading.value = false;
       debugPrint("📍 Using saved or default location: $userLocation");
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Authentication failed. Please log in again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Authentication failed. Please log in again.",
+      type: SnackBarType.error
+      );
       }
       return;
     }
@@ -1144,7 +1176,10 @@ class PostTaskEditController extends GetxController {
           isLoading.value = false;
           debugPrint("❌ API error: ${responseData['message']}");
           if (Get.context != null && Get.context!.mounted) {
-            showSnackbar("Error", responseData['message'] ?? 'Failed to fetch profile data.', context: Get.context!);
+ CustomSnackBar.show(
+          message:responseData['message'] ?? 'Failed to fetch profile data.',
+      type: SnackBarType.error
+      );
           }
         }
       } else {
@@ -1153,7 +1188,10 @@ class PostTaskEditController extends GetxController {
         isLoading.value = false;
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (Get.context != null && Get.context!.mounted) {
-          showSnackbar("Error", 'Failed to fetch profile data.', context: Get.context!);
+ CustomSnackBar.show(
+          message:'Failed to fetch profile data.',
+      type: SnackBarType.error
+      );
         }
       }
     } catch (e) {
@@ -1162,7 +1200,10 @@ class PostTaskEditController extends GetxController {
       addressController.text = savedLocation ?? 'Select Location';
       isLoading.value = false;
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", 'Failed to fetch location. Please try again.', context: Get.context!);
+ CustomSnackBar.show(
+          message:'Failed to fetch location. Please try again.',
+      type: SnackBarType.error
+      );
       }
     }
   }
@@ -1188,7 +1229,10 @@ class PostTaskEditController extends GetxController {
       );
     } else {
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Failed to fetch categories.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Failed to fetch categories.",
+      type: SnackBarType.error
+      );
       }
     }
   }
@@ -1214,7 +1258,10 @@ class PostTaskEditController extends GetxController {
       );
     } else {
       if (Get.context != null && Get.context!.mounted) {
-        showSnackbar("Error", "Failed to fetch subcategories.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Failed to fetch subcategories.",
+      type: SnackBarType.error
+      );
       }
     }
   }
@@ -1285,7 +1332,10 @@ class PostTaskEditController extends GetxController {
 
   Future<void> pickImage() async {
     if (selectedImages.length >= 5) {
-      showSnackbar("Error", "Maximum 5 images allowed.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Maximum 5 images allowed.",
+      type: SnackBarType.error
+      );
       return;
     }
 
@@ -1308,7 +1358,10 @@ class PostTaskEditController extends GetxController {
         final newImages = pickedImages.map((x) => File(x.path)).toList();
         final totalImages = selectedImages.length + newImages.length;
         if (totalImages > 5) {
-          showSnackbar("Error", "Cannot select more than 5 images.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Cannot select more than 5 images.",
+      type: SnackBarType.error
+      );
           selectedImages.addAll(newImages.take(5 - selectedImages.length));
         } else {
           selectedImages.addAll(newImages);
@@ -1323,7 +1376,10 @@ class PostTaskEditController extends GetxController {
       if (!serviceEnabled) {
         bool opened = await Geolocator.openLocationSettings();
         if (!opened) {
-          showSnackbar("Error", "Please enable location services from settings.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Please enable location services from settings.",
+      type: SnackBarType.error
+      );
           return;
         }
         serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -1336,13 +1392,19 @@ class PostTaskEditController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          showSnackbar("Error", "Location permission denied.", context: Get.context!);
+ CustomSnackBar.show(
+          message:"Location permission denied.",
+      type: SnackBarType.error
+      );
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        showSnackbar("Error", "Location permission permanently denied. Please enable from app settings.", context: Get.context!);
+ CustomSnackBar.show(
+          message:   "Location permission permanently denied. Please enable from app settings.",
+      type: SnackBarType.error
+      );
         await Geolocator.openAppSettings();
         return;
       }
@@ -1363,31 +1425,53 @@ class PostTaskEditController extends GetxController {
         addressController.text = formattedAddress;
         userLocation.value = formattedAddress;
       } else {
-        showSnackbar("Error", "Unable to fetch address from location.", context: Get.context!);
+ CustomSnackBar.show(
+          message:  "Unable to fetch address from location.",
+      type: SnackBarType.error
+      );
       }
     } catch (e) {
-      showSnackbar("Error", "Failed to fetch location. Please try again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:  "Failed to fetch location. Please try again.",
+      type: SnackBarType.error
+      );
     }
   }
 
   Future<void> submitTask(BuildContext context) async {
     if (!formKey.currentState!.validate()) {
-      showSnackbar("Error", "Please fill all required fields correctly.", context: context);
+      CustomSnackBar.show(
+          message: "Please fill all required fields correctly.",
+          type: SnackBarType.error
+      );
+
       return;
     }
 
     if (selectedCategoryId.value == null) {
-      showSnackbar("Error", "Please select a category.", context: context);
+      CustomSnackBar.show(
+          message:"Please select a category." ,
+          type: SnackBarType.error
+      );
+
       return;
     }
 
     if (selectedSubCategoryIds.isEmpty) {
-      showSnackbar("Error", "Please select at least one subcategory.", context: context);
+      CustomSnackBar.show(
+          message: "Please select at least one subcategory.",
+          type: SnackBarType.error
+      );
+
       return;
     }
 
     if (addressController.text.trim() == 'Select Location' || addressController.text.trim().isEmpty) {
-      showSnackbar("Error", "Please provide a valid address.", context: context);
+      CustomSnackBar.show(
+          message: "Please provide a valid address.",
+          type: SnackBarType.error
+      );
+
       return;
     }
 
@@ -1403,7 +1487,10 @@ class PostTaskEditController extends GetxController {
           ? addressController.text.trim()
           : userLocation.value.trim();
       if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
-        showSnackbar("Error", "Please provide a valid address.", context: context);
+ CustomSnackBar.show(
+          message:  "Please provide a valid address.",
+      type: SnackBarType.error
+      );
         return;
       }
 
@@ -1449,13 +1536,24 @@ class PostTaskEditController extends GetxController {
         Get.delete<PostTaskEditController>();
         Get.back();
       } else if (response.statusCode == 401) {
-        showSnackbar("Error", "Session expired. Please log in again.", context: context);
+ CustomSnackBar.show(
+          message:  "Session expired. Please log in again.",
+      type: SnackBarType.error
+      );
         Get.offAllNamed('/login');
       } else {
-        showSnackbar("Error", "Failed to update task. Please try again.", context: context);
+        CustomSnackBar.show(
+            message:"Failed to update task. Please try again." ,
+            type: SnackBarType.error
+        );
+
       }
     } catch (e) {
-      showSnackbar("Error", "An error occurred while updating the task. Please try again.", context: context);
+      CustomSnackBar.show(
+          message:"An error occurred while updating the task. Please try again." ,
+          type: SnackBarType.error
+      );
+
     }
   }
 
@@ -1485,7 +1583,10 @@ class PostTaskEditController extends GetxController {
         await fetchLocation();
       } else {
         debugPrint("❌ Invalid location data received: $result");
-        showSnackbar("Error", "Invalid location data. Please try again.", context: Get.context!);
+ CustomSnackBar.show(
+          message:  "Invalid location data. Please try again.",
+      type: SnackBarType.error
+      );
       }
     }
   }

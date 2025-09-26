@@ -312,8 +312,7 @@ class AddWorkerController {
 
     if (token == null || token.isEmpty) {
       if (!context.mounted) return false;
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Token not found. Please login again." ,
           type: SnackBarType.warning
       );
@@ -352,8 +351,7 @@ class AddWorkerController {
     // Aadhaar Image(s)
     if (aadhaarImages.isEmpty) {
       if (!context.mounted) return false;
-           CustomSnackBar.show(
-          context,
+            CustomSnackBar.show(
           message: "Please upload at least 1 Aadhaar image.",
           type: SnackBarType.error
       );
@@ -412,8 +410,7 @@ class AddWorkerController {
       }
     } catch (e) {
       if (!context.mounted) return false;
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Something went wrong.",
           type: SnackBarType.error
       );
@@ -423,8 +420,7 @@ class AddWorkerController {
   }
   Future<void> pickAadhaarImages(BuildContext context, VoidCallback onUpdate) async {
     if (aadhaarImages.length >= 2) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'You can upload up to 2 Aadhaar images only.',
           type: SnackBarType.warning
       );

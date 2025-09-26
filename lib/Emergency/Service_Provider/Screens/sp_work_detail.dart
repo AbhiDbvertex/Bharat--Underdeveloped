@@ -469,7 +469,6 @@ import '../../../utility/custom_snack_bar.dart';
 import '../../User/screens/request_accepted_section.dart';
 import '../../User/screens/task_view.dart';
 import '../../utils/map_launcher_lat_long.dart';
-import '../../utils/snack_bar_helper.dart';
 
 class SpWorkDetail extends StatefulWidget {
   final  data;
@@ -730,7 +729,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               if(!success) {
                                 // SnackBarHelper.showSnackBar(context, "Could not open the map");
                                 CustomSnackBar.show(
-                                    context,
+
                                     message:  "Could not open the map",
                                     type: SnackBarType.error
                                 );

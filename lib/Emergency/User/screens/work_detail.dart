@@ -458,7 +458,6 @@ import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
 import 'package:developer/Emergency/User/screens/task_view.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
-import 'package:developer/Emergency/utils/snack_bar_helper.dart';
 import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -715,7 +714,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           if (!success) {
 
                             CustomSnackBar.show(
-                                context,
                                 message:"Could not open the map" ,
                                 type: SnackBarType.error
                             );
@@ -836,8 +834,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       String status = await controller
                                           .cancelEmergencyOrder(orderId);
 
-                                      CustomSnackBar.show(
-                                          context,
+                                       CustomSnackBar.show(
                                           message: status,
                                           type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
                                       );
@@ -899,7 +896,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
 
                                     CustomSnackBar.show(
-                                        context,
                                         message: status,
                                         type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
                                     );
@@ -927,7 +923,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         await controller.rejectUserOrder(
                                             "6871f5b5ed31367eed8d2210");
                                   CustomSnackBar.show(
-                                        context,
                                         message: status,
                                         type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
                                     );

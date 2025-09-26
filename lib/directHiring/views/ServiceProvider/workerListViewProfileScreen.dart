@@ -232,8 +232,7 @@ class _WorkerListViewProfileScreenState
       await controller.fetchWorkerProfile(widget.workerId);
     } catch (e) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Something went wrong' ,
           type: SnackBarType.error
       );

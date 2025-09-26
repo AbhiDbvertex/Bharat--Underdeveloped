@@ -86,8 +86,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     super.dispose();
   }
   void _showMessageSuccessAddress(String message) {
-    CustomSnackBar.show(
-        context,
+     CustomSnackBar.show(
         message: message,
         type: SnackBarType.success
     );
@@ -99,8 +98,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // _showMessage('Please enable location services.');
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Please enable location services.' ,
           type: SnackBarType.error
       );
@@ -112,8 +110,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         // _showMessage('Location permission denied.');
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Location permission denied.',
             type: SnackBarType.warning
         );
@@ -136,8 +133,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } catch (e) {
       // _showMessage('Unable to get location: $e');
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Unable to get location: $e',
           type: SnackBarType.error
       );
@@ -174,8 +170,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           addressController.text = 'Coordinates: $lat, $lng (No address found)';
         });
         // _showMessage('Error fetching address: $e');
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Error fetching address: $e' ,
             type: SnackBarType.error
         );
@@ -266,8 +261,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning
             );
@@ -333,8 +327,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
           if (mounted) {
             // _showMessage('Address updated successfully.');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message:'Address updated successfully.' ,
                 type: SnackBarType.success
             );
@@ -352,8 +345,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error
             );
@@ -363,8 +355,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       } catch (e) {
         if (mounted) {
           // _showMessage('Error updating address: $e');
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:'Error updating address: $e' ,
               type: SnackBarType.error
           );
@@ -374,8 +365,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Please fill all fields correctly.',
           type: SnackBarType.warning
       );
@@ -392,8 +382,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning
             );
@@ -458,8 +447,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
           if (mounted) {
             // _showMessage('Address added successfully.');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'Address added successfully.',
                 type: SnackBarType.success
             );
@@ -479,8 +467,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error
             );
@@ -490,8 +477,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       } catch (e) {
         if (mounted) {
           // _showMessage('Error adding address: $e');
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: 'Error adding address: $e',
               type: SnackBarType.error
           );
@@ -501,8 +487,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Please fill all fields correctly.' ,
           type: SnackBarType.warning
       );
@@ -525,8 +510,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning
             );
@@ -640,8 +624,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error
             );
@@ -650,8 +633,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       } catch (e) {
         if (mounted) {
           // _showMessage('Error calling API: $e');
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:'Error calling API: $e' ,
               type: SnackBarType.error
           );
@@ -666,8 +648,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Please fill all fields correctly.',
           type: SnackBarType.warning
       );

@@ -217,8 +217,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         Navigator.pop(context);
         _clearHiredProviders().then((_) => fetchOrderDetail());
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Order cancelled successfully" ,
             type: SnackBarType.success
         );
@@ -226,8 +225,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         print("Abhi:- else darect-hire cancelOder error :- ${response.body}");
         print("Abhi:- else darect-hire cancelOder statusCode :- ${response.statusCode}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:   'Failed to cancel order',
             type: SnackBarType.error
         );
@@ -236,8 +234,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     } catch (e) {
       print("Abhi:- Exception darect-hire : - $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Error cancelling order.',
           type: SnackBarType.error
       );
@@ -270,8 +267,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       } else {
         print("❌ Provider fetch failed: ${response.body}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:  'Failed to fetch provider:',
             type: SnackBarType.error
         );
@@ -279,8 +275,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       }
     } catch (e) {
       print("❗ fetchProviderById Error: $e");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Error fetching provider' ,
           type: SnackBarType.error
       );
@@ -317,8 +312,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       } catch (e) {
         print("❗ Refund Error: $e");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Error processing refund.' ,
             type: SnackBarType.error
         );
@@ -336,8 +330,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
 
     if (token == null) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:  'Login Required' ,
           type: SnackBarType.error
       );
@@ -422,8 +415,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         } else {
           print("⚠️ No providers in API response");
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:'No provider found!' ,
               type: SnackBarType.error
           );
@@ -432,8 +424,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       } else {
         print("❌ API Error: ${response.statusCode}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Somthing went wrong." ,
             type: SnackBarType.error
         );
@@ -442,8 +433,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     } catch (e) {
       print("❗ Error: $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Error' ,
           type: SnackBarType.error
       );
@@ -481,8 +471,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     if (alreadyOffered) {
       print("⚠️ Provider has already been offered.");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Offer already sent to this provider',
           type: SnackBarType.info
       );
@@ -545,8 +534,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
             }
 
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: 'Offer sent successfully' ,
                 type: SnackBarType.success
             );
@@ -555,8 +543,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         } else {
           print("❌ Send offer failed: ${data['message']}");
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: 'Something wrong',
               type: SnackBarType.error
           );
@@ -566,8 +553,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         final err = json.decode(response.body);
         print("❗ API Error: ${response.statusCode} - ${err['message']}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: '${err['message']}',
             type: SnackBarType.error
         );
@@ -575,8 +561,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       }
     } catch (e) {
       print("❗ sendNextOffer Exception: $e");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Something went wrong" ,
           type: SnackBarType.error
       );
@@ -1606,8 +1591,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         final token = prefs.getString('token');
                                         if (token == null) {
 
-                                          CustomSnackBar.show(
-                                              context,
+                                           CustomSnackBar.show(
                                               message: 'Login Required, User not logged in.',
                                               type: SnackBarType.error
                                           );
@@ -1635,8 +1619,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           }
                                         } else {
 
-                                          CustomSnackBar.show(
-                                              context,
+                                           CustomSnackBar.show(
                                               message: 'Failed: ${response.statusCode}',
                                               type: SnackBarType.error
                                           );
@@ -1644,8 +1627,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         }
                                       } catch (e) {
 
-                                        CustomSnackBar.show(
-                                            context,
+                                         CustomSnackBar.show(
                                             message:  'Error: $e',
                                             type: SnackBarType.error
                                         );
@@ -1715,8 +1697,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         await sendNextOffer(order!['_id'], worker.id!);
                                       } else {
 
-                                        CustomSnackBar.show(
-                                            context,
+                                         CustomSnackBar.show(
                                             message: 'Invalid order or provider ID',
                                             type: SnackBarType.error
                                         );
@@ -2013,8 +1994,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         final token = prefs.getString('token');
                                         if (token == null) {
 
-                                          CustomSnackBar.show(
-                                              context,
+                                           CustomSnackBar.show(
                                               message: 'Login Required, User not logged in.',
                                               type: SnackBarType.error
                                           );
@@ -2048,8 +2028,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           }
                                         } else {
 
-                                          CustomSnackBar.show(
-                                              context,
+                                           CustomSnackBar.show(
                                               message:'Failed: ${response.statusCode}' ,
                                               type: SnackBarType.error
                                           );
@@ -2057,8 +2036,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         }
                                       } catch (e) {
 
-                                        CustomSnackBar.show(
-                                            context,
+                                         CustomSnackBar.show(
                                             message:'Error: something wrong' ,
                                             type: SnackBarType.error
                                         );
@@ -2122,8 +2100,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       if (order?['_id'] != null && worker.id != null) {
                                         await sendNextOffer(order!['_id'], worker.id!);
                                       } else {
-                                        CustomSnackBar.show(
-                                            context,
+                                         CustomSnackBar.show(
                                             message:  'Invalid order or provider ID' ,
                                             type: SnackBarType.error
                                         );

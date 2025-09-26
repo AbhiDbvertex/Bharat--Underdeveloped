@@ -2743,14 +2743,15 @@
 // }
 
 import 'dart:convert';
+
 import 'package:developer/directHiring/views/User/user_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
@@ -2783,6 +2784,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   late Razorpay _razorpay;
+  var isLoading = false;
 
   @override
   void initState() {
@@ -2794,16 +2796,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
     // Add listeners to keep controllers and variables in sync
-    _descriptionController.addListener(() {
-      setState(() {
-        _description = _descriptionController.text;
-      });
-    });
-    _amountController.addListener(() {
-      setState(() {
-        _amount = _amountController.text;
-      });
-    });
+    // _descriptionController.addListener(() {
+    //   setState(() {
+    //     _description = _descriptionController.text;
+    //   });
+    // });
+    // _amountController.addListener(() {
+    //   setState(() {
+    //     _amount = _amountController.text;
+    //   });
+    // });
 
     // Load payments from storage
     loadPaymentsFromStorage();
@@ -2812,11 +2814,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
     if (widget.paymentHistory != null) {
       setState(() {
         _payments.addAll(widget.paymentHistory!.map((payment) => {
-          'description': payment['description']?.toString() ?? 'No description',
-          'amount': payment['amount']?.toString() ?? '0',
-          'status': payment['status']?.toString() ?? 'UNKNOWN',
-          'method': payment['method']?.toString() ?? 'cod',
-          '_id': payment['_id']?.toString() ?? '',
+              'description':
+                  payment['description']?.toString() ?? 'No description',
+              'amount': payment['amount']?.toString() ?? '0',
+              'status': payment['status']?.toString() ?? 'UNKNOWN',
+              'method': payment['method']?.toString() ?? 'cod',
+              '_id': payment['_id']?.toString() ?? '',
+          'release_status': payment['release_status']?.toString() ?? ""
+
         }));
       });
     }
@@ -2831,23 +2836,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-
     CustomSnackBar.show(
-        context,
         message: "Payment failed: ${response.message}",
-        type: SnackBarType.error
-    );
-
+        type: SnackBarType.error);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-
     CustomSnackBar.show(
-        context,
         message: "External wallet selected: ${response.walletName}",
-        type: SnackBarType.info
-    );
-
+        type: SnackBarType.info);
   }
 
   Future<String?> _getUserId() async {
@@ -2890,7 +2887,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> marCompleteDarectHire() async {
     print("Abhi:- direct cancelOrder order id ${widget.orderId}");
-    final String url = '${AppConstants.baseUrl}${ApiEndpoint.darectMarkComplete}';
+    final String url =
+        '${AppConstants.baseUrl}${ApiEndpoint.darectMarkComplete}';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     print("Abhi:- Mark as Complete token: $token");
@@ -2921,28 +2919,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
         );
       } else {
-        print("Abhi:- else direct-hire Mark as Complete error :- ${response.body}");
+        print(
+            "Abhi:- else direct-hire Mark as Complete error :- ${response.body}");
 
         CustomSnackBar.show(
-            context,
             message: "Failed to mark as complete: ${response.body}",
-            type: SnackBarType.error
-        );
-
+            type: SnackBarType.error);
       }
     } catch (e) {
       print("Abhi:- Exception Mark as Complete direct-hire : - $e");
 
       CustomSnackBar.show(
-          context,
-          message: "Error marking as complete: $e",
-          type: SnackBarType.error
-      );
-
+          message: "Error marking as complete: $e", type: SnackBarType.error);
     }
   }
 
   Future<void> postPaymentRequest(String payId) async {
+    setState(() {
+      isLoading = true;
+    });
     final String url =
         'https://api.thebharatworks.com/api/direct-order/user/request-release/${widget.orderId}/$payId';
     print('Abhi:- postPaymentRequest orderId ${widget.orderId}');
@@ -2965,32 +2960,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
         print("Abhi:- postPaymentRequest response : ${response.body}");
         print("Abhi:- postPaymentRequest statuscode : ${response.statusCode}");
 
-
         CustomSnackBar.show(
-            context,
-            message:responseData['message'] != null ? "Payment release request has been successfully sent to the admin.": "Payment request successful" ,
-            type: SnackBarType.success
-        );
-
+            message: responseData['message'] != null
+                ? "Payment release request has been successfully sent to the admin."
+                : "Payment request successful",
+            type: SnackBarType.success);
+        Navigator.pop(context);
       } else {
         print("Abhi:- else postPaymentRequest response : ${response.body}");
-        print("Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
+        print(
+            "Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
         CustomSnackBar.show(
-            context,
-            message:responseData['message'] ?? "Payment request failed" ,
-            type: SnackBarType.error
-        );
-
+            message: responseData['message'] ?? "Payment request failed",
+            type: SnackBarType.error);
       }
     } catch (e) {
       print("Abhi:- postPaymentRequest Exception $e");
 
       CustomSnackBar.show(
-          context,
-          message: "Error in payment request: $e",
-          type: SnackBarType.error
-      );
-
+          message: "Error in payment request: $e", type: SnackBarType.error);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -3003,48 +2995,52 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     print("Abhi:- getOrderId postPaymentRequest ${widget.orderId}");
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      // padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Payment",
-                style: GoogleFonts.roboto(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Payment",
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              if (!_showForm)
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _showForm = true;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                if (!_showForm)
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showForm = true;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      "Create",
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                      child: Text(
+                        "Create",
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           Card(
             child: Container(
@@ -3075,8 +3071,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                   ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _description = value;
+                                    });
+                                  },
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -3088,7 +3090,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   inputFormatters: [
                                     // Allows decimals up to 2 places. For integers only, use:
                                     // FilteringTextInputFormatter.digitsOnly
-                                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d{0,2}$')),
                                   ],
                                   decoration: InputDecoration(
                                     hintText: 'Enter amount',
@@ -3096,8 +3099,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                   ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _amount = value;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -3134,14 +3143,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             children: [
                               ElevatedButton(
                                 onPressed: (_description.isNotEmpty &&
-                                    _amount.isNotEmpty &&
-                                    double.tryParse(_amount) != null &&
-                                    double.tryParse(_amount)! > 0)
+                                        _amount.isNotEmpty &&
+                                        double.tryParse(_amount) != null &&
+                                        double.tryParse(_amount)! > 0)
                                     ? () => _showPaymentDialog()
                                     : null,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
-                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -3170,7 +3180,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.green,
                                   side: const BorderSide(color: Colors.green),
-                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -3194,10 +3205,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       int i = entry.key;
                       var payment = entry.value;
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 3),
                         child: Column(
                           children: [
-                            Row(
+                            /*  Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: RichText(
@@ -3218,7 +3231,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ),
                                 ),
                                 Text(
-                                  "₹${payment['amount']}",
+                                  "₹${payment['amount']}/-",
                                   style: GoogleFonts.roboto(
                                     fontSize: 16,
                                     color: Colors.black,
@@ -3251,6 +3264,103 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       ),
                                     ),
                                   ),
+                                ),
+                              ],
+                            ),*/
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex:1,
+                                  child: Text(
+                                    "${i + 1}.",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 13,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5, //
+                                  child: Text(
+                                    "${toTitleCase(payment['description'])}",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 13,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                // Status column
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    toTitleCase(payment['release_status'] ==
+                                            "release_requested"
+                                        ? "Requested"
+                                        : payment['release_status'] ??
+                                            'Pending'),
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      // color: getColor(payment['release_status']),
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+
+                                // Amount column
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    "₹${payment['amount']}/-",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+
+                                // Button column
+                                Expanded(
+                                  flex: 1,
+                                  child: payment['release_status'] ==
+                                              'release_requested' ||
+                                          payment['release_status'] ==
+                                              'released'
+                                      ? const SizedBox(
+                                          width: 36) // empty placeholder
+                                      : GestureDetector(
+                                          onTap: isLoading == true
+                                              ? null
+                                              : () async {
+                                                  await postPaymentRequest(
+                                                      payment['_id'] ?? '');
+                                                  print(
+                                                      "Abhi:- payment releaseId : ${payment['_id']}");
+                                                },
+                                          child: Container(
+                                            height: 26,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(7),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                "Pay",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 13,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                 ),
                               ],
                             ),
@@ -3377,7 +3487,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Date", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("Date",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     DateFormat("dd/MM/yyyy").format(DateTime.now()),
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -3387,7 +3498,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Time", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("Time",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     DateFormat("kk:mm").format(DateTime.now()),
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -3397,7 +3509,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Amount", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("Amount",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     "₹${amount.toStringAsFixed(2)}",
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -3407,7 +3520,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("GST (18%)", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("GST (18%)",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     "₹${gst.toStringAsFixed(2)}",
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -3418,7 +3532,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Total Amount", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("Total Amount",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                   Text(
                     "₹${totalAmount.toStringAsFixed(2)}",
                     style: const TextStyle(fontWeight: FontWeight.w600),
@@ -3447,7 +3562,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               'key': 'rzp_test_R7z5O0bqmRXuiH',
                               'amount': razorpayAmount,
                               'name': 'The Bharat Work',
-                              'description': 'Payment for order ${widget.orderId}',
+                              'description':
+                                  'Payment for order ${widget.orderId}',
                               'prefill': {
                                 'contact': '9876543210',
                                 'email': 'test@gmail.com',
@@ -3459,25 +3575,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             try {
                               _razorpay.open(options);
                             } catch (e) {
-
                               CustomSnackBar.show(
-                                  context,
                                   message: "Razorpay error: $e",
-                                  type: SnackBarType.error
-                              );
-
+                                  type: SnackBarType.error);
                             }
                           } else {
                             submitPayment();
                           }
                         } else {
-
                           CustomSnackBar.show(
-                              context,
-                              message:"Please enter a valid description and amount" ,
-                              type: SnackBarType.error
-                          );
-
+                              message:
+                                  "Please enter a valid description and amount",
+                              type: SnackBarType.error);
                         }
                       },
                       child: const Text(
@@ -3521,25 +3630,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-
       CustomSnackBar.show(
-          context,
-          message:"Token not found" ,
-          type: SnackBarType.warning
-      );
-
+          message: "Token not found", type: SnackBarType.warning);
 
       return;
     }
 
     double baseAmount = double.tryParse(_amount) ?? 0;
     if (baseAmount <= 0) {
-
       CustomSnackBar.show(
-          context,
-          message:"Please enter a valid amount" ,
-          type: SnackBarType.error
-      );
+          message: "Please enter a valid amount", type: SnackBarType.error);
 
       return;
     }
@@ -3571,7 +3671,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
             responseData['service_payment']['payment_history'] != null) {
-          final paymentHistory = responseData['service_payment']['payment_history'];
+          final paymentHistory =
+              responseData['service_payment']['payment_history'];
           final paymentId = paymentHistory.isNotEmpty
               ? paymentHistory.last['_id']?.toString() ?? ''
               : '';
@@ -3594,38 +3695,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-
           CustomSnackBar.show(
-              context,
               message: "Payment stage added successfully",
-              type: SnackBarType.success
-          );
-
+              type: SnackBarType.success);
         } else {
-
           CustomSnackBar.show(
-              context,
-              message:"Invalid response structure" ,
-              type: SnackBarType.error
-          );
+              message: "Invalid response structure", type: SnackBarType.error);
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment failed';
 
-        CustomSnackBar.show(
-            context,
-            message: errorMessage,
-            type: SnackBarType.error
-        );
+        CustomSnackBar.show(message: errorMessage, type: SnackBarType.error);
       }
     } catch (e) {
-
-      CustomSnackBar.show(
-          context,
-          message:"Error occurred" ,
-          type: SnackBarType.error
-      );
+      CustomSnackBar.show(message: "Error occurred", type: SnackBarType.error);
 
       print("Abhi:- submitPayment Exception: $e");
     }
@@ -3640,24 +3724,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-
       CustomSnackBar.show(
-          context,
-          message: "Token not found",
-          type: SnackBarType.warning
-      );
+          message: "Token not found", type: SnackBarType.warning);
       return;
     }
 
     double baseAmount = double.tryParse(_amount) ?? 0;
     if (baseAmount <= 0) {
-
-      CustomSnackBar.show(
-          context,
-          message: "Invalid amount",
-          type: SnackBarType.error
-      );
-
+      CustomSnackBar.show(message: "Invalid amount", type: SnackBarType.error);
 
       return;
     }
@@ -3690,7 +3764,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
             responseData['service_payment']['payment_history'] != null) {
-          final paymentHistory = responseData['service_payment']['payment_history'];
+          final paymentHistory =
+              responseData['service_payment']['payment_history'];
           final paymentId = paymentHistory.isNotEmpty
               ? paymentHistory.last['_id']?.toString() ?? ''
               : '';
@@ -3713,37 +3788,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
           CustomSnackBar.show(
-              context,
-              message:"Payment completed successfully" ,
-              type: SnackBarType.success
-          );
+              message: "Payment completed successfully",
+              type: SnackBarType.success);
         } else {
           CustomSnackBar.show(
-              context,
-              message:"Invalid response structure" ,
-              type: SnackBarType.error
-          );
-
+              message: "Invalid response structure", type: SnackBarType.error);
         }
       } else {
         final responseData = jsonDecode(response.body);
-        String errorMessage = responseData['message'] ?? 'Payment update failed';
-              CustomSnackBar.show(
-            context,
-            message: errorMessage,
-            type: SnackBarType.error
-        );
+        String errorMessage =
+            responseData['message'] ?? 'Payment update failed';
+        CustomSnackBar.show(message: errorMessage, type: SnackBarType.error);
 
         print("Abhi:- payment screen get Exception ${responseData['message']}");
       }
     } catch (e) {
-          CustomSnackBar.show(
-          context,
-          message: "Something went wrong",
-          type: SnackBarType.error
-      );
+      CustomSnackBar.show(
+          message: "Something went wrong", type: SnackBarType.error);
 
       print("Abhi:- payment screen get Exception $e");
     }
   }
+//   getColor(String? payment) {
+// switch (payment){
+//   case 'pending':
+//     return Colors.red;
+//   case 'released':
+//     return Colors.green;
+//   case 'release_requested':
+//     return Colors.yellow.shade700;
+//   case 'refunded':
+//     return Colors.blue;
+//   default:
+// }
+//
+//   }
 }

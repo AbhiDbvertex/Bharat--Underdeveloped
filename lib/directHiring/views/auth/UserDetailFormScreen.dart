@@ -243,8 +243,7 @@ class _UserDetailFormScreenState extends State<UserDetailFormScreen> {
       //     duration: Duration(seconds: 2),
       //   ),
       // );
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Please fill in all required fields correctly.',
           type: SnackBarType.warning
       );

@@ -525,8 +525,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       // );
       Future.delayed(Duration.zero, () {
         if (context.mounted) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Please select a role.",
           type: SnackBarType.warning
       );

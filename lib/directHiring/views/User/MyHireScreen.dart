@@ -1248,7 +1248,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Bidding/view/user/bidding_work_detail_screen.dart';
 import '../../../Emergency/User/models/emergency_list_model.dart';
 import '../../../Emergency/utils/map_launcher_lat_long.dart';
-import '../../../Emergency/utils/snack_bar_helper.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
@@ -1416,8 +1415,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
       } else {
         print("❌ API Error Status: ${res.statusCode}");
         if (mounted) {
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Error ${res.statusCode},Something went wrong",
               type: SnackBarType.error
           );
@@ -1426,8 +1424,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     } catch (e) {
       print("❌ API Exception: $e");
       if (mounted) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Error: Something went wrong",
             type: SnackBarType.error
         );
@@ -1471,7 +1468,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
   }
 
   Color _getStatusColor(String status) {
-    bwDebug("status : $status");
+    // bwDebug("status : $status");
     switch (status.toLowerCase()) {
       case 'cancelled':
         return const Color(0xFFFF3B30); // Vibrant Apple Red
@@ -2614,7 +2611,6 @@ class _MyHireScreenState extends State<MyHireScreen> {
                           if(!success) {
                             // SnackBarHelper.showSnackBar(context, "Could not open the map");
                             CustomSnackBar.show(
-                                context,
                                 message: "Could not open the map",
                                 type: SnackBarType.error
                             );

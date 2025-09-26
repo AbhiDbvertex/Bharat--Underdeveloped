@@ -44,11 +44,11 @@ class ViewImage extends StatelessWidget {
           imageUrl,
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
-            return const Center(
-              child: Text(
-                'Image not available',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+            return  Center(
+              child: Image.asset(
+                'assets/images/d_png/No_Image_Available.jpg',
+                fit: BoxFit.contain,
+              )
             );
           },
         ),
@@ -68,10 +68,10 @@ class ViewImage extends StatelessWidget {
               imageUrl[index],
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Text(
-                    'Image not available',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                return Center(
+                  child:Image.asset(
+                    'assets/images/d_png/No_Image_Available.jpg',
+                    fit: BoxFit.contain,
                   ),
                 );
               },

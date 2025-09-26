@@ -413,7 +413,6 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Emergency/utils/snack_bar_helper.dart';
 import '../../../utility/custom_snack_bar.dart';
 
 class EditWorkerController {
@@ -490,8 +489,7 @@ class EditWorkerController {
     final token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Token not found. Please login again.",
           type: SnackBarType.warning
       );
@@ -548,23 +546,20 @@ class EditWorkerController {
 
       if (response.statusCode == 200) {
         if (decoded['success'] == true || decoded['worker'] != null) {
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Worker updated successfully",
               type: SnackBarType.success
           );
           return true;
         } else {
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Update failed: ${decoded['message'] ?? 'Unknown error'}",
               type: SnackBarType.error
           );
           return false;
         }
       } else {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Update failed: $respStr" ,
             type: SnackBarType.error
         );
@@ -574,8 +569,7 @@ class EditWorkerController {
     } catch (e) {
       isSubmitting = false; // loader stop
       debugPrint("Exception: $e");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Something went wrong",
           type: SnackBarType.error
       );
