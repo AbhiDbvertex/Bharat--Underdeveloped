@@ -3471,19 +3471,19 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
       });
 
       // Step 8: ChatDetailScreen push karo
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => StandaloneChatDetailScreen(
-      //       initialCurrentChat: currentChat,
-      //       initialUserId: userId,
-      //       initialMessages: messages,
-      //       initialOnlineUsers: onlineUsers,
-      //     ),
-      //   ),
-      // ).then((_) {
-      //   SocketService.disconnect();
-      // });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StandaloneChatDetailScreen(
+            initialCurrentChat: currentChat,
+            initialUserId: userId,
+            initialMessages: messages,
+            initialOnlineUsers: onlineUsers,
+          ),
+        ),
+      ).then((_) {
+        SocketService.disconnect();
+      });
     } catch (e, stackTrace) {
       print("Abhi:- Error starting conversation: $e");
       print("Abhi:- Stack trace: $stackTrace");
@@ -3996,24 +3996,24 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                   SizedBox(height: 10),
                                   //           this code is currect added by Abhishek
                                   InkWell(
-                                    // onTap: () async {
-                                    //   final receiverId = order != null && order!['user_id'] != null
-                                    //       ? order!['user_id']['_id']?.toString() ?? 'Unknown'
-                                    //       : 'Unknown';
-                                    //   final fullName = order != null && order!['user_id'] != null
-                                    //       ?  order!['user_id']['full_name'] ?? 'Unknown'
-                                    //       : 'Unknown';
-                                    //   print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-                                    //
-                                    //   if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                    //     await _startOrFetchConversation(context, receiverId);
-                                    //   } else {
-                                    //     print("Abhi:- Error: Invalid receiver ID");
-                                    //     ScaffoldMessenger.of(context).showSnackBar(
-                                    //       SnackBar(content: Text('Error: Invalid receiver ID')),
-                                    //     );
-                                    //   }
-                                    // },
+                                    onTap: () async {
+                                      final receiverId = order != null && order!['user_id'] != null
+                                          ? order!['user_id']['_id']?.toString() ?? 'Unknown'
+                                          : 'Unknown';
+                                      final fullName = order != null && order!['user_id'] != null
+                                          ?  order!['user_id']['full_name'] ?? 'Unknown'
+                                          : 'Unknown';
+                                      print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                                      if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                        await _startOrFetchConversation(context, receiverId);
+                                      } else {
+                                        print("Abhi:- Error: Invalid receiver ID");
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error: Invalid receiver ID')),
+                                        );
+                                      }
+                                    },
                                     child: CircleAvatar(
                                       radius: 14,
                                       backgroundColor: Colors.grey[300],

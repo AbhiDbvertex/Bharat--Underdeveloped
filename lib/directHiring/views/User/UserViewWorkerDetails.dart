@@ -1675,6 +1675,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/view/user/nagotiate_card.dart';
+import '../../../chat/APIServices.dart';
+import '../../../chat/SocketService.dart';
+import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../models/userModel/UserViewWorkerDetailsModel.dart';
@@ -1792,6 +1795,163 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
     }
   }
 
+  ///--------------       Added chat code ------------------///
+
+  Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
+    try {
+      print("Abhi:- Fetching user by ID: $userId");
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) {
+          final user = body['user'];
+          user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+          return user;
+        } else {
+          throw Exception(body['message'] ?? 'Failed to fetch user');
+        }
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Abhi:- Error fetching user by ID: $e");
+      return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
+    }
+  }
+
+  String getIdAsString(dynamic id) {
+    if (id == null) return '';
+    if (id is String) return id;
+    if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+    print("Abhi:- Warning: Unexpected _id format: $id");
+    return id.toString();
+  }
+// Yeh function InkWell ke onTap mein call hota hai
+  Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
+    try {
+      // Step 1: User ID fetch karo
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        print("Abhi:- Error: No token found");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: No token found, please log in again')),
+        );
+        return;
+      }
+
+      // Step 2: User profile fetch karo
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        print("Abhi:- Error fetching profile: Status=${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch user profile')),
+        );
+        return;
+      }
+
+      final body = json.decode(response.body);
+      if (body['status'] != true) {
+        print("Abhi:- Error fetching profile: ${body['message']}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
+        );
+        return;
+      }
+
+      final userId = getIdAsString(body['data']['_id']);
+      if (userId.isEmpty) {
+        print("Abhi:- Error: User ID is empty");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: User ID not available')),
+        );
+        return;
+      }
+
+      // Step 3: Check if conversation exists
+      print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+      final convs = await ApiService.fetchConversations(userId);
+      dynamic currentChat = convs.firstWhere(
+            (conv) {
+          final members = conv['members'] as List? ?? [];
+          if (members.isEmpty) return false;
+          if (members[0] is String) {
+            return members.contains(receiverId) && members.contains(userId);
+          } else {
+            return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
+                members.any((m) => getIdAsString(m['_id']) == userId);
+          }
+        },
+        orElse: () => null,
+      );
+
+      // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
+      if (currentChat == null) {
+        print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+        currentChat = await ApiService.startConversation(userId, receiverId);
+      }
+
+      // Step 5: Agar members strings hain, toh full user details fetch karo
+      if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
+        print("Abhi:- New conversation, fetching user details for members");
+        final otherId = currentChat['members'].firstWhere((id) => id != userId);
+        final otherUserData = await fetchUserById(otherId, token);
+        final senderUserData = await fetchUserById(userId, token);
+        currentChat['members'] = [senderUserData, otherUserData];
+        print("Abhi:- Updated members with full details: ${currentChat['members']}");
+      }
+
+      // Step 6: Messages fetch karo
+      final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+      messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
+
+      // Step 7: Socket initialize karo
+      SocketService.connect(userId);
+      final onlineUsers = <String>[];
+      SocketService.listenOnlineUsers((users) {
+        onlineUsers.clear();
+        onlineUsers.addAll(users.map((u) => getIdAsString(u)));
+      });
+
+      // Step 8: ChatDetailScreen push karo
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StandaloneChatDetailScreen(
+            initialCurrentChat: currentChat,
+            initialUserId: userId,
+            initialMessages: messages,
+            initialOnlineUsers: onlineUsers,
+          ),
+        ),
+      ).then((_) {
+        SocketService.disconnect();
+      });
+    } catch (e, stackTrace) {
+      print("Abhi:- Error starting conversation: $e");
+      print("Abhi:- Stack trace: $stackTrace");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: Failed to start conversation: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -1839,119 +1999,141 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 ),
 
                 // Profile Image, Message, Call, Name, Location
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Message Button
-                    Padding(
-                      padding: const EdgeInsets.only(right: 18.0),
-                      child: Container(
-                        height: 30,
-                        width: 85,
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.green.shade700,
-                            width: 1.5,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Message Button
+                      GestureDetector(
+                        onTap: () async {
+                          final receiverId = widget.workerId != null && widget.workerId != null
+                              ? widget.workerId?.toString() ?? 'Unknown'
+                              : 'Unknown';
+                          final fullName = widget.workerId != null && workerData?.fullName != null
+                              ?  workerData?.fullName ?? 'No data'
+                              : 'Unknown';
+                          print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                          if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                            await _startOrFetchConversation(context, receiverId);
+                          } else {
+                            print("Abhi:- Error: Invalid receiver ID");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: Invalid receiver ID')),
+                            );
+                          }
+                        },
+                        child: Container(
+                          height: 30,
+                          width: 85,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green.shade700,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                child: Icon(
+                                  Icons.message,
+                                  color: Colors.green,
+                                  size: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Message',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.green.shade700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.message,
-                              color: Colors.green.shade700,
-                              size: 15,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              'Message',
-                              style: GoogleFonts.roboto(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green.shade700,
+                      ),
+
+                      const Spacer(), // Centering ke liye
+
+                      // Profile Image with Tap
+                      GestureDetector(
+                        onTap: () {
+                          print("Profile image tapped: ${workerData?.profilePic}");
+                          if (workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ViewImage(imageUrl: workerData!.profilePic!),
                               ),
-                            ),
-                          ],
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("No profile image available"),
+                              ),
+                            );
+                          }
+                        },
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey.shade300,
+                          backgroundImage: workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty
+                              ? NetworkImage(workerData!.profilePic!)
+                              : null,
+                          child: workerData?.profilePic == null || workerData!.profilePic!.isEmpty
+                              ? const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.white,
+                          )
+                              : null,
                         ),
                       ),
-                    ),
 
-                    const Spacer(), // Centering ke liye
+                      const Spacer(), // Centering ke liye
 
-                    // Profile Image with Tap
-                    GestureDetector(
-                      onTap: () {
-                        print("Profile image tapped: ${workerData?.profilePic}");
-                        if (workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ViewImage(imageUrl: workerData!.profilePic!),
+                      // Call Button
+                      Padding(
+                        padding: const EdgeInsets.only(left: 18.0),
+                        child: Container(
+                          height: 30,
+                          width: 80,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.green.shade700,
+                              width: 1.4,
                             ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("No profile image available"),
-                            ),
-                          );
-                        }
-                      },
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.grey.shade300,
-                        backgroundImage: workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty
-                            ? NetworkImage(workerData!.profilePic!)
-                            : null,
-                        child: workerData?.profilePic == null || workerData!.profilePic!.isEmpty
-                            ? const Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.white,
-                        )
-                            : null,
-                      ),
-                    ),
-
-                    const Spacer(), // Centering ke liye
-
-                    // Call Button
-                    Padding(
-                      padding: const EdgeInsets.only(left: 18.0),
-                      child: Container(
-                        height: 30,
-                        width: 80,
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.green.shade700,
-                            width: 1.4,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.call,
+                                color: Colors.green.shade700,
+                                size: 17,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                'Call',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.green.shade700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.call,
-                              color: Colors.green.shade700,
-                              size: 17,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Call',
-                              style: GoogleFonts.roboto(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.green.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(

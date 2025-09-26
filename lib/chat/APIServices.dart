@@ -128,14 +128,14 @@ class ApiService {
     request.fields['senderId'] = senderId;
     request.fields['receiverId'] = receiverId;
     request.fields['conversationId'] = conversationId;
-    request.fields['messageType'] = 'document';
+    request.fields['messageType'] = 'image';
     if (message != null && message.isNotEmpty) {
       request.fields['message'] = message;
     }
 
     for (var path in documentPaths) {
       print('Abhi:- Adding document to request: $path');
-      request.files.add(await http.MultipartFile.fromPath('documents', path));
+      request.files.add(await http.MultipartFile.fromPath('image', path));  // currect word is images
     }
 
     final response = await request.send();

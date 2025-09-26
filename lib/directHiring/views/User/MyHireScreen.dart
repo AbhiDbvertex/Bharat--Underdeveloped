@@ -1250,6 +1250,9 @@ import '../../../Emergency/User/models/emergency_list_model.dart';
 import '../../../Emergency/utils/map_launcher_lat_long.dart';
 import '../../../Emergency/utils/snack_bar_helper.dart';
 import '../../../Widgets/AppColors.dart';
+import '../../../chat/APIServices.dart';
+import '../../../chat/SocketService.dart';
+import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
@@ -1528,6 +1531,163 @@ class _MyHireScreenState extends State<MyHireScreen> {
     });
   }
 
+       //                 Chat screen code
+  Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
+    try {
+      print("Abhi:- Fetching user by ID: $userId");
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) {
+          final user = body['user'];
+          user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+          return user;
+        } else {
+          throw Exception(body['message'] ?? 'Failed to fetch user');
+        }
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Abhi:- Error fetching user by ID: $e");
+      return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
+    }
+  }
+
+  String getIdAsString(dynamic id) {
+    if (id == null) return '';
+    if (id is String) return id;
+    if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+    print("Abhi:- Warning: Unexpected _id format: $id");
+    return id.toString();
+  }
+// Yeh function InkWell ke onTap mein call hota hai
+  Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
+    try {
+      // Step 1: User ID fetch karo
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        print("Abhi:- Error: No token found");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: No token found, please log in again')),
+        );
+        return;
+      }
+
+      // Step 2: User profile fetch karo
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        print("Abhi:- Error fetching profile: Status=${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch user profile')),
+        );
+        return;
+      }
+
+      final body = json.decode(response.body);
+      if (body['status'] != true) {
+        print("Abhi:- Error fetching profile: ${body['message']}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
+        );
+        return;
+      }
+
+      final userId = getIdAsString(body['data']['_id']);
+      if (userId.isEmpty) {
+        print("Abhi:- Error: User ID is empty");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: User ID not available')),
+        );
+        return;
+      }
+
+      // Step 3: Check if conversation exists
+      print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+      final convs = await ApiService.fetchConversations(userId);
+      dynamic currentChat = convs.firstWhere(
+            (conv) {
+          final members = conv['members'] as List? ?? [];
+          if (members.isEmpty) return false;
+          if (members[0] is String) {
+            return members.contains(receiverId) && members.contains(userId);
+          } else {
+            return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
+                members.any((m) => getIdAsString(m['_id']) == userId);
+          }
+        },
+        orElse: () => null,
+      );
+
+      // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
+      if (currentChat == null) {
+        print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+        currentChat = await ApiService.startConversation(userId, receiverId);
+      }
+
+      // Step 5: Agar members strings hain, toh full user details fetch karo
+      if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
+        print("Abhi:- New conversation, fetching user details for members");
+        final otherId = currentChat['members'].firstWhere((id) => id != userId);
+        final otherUserData = await fetchUserById(otherId, token);
+        final senderUserData = await fetchUserById(userId, token);
+        currentChat['members'] = [senderUserData, otherUserData];
+        print("Abhi:- Updated members with full details: ${currentChat['members']}");
+      }
+
+      // Step 6: Messages fetch karo
+      final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+      messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
+
+      // Step 7: Socket initialize karo
+      SocketService.connect(userId);
+      final onlineUsers = <String>[];
+      SocketService.listenOnlineUsers((users) {
+        onlineUsers.clear();
+        onlineUsers.addAll(users.map((u) => getIdAsString(u)));
+      });
+
+      // Step 8: ChatDetailScreen push karo
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StandaloneChatDetailScreen(
+            initialCurrentChat: currentChat,
+            initialUserId: userId,
+            initialMessages: messages,
+            initialOnlineUsers: onlineUsers,
+          ),
+        ),
+      ).then((_) {
+        SocketService.disconnect();
+      });
+    } catch (e, stackTrace) {
+      print("Abhi:- Error starting conversation: $e");
+      print("Abhi:- Stack trace: $stackTrace");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: Failed to start conversation: $e')),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -1693,296 +1853,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     );
   }
 
-//   Widget _buildBudingCard(dynamic BudingData) {
-//
-//     if (BudingData == null) {
-//       return const Center(
-//         child: CircularProgressIndicator(
-//           color: Colors.green,
-//         ),
-//       );
-//     }
-//
-//     final List dataList = BudingData['data'] ?? [];
-//     print("Abhi:- get bidding oderId : ${BudingData['data'] }");
-//
-//     return Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             // TextFormField(
-//             //   readOnly: true,
-//             //   decoration: InputDecoration(
-//             //     contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-//             //     prefixIcon: Icon(Icons.search),
-//             //     hintText: "Search for services",
-//             //     border: OutlineInputBorder(
-//             //       borderRadius: BorderRadius.circular(15),
-//             //     ),
-//             //   ),
-//             // ),
-//             SizedBox(height: 10),
-//             // Check if dataList is empty
-//
-//             if (dataList.isEmpty)
-//               Center(
-//                 child: Text(
-//                   "No bidding tasks found!",
-//                   style: TextStyle(fontSize: 14, color: Colors.black54),
-//                 ),
-//               )
-//             else
-//               ListView.builder(
-//                 physics: NeverScrollableScrollPhysics(),
-//                 shrinkWrap: true,
-//                 itemCount: dataList.length,
-//                 itemBuilder: (context, index) {
-//                   final item = dataList[index];
-//
-//                   final category = item['category_id']?['name'] ?? "No Title";
-//                   final price = item['service_payment']?['amount']?.toString() ?? "0";
-//                   // final userId = item?['user_id']['_id'] ?? "";
-//                   final buddingOderId = item['_id'] ?? "0";
-//                   final buddingprojectid = item['project_id'] ?? "0";
-//                   final address = item['google_address'] ?? "No Address";
-//                   final latitude = item['latitude'] ?? 0.0;
-//                   final longitude = item['longitude'] ?? 0.0;
-//                   final description = item['description'] ?? "No description";
-//                   final status = item['hire_status'] ?? "No Status";
-//                   final title = item['title'] ?? "No title";
-//                   final deadline = item['deadline']?.toString() ?? "";
-//                   final imageUrl = (item['image_url'] != null && item['image_url'].isNotEmpty)
-//                       ? item['image_url'][0]
-//                       : "";
-//                   var user = item?['user_id'];
-//                   var serviceProvider = item?['service_provider_id']; // 👈 yaha var rakho
-//
-//                   String userId = "";
-//                   String serviceProviderId = "";
-//
-// // user check
-//                   if (user is Map) {
-//                     userId = user['_id']?.toString() ?? "";
-//                   } else if (user is String) {
-//                     userId = user;
-//                   }
-//
-// // service provider check
-//                   if (serviceProvider is Map) {
-//                     serviceProviderId = serviceProvider['_id']?.toString() ?? "";
-//                   } else if (serviceProvider is String) {
-//                     serviceProviderId = serviceProvider;
-//                   }
-//
-//
-//                   print("Abhi:- get bidding oderId : ${buddingOderId }");
-//                   print("Abhi:- get bidding oderId status : ${status}");
-//                   print("Abhi:- get bidding images : ${imageUrl}");
-//                   print("Abhi:- get bidding userId : ${userId}");
-//
-//                   return Card(
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                       side: BorderSide(color: Colors.green, width: 1),
-//                     ),
-//                     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-//                     child: Padding(
-//                       padding: const EdgeInsets.all(8.0),
-//                       child: Row(
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                           // left image
-//                           Center(
-//                             child: Stack(
-//                               children:[ Container(
-//                                 color:Colors.grey,
-//                                 child: ClipRRect(
-//                                     borderRadius: BorderRadius.circular(10),
-//                                     child: imageUrl.isNotEmpty
-//                                         ? Image.network(
-//                                       'https://api.thebharatworks.com/${imageUrl}',
-//                                       height: 125,
-//                                       width: 100,
-//                                       // fit: BoxFit.cover,
-//                                       errorBuilder: (context, error, stackTrace) {
-//                                         return Icon(Icons.image_not_supported_outlined,size: 100,);
-//                                       },
-//                                     )
-//                                         : /*Image.asset(
-//                                     "assets/images/Work.png",
-//                                     height: 100,
-//                                     width: 100,
-//                                     fit: BoxFit.cover,
-//                                   ),*/
-//                                     Icon(Icons.image_not_supported_outlined,size: 100,)
-//                                 ),
-//                               ),
-//                                 Positioned(
-//                                     bottom: 7,
-//                                     left: 10,
-//                                     right: 5,
-//                                     child: Container(
-//                                       decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-//                                       child: Center(child: Text(buddingprojectid,style: TextStyle(color: Colors.white), maxLines: 1,
-//                                         overflow: TextOverflow.ellipsis,)),))
-//                               ],),
-//                           ),
-//                           SizedBox(width: 10),
-//                           // right content
-//                           Expanded(
-//                             child: Column(
-//                               crossAxisAlignment: CrossAxisAlignment.start,
-//                               children: [
-//                                 Text(
-//                                   title,
-//                                   style: TextStyle(
-//                                     fontWeight: FontWeight.bold,
-//                                     fontSize: 16,
-//                                   ),
-//                                   maxLines: 1,
-//                                   overflow: TextOverflow.ellipsis,
-//                                 ),
-//                                 SizedBox(height: 3),
-//                                 Text(
-//                                   "₹$price",
-//                                   style: TextStyle(
-//                                     color: Colors.green,
-//                                     fontSize: 14,
-//                                     fontWeight: FontWeight.bold,
-//                                   ),
-//                                 ),
-//                                 SizedBox(height: 3),
-//                                 Text(
-//                                   description,
-//                                   style: TextStyle(
-//                                     color: Colors.black54,
-//                                     fontSize: 13,
-//                                   ),
-//                                   maxLines: 2,
-//                                 ),
-//                                 SizedBox(height: 3),
-//                                 Row(
-//                                   children: [
-//                                     Expanded(
-//                                       child: Text(
-//                                         "Date: $deadline",
-//                                         style: TextStyle(
-//                                           fontSize: 13,
-//                                           fontWeight: FontWeight.w500,
-//                                         ),
-//                                         overflow: TextOverflow.ellipsis,
-//                                         maxLines: 1,
-//                                       ),
-//                                     ),
-//                                     Container(
-//                                       padding: EdgeInsets.symmetric(
-//                                         horizontal: 10,
-//                                         vertical: 4,
-//                                       ),
-//                                       decoration: BoxDecoration(
-//                                         color: _getStatusColor(status),
-//                                         borderRadius: BorderRadius.circular(5),
-//                                       ),
-//                                       child: Text(
-//                                         "$status",
-//                                         style: TextStyle(
-//                                           color: Colors.white,
-//                                           fontSize: 12,
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 SizedBox(height: 6),
-//                                 Row(
-//                                   children: [
-//                                     InkWell(
-//                                       onTap:(){
-//                                         MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
-//                                       },
-//                                       child: Container(
-//                                         padding: EdgeInsets.symmetric(
-//                                           horizontal: 10,
-//                                           vertical: 4,
-//                                         ),
-//                                         decoration: BoxDecoration(
-//                                           color: Color(0xffF27773),
-//                                           borderRadius: BorderRadius.circular(20),
-//                                         ),
-//                                         child: Text(
-//                                           address,
-//                                           style: TextStyle(
-//                                             color: Colors.white,
-//                                             fontSize: 12,
-//                                           ),
-//                                           overflow: TextOverflow.ellipsis,
-//                                         ),
-//                                         width: 110,
-//                                       ),
-//                                     ),
-//                                     Spacer(),
-//                                     InkWell(
-//                                       onTap: () async {
-//                                         final result = await Navigator.push(
-//                                           context,
-//                                           MaterialPageRoute(
-//                                             builder: (context) => BiddingWorkerDetailScreen(
-//                                               buddingOderId: buddingOderId,
-//                                               userId: userId,
-//                                               serviceProviderId: serviceProviderId,
-//                                             ),
-//                                           ),
-//                                         );
-//
-//                                         if (result == true) {
-//                                           // 👈 refresh function call kar do
-//                                           _loadCategoryIdsAndFetchOrders();
-//                                           getEmergencyOrder();
-//                                           getBudingAllOders();
-//                                           setState(() {});
-//                                         }
-//                                       },
-//
-//
-//                                       //                   _loadCategoryIdsAndFetchOrders();
-//                                       //                   getEmergencyOrder();
-//                                       //                    getBudingAllOders();
-//                                       child: Container(
-//                                         padding: EdgeInsets.symmetric(
-//                                           horizontal: 10,
-//                                           vertical: 4,
-//                                         ),
-//                                         decoration: BoxDecoration(
-//                                           color: Colors.green,
-//                                           borderRadius: BorderRadius.circular(5),
-//                                         ),
-//                                         child: Text(
-//                                           "View Details",
-//                                           style: TextStyle(
-//                                             color: Colors.white,
-//                                             fontSize: 12,
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   );
-//                 },
-//               ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
+
 
   Widget _buildBiddingCard(dynamic biddingData) {
     if (biddingData == null) {
@@ -2269,6 +2140,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
     );
   }
 
+  //              chat code
+
+
+
 
   Widget _buildHireCard(DirectOrder darectHiringData) {
     String displayStatus = darectHiringData.status;
@@ -2381,12 +2256,32 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.grey.shade200,
-                      child: SvgPicture.asset(
-                        "assets/svg_images/call.svg",
-                        height: 18,
+                    GestureDetector(
+                      // onTap: (){
+                      //   final receiverId = order != null && order!['user_id'] != null
+                      //       ? order!['user_id']['_id']?.toString() ?? 'Unknown'
+                      //       : 'Unknown';
+                      //   final fullName = order != null && order!['user_id'] != null
+                      //       ?  order!['user_id']['full_name'] ?? 'Unknown'
+                      //       : 'Unknown';
+                      //   print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                      //
+                      //   if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                      //     await _startOrFetchConversation(context, receiverId);
+                      //   } else {
+                      //     print("Abhi:- Error: Invalid receiver ID");
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       SnackBar(content: Text('Error: Invalid receiver ID')),
+                      //     );
+                      //   }
+                      // },
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.grey.shade200,
+                        child: SvgPicture.asset(
+                          "assets/svg_images/call.svg",
+                          height: 18,
+                        ),
                       ),
                     )
                   ],
