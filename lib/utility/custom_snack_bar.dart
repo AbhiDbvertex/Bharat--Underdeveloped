@@ -77,7 +77,7 @@ enum SnackBarType { success, error, warning, info }
 
 class CustomSnackBar {
   static void show(
-      BuildContext context, { // still required, but not used internally
+       {
         required String message,
         SnackBarType type = SnackBarType.info,
         Duration duration = const Duration(seconds: 3),

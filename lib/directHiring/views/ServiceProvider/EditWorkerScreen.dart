@@ -360,8 +360,7 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
       isLoading = false;
     });
     if (!success && mounted) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Failed to load worker details" ,
           type: SnackBarType.error
       );
@@ -601,8 +600,7 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
                           if (controller.aadhaarSelectedImages.length +
                               controller.aadhaarImageUrls.length >=
                               2) {
-                            CustomSnackBar.show(
-                              context,
+                             CustomSnackBar.show(
                               message: "You can upload max 2 Aadhaar images",
                               type: SnackBarType.warning,
                             );
@@ -723,8 +721,7 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
                               if (!mounted) return;
 
                               if (success) {
-                                CustomSnackBar.show(
-                                    context,
+                                 CustomSnackBar.show(
                                     message:  "Worker updated successfully",
                                     type: SnackBarType.success
                                 );
@@ -735,8 +732,7 @@ class _EditWorkerScreenState extends State<EditWorkerScreen> {
                                   Navigator.pop(context, true);
                                 }
                               } else {
-                                CustomSnackBar.show(
-                                    context,
+                                 CustomSnackBar.show(
                                     message: "Failed to update worker",
                                     type: SnackBarType.error
                                 );

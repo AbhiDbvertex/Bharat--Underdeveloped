@@ -69,8 +69,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
           print("❌ API error: ${data['message']}");
           setState(() => isLoading = false);
           if (!context.mounted) return;
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "API error: ${data['message']}",
               type: SnackBarType.error
           );
@@ -79,8 +78,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
         print("❌ Server error: ${response.statusCode}");
         setState(() => isLoading = false);
         if (!context.mounted) return;
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Failed to fetch workers: ${response.statusCode}" ,
             type: SnackBarType.error
         );
@@ -90,8 +88,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
       print('❌ Error fetching workers: $e');
       setState(() => isLoading = false);
       if (!context.mounted) return;
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Error fetching workers: $e" ,
           type: SnackBarType.error
       );
@@ -128,7 +125,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                   await fetchWorkers();
                   if (!context.mounted) return;
                   CustomSnackBar.show(
-                      context,
+
                       message:"Worker added successfully" ,
                       type: SnackBarType.success
                   );
@@ -202,7 +199,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                 if (!context.mounted) return;
 
                 CustomSnackBar.show(
-                    context,
+
                     message: "Worker added successfully",
                     type: SnackBarType.success
                 );
@@ -468,8 +465,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
                           await fetchWorkers();
                           if (!context.mounted) return;
 
-                          CustomSnackBar.show(
-                              context,
+                           CustomSnackBar.show(
                               message: "Worker updated successfully",
                               type: SnackBarType.success
                           );
@@ -572,8 +568,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
       final token = await getToken();
       if (token == null) {
         if (!context.mounted) return;
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "User not logged in",
             type: SnackBarType.warning
         );
@@ -591,15 +586,13 @@ class _WorkerScreenState extends State<WorkerScreen> {
           workers.removeWhere((w) => w.id == workerId);
         });
         if (!context.mounted) return;
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Worker deleted successfully" ,
             type: SnackBarType.success
         );
       } else {
         if (!context.mounted) return;
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Failed to delete worker: ${response.statusCode}",
             type: SnackBarType.error
         );
@@ -607,8 +600,7 @@ class _WorkerScreenState extends State<WorkerScreen> {
       }
     } catch (e) {
       if (!context.mounted) return;
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Error: $e",
           type: SnackBarType.error
       );

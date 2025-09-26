@@ -297,8 +297,7 @@ class _UserFeedbackState extends State<UserFeedback> {
   Future<void> postRatingDarect() async {
     if (selectedRating == 0) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Please select a rating",
           type: SnackBarType.error
       );
@@ -307,8 +306,7 @@ class _UserFeedbackState extends State<UserFeedback> {
     }
 
     if (feedController.text.trim().isEmpty) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Please enter feedback",
           type: SnackBarType.error
       );
@@ -318,8 +316,7 @@ class _UserFeedbackState extends State<UserFeedback> {
 
     if (feedController.text.trim().length < 10) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Feedback must be at least 10 characters long" ,
           type: SnackBarType.error
       );
@@ -375,8 +372,7 @@ class _UserFeedbackState extends State<UserFeedback> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postRatingDarect response ${response.body}");
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Feedback submitted successfully",
             type: SnackBarType.success
         );
@@ -397,8 +393,7 @@ class _UserFeedbackState extends State<UserFeedback> {
       }  if (response.statusCode == 500 ) {
         print("Abhi:- else postRatingDarect respons 500  ${response.body}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Internal server error.Try again...",
             type: SnackBarType.error
         );
@@ -407,8 +402,7 @@ class _UserFeedbackState extends State<UserFeedback> {
         print("Abhi:- else postRatingDarect response ${response.body}");
         print("Abhi:- else postRatingDarect response ${response.statusCode}");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "You already reviewed this provider.",
             type: SnackBarType.info
         );
@@ -417,8 +411,7 @@ class _UserFeedbackState extends State<UserFeedback> {
     } catch (e) {
       print("Abhi:- Exception postRatingDarect $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "An error occurred while submitting",
           type: SnackBarType.error
       );
@@ -586,8 +579,7 @@ class _UserFeedbackState extends State<UserFeedback> {
           selectedImages.addAll(pickedList);
         } else {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Maximum 5 images allowed",
               type: SnackBarType.error
           );

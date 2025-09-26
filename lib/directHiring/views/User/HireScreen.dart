@@ -227,8 +227,7 @@ class _HireScreenState extends State<HireScreen> {
           selectedImages.addAll(pickedList);
         } else {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Maximum 5 images allowed",
               type: SnackBarType.error
           );
@@ -245,8 +244,7 @@ class _HireScreenState extends State<HireScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-         CustomSnackBar.show(
-              context,
+           CustomSnackBar.show(
               message: "Location permission denied",
               type: SnackBarType.error
           );
@@ -254,8 +252,7 @@ class _HireScreenState extends State<HireScreen> {
         }
       }
       if (permission == LocationPermission.deniedForever) {
-              CustomSnackBar.show(
-            context,
+               CustomSnackBar.show(
             message: "Location permission permanently denied",
             type: SnackBarType.error
         );
@@ -293,8 +290,7 @@ class _HireScreenState extends State<HireScreen> {
         });
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Unable to fetch address",
             type: SnackBarType.error
         );
@@ -302,8 +298,7 @@ class _HireScreenState extends State<HireScreen> {
     } catch (e) {
       print("❗ Error fetching location: $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Error fetching location: ",
           type: SnackBarType.error
       );
@@ -519,8 +514,7 @@ bwDebug("[submitForm]Goto his show? : $_goToShopSelection",tag: "Hire Screen");
         selectedDate == null ||
         selectedTime == null ||
         selectedImages.isEmpty ) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Please fill all fields',
           type: SnackBarType.error
       );
@@ -540,8 +534,7 @@ bwDebug("[submitForm]Goto his show? : $_goToShopSelection",tag: "Hire Screen");
 
     if (token == null) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'User not logged in' ,
           type: SnackBarType.warning
       );
@@ -632,16 +625,14 @@ final orderId=decoded["order"]["_id"];
       } else {
         print("❌ Error Response: $respStr");
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Failed: $respStr' ,
             type: SnackBarType.error
         );
       }
     } catch (e) {
       print("❗ Exception: $e");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Something went wrong.",
           type: SnackBarType.error
       );

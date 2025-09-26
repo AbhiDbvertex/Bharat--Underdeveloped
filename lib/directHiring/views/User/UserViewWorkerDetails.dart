@@ -1743,8 +1743,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
       final token = prefs.getString('token');
 
       if (token == null) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"No auth token found" ,
             type: SnackBarType.warning
         );
@@ -1771,8 +1770,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
             isLoading = false;
           });
         } else {
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:"Worker data not found" ,
               type: SnackBarType.error
           );
@@ -1783,8 +1781,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
       }
     } catch (e) {
       bwDebug("error : $e");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Error loading worker details",
           type: SnackBarType.error
       );
@@ -1824,18 +1821,22 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
             child: Column(
               children: [
                 // Header
-                ClipPath(
-                  clipper: BottomCurveClipper(),
-                  child: Container(
-                    width: double.infinity,
-                    color: const Color(0xFF9DF89D),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    height: 100,
+                LayoutBuilder(
+                  builder: (context,constraints) {
+                    return ClipPath(
+                      clipper: BottomCurveClipper(),
+                      child: Container(
+                        width: constraints.maxWidth,
+                        color: const Color(0xFF9DF89D),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        height: 100,
 
-                  ),
+                      ),
+                    );
+                  }
                 ),
 
                 // Profile Image, Message, Call, Name, Location
@@ -2045,7 +2046,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 const SizedBox(height: 16),
 
                 // Document Section
-                Padding(
+               /* Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
                     height: 0.42.toWidthPercent(),
@@ -2149,8 +2150,136 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                       ],
                     ),
                   ),
+                ),*/
+// Document Section
+                // Document Section
+                // Document Section
+                // Document Section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final validImages = workerData?.documents
+                          ?.where((doc) => doc.images != null && doc.images!.isNotEmpty)
+                          .expand((doc) => doc.images!)
+                          .toList() ??
+                          [];
+                      return Container(
+                        height: validImages.isEmpty ? 151.2 : null, // Use original height for empty case, else auto-size
+                        width: constraints.maxWidth,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Document",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Container(
+                                  width: 82,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: Colors.green, width: 2),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "Verified",
+                                      style: TextStyle(
+                                        color: Colors.green.shade700,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset(
+                                  'assets/images/line2.png',
+                                  height: 20,
+                                  width: 20,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  "Valid Id Proof",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: validImages.isEmpty ? null : 72, // Image height when images exist
+                              child: validImages.isEmpty
+                                  ? Center(
+                                child: Text(
+                                  "No documents",
+                                  style: GoogleFonts.roboto(fontSize: 13),
+                                ),
+                              )
+                                  : ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: validImages.length,
+                                itemBuilder: (context, index) {
+                                  final imageUrl = validImages[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ViewImage(imageUrl: imageUrl,title: "Document",),
+                                          ),
+                                        );
+                                      },
+                                      child: Image.network(
+                                        imageUrl,
+                                        height: 72,
+                                        width: 100,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/d_png/No_Image_Available.jpg',
+                                            height: 72,
+                                            width: 100,
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-
                 // Reviews
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -2242,7 +2371,9 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
           color: const Color(0xFF9DF89D),
           borderRadius: BorderRadius.circular(14),
         ),
-        child: Column(
+        child: /*Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
             Text(
@@ -2256,6 +2387,13 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "Sub-Categories: ${workerData?.subcategoryNames?.join(', ') ?? 'N/A'}",
+                style: GoogleFonts.poppins(fontSize: 13),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Emergency Sub-Categories: ${workerData?.subcategoryNames?.join(', ') ?? 'N/A'}",
                 style: GoogleFonts.poppins(fontSize: 13),
               ),
             ),
@@ -2332,6 +2470,96 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 ],
               ),
             ),
+          ],
+        ),*/
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 4),
+              child: RichText(
+                text: TextSpan(
+                  style: GoogleFonts.poppins(fontSize: 11),
+                  children: [
+                    TextSpan(
+                      text: "Category: ",
+                      style: GoogleFonts.roboto(
+                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    TextSpan(
+                      text: workerData?.categoryName ?? 'N/A',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 2),
+              child: RichText(
+                text: TextSpan(
+                  style: GoogleFonts.poppins(fontSize: 11),
+                  children: [
+                    TextSpan(
+                      text: "Sub-Category: ",
+                      style: GoogleFonts.roboto(
+                        color: Colors.green.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    TextSpan(
+                      text:
+                      workerData?.subcategoryNames?.join(', ') ?? 'N/A',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            /*      (profile?.subEmergencyCategoryNames != null &&
+                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 4),
+                      child: RichText(
+                        text: TextSpan(
+                          style: GoogleFonts.poppins(fontSize: 11),
+                          children: [
+                            TextSpan(
+                              text: "Emergency Sub-Category: ",
+                              style: GoogleFonts.roboto(
+                                color: Colors.green.shade800,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                              workerData?.emergencySubcategoryNames?.join(', ') ?? 'N/A',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )/*:SizedBox()*/,
           ],
         ),
       ),

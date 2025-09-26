@@ -414,6 +414,7 @@ import 'package:mime/mime.dart' as mime;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../controller/bidding_post_task_Edit_controller.dart';
 import '../../controller/bidding_post_task_controller.dart';
 
@@ -684,11 +685,17 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
                       onPressed: () {
                         if (controller.formKey.currentState!.validate()) {
                           if (controller.selectedCategoryId.value == null) {
-                            controller.showSnackbar("Error", "Please select a category", context: context);
+                            CustomSnackBar.show(
+                                message: "Please select a category",
+                                type: SnackBarType.error
+                            );
                             return;
                           }
                           if (controller.selectedSubCategoryIds.isEmpty) {
-                            controller.showSnackbar("Error", "Please select at least one sub category", context: context);
+                            CustomSnackBar.show(
+                                message: "Please select at least one sub category",
+                                type: SnackBarType.error
+                            );
                             return;
                           }
                           controller.submitTask(context);
@@ -783,7 +790,10 @@ class _PostTaskEditScreenState extends State<PostTaskEditScreen> {
         if (controller.selectedCategoryId.value != null) {
           controller.showSubcategoryDialog();
         } else {
-          controller.showSnackbar("Error", "Please select category first", context: Get.context!);
+          CustomSnackBar.show(
+              message:  "Please select category first",
+              type: SnackBarType.error
+          );
         }
       },
       child: _buildDropdownTile(controller),

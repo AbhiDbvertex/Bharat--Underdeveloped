@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../Widgets/AppColors.dart';
 import '../../directHiring/views/ServiceProvider/view_user_profile_screen.dart';
+import '../../utility/custom_snack_bar.dart';
 import '../Models/bidding_order.dart';
 import 'BiddingWorkerDisputeScreen.dart';
 
@@ -475,14 +476,11 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'No token found. Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message:  'No token found. Please log in again.' ,
+            type: SnackBarType.error
         );
         return;
       }
@@ -491,14 +489,11 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Please fill all fields',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message:  'Please fill all fields',
+            type: SnackBarType.error
         );
         return;
       }
@@ -515,14 +510,9 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Invalid amount ya duration format',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+             CustomSnackBar.show(
+            message:  'Invalid amount ya duration format',
+            type: SnackBarType.error
         );
         return;
       }
@@ -561,29 +551,22 @@ class _BiddingserviceproviderworkdetailState
             editbidduration = jsonData['data']['duration'];
           });
           print('Abhi:- Bid placed, biddingOfferId: $biddingOfferId');
-          Get.snackbar(
-            'Success',
-            'Bid successfully placed!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+
+          CustomSnackBar.show(
+              message:  'Bid successfully placed!',
+              type: SnackBarType.success
           );
+
           fetchBidders();
         } else {
           setState(() {
             isLoading = false;
           });
-          Get.snackbar(
-            'Error',
-            jsonData['message'] ?? 'Failed to place bid',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+                CustomSnackBar.show(
+              message: jsonData['message'] ?? 'Failed to place bid',
+              type: SnackBarType.error
           );
+
         }
       } else if (response.statusCode == 400) {
         final jsonData = jsonDecode(response.body);
@@ -594,41 +577,33 @@ class _BiddingserviceproviderworkdetailState
             hasAlreadyBid = true;
           }
         });
-        Get.snackbar(
-          'Error',
-          jsonData['message'] ?? 'Invalid request data',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message: jsonData['message'] ?? 'Invalid request data',
+            type: SnackBarType.error
         );
+
       } else if (response.statusCode == 401) {
         setState(() {
           isLoading = false;
           errorMessage = 'Unauthorized: Please log in again.';
         });
-        Get.snackbar(
-          'Error',
-          'Unauthorized: Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message:    'Unauthorized: Please log in again.',
+            type: SnackBarType.error
         );
+
       } else {
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Error: ${response.statusCode}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message:"Something went wrong ! ${response.statusCode} ",
+            type: SnackBarType.error
         );
       }
     } catch (e) {
@@ -636,14 +611,9 @@ class _BiddingserviceproviderworkdetailState
       setState(() {
         isLoading = false;
       });
-      Get.snackbar(
-        'Error',
-        'Error: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
+      CustomSnackBar.show(
+          message:"Something went wrong !" ,
+          type: SnackBarType.error
       );
     }
   }
@@ -677,10 +647,13 @@ class _BiddingserviceproviderworkdetailState
     var responseData = jsonDecode(response.body);
     try {
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.snackbar("Success", responseData['message'],
-            snackPosition: SnackPosition.BOTTOM,
-            colorText: Colors.white,
-            backgroundColor: Colors.green.shade700);
+
+        CustomSnackBar.show(
+            message: responseData['message'],
+            type: SnackBarType.success
+        );
+
+
         print("Abhi:- editbide response :${response.statusCode}");
         print("Abhi:- editbide response :${response.body}");
       } else {
@@ -705,14 +678,10 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'No token found. Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message:  'No token found. Please log in again.',
+            type: SnackBarType.error
         );
         return;
       }
@@ -721,15 +690,11 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Please enter an amount',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+        CustomSnackBar.show(
+            message:  'Please enter an amount',
+            type: SnackBarType.error
         );
+
         return;
       }
 
@@ -743,14 +708,10 @@ class _BiddingserviceproviderworkdetailState
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Invalid amount format',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message:  'Invalid amount format',
+            type: SnackBarType.error
         );
         return;
       }
@@ -790,28 +751,20 @@ print("user: ${biddingOrder!.userId?.id}");
           });
           print('✅ Negotiation started, negotiationId: $negotiationId');
           print('✅ Updated offerPrice: $offerPrice');
-          Get.snackbar(
-            'Success',
-            'Negotiation request sent successfully!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+
+          CustomSnackBar.show(
+              message:'Negotiation request sent successfully!',
+              type: SnackBarType.success
           );
           await fetchLatestNegotiation();
         } else {
           setState(() {
             isLoading = false;
           });
-          Get.snackbar(
-            'Error',
-            jsonData['message'] ?? 'Failed to start negotiation',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+
+          CustomSnackBar.show(
+              message:jsonData['message'] ?? 'Failed to start negotiation' ,
+              type: SnackBarType.error
           );
         }
       } else if (response.statusCode == 401) {
@@ -819,27 +772,19 @@ print("user: ${biddingOrder!.userId?.id}");
           isLoading = false;
           errorMessage = 'Unauthorized: Please log in again.';
         });
-        Get.snackbar(
-          'Error',
-          'Unauthorized: Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message: 'Unauthorized: Please log in again.',
+            type: SnackBarType.error
         );
       } else {
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Error: ${response.statusCode}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message:  'Error: ${response.statusCode}',
+            type: SnackBarType.error
         );
       }
     } catch (e) {
@@ -847,28 +792,19 @@ print("user: ${biddingOrder!.userId?.id}");
       setState(() {
         isLoading = false;
       });
-      Get.snackbar(
-        'Error',
-        'Error: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
+        CustomSnackBar.show(
+          message: 'Error: $e',
+          type: SnackBarType.error
       );
     }
   }
 
   Future<void> acceptNegotiation() async {
     if (negotiationId == null) {
-      Get.snackbar(
-        'Error',
-        'No negotiation found to accept.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
+
+      CustomSnackBar.show(
+          message:  'No negotiation found to accept.',
+          type: SnackBarType.error
       );
       return;
     }
@@ -884,14 +820,10 @@ print("user: ${biddingOrder!.userId?.id}");
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'No token found. Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+        CustomSnackBar.show(
+            message:'No token found. Please log in again.' ,
+            type: SnackBarType.error
         );
         return;
       }
@@ -925,72 +857,61 @@ print("user: ${biddingOrder!.userId?.id}");
                 '₹${jsonData['negotiation']['offer_amount'].toStringAsFixed(2)}';
             print('✅ Setting offerPrice in acceptNegotiation: $offerPrice');
           });
-          Get.snackbar(
-            'Success',
-            'Negotiation accepted successfully!',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+
+          CustomSnackBar.show(
+              message:  'Negotiation accepted successfully!',
+              type: SnackBarType.success
           );
           await fetchLatestNegotiation();
         } else {
           setState(() {
             isLoading = false;
           });
-          Get.snackbar(
-            'Error',
-            jsonData['message'] ?? 'Failed to accept negotiation',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            margin: EdgeInsets.all(10),
-            duration: Duration(seconds: 3),
+
+
+          CustomSnackBar.show(
+              message:jsonData['message'] ?? 'Failed to accept negotiation' ,
+              type: SnackBarType.error
           );
+
         }
       } else if (response.statusCode == 401) {
         setState(() {
           isLoading = false;
           errorMessage = 'Unauthorized: Please log in again.';
         });
-        Get.snackbar(
-          'Error',
-          'Unauthorized: Please log in again.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message: 'Unauthorized: Please log in again.',
+            type: SnackBarType.error
         );
+
       } else {
         setState(() {
           isLoading = false;
         });
-        Get.snackbar(
-          'Error',
-          'Error: ${response.statusCode}',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
+
+
+        CustomSnackBar.show(
+            message:'Error: ${response.statusCode}' ,
+            type: SnackBarType.error
         );
+
+
       }
     } catch (e) {
       print('❌ Accept Negotiation API Error: $e');
       setState(() {
         isLoading = false;
       });
-      Get.snackbar(
-        'Error',
-        'Error: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(10),
-        duration: Duration(seconds: 3),
+
+
+      CustomSnackBar.show(
+          message: 'Error: $e',
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -1098,7 +1019,7 @@ print("user: ${biddingOrder!.userId?.id}");
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Work Detail",
+        title: const Text("Work Details",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
@@ -2061,27 +1982,18 @@ print("user: ${biddingOrder!.userId?.id}");
                               child: GestureDetector(
                                 onTap: biddingOrder!.userId == currentUserId
                                     ? () {
-                                        Get.snackbar(
-                                          'Error',
-                                          'You cannot bid on your own order',
-                                          snackPosition: SnackPosition.BOTTOM,
-                                          backgroundColor: Colors.red,
-                                          colorText: Colors.white,
-                                          margin: EdgeInsets.all(10),
-                                          duration: Duration(seconds: 3),
+
+                                        CustomSnackBar.show(
+                                            message:  'You cannot bid on your own order',
+                                            type: SnackBarType.error
                                         );
                                       }
                                     : hasAlreadyBid
                                         ? () {
-                                            Get.snackbar(
-                                              'Error',
-                                              'You have already placed a bid on this order',
-                                              snackPosition:
-                                                  SnackPosition.BOTTOM,
-                                              backgroundColor: Colors.red,
-                                              colorText: Colors.white,
-                                              margin: EdgeInsets.all(10),
-                                              duration: Duration(seconds: 3),
+
+                                            CustomSnackBar.show(
+                                                message:'You have already placed a bid on this order' ,
+                                                type: SnackBarType.error
                                             );
                                           }
                                         : () {
@@ -2334,14 +2246,10 @@ print("user: ${biddingOrder!.userId?.id}");
                           if (hasAlreadyBid && biddingOfferId != null) {
                             startNegotiation(amount);
                           } else {
-                            Get.snackbar(
-                              'Error',
-                              'Please place a bid first.',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                              margin: EdgeInsets.all(10),
-                              duration: Duration(seconds: 3),
+
+                            CustomSnackBar.show(
+                                message: 'Please place a bid first.',
+                                type: SnackBarType.error
                             );
                           }
                         },
@@ -2349,14 +2257,10 @@ print("user: ${biddingOrder!.userId?.id}");
                           if (hasAlreadyBid && biddingOfferId != null) {
                             acceptNegotiation();
                           } else {
-                            Get.snackbar(
-                              'Error',
-                              'Please place a bid first.',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                              margin: EdgeInsets.all(10),
-                              duration: Duration(seconds: 3),
+
+                            CustomSnackBar.show(
+                                message: 'Please place a bid first.' ,
+                                type: SnackBarType.error
                             );
                           }
                         },

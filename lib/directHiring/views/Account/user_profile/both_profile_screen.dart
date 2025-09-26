@@ -909,7 +909,8 @@ class _SellerScreenState extends State<SellerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Center(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 4),
                   child: RichText(
                     text: TextSpan(
                       style: GoogleFonts.poppins(fontSize: 11),
@@ -919,7 +920,7 @@ class _SellerScreenState extends State<SellerScreen> {
                           style: GoogleFonts.roboto(
                             color: Colors.green.shade800,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 13,
                           ),
                         ),
                         TextSpan(
@@ -935,66 +936,63 @@ class _SellerScreenState extends State<SellerScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 18.0),
-                    child: RichText(
-                      text: TextSpan(
-                        style: GoogleFonts.poppins(fontSize: 11),
-                        children: [
-                          TextSpan(
-                            text: "Sub-Category: ",
-                            style: GoogleFonts.roboto(
-                              color: Colors.green.shade800,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 2),
+                  child: RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.poppins(fontSize: 11),
+                      children: [
+                        TextSpan(
+                          text: "Sub-Category: ",
+                          style: GoogleFonts.roboto(
+                            color: Colors.green.shade800,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
-                          TextSpan(
-                            text:
-                            profile?.subCategoryNames?.join(', ') ?? 'N/A',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
+                        ),
+                        TextSpan(
+                          text:
+                          profile?.subCategoryNames?.join(', ') ?? 'N/A',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 4),
           /*      (profile?.subEmergencyCategoryNames != null &&
-                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 18.0),
-                    child: RichText(
-                      text: TextSpan(
-                        style: GoogleFonts.poppins(fontSize: 11),
-                        children: [
-                          TextSpan(
-                            text: "Emergency Sub-Category: ",
-                            style: GoogleFonts.roboto(
-                              color: Colors.green.shade800,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 4),
+                      child: RichText(
+                        text: TextSpan(
+                          style: GoogleFonts.poppins(fontSize: 11),
+                          children: [
+                            TextSpan(
+                              text: "Emergency Sub-Category: ",
+                              style: GoogleFonts.roboto(
+                                color: Colors.green.shade800,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-                          TextSpan(
-                            text:
-                            profile?.subEmergencyCategoryNames?.join(', ') ?? 'N/A',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                            TextSpan(
+                              text:
+                              profile?.subEmergencyCategoryNames?.join(', ') ?? 'N/A',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                )/*:SizedBox()*/,
+                    )/*:SizedBox()*/,
               ],
             ),
           ),

@@ -867,6 +867,7 @@
 // }
 
 import 'dart:convert';
+
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/directHiring/views/User/user_feedback.dart';
 import 'package:flutter/material.dart';
@@ -874,13 +875,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../directHiring/Consent/ApiEndpoint.dart';
 import '../../../directHiring/Consent/app_constants.dart';
 import '../../../directHiring/views/ServiceProvider/ServiceDisputeScreen.dart';
 import '../../../utility/custom_snack_bar.dart';
-import 'bidding_work_detail_screen.dart';
 
 class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
@@ -906,13 +907,14 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   final List<Map<String, String>> _payments = [];
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController(text: '');
+  final TextEditingController _amountController =
+      TextEditingController(text: '');
   late Razorpay _razorpay;
-   var isLoading=false;
+  var isLoading = false;
 
   @override
   void initState() {
-    bwDebug("[initsState] Order ID : ${widget.orderId}",tag: "Payment Screen");
+    bwDebug("[initsState] Order ID : ${widget.orderId}", tag: "Payment Screen");
     super.initState();
     // Razorpay initialize karo
     _razorpay = Razorpay();
@@ -924,13 +926,14 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
     if (widget.paymentHistory != null) {
       setState(() {
         _payments.addAll(widget.paymentHistory!.map((payment) => {
-          'description': payment['description']?.toString() ?? 'No description',
-          'amount': payment['amount']?.toString() ?? '0',
-          'status': payment['status']?.toString() ?? 'UNKNOWN',
-          'method': payment['method']?.toString() ?? 'cod',
-          '_id': payment['_id']?.toString() ?? '',
-          'release_status':payment['release_status']?.toString()??""
-        }));
+              'description':
+                  payment['description']?.toString() ?? 'No description',
+              'amount': payment['amount']?.toString() ?? '0',
+              'status': payment['status']?.toString() ?? 'UNKNOWN',
+              'method': payment['method']?.toString() ?? 'cod',
+              '_id': payment['_id']?.toString() ?? '',
+              'release_status': payment['release_status']?.toString() ?? ""
+            }));
       });
     }
   }
@@ -944,29 +947,21 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-
     CustomSnackBar.show(
-        context,
-        message:"Payment failed: ${response.message}" ,
-        type: SnackBarType.error
-    );
-
-
+        message: "Payment failed: ${response.message}",
+        type: SnackBarType.error);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-
     CustomSnackBar.show(
-        context,
-        message:"External wallet selected: ${response.walletName}" ,
-        type: SnackBarType.info
-    );
-
+        message: "External wallet selected: ${response.walletName}",
+        type: SnackBarType.info);
   }
 
   Future<String?> _getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id'); // Assuming user_id is stored during login
+    return prefs
+        .getString('user_id'); // Assuming user_id is stored during login
   }
 
   Future<void> savePaymentsToStorage() async {
@@ -1004,7 +999,8 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   Future<void> marCompletebiddingHire() async {
     print("Abhi:- darect cancelOder order id ${widget.orderId}");
-    final String url = '${AppConstants.baseUrl}${ApiEndpoint.biddingMarkComplete}';
+    final String url =
+        '${AppConstants.baseUrl}${ApiEndpoint.biddingMarkComplete}';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     print("Abhi:- Mark as Complete token: $token");
@@ -1028,11 +1024,16 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) => UserFeedback(
-                    providerId: widget.orderProviderId, oderId: widget.orderId,oderType: 'bidding',)));
+                      providerId: widget.orderProviderId,
+                      oderId: widget.orderId,
+                      oderType: 'bidding',
+                    )));
         // Navigator.pop(context);
-        print("Abhi:- getOderId tab mark as complete oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
+        print(
+            "Abhi:- getOderId tab mark as complete oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
       } else {
-        print("Abhi:- else darect-hire Mark as Complete error :- ${response.body}");
+        print(
+            "Abhi:- else darect-hire Mark as Complete error :- ${response.body}");
       }
     } catch (e) {
       print("Abhi:- Exception Mark as Complete darect-hire : - $e");
@@ -1043,9 +1044,10 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
 
   Future<void> postPaymentRequest(payId) async {
     setState(() {
-      isLoading=true;
+      isLoading = true;
     });
-    print("Abhi:- postPaymentRequest oderId: ${widget.orderId} payId: ${payId}");
+    print(
+        "Abhi:- postPaymentRequest oderId: ${widget.orderId} payId: ${payId}");
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/user/request-release/${widget.orderId}/${payId}';
 
@@ -1070,20 +1072,18 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
         print("Abhi:- postPaymentRequest statuscode : ${response.statusCode}");
 
         CustomSnackBar.show(
-            context,
-            message: "${responseData['message']}",
-            type: SnackBarType.success
-        );
-Navigator.pop(context);
+            message: "${responseData['message']}", type: SnackBarType.success);
+        Navigator.pop(context);
       } else {
         print("Abhi:- else postPaymentRequest response : ${response.body}");
-        print("Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
+        print(
+            "Abhi:- else postPaymentRequest statuscode : ${response.statusCode}");
       }
     } catch (e) {
       print("Abhi:- postPaymentRequest Exception $e");
-    }finally{
+    } finally {
       setState(() {
-        isLoading=false;
+        isLoading = false;
       });
     }
   }
@@ -1095,7 +1095,8 @@ Navigator.pop(context);
 
   @override
   Widget build(BuildContext context) {
-    print("Abhi:- getOderId postPaymentRequest oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
+    print(
+        "Abhi:- getOderId postPaymentRequest oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
     // Validation for enabling/disabling the Submit button
     bool isFormValid = _description.isNotEmpty &&
         _amount.isNotEmpty &&
@@ -1131,7 +1132,8 @@ Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -1153,12 +1155,9 @@ Navigator.pop(context);
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(color: Colors.green,blurRadius: 2)
-                ]
-              ),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.green, blurRadius: 2)]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1181,7 +1180,8 @@ Navigator.pop(context);
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                   ),
                                   onChanged: (value) {
                                     setState(() {
@@ -1196,14 +1196,19 @@ Navigator.pop(context);
                                 child: TextField(
                                   controller: _amountController,
                                   keyboardType: TextInputType.number,
-                                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                  inputFormatters: [
+                                    // FilteringTextInputFormatter.digitsOnly
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d{0,2}$')),
+                                  ],
                                   decoration: InputDecoration(
                                     hintText: 'Enter amount',
                                     prefixText: '₹',
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
                                   ),
                                   onChanged: (value) {
                                     setState(() {
@@ -1247,12 +1252,15 @@ Navigator.pop(context);
                               ElevatedButton(
                                 onPressed: isFormValid
                                     ? () {
-                                  _showPaymentDialog();
-                                }
+                                        _showPaymentDialog();
+                                      }
                                     : null, // Disable button if form is invalid
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFormValid ? Colors.green : Colors.grey, // Change color based on validity
-                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                  backgroundColor:
+                                      isFormValid ? Colors.green : Colors.grey,
+                                  // Change color based on validity
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -1280,7 +1288,8 @@ Navigator.pop(context);
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.green,
                                   side: const BorderSide(color: Colors.green),
-                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -1304,7 +1313,8 @@ Navigator.pop(context);
                       int i = entry.key;
                       var payment = entry.value;
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 3),
                         child: Column(
                           children: [
                             // Row(
@@ -1366,7 +1376,8 @@ Navigator.pop(context);
                             //   ],
                             // ),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start, // text top se align hoga
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              // text top se align hoga
                               children: [
                                 // Description column
                                 Text(
@@ -1378,7 +1389,7 @@ Navigator.pop(context);
                                   ),
                                 ),
                                 Expanded(
-                                  flex:2, // jyada space description ko
+                                  flex: 2, // jyada space description ko
                                   child: Text(
                                     "${toTitleCase(payment['description'])}",
                                     style: GoogleFonts.roboto(
@@ -1392,7 +1403,11 @@ Navigator.pop(context);
                                 Expanded(
                                   flex: (2),
                                   child: Text(
-                                    toTitleCase(payment['release_status']=="release_requested" ?"Requested":payment['release_status']?? 'UNKNOWN'),
+                                    toTitleCase(payment['release_status'] ==
+                                            "release_requested"
+                                        ? "Requested"
+                                        : payment['release_status'] ??
+                                            'UNKNOWN'),
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       // color: getColor(payment['release_status']),
@@ -1418,39 +1433,44 @@ Navigator.pop(context);
                                 // Button column
                                 Expanded(
                                   flex: 0,
-                                  child: payment['release_status'] == 'release_requested' || payment['release_status'] == 'released'
-                                      ? const SizedBox(width: 36) // empty placeholder
+                                  child: payment['release_status'] ==
+                                              'release_requested' ||
+                                          payment['release_status'] ==
+                                              'released'
+                                      ? const SizedBox(
+                                          width: 36) // empty placeholder
                                       : GestureDetector(
-                                                                        onTap: isLoading == true
-                                        ? null
-                                        : () async {
-                                      await postPaymentRequest(payment['_id'] ?? '');
-                                      print("Abhi:- payment releaseId : ${payment['_id']}");
-                                                                        },
-                                                                        child: Container(
-                                      height: 26,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          "Pay",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: 13,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
+                                          onTap: isLoading == true
+                                              ? null
+                                              : () async {
+                                                  await postPaymentRequest(
+                                                      payment['_id'] ?? '');
+                                                  print(
+                                                      "Abhi:- payment releaseId : ${payment['_id']}");
+                                                },
+                                          child: Container(
+                                            height: 26,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                "Pay",
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 13,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                                                        ),
-                                                                      ),
                                 ),
                               ],
                             ),
-
-
 
                             const SizedBox(height: 10),
                           ],
@@ -1588,22 +1608,27 @@ Navigator.pop(context);
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Amount", style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text("₹$_amount", style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("₹$_amount",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                 ],
               ),
-          Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("GST (18%)",style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text("₹${(int.parse(_amount) * 0.18).toStringAsFixed(2)}",style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("GST (18%)",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("₹${(int.parse(_amount) * 0.18).toStringAsFixed(2)}",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                 ],
               ),
               Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Amount",style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text("₹${(int.parse(_amount) * 1.18).toStringAsFixed(2)}",style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("Total Amount",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text("₹${(int.parse(_amount) * 1.18).toStringAsFixed(2)}",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
                 ],
               ),
               Divider(),
@@ -1623,13 +1648,14 @@ Navigator.pop(context);
                         Navigator.of(context).pop();
                         if (_description.isNotEmpty && _amount.isNotEmpty) {
                           if (_selectedPayment == 'online') {
-
-                            int razorpayAmount = (int.parse(_amount) * 1.18 * 100).toInt();
+                            int razorpayAmount =
+                                (int.parse(_amount) * 1.18 * 100).toInt();
                             var options = {
                               'key': 'rzp_test_R7z5O0bqmRXuiH',
                               'amount': razorpayAmount,
                               'name': 'The Bharat Work',
-                              'description': 'Payment for order ${widget.orderId}',
+                              'description':
+                                  'Payment for order ${widget.orderId}',
                               'prefill': {
                                 'contact': '9876543210',
                                 'email': 'test@gmail.com',
@@ -1641,12 +1667,9 @@ Navigator.pop(context);
                             try {
                               _razorpay.open(options);
                             } catch (e) {
-
                               CustomSnackBar.show(
-                                  context,
                                   message: "Razorpay error: $e",
-                                  type: SnackBarType.error
-                              );
+                                  type: SnackBarType.error);
                             }
                           } else {
                             // COD ke liye direct submitPayment call
@@ -1695,12 +1718,8 @@ Navigator.pop(context);
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-
       CustomSnackBar.show(
-          context,
-          message: "Token not found",
-          type: SnackBarType.warning
-      );
+          message: "Token not found", type: SnackBarType.warning);
 
       return;
     }
@@ -1733,7 +1752,8 @@ Navigator.pop(context);
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
             responseData['service_payment']['payment_history'] != null) {
-          final paymentHistory = responseData['service_payment']['payment_history'];
+          final paymentHistory =
+              responseData['service_payment']['payment_history'];
           final paymentId = paymentHistory.isNotEmpty
               ? paymentHistory.last['_id']?.toString() ?? ''
               : '';
@@ -1756,41 +1776,22 @@ Navigator.pop(context);
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-
           CustomSnackBar.show(
-              context,
-              message:"Payment stage added successfully" ,
-              type: SnackBarType.success
-          );
-
+              message: "Payment stage added successfully",
+              type: SnackBarType.success);
         } else {
-
           CustomSnackBar.show(
-              context,
-              message: "Invalid response structure",
-              type: SnackBarType.error
-          );
-
+              message: "Invalid response structure", type: SnackBarType.error);
         }
       } else {
         final responseData = jsonDecode(response.body);
         String errorMessage = responseData['message'] ?? 'Payment failed';
 
-        CustomSnackBar.show(
-            context,
-            message:errorMessage ,
-            type: SnackBarType.error
-        );
-
+        CustomSnackBar.show(message: errorMessage, type: SnackBarType.error);
       }
     } catch (e) {
-
       CustomSnackBar.show(
-          context,
-          message: "Error occurred: $e",
-          type: SnackBarType.error
-      );
-
+          message: "Error occurred: $e", type: SnackBarType.error);
     }
   }
 
@@ -1804,12 +1805,8 @@ Navigator.pop(context);
     String? token = prefs.getString('token');
 
     if (token == null || token.isEmpty) {
-
       CustomSnackBar.show(
-          context,
-          message: "Token not found",
-          type: SnackBarType.warning
-      );
+          message: "Token not found", type: SnackBarType.warning);
 
       return;
     }
@@ -1843,7 +1840,8 @@ Navigator.pop(context);
         final responseData = jsonDecode(response.body);
         if (responseData['service_payment'] != null &&
             responseData['service_payment']['payment_history'] != null) {
-          final paymentHistory = responseData['service_payment']['payment_history'];
+          final paymentHistory =
+              responseData['service_payment']['payment_history'];
           final paymentId = paymentHistory.isNotEmpty
               ? paymentHistory.last['_id']?.toString() ?? ''
               : '';
@@ -1866,41 +1864,24 @@ Navigator.pop(context);
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
 
-
           CustomSnackBar.show(
-              context,
-              message:"Payment completed successfully" ,
-              type: SnackBarType.success
-          );
-
+              message: "Payment completed successfully",
+              type: SnackBarType.success);
         } else {
-
           CustomSnackBar.show(
-              context,
-              message: "Invalid response structure",
-              type: SnackBarType.error
-          );
-
+              message: "Invalid response structure", type: SnackBarType.error);
         }
       } else {
         final responseData = jsonDecode(response.body);
-        String errorMessage = responseData['message'] ?? 'Payment update failed';
+        String errorMessage =
+            responseData['message'] ?? 'Payment update failed';
 
-        CustomSnackBar.show(
-            context,
-            message:errorMessage ,
-            type: SnackBarType.error
-        );
+        CustomSnackBar.show(message: errorMessage, type: SnackBarType.error);
 
         print("Abhi:- payment screen get Exception ${responseData['message']}");
       }
     } catch (e) {
-
-      CustomSnackBar.show(
-          context,
-          message: "Error: $e",
-          type: SnackBarType.error
-      );
+      CustomSnackBar.show(message: "Error: $e", type: SnackBarType.error);
 
       print("Abhi:- payment screen get Exception $e");
     }

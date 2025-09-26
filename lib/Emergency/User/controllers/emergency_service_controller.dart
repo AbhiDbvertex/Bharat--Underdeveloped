@@ -111,7 +111,7 @@ class EmergencyServiceController extends GetxController {
         images.add(File(picked.path));
       } else {
         CustomSnackBar.show(
-            context,
+
             message: "Max 5 images allowed",
             type: SnackBarType.warning
         );
@@ -124,7 +124,7 @@ class EmergencyServiceController extends GetxController {
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       if (images.length + pickedFiles.length > 5) {
            CustomSnackBar.show(
-            context,
+
             message:"You can upload max 5 images" ,
             type: SnackBarType.error
         );
@@ -134,7 +134,7 @@ class EmergencyServiceController extends GetxController {
       images.addAll(pickedFiles.map((e) => File(e.path)));
 
       CustomSnackBar.show(
-          context,
+
           message: "${pickedFiles.length} images selected",
           type: SnackBarType.info
       );
@@ -199,7 +199,7 @@ class EmergencyServiceController extends GetxController {
         images.isEmpty) {
       // Get.snackbar("Error", "Please fill all fields",colorText: Colors.red);
       if (!context.mounted) return;
-      CustomSnackBar.show(context, message: "Please fill all fields",type: SnackBarType.error);
+      CustomSnackBar.show( message: "Please fill all fields",type: SnackBarType.error);
       return;
     }
     isLoading.value=true;
@@ -257,7 +257,7 @@ class EmergencyServiceController extends GetxController {
       } else {
         bwDebug("❌ Failed: $body");
         CustomSnackBar.show(
-            context,
+
             message: "Something went wrong!",
             type: SnackBarType.error
         );
@@ -265,7 +265,7 @@ class EmergencyServiceController extends GetxController {
     } catch (e) {
       bwDebug("⚠️ Exception: $e");
       CustomSnackBar.show(
-          context,
+
           message:"Failed to submit request!" ,
           type: SnackBarType.error
       );
@@ -307,7 +307,7 @@ class EmergencyServiceController extends GetxController {
 
       bwDebug("❌ Verification Failed: /*${decoded['message']}*/");
       CustomSnackBar.show(
-          context,
+
           message: "Verification Failed",
           type: SnackBarType.error
       );
