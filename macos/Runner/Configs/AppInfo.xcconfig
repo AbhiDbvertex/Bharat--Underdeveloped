@@ -8,7 +8,7 @@
 PRODUCT_NAME = developer
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.developer
+PRODUCT_BUNDLE_IDENTIFIER = com.thebharatworks
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

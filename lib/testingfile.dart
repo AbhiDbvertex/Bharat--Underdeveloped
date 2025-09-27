@@ -3484,6 +3484,8 @@
 //
 
 
+       ///----------------------BOTTOM CODE IS CURRECT CODE--------------------///
+
 
 import 'dart:convert';
 import 'dart:io';
@@ -3509,7 +3511,7 @@ Future<void> openFileExample(String path) async {
   } catch (e) {
     print("Error opening file: $e");
   }
-}
+}// In the stream builder use of continue async data flow .
 
 class StandaloneChatDetailScreen extends StatefulWidget {
   final dynamic initialCurrentChat;
@@ -5104,9 +5106,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   print("Abhi:- Error finding other user in ChatListScreen for conversation ${conv['_id']}: $e");
                   otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
                   SchedulerBinding.instance.addPostFrameCallback((_) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: Failed to load chat user in list: $e')),
-                    );
+                    print("Abhi:- get exception with post frame callback $e");
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(content: Text('Error: Failed to load chat user in list: $e')),
+                    // );
                   });
                 }
                 final isOnline = widget.onlineUsers.contains(otherUser['_id'].toString());

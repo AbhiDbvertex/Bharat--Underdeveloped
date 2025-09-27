@@ -1529,160 +1529,160 @@ class _MyHireScreenState extends State<MyHireScreen> {
   }
 
        //                 Chat screen code
-  Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
-    try {
-      print("Abhi:- Fetching user by ID: $userId");
-      final response = await http.get(
-        Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-      print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
-      if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        if (body['success'] == true) {
-          final user = body['user'];
-          user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
-          return user;
-        } else {
-          throw Exception(body['message'] ?? 'Failed to fetch user');
-        }
-      } else {
-        throw Exception('Server error: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Abhi:- Error fetching user by ID: $e");
-      return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
-    }
-  }
-
-  String getIdAsString(dynamic id) {
-    if (id == null) return '';
-    if (id is String) return id;
-    if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
-    print("Abhi:- Warning: Unexpected _id format: $id");
-    return id.toString();
-  }
-// Yeh function InkWell ke onTap mein call hota hai
-  Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
-    try {
-      // Step 1: User ID fetch karo
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      if (token == null) {
-        print("Abhi:- Error: No token found");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: No token found, please log in again')),
-        );
-        return;
-      }
-
-      // Step 2: User profile fetch karo
-      final response = await http.get(
-        Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      if (response.statusCode != 200) {
-        print("Abhi:- Error fetching profile: Status=${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Failed to fetch user profile')),
-        );
-        return;
-      }
-
-      final body = json.decode(response.body);
-      if (body['status'] != true) {
-        print("Abhi:- Error fetching profile: ${body['message']}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
-        );
-        return;
-      }
-
-      final userId = getIdAsString(body['data']['_id']);
-      if (userId.isEmpty) {
-        print("Abhi:- Error: User ID is empty");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: User ID not available')),
-        );
-        return;
-      }
-
-      // Step 3: Check if conversation exists
-      print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
-      final convs = await ApiService.fetchConversations(userId);
-      dynamic currentChat = convs.firstWhere(
-            (conv) {
-          final members = conv['members'] as List? ?? [];
-          if (members.isEmpty) return false;
-          if (members[0] is String) {
-            return members.contains(receiverId) && members.contains(userId);
-          } else {
-            return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
-                members.any((m) => getIdAsString(m['_id']) == userId);
-          }
-        },
-        orElse: () => null,
-      );
-
-      // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
-      if (currentChat == null) {
-        print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
-        currentChat = await ApiService.startConversation(userId, receiverId);
-      }
-
-      // Step 5: Agar members strings hain, toh full user details fetch karo
-      if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
-        print("Abhi:- New conversation, fetching user details for members");
-        final otherId = currentChat['members'].firstWhere((id) => id != userId);
-        final otherUserData = await fetchUserById(otherId, token);
-        final senderUserData = await fetchUserById(userId, token);
-        currentChat['members'] = [senderUserData, otherUserData];
-        print("Abhi:- Updated members with full details: ${currentChat['members']}");
-      }
-
-      // Step 6: Messages fetch karo
-      final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
-      messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
-
-      // Step 7: Socket initialize karo
-      SocketService.connect(userId);
-      final onlineUsers = <String>[];
-      SocketService.listenOnlineUsers((users) {
-        onlineUsers.clear();
-        onlineUsers.addAll(users.map((u) => getIdAsString(u)));
-      });
-
-      // Step 8: ChatDetailScreen push karo
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StandaloneChatDetailScreen(
-            initialCurrentChat: currentChat,
-            initialUserId: userId,
-            initialMessages: messages,
-            initialOnlineUsers: onlineUsers,
-          ),
-        ),
-      ).then((_) {
-        SocketService.disconnect();
-      });
-    } catch (e, stackTrace) {
-      print("Abhi:- Error starting conversation: $e");
-      print("Abhi:- Stack trace: $stackTrace");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: Failed to start conversation: $e')),
-      );
-    }
-  }
+//   Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
+//     try {
+//       print("Abhi:- Fetching user by ID: $userId");
+//       final response = await http.get(
+//         Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Content-Type': 'application/json',
+//           'Accept': 'application/json',
+//         },
+//       );
+//       print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+//       if (response.statusCode == 200) {
+//         final body = json.decode(response.body);
+//         if (body['success'] == true) {
+//           final user = body['user'];
+//           user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+//           return user;
+//         } else {
+//           throw Exception(body['message'] ?? 'Failed to fetch user');
+//         }
+//       } else {
+//         throw Exception('Server error: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print("Abhi:- Error fetching user by ID: $e");
+//       return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
+//     }
+//   }
+//
+//   String getIdAsString(dynamic id) {
+//     if (id == null) return '';
+//     if (id is String) return id;
+//     if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+//     print("Abhi:- Warning: Unexpected _id format: $id");
+//     return id.toString();
+//   }
+// // Yeh function InkWell ke onTap mein call hota hai
+//   Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
+//     try {
+//       // Step 1: User ID fetch karo
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token');
+//       if (token == null) {
+//         print("Abhi:- Error: No token found");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: No token found, please log in again')),
+//         );
+//         return;
+//       }
+//
+//       // Step 2: User profile fetch karo
+//       final response = await http.get(
+//         Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Content-Type': 'application/json',
+//           'Accept': 'application/json',
+//         },
+//       );
+//
+//       if (response.statusCode != 200) {
+//         print("Abhi:- Error fetching profile: Status=${response.statusCode}");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Failed to fetch user profile')),
+//         );
+//         return;
+//       }
+//
+//       final body = json.decode(response.body);
+//       if (body['status'] != true) {
+//         print("Abhi:- Error fetching profile: ${body['message']}");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
+//         );
+//         return;
+//       }
+//
+//       final userId = getIdAsString(body['data']['_id']);
+//       if (userId.isEmpty) {
+//         print("Abhi:- Error: User ID is empty");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: User ID not available')),
+//         );
+//         return;
+//       }
+//
+//       // Step 3: Check if conversation exists
+//       print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+//       final convs = await ApiService.fetchConversations(userId);
+//       dynamic currentChat = convs.firstWhere(
+//             (conv) {
+//           final members = conv['members'] as List? ?? [];
+//           if (members.isEmpty) return false;
+//           if (members[0] is String) {
+//             return members.contains(receiverId) && members.contains(userId);
+//           } else {
+//             return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
+//                 members.any((m) => getIdAsString(m['_id']) == userId);
+//           }
+//         },
+//         orElse: () => null,
+//       );
+//
+//       // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
+//       if (currentChat == null) {
+//         print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+//         currentChat = await ApiService.startConversation(userId, receiverId);
+//       }
+//
+//       // Step 5: Agar members strings hain, toh full user details fetch karo
+//       if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
+//         print("Abhi:- New conversation, fetching user details for members");
+//         final otherId = currentChat['members'].firstWhere((id) => id != userId);
+//         final otherUserData = await fetchUserById(otherId, token);
+//         final senderUserData = await fetchUserById(userId, token);
+//         currentChat['members'] = [senderUserData, otherUserData];
+//         print("Abhi:- Updated members with full details: ${currentChat['members']}");
+//       }
+//
+//       // Step 6: Messages fetch karo
+//       final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+//       messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
+//
+//       // Step 7: Socket initialize karo
+//       SocketService.connect(userId);
+//       final onlineUsers = <String>[];
+//       SocketService.listenOnlineUsers((users) {
+//         onlineUsers.clear();
+//         onlineUsers.addAll(users.map((u) => getIdAsString(u)));
+//       });
+//
+//       // Step 8: ChatDetailScreen push karo
+//       Navigator.push(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => StandaloneChatDetailScreen(
+//             initialCurrentChat: currentChat,
+//             initialUserId: userId,
+//             initialMessages: messages,
+//             initialOnlineUsers: onlineUsers,
+//           ),
+//         ),
+//       ).then((_) {
+//         SocketService.disconnect();
+//       });
+//     } catch (e, stackTrace) {
+//       print("Abhi:- Error starting conversation: $e");
+//       print("Abhi:- Stack trace: $stackTrace");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: Failed to start conversation: $e')),
+//       );
+//     }
+//   }
 
 
   @override
@@ -1819,6 +1819,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
   Widget _buildDirectHiringList() {
     List<DirectOrder> displayOrders = searchQuery.isEmpty ? orders : filteredDirectOrders;
+
     if (displayOrders.isEmpty) {
       return const Center(child: Text("No Direct Hiring Found"));
     }
@@ -1828,6 +1829,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
       child: ListView.builder(
         itemCount: displayOrders.length,
         itemBuilder: (context, index) => _buildHireCard(displayOrders[index]),
+
       ),
     );
   }
@@ -2139,12 +2141,180 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
   //              chat code
 
+  Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
+    try {
+      print("Abhi:- Fetching user by ID: $userId");
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) {
+          final user = body['user'];
+          user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+          return user;
+        } else {
+          throw Exception(body['message'] ?? 'Failed to fetch user');
+        }
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Abhi:- Error fetching user by ID: $e");
+      return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
+    }
+  }
 
+  String getIdAsString(dynamic id) {
+    if (id == null) return '';
+    if (id is String) return id;
+    if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+    print("Abhi:- Warning: Unexpected _id format: $id");
+    return id.toString();
+  }
+// Yeh function InkWell ke onTap mein call hota hai
+  Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
+    try {
+      // Step 1: User ID fetch karo
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        print("Abhi:- Error: No token found");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: No token found, please log in again')),
+        );
+        return;
+      }
+
+      // Step 2: User profile fetch karo
+      final response = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        print("Abhi:- Error fetching profile: Status=${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch user profile')),
+        );
+        return;
+      }
+
+      final body = json.decode(response.body);
+      if (body['status'] != true) {
+        print("Abhi:- Error fetching profile: ${body['message']}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
+        );
+        return;
+      }
+
+      final userId = getIdAsString(body['data']['_id']);
+      if (userId.isEmpty) {
+        print("Abhi:- Error: User ID is empty");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: User ID not available')),
+        );
+        return;
+      }
+
+      // Step 3: Check if conversation exists
+      print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+      final convs = await ApiService.fetchConversations(userId);
+      dynamic currentChat = convs.firstWhere(
+            (conv) {
+          final members = conv['members'] as List? ?? [];
+          if (members.isEmpty) return false;
+          if (members[0] is String) {
+            return members.contains(receiverId) && members.contains(userId);
+          } else {
+            return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
+                members.any((m) => getIdAsString(m['_id']) == userId);
+          }
+        },
+        orElse: () => null,
+      );
+
+      // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
+      if (currentChat == null) {
+        print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+        currentChat = await ApiService.startConversation(userId, receiverId);
+      }
+
+      // Step 5: Agar members strings hain, toh full user details fetch karo
+      if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
+        print("Abhi:- New conversation, fetching user details for members");
+        final otherId = currentChat['members'].firstWhere((id) => id != userId);
+        final otherUserData = await fetchUserById(otherId, token);
+        final senderUserData = await fetchUserById(userId, token);
+        currentChat['members'] = [senderUserData, otherUserData];
+        print("Abhi:- Updated members with full details: ${currentChat['members']}");
+      }
+
+      // Step 6: Messages fetch karo
+      final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+      messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
+
+      // Step 7: Socket initialize karo
+      SocketService.connect(userId);
+      final onlineUsers = <String>[];
+      SocketService.listenOnlineUsers((users) {
+        onlineUsers.clear();
+        onlineUsers.addAll(users.map((u) => getIdAsString(u)));
+      });
+
+      // Step 8: ChatDetailScreen push karo
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StandaloneChatDetailScreen(
+            initialCurrentChat: currentChat,
+            initialUserId: userId,
+            initialMessages: messages,
+            initialOnlineUsers: onlineUsers,
+          ),
+        ),
+      ).then((_) {
+        SocketService.disconnect();
+      });
+    } catch (e, stackTrace) {
+      print("Abhi:- Error starting conversation: $e");
+      print("Abhi:- Stack trace: $stackTrace");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: Failed to start conversation: $e')),
+      );
+    }
+  }
 
 
   Widget _buildHireCard(DirectOrder darectHiringData) {
     String displayStatus = darectHiringData.status;
     String displayProjectId = darectHiringData.projectid ?? "";
+
+    String? firstProviderId = darectHiringData.offer_history?.isNotEmpty == true
+        ? darectHiringData.offer_history!.first.provider_id?.id
+        : null;
+    String? firstProviderName = darectHiringData.offer_history?.isNotEmpty == true
+        ? darectHiringData.offer_history!.first.provider_id?.full_name
+        : null;
+    String? firstProviderImage = darectHiringData.offer_history?.isNotEmpty == true
+        ? darectHiringData.offer_history!.first.provider_id?.profile_pic
+        : null;
+
+    print("Abhi:- Provider ID: $firstProviderId");
+
+
+    // print("Abhi:- print providerId get for chat : ${darectHiringData.}");
     // if (data.offer_history != null &&
     //     data.offer_history!.isNotEmpty &&
     //     data.status != 'cancelled' &&
@@ -2230,14 +2400,14 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    CircleAvatar(
+                    displayStatus == 'accepted' || displayStatus == 'pending' ?    CircleAvatar(
                       radius: 16,
                       backgroundColor: Colors.grey.shade200,
                       child: SvgPicture.asset(
-                        "assets/svg_images/chat.svg",
+                        "assets/svg_images/call.svg",
                         height: 18,
                       ),
-                    )
+                    ) : SizedBox(),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -2253,34 +2423,34 @@ class _MyHireScreenState extends State<MyHireScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    GestureDetector(
-                      // onTap: (){
-                      //   final receiverId = order != null && order!['user_id'] != null
-                      //       ? order!['user_id']['_id']?.toString() ?? 'Unknown'
-                      //       : 'Unknown';
-                      //   final fullName = order != null && order!['user_id'] != null
-                      //       ?  order!['user_id']['full_name'] ?? 'Unknown'
-                      //       : 'Unknown';
-                      //   print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-                      //
-                      //   if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                      //     await _startOrFetchConversation(context, receiverId);
-                      //   } else {
-                      //     print("Abhi:- Error: Invalid receiver ID");
-                      //     ScaffoldMessenger.of(context).showSnackBar(
-                      //       SnackBar(content: Text('Error: Invalid receiver ID')),
-                      //     );
-                      //   }
-                      // },
-                      child: CircleAvatar(
+                    displayStatus == 'accepted' || displayStatus == 'pending' ?  GestureDetector(
+                      onTap: () async {
+                        final receiverId =  firstProviderId != null && firstProviderId != null
+                            ? firstProviderId?.toString() ?? 'Unknown'
+                            : 'Unknown';
+                        final fullName =  firstProviderId != null && firstProviderId != null
+                            ?  firstProviderId ?? 'Unknown'
+                            : 'Unknown';
+                        print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                        if (receiverId != 'Unknown' && receiverId!.isNotEmpty) {
+                          await _startOrFetchConversation(context, receiverId);
+                        } else {
+                          print("Abhi:- Error: Invalid receiver ID");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: Invalid receiver ID')),
+                          );
+                        }
+                      },
+                      child:  CircleAvatar(
                         radius: 16,
                         backgroundColor: Colors.grey.shade200,
                         child: SvgPicture.asset(
-                          "assets/svg_images/call.svg",
+                          "assets/svg_images/chat.svg",
                           height: 18,
                         ),
-                      ),
-                    )
+                      )
+                    ) : SizedBox()
                   ],
                 ),
                 const SizedBox(height: 6),

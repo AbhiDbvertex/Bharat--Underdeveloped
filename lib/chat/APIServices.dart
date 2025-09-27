@@ -135,7 +135,7 @@ class ApiService {
 
     for (var path in documentPaths) {
       print('Abhi:- Adding document to request: $path');
-      request.files.add(await http.MultipartFile.fromPath('image', path));  // currect word is images
+      request.files.add(await http.MultipartFile.fromPath('images', path));  // currect word is images
     }
 
     final response = await request.send();

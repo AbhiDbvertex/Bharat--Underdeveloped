@@ -133,7 +133,11 @@ class PremiumView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 60),
-        Center(
+       GestureDetector(
+         onTap: (){
+           Navigator.pop(context);
+         },
+       child:  Center(
           child: Container(
             height: 50,
             width: 300,
@@ -152,9 +156,12 @@ class PremiumView extends StatelessWidget {
             ),
           ),
         ),
+       ),
         Center(
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             child: const Text('Not Now', style: TextStyle(color: Colors.grey)),
           ),
         ),
