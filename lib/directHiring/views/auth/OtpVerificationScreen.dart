@@ -243,8 +243,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen>
                       //     backgroundColor: Colors.black,
                       //   ),
                       // );
-                      CustomSnackBar.show(
-                      context,
+                       CustomSnackBar.show(
                       message: "Please enter the 4-digit OTP",
                       type: SnackBarType.error
     );

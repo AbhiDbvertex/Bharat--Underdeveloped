@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import '../../../Widgets/Bottombar.dart';
+
+import 'package:developer/Widgets/CustomButton.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../Widgets/AppColors.dart';
+import '../../../Widgets/Bottombar.dart';
 import '../../../utility/custom_snack_bar.dart';
 import 'LoginScreen.dart';
 import 'RoleSelectionScreen.dart';
-import '../../../../Widgets/AppColors.dart';
-import 'package:developer/Widgets/CustomButton.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 class SignupAddressDetailScreen extends StatefulWidget {
   final String? initialAddress;
   final LatLng? initialLocation;
@@ -27,8 +29,8 @@ class SignupAddressDetailScreen extends StatefulWidget {
   final String? refralCode;
   final String? role;
   final String? gender;
-  final  age;
-  final  dataHide;
+  final age;
+  final dataHide;
 
   const SignupAddressDetailScreen({
     super.key,
@@ -46,7 +48,8 @@ class SignupAddressDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<SignupAddressDetailScreen> createState() => _SignupAddressDetailScreenState();
+  State<SignupAddressDetailScreen> createState() =>
+      _SignupAddressDetailScreenState();
 }
 
 class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
@@ -85,25 +88,18 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     mapController.dispose();
     super.dispose();
   }
+
   void _showMessageSuccessAddress(String message) {
-    CustomSnackBar.show(
-        context,
-        message: message,
-        type: SnackBarType.success
-    );
-
+    CustomSnackBar.show(message: message, type: SnackBarType.success);
   }
-
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // _showMessage('Please enable location services.');
       CustomSnackBar.show(
-          context,
-          message:'Please enable location services.' ,
-          type: SnackBarType.error
-      );
+          message: 'Please enable location services.',
+          type: SnackBarType.error);
       return;
     }
 
@@ -113,10 +109,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       if (permission == LocationPermission.denied) {
         // _showMessage('Location permission denied.');
         CustomSnackBar.show(
-            context,
-            message: 'Location permission denied.',
-            type: SnackBarType.warning
-        );
+            message: 'Location permission denied.', type: SnackBarType.warning);
         return;
       }
     }
@@ -137,10 +130,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     } catch (e) {
       // _showMessage('Unable to get location: $e');
       CustomSnackBar.show(
-          context,
-          message: 'Unable to get location: $e',
-          type: SnackBarType.error
-      );
+          message: 'Unable to get location: $e', type: SnackBarType.error);
     }
   }
 
@@ -175,11 +165,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         });
         // _showMessage('Error fetching address: $e');
         CustomSnackBar.show(
-            context,
-            message:'Error fetching address: $e' ,
-            type: SnackBarType.error
-        );
-
+            message: 'Error fetching address: $e', type: SnackBarType.error);
       }
     }
   }
@@ -267,30 +253,31 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
             CustomSnackBar.show(
-                context,
                 message: 'Token not found. Please log in.',
-                type: SnackBarType.warning
-            );
+                type: SnackBarType.warning);
 
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    (route) => false,
+                (route) => false,
               );
             }
           }
           return;
         }
 
-        const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
+        const String apiUrl =
+            'https://api.thebharatworks.com/api/user/updateUserProfile';
         final Map<String, dynamic> payload = {
           'full_name': widget.name ?? '',
           'role': widget.role ?? '',
           'location': {
-            'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-            'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+            'latitude':
+                _selectedLocation?.latitude ?? _initialPosition.latitude,
+            'longitude':
+                _selectedLocation?.longitude ?? _initialPosition.longitude,
             'address': _selectedAddress ?? addressController.text,
           },
           'full_address': [
@@ -299,8 +286,10 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
-              'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-              'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+              'latitude':
+                  _selectedLocation?.latitude ?? _initialPosition.latitude,
+              'longitude':
+                  _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
           ],
           'referral_code': widget.refralCode ?? '',
@@ -325,26 +314,31 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         final responseData = jsonDecode(response.body);
 
         if (response.statusCode == 200 && responseData['status'] == true) {
-          await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
-          await prefs.setString('address', _selectedAddress ?? addressController.text);
-          await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
-          await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
-          await prefs.setString('selected_address_id', widget.editlocationId ?? '');
+          await prefs.setString(
+              'selected_location', _selectedAddress ?? addressController.text);
+          await prefs.setString(
+              'address', _selectedAddress ?? addressController.text);
+          await prefs.setDouble('user_latitude',
+              _selectedLocation?.latitude ?? _initialPosition.latitude);
+          await prefs.setDouble('user_longitude',
+              _selectedLocation?.longitude ?? _initialPosition.longitude);
+          await prefs.setString(
+              'selected_address_id', widget.editlocationId ?? '');
 
           if (mounted) {
             // _showMessage('Address updated successfully.');
             CustomSnackBar.show(
-                context,
-                message:'Address updated successfully.' ,
-                type: SnackBarType.success
-            );
+                message: 'Address updated successfully.',
+                type: SnackBarType.success);
 
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pop(context, {
                 'address': _selectedAddress ?? addressController.text,
-                'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-                'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+                'latitude':
+                    _selectedLocation?.latitude ?? _initialPosition.latitude,
+                'longitude':
+                    _selectedLocation?.longitude ?? _initialPosition.longitude,
                 'addressId': widget.editlocationId,
               });
             }
@@ -353,21 +347,16 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
             CustomSnackBar.show(
-                context,
-                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
-                type: SnackBarType.error
-            );
-
+                message:
+                    'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error);
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error updating address: $e');
           CustomSnackBar.show(
-              context,
-              message:'Error updating address: $e' ,
-              type: SnackBarType.error
-          );
+              message: 'Error updating address: $e', type: SnackBarType.error);
 
           print("Error in _updateAddress: $e");
         }
@@ -375,11 +364,8 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     } else {
       // _showMessage('Please fill all fields correctly.');
       CustomSnackBar.show(
-          context,
           message: 'Please fill all fields correctly.',
-          type: SnackBarType.warning
-      );
-
+          type: SnackBarType.warning);
     }
   }
 
@@ -393,29 +379,30 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
             CustomSnackBar.show(
-                context,
                 message: 'Token not found. Please log in.',
-                type: SnackBarType.warning
-            );
+                type: SnackBarType.warning);
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    (route) => false,
+                (route) => false,
               );
             }
           }
           return;
         }
 
-        const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
+        const String apiUrl =
+            'https://api.thebharatworks.com/api/user/updateUserProfile';
         final Map<String, dynamic> payload = {
           'full_name': widget.name ?? '',
           'role': widget.role ?? '',
           'location': {
-            'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-            'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+            'latitude':
+                _selectedLocation?.latitude ?? _initialPosition.latitude,
+            'longitude':
+                _selectedLocation?.longitude ?? _initialPosition.longitude,
             'address': _selectedAddress ?? addressController.text,
           },
           'full_address': [
@@ -423,8 +410,10 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
-              'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-              'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+              'latitude':
+                  _selectedLocation?.latitude ?? _initialPosition.latitude,
+              'longitude':
+                  _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
           ],
           'referral_code': widget.refralCode ?? '',
@@ -450,29 +439,33 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
         if (response.statusCode == 200 && responseData['status'] == true) {
           await prefs.setBool('isProfileComplete', true);
-          await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
-          await prefs.setString('address', _selectedAddress ?? addressController.text);
-          await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
-          await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
-          await prefs.setString('selected_address_id', responseData['addressId'] ?? '');
+          await prefs.setString(
+              'selected_location', _selectedAddress ?? addressController.text);
+          await prefs.setString(
+              'address', _selectedAddress ?? addressController.text);
+          await prefs.setDouble('user_latitude',
+              _selectedLocation?.latitude ?? _initialPosition.latitude);
+          await prefs.setDouble('user_longitude',
+              _selectedLocation?.longitude ?? _initialPosition.longitude);
+          await prefs.setString(
+              'selected_address_id', responseData['addressId'] ?? '');
 
           if (mounted) {
             // _showMessage('Address added successfully.');
             CustomSnackBar.show(
-                context,
                 message: 'Address added successfully.',
-                type: SnackBarType.success
-            );
+                type: SnackBarType.success);
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => (role == 'user' || role == 'service_provider')
-                      ? const Bottombar()
-                      : const RoleSelectionScreen(),
+                  builder: (context) =>
+                      (role == 'user' || role == 'service_provider')
+                          ? const Bottombar()
+                          : const RoleSelectionScreen(),
                 ),
-                    (route) => false,
+                (route) => false,
               );
             }
           }
@@ -480,21 +473,16 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
             CustomSnackBar.show(
-                context,
-                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
-                type: SnackBarType.error
-            );
-
+                message:
+                    'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error);
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error adding address: $e');
           CustomSnackBar.show(
-              context,
-              message: 'Error adding address: $e',
-              type: SnackBarType.error
-          );
+              message: 'Error adding address: $e', type: SnackBarType.error);
 
           print("Error in _addAddress: $e");
         }
@@ -502,10 +490,8 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     } else {
       // _showMessage('Please fill all fields correctly.');
       CustomSnackBar.show(
-          context,
-          message:'Please fill all fields correctly.' ,
-          type: SnackBarType.warning
-      );
+          message: 'Please fill all fields correctly.',
+          type: SnackBarType.warning);
     }
   }
 
@@ -526,31 +512,32 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
             CustomSnackBar.show(
-                context,
                 message: 'Token not found. Please log in.',
-                type: SnackBarType.warning
-            );
+                type: SnackBarType.warning);
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    (route) => false,
+                (route) => false,
               );
             }
           }
           return;
         }
 
-        const String apiUrl = 'https://api.thebharatworks.com/api/user/updateUserProfile';
+        const String apiUrl =
+            'https://api.thebharatworks.com/api/user/updateUserProfile';
         final Map<String, dynamic> payload = {
           'full_name': widget.name ?? '',
           'role': widget.role ?? '',
           "gender": widget.gender,
           "age": widget.age,
           'location': {
-            'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-            'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+            'latitude':
+                _selectedLocation?.latitude ?? _initialPosition.latitude,
+            'longitude':
+                _selectedLocation?.longitude ?? _initialPosition.longitude,
             'address': _selectedAddress ?? addressController.text,
           },
           'full_address': [
@@ -559,8 +546,10 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
-              'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
-              'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
+              'latitude':
+                  _selectedLocation?.latitude ?? _initialPosition.latitude,
+              'longitude':
+                  _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
           ],
           'referral_code': widget.refralCode ?? '',
@@ -586,11 +575,16 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
         if (response.statusCode == 200 && responseData['status'] == true) {
           await prefs.setBool('isProfileComplete', true);
-          await prefs.setString('selected_location', _selectedAddress ?? addressController.text);
-          await prefs.setString('address', _selectedAddress ?? addressController.text);
-          await prefs.setDouble('user_latitude', _selectedLocation?.latitude ?? _initialPosition.latitude);
-          await prefs.setDouble('user_longitude', _selectedLocation?.longitude ?? _initialPosition.longitude);
-          await prefs.setString('selected_address_id', responseData['addressId'] ?? widget.editlocationId ?? '');
+          await prefs.setString(
+              'selected_location', _selectedAddress ?? addressController.text);
+          await prefs.setString(
+              'address', _selectedAddress ?? addressController.text);
+          await prefs.setDouble('user_latitude',
+              _selectedLocation?.latitude ?? _initialPosition.latitude);
+          await prefs.setDouble('user_longitude',
+              _selectedLocation?.longitude ?? _initialPosition.longitude);
+          await prefs.setString('selected_address_id',
+              responseData['addressId'] ?? widget.editlocationId ?? '');
 
           if (mounted) {
             // widget.editlocationId != null ? _showMessageSuccessAddress('Sign up successful.',) : _showMessageSuccessAddress('Sign up successful.',);
@@ -601,29 +595,20 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => (role == 'user' || role == 'service_provider')
-                      ? const Bottombar()
-                      : const RoleSelectionScreen(),
+                  builder: (context) =>
+                      (role == 'user' || role == 'service_provider')
+                          ? const Bottombar()
+                          : const RoleSelectionScreen(),
                 ),
-                    (route) => false,
+                (route) => false,
               );
               widget.dataHide == "hide"
-                  ? Fluttertoast.showToast(
-                msg: "Sign up successful.",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 14,
-              )
-                  : Fluttertoast.showToast(
-                msg: "Address saved successfully.",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 14,
-              );
+                  ? CustomSnackBar.show(
+                      message: "Sign up successful.",
+                      type: SnackBarType.success)
+                  : CustomSnackBar.show(
+                      message: "Address saved successfully.",
+                      type: SnackBarType.success);
 
               // Navigator.pop(context, {
               //   'address': _selectedAddress ?? addressController.text,
@@ -634,27 +619,22 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
               //   'landmark': landmarkController.text,
               //   'isEdit': widget.editlocationId != null, // true if editing, false if adding
               // });
-
             }
           }
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
             CustomSnackBar.show(
-                context,
-                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
-                type: SnackBarType.error
-            );
+                message:
+                    'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error);
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error calling API: $e');
           CustomSnackBar.show(
-              context,
-              message:'Error calling API: $e' ,
-              type: SnackBarType.error
-          );
+              message: 'Error calling API: $e', type: SnackBarType.error);
           print("❌ Error: $e");
         }
       } finally {
@@ -667,18 +647,17 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
     } else {
       // _showMessage('Please fill all fields correctly.');
       CustomSnackBar.show(
-          context,
           message: 'Please fill all fields correctly.',
-          type: SnackBarType.warning
-      );
-
+          type: SnackBarType.warning);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}");
-    print("Debug: get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
+    print(
+        "Debug: AddressDetailScreen build, editlocationId: ${widget.editlocationId}");
+    print(
+        "Debug: get userdetail : ${widget.name} user role ${widget.role} user refral ${widget.refralCode}");
     return Scaffold(
       // backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -689,13 +668,12 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
           statusBarIconBrightness: Brightness.light,
         ),
       ),
       body: SafeArea(
-
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -725,7 +703,9 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                 // ),
                 Center(
                   child: Text(
-                    widget.editlocationId != null ? 'Edit Location' : 'Select your location',
+                    widget.editlocationId != null
+                        ? 'Edit Location'
+                        : 'Select your location',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -746,9 +726,10 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: GoogleMap(
-                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                        gestureRecognizers: <Factory<
+                            OneSequenceGestureRecognizer>>{
                           Factory<OneSequenceGestureRecognizer>(
-                                () => EagerGestureRecognizer(),
+                            () => EagerGestureRecognizer(),
                           ),
                         },
                         onMapCreated: _onMapCreated,
@@ -770,7 +751,7 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                           _debounceTimer?.cancel();
                           _debounceTimer = Timer(
                             const Duration(seconds: 1),
-                                () {
+                            () {
                               _getAddressFromLatLng(
                                 _initialPosition.latitude,
                                 _initialPosition.longitude,
@@ -861,7 +842,9 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                           LengthLimitingTextInputFormatter(50),
                         ],
                         validator: (value) {
-                          if (value != null && value.isNotEmpty && value.length < 3) {
+                          if (value != null &&
+                              value.isNotEmpty &&
+                              value.length < 3) {
                             return 'Landmark must be at least 3 characters long.';
                           }
                           return null;
@@ -997,7 +980,6 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
                           }
                         },
                       ),
-
                     ],
                   ),
                 ),

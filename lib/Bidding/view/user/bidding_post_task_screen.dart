@@ -1,3 +1,4 @@
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../Widgets/AppColors.dart';
 import '../../../Emergency/User/controllers/emergency_service_controller.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
+import '../../../utility/custom_snack_bar.dart';
 import '../../controller/bidding_post_task_controller.dart';
 
 class PostTaskScreen extends StatelessWidget {
@@ -65,11 +67,14 @@ class PostTaskScreen extends StatelessWidget {
                       controller.titleController, "Enter Title of work"),
                   _buildLabel("Category"),
                   DropdownButtonFormField<String>(
+                      iconEnabledColor: AppColors.primaryGreen,
+                    iconDisabledColor: AppColors.primaryGreen,
                     decoration: _inputDecoration("Choose category"),
                     value: controller.selectedCategoryId.value,
                     items: controller.categories
                         .map(
                           (cat) => DropdownMenuItem(
+
                             value: cat['id'],
                             child: Text(cat['name']!),
                           ),
@@ -123,7 +128,7 @@ class PostTaskScreen extends StatelessWidget {
                             ? "Please enter a valid address"
                             : null,
                   ),
-                  _buildLabel("Google Address"),
+                  _buildLabel("Google Location"),
                   _googleLocationField(controller),
                   _buildLabel("Description"),
                   _buildTextField(
@@ -163,7 +168,7 @@ class PostTaskScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _buildLabel("Upload Task Image"),
+                  _buildLabel("Upload Task Photo"),
                   _buildImagePicker(controller),
                   const SizedBox(height: 24),
                   Obx(() {
@@ -178,15 +183,19 @@ class PostTaskScreen extends StatelessWidget {
                               if (controller.formKey.currentState!.validate()) {
                                 if (controller.selectedCategoryId.value ==
                                     null) {
-                                  controller.showSnackbar(
-                                      "Error", "Please select a category",
-                                      context: context);
+
+                                  CustomSnackBar.show(
+                                      message: "Please select a category" ,
+                                      type: SnackBarType.error
+                                  );
                                   return;
                                 }
                                 if (controller.selectedSubCategoryIds.isEmpty) {
-                                  controller.showSnackbar("Error",
-                                      "Please select at least one sub category",
-                                      context: context);
+
+                                  CustomSnackBar.show(
+                                      message:"Please select at least one sub category" ,
+                                      type: SnackBarType.error
+                                  );
                                   return;
                                 }
                                 controller.submitTask(
@@ -267,7 +276,8 @@ class PostTaskScreen extends StatelessWidget {
   InputDecoration _inputDecoration(String hint, {IconData? icon}) =>
       InputDecoration(
         hintText: hint,
-        prefixIcon: icon != null ? Icon(icon) : null,
+        suffixIcon: icon != null ? Icon(icon) : null,
+        suffixIconColor: AppColors.primaryGreen,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 14,
@@ -308,8 +318,11 @@ class PostTaskScreen extends StatelessWidget {
         if (controller.selectedCategoryId.value != null) {
           controller.showSubcategoryDialog();
         } else {
-          controller.showSnackbar("Error", "Please select category first",
-              context: Get.context!);
+
+          CustomSnackBar.show(
+              message:  "Please select category first",
+              type: SnackBarType.error
+          );
         }
       },
       child: _buildDropdownTile(controller),
@@ -342,7 +355,7 @@ class PostTaskScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.arrow_drop_down),
+            const Icon(Icons.arrow_drop_down,color: AppColors.primaryGreen,),
           ],
         ),
       );
@@ -369,7 +382,7 @@ class PostTaskScreen extends StatelessWidget {
                       children: [
                         const Icon(Icons.upload, size: 20, color: Colors.green),
                         Text(
-                          "Upload Work Photo",
+                          "Upload Task Photo",
                           style: GoogleFonts.roboto(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

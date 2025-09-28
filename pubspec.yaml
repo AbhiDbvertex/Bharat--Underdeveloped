@@ -66,6 +66,7 @@ dependencies:
   photo_view: ^0.15.0
   smooth_page_indicator: ^1.2.1
 #  fluttertoast:
+
   flutter_html:
   socket_io_client: ^3.0.0
 #  firebase_auth:

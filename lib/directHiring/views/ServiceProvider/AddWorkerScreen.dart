@@ -765,7 +765,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                                 Navigator.pop(context, true);
                               }
                             } else {
-                              CustomSnackBar.show(context,
+                              CustomSnackBar.show(
                                   message: "Please fill all required fields",
                                   type: SnackBarType.warning);
                             }
@@ -782,7 +782,7 @@ class _AddWorkerScreenState extends State<AddWorkerScreen> {
                         }
                       } else {
                         CustomSnackBar.show(
-                          context,
+
                           message: errorMessage,
                           type: SnackBarType.error,
                         );

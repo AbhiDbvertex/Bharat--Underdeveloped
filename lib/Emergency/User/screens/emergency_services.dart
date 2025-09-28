@@ -620,7 +620,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             //   duration: Duration(seconds: 2),
             // ));
             CustomSnackBar.show(
-                context,
+
                 message:  "Select a category first",
                 type: SnackBarType.error
             );

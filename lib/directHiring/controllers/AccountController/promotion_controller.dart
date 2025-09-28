@@ -125,6 +125,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -166,17 +167,18 @@ class PromotionController extends GetxController {
 
       // Request bhejo
       final rawResponse = await request.send();
-      print("dss :- Response Status: ${rawResponse.statusCode}");
+      final response = await http.Response.fromStream(rawResponse); // ✅ Read the body here
+      print("dss :- Response Status: ${response.statusCode}, body: ${response.body}");
       if (rawResponse.statusCode == 201) {
-        var response = await http.Response.fromStream(rawResponse);
+        //var response = await http.Response.fromStream(rawResponse);
         final decodedData = jsonDecode(response.body);
         if (decodedData['success'] == true) {
           print('dss :- Promotion created: ${decodedData['message']}');
           Get.back();
           selectedImages.clear(); // Images clear karo
            // API success par screen back karo
-          Get.snackbar("Success", "Promotion submitted successfully!",
-              backgroundColor: Colors.green, colorText: Colors.white,snackPosition: SnackPosition.BOTTOM); // Success snackbar
+
+          CustomSnackBar.show(message: "Promotion submitted successfully!",type: SnackBarType.success);
           return true;
         }
       }

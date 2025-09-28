@@ -908,7 +908,7 @@ class WorkDetailController extends GetxController {
   Future<void> submitPayment(BuildContext context) async {
     if (descriptionController.text.isEmpty || amountController.text.isEmpty) {
       CustomSnackBar.show(
-          context,
+
           message: 'Error: Please enter both description and amount.',
           type: SnackBarType.error
       );
@@ -920,7 +920,7 @@ class WorkDetailController extends GetxController {
         double.tryParse(amountController.text.replaceAll(',', '')) ?? 0.0;
     if (enteredAmount <= 0) {
       CustomSnackBar.show(
-          context,
+
           message: 'Error Amount must be greater than zero.',
           type: SnackBarType.error
       );
@@ -1129,7 +1129,7 @@ bwDebug("final url: $url");
       if (response.statusCode == 200) {
         bwDebug("API call successful: ${response.body}");
         CustomSnackBar.show(
-            context,
+
             message:'Payment added successfully!' ,
             type: SnackBarType.success
         );
@@ -1138,7 +1138,7 @@ bwDebug("final url: $url");
       } else {
         bwDebug("API call failed: ${response.statusCode} - ${response.body}");
         CustomSnackBar.show(
-            context,
+
             message:'Failed to add payment.' ,
             type: SnackBarType.error
         );
@@ -1147,7 +1147,7 @@ bwDebug("final url: $url");
     } catch (e) {
       bwDebug("API call error: $e");
       CustomSnackBar.show(
-          context,
+
           message: 'An error occurred. Please try again.' ,
           type: SnackBarType.warning
       );
@@ -1308,7 +1308,7 @@ bwDebug("final url: $url");
           );
           if (response.statusCode == 200) {
             CustomSnackBar.show(
-                context,
+
                 message: 'Task marked as complete.' ,
                 type: SnackBarType.success
             );
@@ -1316,7 +1316,7 @@ bwDebug("final url: $url");
             completer.complete(true);
           } else {
             CustomSnackBar.show(
-                context,
+
                 message: 'Task marked as incomplete.',
                 type: SnackBarType.error
             );
@@ -1364,7 +1364,7 @@ bwDebug("final url: $url");
         bwDebug("API call successful: ${response.body}", tag: tag);
         final json = jsonDecode(response.body);
         CustomSnackBar.show(
-            context,
+
             message: json['message'] ?? 'Payment request sent successfully!' ,
             type: SnackBarType.success
         );
@@ -1373,7 +1373,7 @@ bwDebug("final url: $url");
         bwDebug("API call failed: ${response.statusCode} - ${response.body}", tag: tag);
         final json = jsonDecode(response.body);
         CustomSnackBar.show(
-            context,
+
             message: 'Error: Failed to send payment request.',
             type: SnackBarType.error
         );
@@ -1382,7 +1382,7 @@ bwDebug("final url: $url");
     } catch (e) {
       bwDebug("API call error: $e", tag: tag);
       CustomSnackBar.show(
-          context,
+
           message: 'An error occurred. Please try again.' ,
           type: SnackBarType.error
       );

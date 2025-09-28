@@ -489,16 +489,14 @@ class _AccountScreenState extends State<AccountScreen> {
           print("Saved address: $fetchedAddress");
         } else {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: data["message"] ?? "Profile fetch failed",
               type: SnackBarType.error
           );
         }
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Server error, profile fetch failed!",
             type: SnackBarType.error
         );
@@ -506,8 +504,7 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (e) {
       print("Error: $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Something went wrong, try again!",
           type: SnackBarType.error
       );

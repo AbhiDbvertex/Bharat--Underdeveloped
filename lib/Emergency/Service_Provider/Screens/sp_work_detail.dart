@@ -469,7 +469,6 @@ import '../../../utility/custom_snack_bar.dart';
 import '../../User/screens/request_accepted_section.dart';
 import '../../User/screens/task_view.dart';
 import '../../utils/map_launcher_lat_long.dart';
-import '../../utils/snack_bar_helper.dart';
 
 class SpWorkDetail extends StatefulWidget {
   final  data;
@@ -730,7 +729,7 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                               if(!success) {
                                 // SnackBarHelper.showSnackBar(context, "Could not open the map");
                                 CustomSnackBar.show(
-                                    context,
+
                                     message:  "Could not open the map",
                                     type: SnackBarType.error
                                 );
@@ -963,8 +962,8 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                   ),
                                 ),
                               );
-                            } else if (controller.isFirstAccepted) {
-                              return Container(
+                            } else if (controller.isFirstAccepted ) {
+                              return controller.hireStatus !="completed" && controller.hireStatus !="assigned"&&controller.hireStatus !="cancelledDispute"?Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(vertical: 11),
                                 decoration: BoxDecoration(
@@ -981,7 +980,41 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                         fontWeight: FontWeight.w500),
                                   ),
                                 ),
-                              );SizedBox();
+                              ):controller.hireStatus !="assigned"&&controller.hireStatus !="cancelledDispute"?Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 11),
+                                decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(3)
+
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Completed",
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ):controller.hireStatus !="assigned"?Container(
+                                height: 40,
+                                width: double.infinity,
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.warning_amber, color: Colors.red),
+                                    Flexible(
+                                      child: Text("The order has been cancelled due to a dispute.",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                                    ),
+                                  ],
+                                ),
+                              ):SizedBox();
                             } else {
                               return Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

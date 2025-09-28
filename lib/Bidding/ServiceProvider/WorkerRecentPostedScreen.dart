@@ -854,7 +854,9 @@
 
 import 'dart:convert';
 
+import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1143,11 +1145,24 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
     print('Building WorkerRecentPostedScreen');
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryGreen,
-        centerTitle: true,
         elevation: 0,
-        toolbarHeight: screenHeight * 0.02,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text("Recent Posted Work",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        leading: const BackButton(color: Colors.black),
+        actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: SvgPicture.asset(
+                'assets/svg_images/Vector1.svg',height: 0.06.toWidthPercent(),
+              ),
+        ),
+        ],
+        systemOverlayStyle:  SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
@@ -1156,34 +1171,34 @@ class _WorkerRecentPostedScreenState extends State<WorkerRecentPostedScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: screenHeight * 0.02),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Padding(
-                              padding:
-                                  EdgeInsets.only(left: screenWidth * 0.03),
-                              child: Icon(Icons.arrow_back,
-                                  size: screenWidth * 0.06),
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.13),
-                          Text(
-                            "Recent Posted Work",
-                            style: GoogleFonts.roboto(
-                              fontSize: screenWidth * 0.045,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.13),
-                          SvgPicture.asset(
-                            'assets/svg_images/Vector1.svg',
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: screenHeight * 0.010),
+                      // SizedBox(height: screenHeight * 0.02),
+                      // Row(
+                      //   children: [
+                      //     GestureDetector(
+                      //       onTap: () => Navigator.pop(context),
+                      //       child: Padding(
+                      //         padding:
+                      //             EdgeInsets.only(left: screenWidth * 0.03),
+                      //         child: Icon(Icons.arrow_back,
+                      //             size: screenWidth * 0.06),
+                      //       ),
+                      //     ),
+                      //     SizedBox(width: screenWidth * 0.13),
+                      //     Text(
+                      //       "Recent Posted Work",
+                      //       style: GoogleFonts.roboto(
+                      //         fontSize: screenWidth * 0.045,
+                      //         fontWeight: FontWeight.bold,
+                      //         color: Colors.black,
+                      //       ),
+                      //     ),
+                      //     SizedBox(width: screenWidth * 0.13),
+                      //     SvgPicture.asset(
+                      //       'assets/svg_images/Vector1.svg',
+                      //     ),
+                      //   ],
+                      // ),
+                      // SizedBox(height: screenHeight * 0.010),
                       Card(
                         child: Container(
                           width: screenWidth * 0.95,

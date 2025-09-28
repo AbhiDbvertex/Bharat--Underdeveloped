@@ -1513,8 +1513,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
             print("Debug: API failed: ${data['message']}");
             if (mounted) {
 
-              CustomSnackBar.show(
-                  context,
+               CustomSnackBar.show(
                   message: "API failed: ${data['message'] ?? 'Unknown error'}",
                   type: SnackBarType.error
               );
@@ -1525,8 +1524,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           print("Debug: API server error: ${response.statusCode}");
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message:"Server error: ${response.statusCode}" ,
                 type: SnackBarType.error
             );
@@ -1537,8 +1535,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         print("Error in _loadSavedLocation: $e");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Error fetching location",
               type: SnackBarType.error
           );
@@ -1549,8 +1546,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       print("Debug: Token null hai ya widget mounted nahi hai.");
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Please login first!",
             type: SnackBarType.error
         );
@@ -1618,8 +1614,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (token == null) {
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Please login first!",
             type: SnackBarType.error
         );
@@ -1660,8 +1655,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     } catch (e) {
       print("Error in fetchLocationSuggestions: $e");
       if (mounted) {
-            CustomSnackBar.show(
-            context,
+             CustomSnackBar.show(
             message:"Error fetching suggestions" ,
             type: SnackBarType.error
         );
@@ -1680,8 +1674,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (token == null) {
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Please login first!" ,
             type: SnackBarType.error
         );
@@ -1719,8 +1712,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           if (address == null || address.isEmpty || latitude == null || longitude == null) {
             if (mounted) {
 
-              CustomSnackBar.show(
-                  context,
+               CustomSnackBar.show(
                   message: "Invalid location data received!",
                   type: SnackBarType.error
               );
@@ -1740,8 +1732,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           print("Debug: Location details API failed: ${data['message']}");
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: "API error: ${data['message'] ?? 'Unknown error'}",
                 type: SnackBarType.error
             );
@@ -1752,8 +1743,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         print("Debug: Location details server error: ${response.statusCode}");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:"Server error: ${response.statusCode}" ,
               type: SnackBarType.error
           );
@@ -1764,8 +1754,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       print("Error in fetchLocationDetails: $e");
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Error fetching location details: $e",
             type: SnackBarType.error
         );
@@ -1791,8 +1780,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (address.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Invalid address or coordinates!",
             type: SnackBarType.error
         );
@@ -1804,8 +1792,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (token == null) {
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Please login first!",
             type: SnackBarType.error
         );
@@ -1887,8 +1874,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           print("Debug: Update location API failed: ${data['message']}");
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message:"API error: ${data['message'] ?? 'Unknown error'}" ,
                 type: SnackBarType.error
             );
@@ -1898,8 +1884,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         print("Debug: Update location server error: ${response.statusCode}");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Server error: ${response.statusCode}",
               type: SnackBarType.error
           );
@@ -1909,8 +1894,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       print("Error in updateLocation: $e");
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Error updating location: $e" ,
             type: SnackBarType.error
         );
@@ -1929,8 +1913,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (token == null) {
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Please login first!",
             type: SnackBarType.error
         );
@@ -2022,8 +2005,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               print("Debug: Address deleted, updated savedAddresses: $savedAddresses");
             });
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message:data['message'] ?? "Address deleted successfully!" ,
                 type: SnackBarType.success
             );
@@ -2032,8 +2014,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           print("Debug: Delete address API failed: ${data['message']}");
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: "API error: ${data['message'] ?? 'Unknown error'}",
                 type: SnackBarType.error
             );
@@ -2044,8 +2025,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         print("Debug: Delete address server error: ${response.statusCode}");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Server error: ${response.statusCode}",
               type: SnackBarType.error
           );
@@ -2055,8 +2035,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     } catch (e) {
       print("Error in deleteAddress: $e");
       if (mounted) {
-            CustomSnackBar.show(
-            context,
+             CustomSnackBar.show(
             message: "Error deleting address",
             type: SnackBarType.error
         );
@@ -2198,8 +2177,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     final landmark = address['landmark']?.toString() ?? 'N/A';
 
                                     if (addressText == null || addressText.isEmpty) {
-                                      CustomSnackBar.show(
-                                          context,
+                                       CustomSnackBar.show(
                                           message: "Invalid address!",
                                           type: SnackBarType.error
                                       );
@@ -2208,8 +2186,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     }
                                     if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
 
-                                      CustomSnackBar.show(
-                                          context,
+                                       CustomSnackBar.show(
                                           message: "Invalid latitude or longitude for this address!",
                                           type: SnackBarType.error
                                       );
@@ -2257,8 +2234,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                 final landmark = address['landmark']?.toString() ?? 'N/A';
                                                 if (addressText == null || addressText.isEmpty) {
 
-                                                  CustomSnackBar.show(
-                                                      context,
+                                                   CustomSnackBar.show(
                                                       message:"Invalid address!" ,
                                                       type: SnackBarType.error
                                                   );
@@ -2268,8 +2244,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                 if (latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
 
 
-                                                  CustomSnackBar.show(
-                                                      context,
+                                                   CustomSnackBar.show(
                                                       message: "Invalid latitude or longitude for this address!",
                                                       type: SnackBarType.error
                                                   );
@@ -2478,8 +2453,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     } else {
                                       if (mounted) {
 
-                                        CustomSnackBar.show(
-                                            context,
+                                         CustomSnackBar.show(
                                             message:"Failed to fetch location details!" ,
                                             type: SnackBarType.error
                                         );
@@ -2502,8 +2476,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       print("Debug: Submit button pressed");
                       if (selectedAddressId == null) {
 
-                        CustomSnackBar.show(
-                            context,
+                         CustomSnackBar.show(
                             message:"Please select a location!" ,
                             type: SnackBarType.error
                         );
@@ -2517,8 +2490,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
                       if (selectedAddress == null) {
 
-                        CustomSnackBar.show(
-                            context,
+                         CustomSnackBar.show(
                             message: "Selected address not found!",
                             type: SnackBarType.error
                         );
@@ -2533,8 +2505,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
                       if (addressText == null || addressText.isEmpty || latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
 
-                        CustomSnackBar.show(
-                            context,
+                         CustomSnackBar.show(
                             message: "Invalid selected address data!",
                             type: SnackBarType.error
                         );
@@ -2577,8 +2548,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
 
                       Navigator.pop(context);
                       CustomSnackBar.show(
-                          context,
-                          message: "Location submitted successfully!",
+                                                   message: "Location submitted successfully!",
                           type: SnackBarType.success
                       );
                     },

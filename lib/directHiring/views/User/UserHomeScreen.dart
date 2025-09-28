@@ -150,8 +150,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       });
       debugPrint("📍 Using saved or default location: $userLocation");
       if (mounted) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Authentication failed, please log in again!' ,
             type: SnackBarType.error
         );
@@ -257,8 +256,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           debugPrint("❌ API error: ${responseData['message']}");
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: responseData['message'] ?? 'Failed to fetch profile',
                 type: SnackBarType.error
             );
@@ -273,8 +271,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:'Failed to fetch profile data!' ,
               type: SnackBarType.error
           );
@@ -289,8 +286,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       });
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Error fetching location ',
             type: SnackBarType.error
         );
@@ -308,8 +304,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       debugPrint("❌ Invalid location data: $newAddress, $latitude, $longitude");
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Invalid location data" ,
             type: SnackBarType.error
         );
@@ -374,8 +369,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           );
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message:"Location updated successfully : $newAddress" ,
                 type: SnackBarType.success
             );
@@ -383,8 +377,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         } else {
           if (mounted) {
 
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: "Location update failed: ${data['message']}",
                 type: SnackBarType.error
             );
@@ -394,8 +387,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       } else {
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Server error, location update failed!",
               type: SnackBarType.error
           );
@@ -406,8 +398,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       debugPrint("❌ Error updating location: $e");
       if (mounted) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:"Error updating location" ,
             type: SnackBarType.error
         );
@@ -452,8 +443,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         debugPrint("❌ Invalid location data received: $result");
         if (mounted) {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: "Invalid location data, please try again!",
               type: SnackBarType.error
           );

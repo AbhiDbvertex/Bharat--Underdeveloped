@@ -464,8 +464,7 @@ class _SubCategoriesState extends State<SubCategories> {
     final token = prefs.getString('token');
 
     if (token == null) {
-       CustomSnackBar.show(
-          context,
+        CustomSnackBar.show(
           message: "Please login first",
           type: SnackBarType.error
       );
@@ -510,8 +509,7 @@ class _SubCategoriesState extends State<SubCategories> {
           );
         } else {
 
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message:"No providers found." ,
               type: SnackBarType.error
           );
@@ -520,8 +518,7 @@ class _SubCategoriesState extends State<SubCategories> {
       } else {
         final err = json.decode(response.body);
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: "Error ${response.statusCode}: ${err['message']}",
             type: SnackBarType.error
         );
@@ -529,8 +526,7 @@ class _SubCategoriesState extends State<SubCategories> {
       }
     } catch (e) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:"Something went wrong",
           type: SnackBarType.error
       );

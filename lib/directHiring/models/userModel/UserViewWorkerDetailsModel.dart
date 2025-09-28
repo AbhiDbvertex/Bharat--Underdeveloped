@@ -56,11 +56,12 @@ class ServiceProviderDetailModel {
   final List<String>? hisWork;
   final List<Review>? rateAndReviews;
   final String? categoryName;
-  final List<String>? subcategoryNames;  // Yeh new add kiya, puri list
+  final List<String>? subcategoryNames;
+  final List<String>? emergencySubcategoryNames;
   // final String? documents;
   final List<Document>? documents;
   final Map<String, dynamic>? location;  // Location object
-  final List<Map<String, dynamic>>? fullAddress;  // Full address list add kiya
+  final List<Map<String, dynamic>>? fullAddress;
   final List<String>? customerReview;
 
   ServiceProviderDetailModel({
@@ -71,6 +72,7 @@ class ServiceProviderDetailModel {
     this.rateAndReviews,
     this.categoryName,
     this.subcategoryNames,
+    this.emergencySubcategoryNames,
     this.documents,
     this.location,
     this.fullAddress,
@@ -87,6 +89,7 @@ class ServiceProviderDetailModel {
       // categoryName: json["category_name"],
       categoryName: json["category"]?["name"] as String?,
       subcategoryNames: List<String>.from(json["subcategory_names"] ?? []),
+      emergencySubcategoryNames: List<String>.from(json["emergencySubcategory_names"] ?? []),
       // documents: json["documents"],
       documents: (json["documents"] as List<dynamic>?)?.map((e) => Document.fromJson(e as Map<String, dynamic>)).toList(),      location: json["location"],  // Location object
       fullAddress: (json["full_address"] as List?)?.map((e) => e as Map<String, dynamic>).toList(),  // Full address list

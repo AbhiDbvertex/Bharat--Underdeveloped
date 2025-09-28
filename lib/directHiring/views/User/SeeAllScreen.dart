@@ -26,7 +26,7 @@ class SeeAllScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: GridView.count(
-          crossAxisCount: 5,
+          crossAxisCount: 4,
           crossAxisSpacing: 15,
           mainAxisSpacing: 20,
           children: List.generate(20, (index) {

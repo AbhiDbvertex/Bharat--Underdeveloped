@@ -95,7 +95,6 @@ import 'package:http/http.dart' as http;
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../views/auth/OtpVerificationScreen.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginController {
   final TextEditingController phoneController;
@@ -116,7 +115,7 @@ class LoginController {
     // Validate phone number
     if (phone.length != 10) {
       // _showSnackBar(context, 'Please enter a valid 10-digit phone number');
-      CustomSnackBar.show(context,
+      CustomSnackBar.show(
           message: "Please enter a valid 10-digit phone number",
           type: SnackBarType.error);
       return;
@@ -132,7 +131,7 @@ class LoginController {
     // Check if token is null
     if (fcmToken == null) {
       // _showSnackBar(context, 'Unable to fetch FCM token. Please try again.');
-      CustomSnackBar.show(context,
+      CustomSnackBar.show(
           message: "Unable to fetch FCM token. Please try again.",
           type: SnackBarType.error);
       print("❌ FCM Token is null, retry failed!");
@@ -163,13 +162,13 @@ class LoginController {
         final String? tempOtp = responseData['temp_otp']?.toString();
         if (tempOtp == null) {
           // _showSnackBar(context, 'OTP not received from server');
-          CustomSnackBar.show(context, message: 'OTP not received from server' ,type: SnackBarType.warning);
+          CustomSnackBar.show( message: 'OTP not received from server' ,type: SnackBarType.warning);
           print("❌ OTP is null in response: $responseData");
           isLoading.value = false;
           return;
         }
         // _showSnackBar(context, "OTP sent successfully");
-        // CustomSnackBar.show(context, message: "OTP sent successfully",type: SnackBarType.success);
+        // CustomSnackBar.show( message: "OTP sent successfully",type: SnackBarType.success);
         print("Abhi:- 2 print on success ${fcmToken}");
         // Navigate to OTP screen
         Future.delayed(Duration.zero, () {
@@ -183,23 +182,20 @@ class LoginController {
             ),
           );
         });
-        Fluttertoast.showToast(
-          msg: "OTP sent successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 14,
+        CustomSnackBar.show(
+            message: "OTP sent successfully",
+            type: SnackBarType.success
         );
+
       } else {
         final errorMsg = responseData['message'] ?? 'Failed to send OTP';
         // _showSnackBar(context, errorMsg);
-        CustomSnackBar.show(context, message: errorMsg,type: SnackBarType.error);
+        CustomSnackBar.show( message: errorMsg,type: SnackBarType.error);
         print("❌ Error: $errorMsg");
       }
     } catch (e) {
       // _showSnackBar(context, 'Network error: $e');
-      CustomSnackBar.show(context, message: 'Network error' ,type: SnackBarType.error);
+      CustomSnackBar.show( message: 'Network error' ,type: SnackBarType.error);
 
       print("❌ Network error: $e");
     } finally {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Bidding/view/user/payment_screen.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,6 +18,7 @@ import '../../../Widgets/address_map_class.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import '../../../testingfile.dart';
+import '../../../utility/custom_snack_bar.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
 class BiddingWorkerDetailScreen extends StatefulWidget {
@@ -46,6 +48,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   String? selectedBidderId; // New variable add kar
   @override
   void initState() {
+    bwDebug("order id ${widget.buddingOderId}",tag:"Bidding workdetail screen");
     super.initState();
     getBuddingOderById();
     getAllBidders();
@@ -97,12 +100,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
         // await AcceptNegotiation();
         Get.back(result: true);
         Get.back(result: true);
-        Get.snackbar(
-          "Success",
-          responseData['message'],
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+
+        CustomSnackBar.show(
+            message:responseData['message'] ,
+            type: SnackBarType.success
         );
       } else {
         print(
@@ -120,16 +121,21 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     // verifaibiddingPlateformFee(response.paymentId!, razorpayOrderId!,); // Call verify
     verifaibiddingPlateformFee(response.paymentId!, razorpayOrderId!,
         selectedBidderId!); // Ab teesra arg: selectedBidderId
-    Get.snackbar("Payment Success", "Transaction completed!",
-        backgroundColor: Colors.green, colorText: Colors.white);
+    CustomSnackBar.show(
+        message:"Transaction completed!" ,
+        type: SnackBarType.success
+    );
     Get.back(); // Close dialog
     Get.back(); // Extra back if needed for previous screen
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     print("Abhi:- Payment Error: ${response.message}");
-    Get.snackbar("Payment Failed", "Error: ${response.message}",
-        backgroundColor: Colors.red, colorText: Colors.white);
+      CustomSnackBar.show(
+        message: "Error: ${response.message}",
+        type: SnackBarType.error
+    );
+
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -242,26 +248,24 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
             isLoading = false;
             _filterLists();
           });
-          Get.snackbar(
-            "Error",
-            responseData['message'] ?? "Failed to fetch order details.",
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+
+          CustomSnackBar.show(
+              message: responseData['message'] ?? "Failed to fetch order details.",
+              type: SnackBarType.error
           );
+
         }
       } else {
         setState(() {
           isLoading = false;
           _filterLists();
         });
-        Get.snackbar(
-          "Error",
-          responseData['message'] ?? "Failed to fetch order details.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+
+        CustomSnackBar.show(
+            message:responseData['message'] ?? "Failed to fetch order details." ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print("Abhi:- getBuddingOderById Exception: $e");
@@ -269,13 +273,12 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
         isLoading = false;
         _filterLists();
       });
-      Get.snackbar(
-        "Error",
-        "Something went wrong!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+
+      CustomSnackBar.show(
+          message:"Something went wrong!" ,
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -322,12 +325,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
             isLoading = getBuddingOderByIdResponseData == null &&
                 relatedWorkers.isEmpty;
           });
-          Get.snackbar(
-            "Error",
-            responseData['message'] ?? "Failed to fetch bidders.",
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+
+          CustomSnackBar.show(
+              message: responseData['message'] ?? "Failed to fetch bidders.",
+              type: SnackBarType.error
           );
         }
       } else {
@@ -337,12 +338,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
           isLoading =
               getBuddingOderByIdResponseData == null && relatedWorkers.isEmpty;
         });
-        Get.snackbar(
-          "Error",
-          responseData['message'] ?? "Failed to fetch bidders.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+
+        CustomSnackBar.show(
+            message:responseData['message'] ?? "Failed to fetch bidders." ,
+            type: SnackBarType.error
         );
       }
     } catch (e) {
@@ -353,12 +352,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
         isLoading =
             getBuddingOderByIdResponseData == null && relatedWorkers.isEmpty;
       });
-      Get.snackbar(
-        "Error",
-        "Something went wrong!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+
+      CustomSnackBar.show(
+          message:"Something went wrong!" ,
+          type: SnackBarType.error
       );
     }
   }
@@ -404,12 +401,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
             isLoading =
                 getBuddingOderByIdResponseData == null && bidders.isEmpty;
           });
-          Get.snackbar(
-            "Error",
-            responseData['message'] ?? "Failed to fetch related workers.",
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+
+          CustomSnackBar.show(
+              message: responseData['message'] ?? "Failed to fetch related workers.",
+              type: SnackBarType.error
           );
         }
       } else {
@@ -418,12 +413,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
           filteredRelatedWorkers = [];
           isLoading = getBuddingOderByIdResponseData == null && bidders.isEmpty;
         });
-        Get.snackbar(
-          "Error",
-          responseData['message'] ?? "Failed to fetch related workers.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+
+        CustomSnackBar.show(
+            message: responseData['message'] ?? "Failed to fetch related workers.",
+            type: SnackBarType.error
         );
       }
     } catch (e) {
@@ -433,13 +426,12 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
         filteredRelatedWorkers = [];
         isLoading = getBuddingOderByIdResponseData == null && bidders.isEmpty;
       });
-      Get.snackbar(
-        "Error",
-        "Something went wrong!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+
+      CustomSnackBar.show(
+          message:"Something went wrong!" ,
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -466,22 +458,18 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
       } else {
         print("Abhi:- Cancel task response else ${response.body}");
         print("Abhi:- Cancel task response else ${response.statusCode}");
-        Get.snackbar(
-          "Error",
-          "Failed to cancel task.",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+
+        CustomSnackBar.show(
+            message:  "Failed to cancel task.",
+            type: SnackBarType.error
         );
       }
     } catch (e) {
       print("Abhi:- Cancel task Exception: $e");
-      Get.snackbar(
-        "Error",
-        "Something went wrong!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+
+      CustomSnackBar.show(
+          message:"Something went wrong!" ,
+          type: SnackBarType.error
       );
     }
   }
@@ -510,32 +498,27 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
       var responseData = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- Invideprovider response : ${response.body}");
-        Get.snackbar(
-          "Success",
-          responseData['message'],
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+
+        CustomSnackBar.show(
+            message:responseData['message'] ,
+            type: SnackBarType.success
         );
+
       } else {
-        print("Abhi:- else Invideprovider response : ${response.body}");
-        Get.snackbar(
-          "Error",
-          responseData['message'] ?? "Something went wrong",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+        print("Abhi:- else Invideprovider response : ${response.statusCode},${response.body}");
+        CustomSnackBar.show(
+            message:responseData['message'] ?? "Something went wrong" ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       print("Abhi:- inviteprovider api Exception $e");
-      Get.snackbar(
-        "Error",
-        "Something went wrong!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+       CustomSnackBar.show(
+          message:"Something went wrong!" ,
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -636,7 +619,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
             elevation: 0,
             backgroundColor: Colors.white,
             centerTitle: true,
-            title: const Text("Worker Details",
+            title: const Text("Work Details",
                 style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             leading: const BackButton(color: Colors.black),
             actions: [],
@@ -967,7 +950,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                           hirebuttonhide: "hide",
                                                           UserId: widget.userId,
                                                           hideonly: "hideOnly",
-                                                          // oderId: OderId,
+                                                          oderId: widget.buddingOderId,
                                                           // biddingOfferId: biddingofferId,
                                                         ),
                                                       ));
@@ -1030,7 +1013,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               ? Center(
                                   child: Container(
                                     height: 40,
-                                    width: 300,
+                                    width: double.infinity,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
                                         border: Border.all(color: Colors.red)),
@@ -2252,6 +2235,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               hirebuttonhide:
                                                                                   "hide",
                                                                                   hideonly: "hideOnly",
+                                                                                  oderId: widget.buddingOderId,
                                                                             ),
                                                                           ),
                                                                         );
@@ -2481,6 +2465,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                 workerId: assignedWorker['_id'],
                                 hirebuttonhide: "hide",
                                 hideonly: "hideOnly",
+                                oderId: widget.buddingOderId,
                                 // userId: widget.userId,
                               ),
                             ),
@@ -2635,10 +2620,12 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             debugPrint('Razorpay Error: $e');
                           }
                         } else {
-                          Get.snackbar(
-                              "Error", "Platform fee or order ID not available",
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white);
+
+                          CustomSnackBar.show(
+                              message: "Platform fee or order ID not available",
+                              type: SnackBarType.error
+                          );
+
                         }
                         Navigator.pop(context);
                       },

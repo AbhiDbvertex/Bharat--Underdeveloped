@@ -185,8 +185,7 @@ class CustomerCareController {
   bool validateForm(BuildContext context) {
     // Check if subject is selected
     if (model.selectedSubject == null) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Please select a subject' ,
           type: SnackBarType.error
       );
@@ -197,8 +196,7 @@ class CustomerCareController {
     // Check if contact field is empty
     if (contactController.text.isEmpty) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:  'Please enter ${model.isEmailSelected ? 'email address' : 'contact number'}' ,
           type: SnackBarType.error
       );
@@ -212,8 +210,7 @@ class CustomerCareController {
         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
       ).hasMatch(contactController.text)) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Please enter a valid email address',
             type: SnackBarType.error
         );
@@ -224,8 +221,7 @@ class CustomerCareController {
     // Phone number validation
     else {
       if (!RegExp(r'^[0-9]+$').hasMatch(contactController.text)) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Phone number must contain only digits',
             type: SnackBarType.error
         );
@@ -234,8 +230,7 @@ class CustomerCareController {
       }
       if (contactController.text.length != 10) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Phone number must be 10 digits',
             type: SnackBarType.error
         );
@@ -247,8 +242,7 @@ class CustomerCareController {
     // Check if description is empty
     if (descriptionController.text.isEmpty) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Please enter a description' ,
           type: SnackBarType.error
       );
@@ -271,8 +265,7 @@ class CustomerCareController {
 
     if (token == null) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Token missing. Please login again.',
           type: SnackBarType.error
       );
@@ -299,8 +292,7 @@ class CustomerCareController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Email submitted successfully!',
             type: SnackBarType.success
         );
@@ -310,14 +302,13 @@ class CustomerCareController {
         refreshView();
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Server Error: ${response.statusCode}\n${response.body}',
             type: SnackBarType.error
         );
       }
     } catch (e) {
-      CustomSnackBar.show(context, message: 'Request Error: $e',type: SnackBarType.error);
+      CustomSnackBar.show( message: 'Request Error: $e',type: SnackBarType.error);
     }
   }
 
@@ -333,8 +324,7 @@ class CustomerCareController {
 
     if (token == null) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Token missing. Please login again.' ,
           type: SnackBarType.error
       );
@@ -363,8 +353,7 @@ class CustomerCareController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Call request submitted successfully!',
             type: SnackBarType.success
         );
@@ -375,16 +364,14 @@ class CustomerCareController {
         refreshView();
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Server Error: ${response.statusCode}\n${response.body}',
             type: SnackBarType.error
         );
 
       }
     } catch (e) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Request Error: $e',
           type: SnackBarType.error
       );

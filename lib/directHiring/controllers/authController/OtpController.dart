@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Added fluttertoast import
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -71,8 +70,7 @@ class OtpController {
 
     if (enteredOtp.length != 4 || !RegExp(r'^\d{4}$').hasMatch(enteredOtp)) {
      // _showMessage("Please enter a valid 4-digit OTP.");
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Please enter a valid 4-digit OTP.',
       type: SnackBarType.error
       );
@@ -120,14 +118,12 @@ class OtpController {
           //     message: data['message'] ?? "OTP verified successfully",
           //     type: SnackBarType.success
           // );
-          Fluttertoast.showToast(
-            msg: data['message'] ?? "OTP verified successfully",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0,
+
+          CustomSnackBar.show(
+              message: data['message'] ?? "OTP verified successfully",
+              type: SnackBarType.success
           );
+
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => nextScreen),
             (route) => false,
@@ -135,8 +131,7 @@ class OtpController {
         } else {
           // _showMessage(
           //     data['message'] ?? "Invalid OTP or authentication failed.");
-          CustomSnackBar.show(
-              context,
+            CustomSnackBar.show(
               message: data['message'] ?? "Invalid OTP or authentication failed.",
               type: SnackBarType.error
           );
@@ -144,18 +139,16 @@ class OtpController {
       } else {
         // _showMessage(
         //     data['message'] ?? "Server error occurred. Please try again.");
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: data['message'] ?? "Server error occurred. Please try again.",
-            type: SnackBarType.warning
+            type: SnackBarType.error
         );
       }
     } catch (e) {
       print('❌ Network Error: $e');
       // _showMessage("Network error. Please check your connection.");
       // if(!context.mounted)return;
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Network error. Please check your connection.",
           type: SnackBarType.warning
       );
@@ -203,8 +196,7 @@ class OtpController {
           refreshUI(newOtp);
           // _showMessage(data['message'] ?? "OTP sent successfully");
           if (context.mounted) {
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: data['message'] ?? "OTP sent successfully",
                 type: SnackBarType.success
             );
@@ -214,8 +206,7 @@ class OtpController {
           //       data['message'] ?? "Failed to resend OTP. Please try again.");
 
           if (context.mounted) {
-            CustomSnackBar.show(
-                context,
+             CustomSnackBar.show(
                 message: data['message'] ??
                     "Failed to resend OTP. Please try again.",
                 type: SnackBarType.error
@@ -226,8 +217,7 @@ class OtpController {
         // _showMessage(
         //     data['message'] ?? "Server error occurred. Please try again.");
         if (context.mounted) {
-          CustomSnackBar.show(
-            context,
+           CustomSnackBar.show(
             message: data['message'] ??
                 "Server error occurred. Please try again.",
             type: SnackBarType.error
@@ -238,8 +228,7 @@ class OtpController {
       print('❌ Resend OTP Error: $e');
       // _showMessage("Network error. Please check your connection.");
       if (context.mounted) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: "Network error. Please check your connection.",
           type: SnackBarType.warning
       );

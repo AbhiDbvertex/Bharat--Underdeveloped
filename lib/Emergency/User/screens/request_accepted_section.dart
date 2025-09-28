@@ -1,11 +1,11 @@
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/map_launcher_lat_long.dart';
-import 'package:developer/Emergency/utils/snack_bar_helper.dart';
 import 'package:developer/Widgets/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import '../../../directHiring/views/User/viewServiceProviderProfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../controllers/request_accepted_controller.dart';
@@ -516,7 +516,7 @@ final tag="RequestAcceptedSection";
                                       if(!success) {
                                         // SnackBarHelper.showSnackBar(context, "Could not open the map");
                                         CustomSnackBar.show(
-                                            context,
+
                                             message:"Could not open the map" ,
                                             type: SnackBarType.error
                                         );
@@ -570,11 +570,14 @@ final tag="RequestAcceptedSection";
                                         builder:
                                             (
                                             context,
-                                            ) => ViewServiceProviderProfileScreen(
+                                            ) => /*ViewServiceProviderProfileScreen(
                                           serviceProviderId:
                                           item.providersId ??
                                               '',
-                                        ),
+                                        ),*/
+                                            UserViewWorkerDetails(
+                                              workerId: item.providersId,
+                                            ),
                                       ),
                                     );
                                   },

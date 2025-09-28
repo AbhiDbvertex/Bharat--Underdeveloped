@@ -103,11 +103,12 @@ class _WorkerCategoriesState extends State<WorkerCategories> {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: GridView.count(
-                        crossAxisCount: 5,
+                        crossAxisCount: 4,
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 8,
                         childAspectRatio: 0.8,
                         children: List.generate(allCategories.length, (index) {
+
                           final category =
                               allCategories[index] as Map<String, dynamic>;
                           final imagePath = category['image']?.toString() ?? '';

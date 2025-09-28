@@ -1480,8 +1480,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Token not found! Please log in.' ,
             type: SnackBarType.warning
         );
@@ -1512,8 +1511,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
         });
       } else {
-               CustomSnackBar.show(
-            context,
+                CustomSnackBar.show(
             message: 'Failed to fetch images: ${response.statusCode}',
             type: SnackBarType.warning
         );
@@ -1521,8 +1519,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       }
     } catch (e) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Error fetching images: $e',
           type: SnackBarType.error
       );
@@ -1678,8 +1675,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
 
     if (pickedFiles == null || pickedFiles.isEmpty) {
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'No images selected',
           type: SnackBarType.error
       );
@@ -1694,8 +1690,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final token = prefs.getString('token');
       if (token == null || token.isEmpty) {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Token not found! Please log in.',
             type: SnackBarType.warning
         );
@@ -1738,23 +1733,20 @@ class _GalleryScreenState extends State<GalleryScreen> {
         setState(() => _hasChanges = true);
         Navigator.pop(context, true);
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Images uploaded successfully' ,
             type: SnackBarType.success
         );
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Upload failed: ${response.statusCode}',
             type: SnackBarType.error
         );
       }
     } catch (e) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Error: $e' ,
           type: SnackBarType.error
       );
@@ -1776,8 +1768,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     //await _fetchImagesFromApi();
     if (token == null || token.isEmpty) {
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message: 'Token not found! Please log in.',
           type: SnackBarType.warning
       );
@@ -1807,8 +1798,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           _images.remove(imageUrl);
         });
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message:'Image deleted successfully' ,
             type: SnackBarType.success
         );
@@ -1816,8 +1806,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         await _fetchImagesFromApi();
       } else {
 
-        CustomSnackBar.show(
-            context,
+         CustomSnackBar.show(
             message: 'Delete failed: ${response.statusCode} - ${response.body}',
             type: SnackBarType.error
         );
@@ -1826,8 +1815,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     } catch (e) {
       print("Abhi:- Exception: $e");
 
-      CustomSnackBar.show(
-          context,
+       CustomSnackBar.show(
           message:'Error deleting image: $e' ,
           type: SnackBarType.error
       );

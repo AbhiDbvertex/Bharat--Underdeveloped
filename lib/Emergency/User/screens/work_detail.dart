@@ -458,7 +458,6 @@ import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
 import 'package:developer/Emergency/User/screens/task_view.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
-import 'package:developer/Emergency/utils/snack_bar_helper.dart';
 import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -715,7 +714,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                           if (!success) {
 
                             CustomSnackBar.show(
-                                context,
                                 message:"Could not open the map" ,
                                 type: SnackBarType.error
                             );
@@ -836,8 +834,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       String status = await controller
                                           .cancelEmergencyOrder(orderId);
 
-                                      CustomSnackBar.show(
-                                          context,
+                                       CustomSnackBar.show(
                                           message: status,
                                           type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
                                       );
@@ -879,7 +876,25 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         ),
                                       ),
                                     )
-                                  : SizedBox()
+                                  :controller.hireStatus == "completed"
+                          ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Mark as completed",
+                            style: GoogleFonts.roboto(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )
+                          : SizedBox()
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -899,7 +914,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
 
                                     CustomSnackBar.show(
-                                        context,
                                         message: status,
                                         type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
                                     );
@@ -927,7 +941,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         await controller.rejectUserOrder(
                                             "6871f5b5ed31367eed8d2210");
                                   CustomSnackBar.show(
-                                        context,
                                         message: status,
                                         type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
                                     );
@@ -947,22 +960,27 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                   ),
                 ),
                 controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
-                        controller.hireStatus != "cancelledDispute"
+                        controller.hireStatus != "cancelledDispute" && controller.hireStatus != "completed"
                     ? RequestAcceptedSection(orderId: controller.orderId.value)
-                    : controller.hireStatus != "assigned"? Center(
+                    : controller.hireStatus != "assigned" && controller.hireStatus != "completed"&&controller.hireStatus == "cancelledDispute"? Center(
                       child: Container(
-                                        height: 35,
-                                        width: 250,
-                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(Icons.warning_amber, color: Colors.red),
-                        Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                      ],
-                                        ),
-                                      ),
+                        height: 40,
+                        width: double.infinity,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_amber, color: Colors.red),
+                            Flexible(
+                              child: Text("The order has been cancelled due to a dispute.",
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                            ),
+                          ],
+                        ),
+                      ),
                     ):SizedBox(),
 
                 controller.hireStatus.value == "assigned" &&
