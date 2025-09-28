@@ -90,16 +90,31 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
   }
 
   void _showMessageSuccessAddress(String message) {
+<<<<<<< HEAD
     CustomSnackBar.show(message: message, type: SnackBarType.success);
+=======
+     CustomSnackBar.show(
+        message: message,
+        type: SnackBarType.success
+    );
+
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
   }
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // _showMessage('Please enable location services.');
+<<<<<<< HEAD
       CustomSnackBar.show(
           message: 'Please enable location services.',
           type: SnackBarType.error);
+=======
+       CustomSnackBar.show(
+          message:'Please enable location services.' ,
+          type: SnackBarType.error
+      );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
       return;
     }
 
@@ -108,8 +123,15 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         // _showMessage('Location permission denied.');
+<<<<<<< HEAD
         CustomSnackBar.show(
             message: 'Location permission denied.', type: SnackBarType.warning);
+=======
+         CustomSnackBar.show(
+            message: 'Location permission denied.',
+            type: SnackBarType.warning
+        );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
         return;
       }
     }
@@ -129,8 +151,15 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } catch (e) {
       // _showMessage('Unable to get location: $e');
+<<<<<<< HEAD
       CustomSnackBar.show(
           message: 'Unable to get location: $e', type: SnackBarType.error);
+=======
+       CustomSnackBar.show(
+          message: 'Unable to get location: $e',
+          type: SnackBarType.error
+      );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
     }
   }
 
@@ -164,8 +193,16 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
           addressController.text = 'Coordinates: $lat, $lng (No address found)';
         });
         // _showMessage('Error fetching address: $e');
+<<<<<<< HEAD
         CustomSnackBar.show(
             message: 'Error fetching address: $e', type: SnackBarType.error);
+=======
+         CustomSnackBar.show(
+            message:'Error fetching address: $e' ,
+            type: SnackBarType.error
+        );
+
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
       }
     }
   }
@@ -252,7 +289,11 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
+<<<<<<< HEAD
             CustomSnackBar.show(
+=======
+             CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning);
 
@@ -327,9 +368,16 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
           if (mounted) {
             // _showMessage('Address updated successfully.');
+<<<<<<< HEAD
             CustomSnackBar.show(
                 message: 'Address updated successfully.',
                 type: SnackBarType.success);
+=======
+             CustomSnackBar.show(
+                message:'Address updated successfully.' ,
+                type: SnackBarType.success
+            );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
 
             await Future.delayed(const Duration(seconds: 2));
             if (mounted) {
@@ -346,24 +394,43 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+<<<<<<< HEAD
             CustomSnackBar.show(
                 message:
                     'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error);
+=======
+             CustomSnackBar.show(
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
+
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error updating address: $e');
+<<<<<<< HEAD
           CustomSnackBar.show(
               message: 'Error updating address: $e', type: SnackBarType.error);
+=======
+            CustomSnackBar.show(
+              message:'Error updating address: $e' ,
+              type: SnackBarType.error
+          );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
 
           print("Error in _updateAddress: $e");
         }
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
+<<<<<<< HEAD
       CustomSnackBar.show(
+=======
+       CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           message: 'Please fill all fields correctly.',
           type: SnackBarType.warning);
     }
@@ -378,7 +445,11 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
+<<<<<<< HEAD
             CustomSnackBar.show(
+=======
+             CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning);
             await Future.delayed(const Duration(seconds: 2));
@@ -452,7 +523,11 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
 
           if (mounted) {
             // _showMessage('Address added successfully.');
+<<<<<<< HEAD
             CustomSnackBar.show(
+=======
+             CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
                 message: 'Address added successfully.',
                 type: SnackBarType.success);
             await Future.delayed(const Duration(seconds: 2));
@@ -472,26 +547,48 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+<<<<<<< HEAD
             CustomSnackBar.show(
                 message:
                     'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error);
+=======
+             CustomSnackBar.show(
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
+
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error adding address: $e');
+<<<<<<< HEAD
           CustomSnackBar.show(
               message: 'Error adding address: $e', type: SnackBarType.error);
+=======
+            CustomSnackBar.show(
+              message: 'Error adding address: $e',
+              type: SnackBarType.error
+          );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
 
           print("Error in _addAddress: $e");
         }
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
+<<<<<<< HEAD
       CustomSnackBar.show(
           message: 'Please fill all fields correctly.',
           type: SnackBarType.warning);
+=======
+       CustomSnackBar.show(
+          message:'Please fill all fields correctly.' ,
+          type: SnackBarType.warning
+      );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
     }
   }
 
@@ -511,7 +608,11 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         if (token == null || token.isEmpty) {
           if (mounted) {
             // _showMessage('Token not found. Please log in.');
+<<<<<<< HEAD
             CustomSnackBar.show(
+=======
+             CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
                 message: 'Token not found. Please log in.',
                 type: SnackBarType.warning);
             await Future.delayed(const Duration(seconds: 2));
@@ -624,17 +725,31 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
         } else {
           if (mounted) {
             // _showMessage('API error: ${responseData['message'] ?? 'Unknown error'}');
+<<<<<<< HEAD
             CustomSnackBar.show(
                 message:
                     'API error: ${responseData['message'] ?? 'Unknown error'}',
                 type: SnackBarType.error);
+=======
+             CustomSnackBar.show(
+                message: 'API error: ${responseData['message'] ?? 'Unknown error'}',
+                type: SnackBarType.error
+            );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           }
         }
       } catch (e) {
         if (mounted) {
           // _showMessage('Error calling API: $e');
+<<<<<<< HEAD
           CustomSnackBar.show(
               message: 'Error calling API: $e', type: SnackBarType.error);
+=======
+            CustomSnackBar.show(
+              message:'Error calling API: $e' ,
+              type: SnackBarType.error
+          );
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           print("❌ Error: $e");
         }
       } finally {
@@ -646,7 +761,11 @@ class _SignupAddressDetailScreenState extends State<SignupAddressDetailScreen> {
       }
     } else {
       // _showMessage('Please fill all fields correctly.');
+<<<<<<< HEAD
       CustomSnackBar.show(
+=======
+       CustomSnackBar.show(
+>>>>>>> 863e96cded1345cf6d8a44e851fa25909251ec1e
           message: 'Please fill all fields correctly.',
           type: SnackBarType.warning);
     }
