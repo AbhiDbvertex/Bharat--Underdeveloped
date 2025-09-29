@@ -766,6 +766,7 @@ class WorkDetailController extends GetxController {
 
   // New variables and methods from the payments logic
   var payments = <PaymentHistory>[].obs;
+  var paymentMethod = "".obs;
   var selectedPaymentIndex = (-1).obs;
   var isCreatingNewPayment = false.obs;
   final descriptionController = TextEditingController();

@@ -674,7 +674,7 @@ final orderId=decoded["order"]["_id"];
               buildLabel("Title"),
               const SizedBox(height: 6),
               buildTextField("Enter Title of work", titleController,
-              inputFormatters:    [
+              inputFormatters:   [
                 FilteringTextInputFormatter.allow(
                   RegExp(r'[a-zA-Z_.,\s]'), // Only letters, numbers and space
                 ),

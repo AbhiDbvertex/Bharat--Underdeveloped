@@ -778,9 +778,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ? const Center(child: CircularProgressIndicator())
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: allCategories.take(6).map((category) {
+                          children: allCategories.take(5).map((category) {
                             return SizedBox(
-                              width: MediaQuery.of(context).size.width / 6 - 10,
+                              width: MediaQuery.of(context).size.width / 5 - 10,
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(

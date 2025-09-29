@@ -1406,8 +1406,11 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
                                     toTitleCase(payment['release_status'] ==
                                             "release_requested"
                                         ? "Requested"
-                                        : payment['release_status'] ??
-                                            'UNKNOWN'),
+                                        : payment['release_status'] ==
+                                        "pending"
+                                        ? "Pending":payment['release_status'] ??
+                                            'Pending'
+                                    ),
                                     style: GoogleFonts.roboto(
                                       fontSize: 14,
                                       // color: getColor(payment['release_status']),
