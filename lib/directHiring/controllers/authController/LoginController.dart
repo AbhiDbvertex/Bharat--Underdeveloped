@@ -95,7 +95,6 @@ import 'package:http/http.dart' as http;
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../views/auth/OtpVerificationScreen.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginController {
   final TextEditingController phoneController;
@@ -183,14 +182,11 @@ class LoginController {
             ),
           );
         });
-        Fluttertoast.showToast(
-          msg: "OTP sent successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 14,
+        CustomSnackBar.show(
+            message: "OTP sent successfully",
+            type: SnackBarType.success
         );
+
       } else {
         final errorMsg = responseData['message'] ?? 'Failed to send OTP';
         // _showSnackBar(context, errorMsg);

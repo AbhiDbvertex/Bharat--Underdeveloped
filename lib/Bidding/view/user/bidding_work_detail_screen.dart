@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Bidding/view/user/payment_screen.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -49,6 +50,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   String? selectedBidderId; // New variable add kar
   @override
   void initState() {
+    bwDebug("order id ${widget.buddingOderId}",tag:"Bidding workdetail screen");
     super.initState();
     getBuddingOderById();
     getAllBidders();
@@ -1108,7 +1110,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                           hirebuttonhide: "hide",
                                                           UserId: widget.userId,
                                                           hideonly: "hideOnly",
-                                                          // oderId: OderId,
+                                                          oderId: widget.buddingOderId,
                                                           // biddingOfferId: biddingofferId,
                                                         ),
                                                       ));
@@ -1171,7 +1173,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               ? Center(
                                   child: Container(
                                     height: 40,
-                                    width: 300,
+                                    width: double.infinity,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
                                         border: Border.all(color: Colors.red)),
@@ -2343,6 +2345,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               hirebuttonhide:
                                                                                   "hide",
                                                                                   hideonly: "hideOnly",
+                                                                                  oderId: widget.buddingOderId,
                                                                             ),
                                                                           ),
                                                                         );
@@ -2572,6 +2575,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                 workerId: assignedWorker['_id'],
                                 hirebuttonhide: "hide",
                                 hideonly: "hideOnly",
+                                oderId: widget.buddingOderId,
                                 // userId: widget.userId,
                               ),
                             ),

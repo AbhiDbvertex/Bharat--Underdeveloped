@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,6 +43,8 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
 
   @override
   void initState() {
+    bwDebug("workerId: ${widget.workerId}, orderId: ${widget.oderId}"
+        ", biddingOfferId: ${widget.biddingOfferId}, userId: ${widget.UserId}",tag: "Negotiate");
     super.initState();
     getNegotiation();
     _razorpay = Razorpay();
@@ -59,6 +62,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
 
   // Get Latest Negotiation API
   Future<void> getNegotiation() async {
+    bwDebug("[get Negotiation call ",tag: "negotiate");
     final String url =
         'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.oderId}';
     print("Abhi:- getNegotiation url: $url");
@@ -96,11 +100,17 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
 
   // Post Negotiate API
   Future<void> postNegotiate(String amount) async {
+
+    bwDebug("[PostNegotiate], called, amount:$amount");
     final String url = "https://api.thebharatworks.com/api/negotiations/start";
     print("Abhi:- postNegotiate url: $url");
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-
+bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},\n"
+    "service providerId : ${widget.workerId}, "
+    "\n userId: ${widget.UserId}.\n"
+    "mount: $amount, \n"
+    "");
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -118,8 +128,9 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
           "message": "Can you do it for $amount?"
         }),
       );
-
       var responseData = jsonDecode(response.body);
+      bwDebug("[postNegotiate]  :  response :$responseData ",tag:"Negotiate");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postNegotiate statusCode: ${response.statusCode}");
         print("Abhi:- postNegotiate response: ${response.body}");
@@ -475,43 +486,36 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
             ),
             SizedBox(height: height * 0.02),
             if (isNegotiating) ...[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 2),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(width * 0.02),
-                  border: Border.all(color: Colors.green),
-                  color: Colors.white,
-                ),
-                child: TextField(
-                  controller: amountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: "Enter your offer Amount",
-                    hintStyle: GoogleFonts.roboto(
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.04,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  ),
-                  style: GoogleFonts.roboto(
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Enter your offer Amount",
+                  hintStyle: GoogleFonts.roboto(
                     color: Colors.green.shade700,
                     fontWeight: FontWeight.bold,
                     fontSize: width * 0.04,
                   ),
+                  border:  OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                ),
+                style: GoogleFonts.roboto(
+                  color: Colors.green.shade700,
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.04,
                 ),
               ),
               SizedBox(height: height * 0.02),
               GestureDetector(
-                onTap: () {
+                onTap: () async{
                   String amount = amountController.text.trim();
                   if (amount.isEmpty) {
                     print("Abhi:- amount empty hai");
                     return;
                   }
-                  postNegotiate(amount);
+             await     postNegotiate(amount);
                   setState(() {
                     isNegotiating = false;
                     amountController.clear();

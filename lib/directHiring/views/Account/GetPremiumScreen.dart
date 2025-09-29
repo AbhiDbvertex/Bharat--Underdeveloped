@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart'; // Add provider package to pubspec.yaml
 import '../../../Widgets/AppColors.dart';
@@ -75,7 +77,7 @@ class PremiumView extends StatelessWidget {
         // const SizedBox(height: 70),
         Center(
           child: Text(
-            'Premium Plans',
+            'Select Premium Plans',
             style: GoogleFonts.roboto(
               fontSize: 20,
               fontWeight: FontWeight.bold,

@@ -674,7 +674,7 @@ class TaskView extends StatelessWidget {
               const SizedBox(height: 5),
               _buildPaymentSection(controller, context),
               const SizedBox(height: 20),
-              if (controller.warningMessage.value.isNotEmpty)
+              //if (controller.warningMessage.value.isNotEmpty)
                 _buildWarningMessage(controller.warningMessage.value),
               const SizedBox(height: 20),
               _buildActionButtons(controller, context),
@@ -1205,35 +1205,37 @@ class TaskView extends StatelessWidget {
         children: [
           Container(
             margin: EdgeInsets.only(top: 0.14.toWidthPercent()),
-            padding: const EdgeInsets.fromLTRB(50, 50, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
             decoration: BoxDecoration(
               color: const Color(0xffFBFBBA),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              children: [
-                const Text(
-                  'Warning Message',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
+            child: Center(
+              child: Column(
+                children: [
+                  const Text(
+                    'Warning Message',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-                SizedBox(height: 0.01.toWidthPercent()),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-              ],
+                  SizedBox(height: 0.01.toWidthPercent()),
+                  Text(
+                    message.isNotEmpty?message:"Make payments only through the app.\nIt's safer and more secure",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w400),
+                  ),
+                ],
+              ),
             ),
           ),
           Image.asset(
             BharatAssets.warning,
             height: 0.28.toWidthPercent(),
-            width: 0.27.toWidthPercent(),
+            width: 0.28.toWidthPercent(),
             fit: BoxFit.contain,
           ),
         ],

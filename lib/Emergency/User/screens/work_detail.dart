@@ -876,7 +876,25 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         ),
                                       ),
                                     )
-                                  : SizedBox()
+                                  :controller.hireStatus == "completed"
+                          ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Mark as completed",
+                            style: GoogleFonts.roboto(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )
+                          : SizedBox()
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -942,22 +960,27 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                   ),
                 ),
                 controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
-                        controller.hireStatus != "cancelledDispute"
+                        controller.hireStatus != "cancelledDispute" && controller.hireStatus != "completed"
                     ? RequestAcceptedSection(orderId: controller.orderId.value)
-                    : controller.hireStatus != "assigned"? Center(
+                    : controller.hireStatus != "assigned" && controller.hireStatus != "completed"&&controller.hireStatus == "cancelledDispute"? Center(
                       child: Container(
-                                        height: 35,
-                                        width: 250,
-                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(Icons.warning_amber, color: Colors.red),
-                        Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                      ],
-                                        ),
-                                      ),
+                        height: 40,
+                        width: double.infinity,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_amber, color: Colors.red),
+                            Flexible(
+                              child: Text("The order has been cancelled due to a dispute.",
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                            ),
+                          ],
+                        ),
+                      ),
                     ):SizedBox(),
 
                 controller.hireStatus.value == "assigned" &&

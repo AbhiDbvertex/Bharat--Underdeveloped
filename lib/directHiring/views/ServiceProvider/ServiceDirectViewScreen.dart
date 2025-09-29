@@ -3749,7 +3749,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                           ? Center(
                         child: Container(
                           height: 40,
-                          width: 300,
+                          width: double.infinity,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

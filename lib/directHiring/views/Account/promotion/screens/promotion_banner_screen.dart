@@ -300,6 +300,7 @@
 
 import 'dart:io';
 import 'package:developer/Emergency/utils/size_ratio.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -360,10 +361,11 @@ class _PromotionBannerScreenState extends State<PromotionBannerScreen> {
   }
 
   // Payment success handler
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    CustomSnackBar.show(message: "Payment done",type: SnackBarType.success);
     print("Payment Success: ${response.paymentId}");
     // API call karo with form data
-    promotionController.submitForm({
+await promotionController.submitForm({
       'whyPromote': _whyPromoteController.text.trim(),
       'description': _descriptionController.text.trim(),
       'phone': _phoneController.text.trim(), // UI se phone
@@ -371,9 +373,9 @@ class _PromotionBannerScreenState extends State<PromotionBannerScreen> {
       'paymentId': response.paymentId, // Razorpay payment ID
       'amount': 100, // Static amount, change kar sakta hai
     });
-    Get.back();
-    Get.snackbar("Success", "Payment done and promotion submitted!",
-        backgroundColor: Colors.green, colorText: Colors.white,snackPosition: SnackPosition.BOTTOM);
+      Get.back();
+    //  CustomSnackBar.show(message: "Promotion Submitted.");
+
     // Clear UI fields after success
     _whyPromoteController.clear();
     _descriptionController.clear();
@@ -384,8 +386,9 @@ class _PromotionBannerScreenState extends State<PromotionBannerScreen> {
   // Payment error handler
   void _handlePaymentError(PaymentFailureResponse response) {
     print("Payment Error: ${response.message}");
-    Get.snackbar("Error", "Payment failed: ${response.message}",
-        backgroundColor: Colors.red, colorText: Colors.white);
+    // Get.snackbar("Error", "Payment failed: ${response.message}",
+    //     backgroundColor: Colors.red, colorText: Colors.white);
+    CustomSnackBar.show(message: "Payment failed: ${response.message}",type: SnackBarType.error);
     promotionController.isPromoting.value = false;
   }
 
@@ -525,6 +528,7 @@ class _PromotionBannerScreenState extends State<PromotionBannerScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextFormField(
+                  maxLength: 10,
                   cursorColor: Colors.black,
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,

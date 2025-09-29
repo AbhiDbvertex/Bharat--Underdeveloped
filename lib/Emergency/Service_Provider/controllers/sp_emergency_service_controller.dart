@@ -158,6 +158,7 @@ import 'dart:convert';
 import 'package:developer/Emergency/Service_Provider/models/sp_emergency_list_model.dart';
 import 'package:developer/Emergency/utils/ApiUrl.dart';
 import 'package:developer/Emergency/utils/logger.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -248,6 +249,12 @@ class SpEmergencyServiceController extends GetxController {
           bwDebug("[_fetchOrders] invalid response format: ${res.body}", tag: tag);
           Get.snackbar('Error', 'Invalid response from server');
           return null;
+        }
+      } else  if (res.statusCode == 401 || res.statusCode == 403) {
+        final body = jsonDecode(res.body);
+        if (body['message'] == "Un-Authorized, You are not authorized to access this route.") {
+         CustomSnackBar.show(message: "You are currently waiting for admin approval, so you cannot view tasks yet.",type: SnackBarType.info);
+          print("User is not authorized. Logging out...");
         }
       } else {
         bwDebug("[_fetchOrders] failed with body: ${res.body}", tag: tag);

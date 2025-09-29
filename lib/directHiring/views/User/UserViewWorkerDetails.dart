@@ -1723,6 +1723,13 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
 
   @override
   void initState() {
+bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
+    ".subcategreyId: ${widget.subcategreyId},"
+    ".hirebuttonhide: ${widget.hirebuttonhide},."
+    "oderId: ${widget.oderId},"
+    ".biddingOfferId: ${widget.biddingOfferId},"
+    ".UserId: ${widget.UserId},"
+    ".hideonly: ${widget.hideonly},",tag: "UserViewWorkDetail");
     super.initState();
     fetchWorkerDetails();
   }
@@ -2487,7 +2494,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                 // Hire Button / Negotiation
                 widget.hirebuttonhide == 'hide'
                     ? NegotiationCardUser(
-                  key: UniqueKey(), // GlobalKey conflict fix
+                  key: ValueKey('negotiationCardKey'), // GlobalKey conflict fix
                   workerId: widget.workerId,
                   biddingOfferId: widget.biddingOfferId,
                   oderId: widget.oderId,

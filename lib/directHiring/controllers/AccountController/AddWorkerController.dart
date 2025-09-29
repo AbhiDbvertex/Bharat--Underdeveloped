@@ -139,7 +139,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utility/custom_snack_bar.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class AddWorkerController {
   final formKey = GlobalKey<FormState>();
@@ -387,15 +386,11 @@ class AddWorkerController {
         //     message:"Worker added successfully" ,
         //     type: SnackBarType.success
         // );
-        Fluttertoast.showToast(
-          msg: "Worker added successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM, // TOP, CENTER, BOTTOM
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
 
+        CustomSnackBar.show(
+            message:"Worker added successfully" ,
+            type: SnackBarType.success
+        );
 
         return true;
       } else {

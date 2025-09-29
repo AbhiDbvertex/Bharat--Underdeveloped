@@ -1188,353 +1188,230 @@ print("user: ${biddingOrder!.userId?.id}");
           statusBarIconBrightness: Brightness.light,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(width * 0.02),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // SizedBox(height: height * 0.01),
-              // Row(
-              //   children: [
-              //     GestureDetector(
-              //       onTap: () => Navigator.pop(context),
-              //       child: Padding(
-              //         padding: EdgeInsets.only(left: width * 0.02),
-              //         child: Icon(Icons.arrow_back, size: width * 0.06),
-              //       ),
-              //     ),
-              //     SizedBox(width: width * 0.25),
-              //     Text(
-              //       "",
-              //       style: GoogleFonts.roboto(
-              //         fontSize: width * 0.045,
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.black,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // SizedBox(height: height * 0.01),
-              Padding(
-                padding: EdgeInsets.all(width * 0.02),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      color: Colors.grey,
-                      child: CarouselSlider(
-                        options: CarouselOptions(
-                          height: height * 0.25,
-                          enlargeCenterPage: true,
-                          autoPlay: true,
-                          viewportFraction: 1,
-                        ),
-                        items: biddingOrder!.imageUrls.isNotEmpty
-                            ? biddingOrder!.imageUrls.map((item) {
-                                print('🖼️ Image: $item');
-                                return ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(width * 0.025),
-                                  child: Image.network(
-                                    item,
-                                    // fit: BoxFit.cover,
-                                    width: width,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      print(
-                                          'Image error: $item, Error: $error');
-                                      return Image.asset(
-                                        'assets/images/chair.png',
-                                        fit: BoxFit.cover,
-                                        width: width,
-                                      );
-                                    },
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(width * 0.02),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // SizedBox(height: height * 0.01),
+                // Row(
+                //   children: [
+                //     GestureDetector(
+                //       onTap: () => Navigator.pop(context),
+                //       child: Padding(
+                //         padding: EdgeInsets.only(left: width * 0.02),
+                //         child: Icon(Icons.arrow_back, size: width * 0.06),
+                //       ),
+                //     ),
+                //     SizedBox(width: width * 0.25),
+                //     Text(
+                //       "",
+                //       style: GoogleFonts.roboto(
+                //         fontSize: width * 0.045,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.black,
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // SizedBox(height: height * 0.01),
+                Padding(
+                  padding: EdgeInsets.all(width * 0.02),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        color: Colors.grey,
+                        child: CarouselSlider(
+                          options: CarouselOptions(
+                            height: height * 0.25,
+                            enlargeCenterPage: true,
+                            autoPlay: true,
+                            viewportFraction: 1,
+                          ),
+                          items: biddingOrder!.imageUrls.isNotEmpty
+                              ? biddingOrder!.imageUrls.map((item) {
+                                  print('🖼️ Image: $item');
+                                  return ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(width * 0.025),
+                                    child: Image.network(
+                                      item,
+                                      // fit: BoxFit.cover,
+                                      width: width,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        print(
+                                            'Image error: $item, Error: $error');
+                                        return Image.asset(
+                                          'assets/images/chair.png',
+                                          fit: BoxFit.cover,
+                                          width: width,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }).toList()
+                              : [
+                                  ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(width * 0.025),
+                                    child: Image.asset(
+                                      'assets/images/chair.png',
+                                      fit: BoxFit.cover,
+                                      width: width,
+                                    ),
                                   ),
+                                ],
+                        ),
+                      ),
+                      SizedBox(height: height * 0.015),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: InkWell(
+                              onTap: () {
+                                openMap(
+                                  biddingOrder?.latitude ?? 0.0,
+                                  biddingOrder?.longitude ?? 0.0,
                                 );
-                              }).toList()
-                            : [
-                                ClipRRect(
+                                print(
+                                    "Abhi:- print latitude : ${biddingOrder?.latitude ?? 0.0} logiture ${biddingOrder?.longitude ?? 0.0}");
+                              },
+                              child: Container(
+                                height: height * 0.03,
+                                width: width * 0.4,
+                                // padding: EdgeInsets.symmetric(
+                                //   horizontal: width * 0.06,
+                                //   vertical: height * 0.005,
+                                // ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade300,
                                   borderRadius:
-                                      BorderRadius.circular(width * 0.025),
-                                  child: Image.asset(
-                                    'assets/images/chair.png',
-                                    fit: BoxFit.cover,
-                                    width: width,
-                                  ),
+                                      BorderRadius.circular(width * 0.02),
                                 ),
-                              ],
-                      ),
-                    ),
-                    SizedBox(height: height * 0.015),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              openMap(
-                                biddingOrder?.latitude ?? 0.0,
-                                biddingOrder?.longitude ?? 0.0,
-                              );
-                              print(
-                                  "Abhi:- print latitude : ${biddingOrder?.latitude ?? 0.0} logiture ${biddingOrder?.longitude ?? 0.0}");
-                            },
-                            child: Container(
-                              height: height * 0.03,
-                              width: width * 0.4,
-                              // padding: EdgeInsets.symmetric(
-                              //   horizontal: width * 0.06,
-                              //   vertical: height * 0.005,
-                              // ),
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade300,
-                                borderRadius:
-                                    BorderRadius.circular(width * 0.02),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(3.0),
-                                child: Text(
-                                  // biddingOrder!.address,
-                                  biddingOrder?.userId?.location?.address ??
-                                      "No data",
-                                  style: GoogleFonts.roboto(
-                                    color: Colors.white,
-                                    fontSize: width * 0.03,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Center(
-                              child: Text(
-                            biddingOrder?.projectId ?? "No data",
-                            style: TextStyle(color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          )),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: height * 0.015),
-                    Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Text(
-                        biddingOrder!.title,
-                        style: TextStyle(
-                          fontSize: width * 0.045,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.005),
-                    Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Text(
-                        'Completion Date : ${biddingOrder!.deadline.split('T').first}',
-                        style: TextStyle(
-                          fontSize: width * 0.035,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.015),
-                    Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Text(
-                        '₹${biddingOrder!.cost.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: width * 0.05,
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.015),
-                    Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Text(
-                        'Task Details',
-                        style: TextStyle(
-                          fontSize: width * 0.04,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: height * 0.005),
-                    Padding(
-                      padding: EdgeInsets.only(left: width * 0.02),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: biddingOrder!.description
-                            .split('.')
-                            .where((s) => s.trim().isNotEmpty)
-                            .map((s) => Padding(
-                                  padding:
-                                      EdgeInsets.only(bottom: height * 0.004),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(3.0),
                                   child: Text(
-                                    '• $s',
-                                    style: TextStyle(fontSize: width * 0.035),
+                                    // biddingOrder!.address,
+                                    biddingOrder?.userId?.location?.address ??
+                                        "No data",
+                                    style: GoogleFonts.roboto(
+                                      color: Colors.white,
+                                      fontSize: width * 0.03,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ))
-                            .toList(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    biddingOrder?.hireStatus == 'cancelled'
-                        ? Center(
-                            child: Container(
-                              height: 35,
-                              width: 250,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.red)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.warning_amber, color: Colors.red),
-                                  Text(
-                                    "This order is cancelled",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.red),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          )
-                        : SizedBox(),
-                    biddingOrder?.hireStatus == 'cancelledDispute'
-                        ? Center(
-                            child: Container(
-                              height: 40,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.red)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.warning_amber, color: Colors.red),
-                                  Flexible(
-                                      child: Text(
-                                    "The order has been cancelled due to a dispute.",
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.red),
-                                  )),
-                                ],
-                              ),
-                            ),
-                          )
-                        : SizedBox(),
-                    biddingOrder?.hireStatus == 'completed'
-                        ? Center(
-                            child: Container(
-                              height: 35,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.green)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.check_circle_outline,
-                                      color: Colors.green),
-                                  Text(
-                                    "  This order has been completed.",
-                                    style: TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : SizedBox(),
-                    biddingOrder?.hireStatus == 'rejected'
-                        ? Center(
-                            child: Container(
-                              height: 35,
-                              width: 300,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.grey)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.block, color: Colors.grey),
-                                  Text("The order is rejected"),
-                                ],
-                              ),
-                            ),
-                          )
-                        : SizedBox(),
-                    if (isAccepted) ...[
-                      Card(
-                        child: Container(
-                          height: 100,
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
                           ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: biddingOrder!.userId != null &&
-                                        biddingOrder!.userId!.profilePic !=
-                                            null &&
-                                        biddingOrder!
-                                            .userId!.profilePic!.isNotEmpty
-                                    ? Image.network(
-                                        biddingOrder!.userId!.profilePic!
-                                                .startsWith('http')
-                                            ? biddingOrder!.userId!.profilePic!
-                                                .replaceFirst(
-                                                    'http://', 'https://')
-                                            : 'https://api.thebharatworks.com${biddingOrder!.userId!.profilePic}',
-                                        height: 70,
-                                        width: 70,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          print(
-                                              '❌ Profile image error: ${biddingOrder!.userId!.profilePic}');
-                                          return Image.asset(
-                                            'assets/images/d_png/no_profile_image.png',
-                                            height: 70,
-                                            width: 70,
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      )
-                                    : Image.asset(
-                                        'assets/images/d_png/no_profile_image.png',
-                                        height: 70,
-                                        width: 70,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Center(
+                                child: Text(
+                              biddingOrder?.projectId ?? "No data",
+                              style: TextStyle(color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: height * 0.015),
+                      Padding(
+                        padding: EdgeInsets.only(left: width * 0.02),
+                        child: Text(
+                          biddingOrder!.title,
+                          style: TextStyle(
+                            fontSize: width * 0.045,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: height * 0.005),
+                      Padding(
+                        padding: EdgeInsets.only(left: width * 0.02),
+                        child: Text(
+                          'Completion Date  : ${biddingOrder!.deadline.split('T').first}',
+                          style: TextStyle(
+                            fontSize: width * 0.035,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+
+                    // ),
+                    // SizedBox(height: height * 0.005),
+                    // Padding(
+                    //   padding: EdgeInsets.only(left: width * 0.02),
+                    //   child: Text(
+                    //     'Completion Date : ${biddingOrder!.deadline.split('T').first}',
+                    //     style: TextStyle(
+                    //       fontSize: width * 0.035,
+                    //       color: Colors.grey,
+
+                      SizedBox(height: height * 0.015),
+                      Padding(
+                        padding: EdgeInsets.only(left: width * 0.02),
+                        child: Text(
+                          '₹${biddingOrder!.cost.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: width * 0.05,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+
+                        ),
+                      ),
+                      SizedBox(height: height * 0.015),
+                      Padding(
+                        padding: EdgeInsets.only(left: width * 0.02),
+                        child: Text(
+                          'Task Details',
+                          style: TextStyle(
+                            fontSize: width * 0.04,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: height * 0.005),
+                      Padding(
+                        padding: EdgeInsets.only(left: width * 0.02),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: biddingOrder!.description
+                              .split('.')
+                              .where((s) => s.trim().isNotEmpty)
+                              .map((s) => Padding(
+                                    padding:
+                                        EdgeInsets.only(bottom: height * 0.004),
+                                    child: Text(
+                                      '• $s',
+                                      style: TextStyle(fontSize: width * 0.035),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      biddingOrder?.hireStatus == 'cancelled'
+                          ? Center(
+                              child: Container(
+                                height: 35,
+                                width: 250,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.red)),
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Row(
                                       children: [
@@ -1614,77 +1491,92 @@ print("user: ${biddingOrder!.userId?.id}");
                                         ),
                                       ],
                                     ),
-                                    SizedBox(
-                                      height: height * 0.008,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ViewUserProfileScreen(
-                                                        userId: biddingOrder!
-                                                                .userId?.id ??
-                                                            'Unknown',
-                                                        profileImage: biddingOrder!
-                                                                .userId
-                                                                ?.profilePic ??
-                                                            'Unknown',
-                                                      )));
-                                        },
+                                //     SizedBox(
+                                //       height: height * 0.008,
+                                //     Icon(Icons.warning_amber, color: Colors.red),
+                                //     Text(
+                                //       "This order is cancelled",
+                                //       style: TextStyle(
+                                //           fontWeight: FontWeight.w600,
+                                //           color: Colors.red),
+                                //     ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
+                      biddingOrder?.hireStatus == 'cancelledDispute'
+                          ? Center(
+                              child: Container(
+                                height: 40,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.red)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.warning_amber, color: Colors.red),
+                                    Flexible(
                                         child: Text(
-                                          "View Profile",
-                                          style: GoogleFonts.roboto(
-                                            color: Colors.green,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                      "The order has been cancelled due to a dispute.",
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.red),
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
+                      biddingOrder?.hireStatus == 'completed'
+                          ? Center(
+                              child: Container(
+                                height: 35,
+                                width: 300,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.green)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.check_circle_outline,
+                                        color: Colors.green),
+                                    Text(
+                                      "  This order has been completed.",
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  BiddingWorkerList(orderId: widget.id),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: 50,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.green.shade700),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Assign to another person',
-                              style: GoogleFonts.roboto(
-                                fontSize: 14,
-                                color: Colors.green,
-                                fontWeight: FontWeight.w600,
+                            )
+                          : SizedBox(),
+                      biddingOrder?.hireStatus == 'rejected'
+                          ? Center(
+                              child: Container(
+                                height: 35,
+                                width: 300,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.grey)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.block, color: Colors.grey),
+                                    Text("The order is rejected"),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Conditionally show assigned worker card only if assignedWorker is not null
-                      if (isAccepted && assignedWorker != null) ...[
-                        SizedBox(height: 20),
+                            )
+                          : SizedBox(),
+                      if (isAccepted) ...[
                         Card(
                           child: Container(
                             height: 100,
@@ -1697,34 +1589,51 @@ print("user: ${biddingOrder!.userId?.id}");
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
-                                  child: Image.network(
-                                    assignedWorker!.image,
-                                    height: 70,
-                                    width: 70,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      print(
-                                          '❌ Worker image error: ${assignedWorker!.image}');
-                                      return Image.asset(
-                                        'assets/images/d_png/no_profile_image.png',
-                                        height: 70,
-                                        width: 70,
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  ),
+                                  child: biddingOrder!.userId != null &&
+                                          biddingOrder!.userId!.profilePic !=
+                                              null &&
+                                          biddingOrder!
+                                              .userId!.profilePic!.isNotEmpty
+                                      ? Image.network(
+                                          biddingOrder!.userId!.profilePic!
+                                                  .startsWith('http')
+                                              ? biddingOrder!.userId!.profilePic!
+                                                  .replaceFirst(
+                                                      'http://', 'https://')
+                                              : 'https://api.thebharatworks.com${biddingOrder!.userId!.profilePic}',
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            print(
+                                                '❌ Profile image error: ${biddingOrder!.userId!.profilePic}');
+                                            return Image.asset(
+                                              'assets/images/d_png/no_profile_image.png',
+                                              height: 70,
+                                              width: 70,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          'assets/images/d_png/no_profile_image.png',
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
                                           Text(
-                                            assignedWorker!.name,
+                                            biddingOrder!.userId?.fullName ??
+                                                'Unknown',
                                             style: GoogleFonts.roboto(
                                               fontSize: 12,
                                               color: Colors.black,
@@ -1732,51 +1641,86 @@ print("user: ${biddingOrder!.userId?.id}");
                                             ),
                                           ),
                                           Spacer(),
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.grey.withOpacity(0.1),
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.call,
+                                                color: Colors.green.shade700,
+                                                size: 14,
+                                              ),
+                                              onPressed: () {},
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       SizedBox(height: 5),
                                       Row(
                                         children: [
                                           Text(
-                                            assignedWorker!.address,
+                                            'Awarded amount: ₹${biddingOrder!.cost.toStringAsFixed(0)}',
                                             style: GoogleFonts.roboto(
                                               fontSize: 12,
                                               color: Colors.black,
                                             ),
                                           ),
+                                          SizedBox(
+                                            width: 17,
+                                          ),
                                           Spacer(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      WorkerListViewProfileScreen(
-                                                    workerId:
-                                                        assignedWorker!.id,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 70,
-                                              decoration: BoxDecoration(
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.grey.withOpacity(0.1),
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.message_rounded,
                                                 color: Colors.green.shade700,
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
+                                                size: 14,
                                               ),
-                                              child: Center(
-                                                child: Text(
-                                                  "View",
-                                                  style: GoogleFonts.roboto(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
+                                              onPressed: () {},
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      SizedBox(
+                                        height: height * 0.008,
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ViewUserProfileScreen(
+                                                          userId: biddingOrder!
+                                                                  .userId?.id ??
+                                                              'Unknown',
+                                                          profileImage: biddingOrder!
+                                                                  .userId
+                                                                  ?.profilePic ??
+                                                              'Unknown',
+                                                        )));
+                                          },
+                                          child: Text(
+                                            "View Profile",
+                                            style: GoogleFonts.roboto(
+                                              color: Colors.green,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1785,1043 +1729,1177 @@ print("user: ${biddingOrder!.userId?.id}");
                             ),
                           ),
                         ),
-                      ],
-                      if (isAccepted) ...[
                         SizedBox(height: 20),
-                        Card(
-                          elevation: 6,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BiddingWorkerList(orderId: widget.id),
+                              ),
+                            );
+                          },
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            height: 50,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.green.shade700),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    'Payment Details',
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
+                            child: Center(
+                              child: Text(
+                                'Assign to another person',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                const SizedBox(height: 10),
-                                const Divider(thickness: 0.8),
-                                const SizedBox(height: 10),
-                                if (biddingOrder!.servicePayment != null &&
-                                    biddingOrder!.servicePayment![
-                                            'payment_history'] !=
-                                        null &&
-                                    biddingOrder!
-                                        .servicePayment!['payment_history']
-                                        .isNotEmpty)
-                                  ...List.generate(
-                                    biddingOrder!
-                                        .servicePayment!['payment_history']
-                                        .length,
-                                    (index) {
-                                      final item =
-                                          biddingOrder!.servicePayment![
-                                              'payment_history'][index];
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Flexible(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    "${index + 1}. ${item['description'] ?? 'No Description'}",
-                                                    style: GoogleFonts.roboto(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                ),
-                                                Flexible(
-                                                  flex: 3,
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Flexible(
-                                                        child: Text(
-                                                          "${item['status'] == 'success' ? 'Paid' : item['status'] == 'pending' ? 'Pending' : 'Failed'}",
-                                                          style: GoogleFonts
-                                                              .roboto(
-                                                            color: item['status'] ==
-                                                                    'success'
-                                                                ? Colors.green
-                                                                : item['status'] ==
-                                                                        'pending'
-                                                                    ? Colors
-                                                                        .orange
-                                                                    : Colors
-                                                                        .red,
-                                                            fontSize: 12,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 10),
-                                                      Flexible(
-                                                        child: Text(
-                                                          "₹${item['amount']}",
-                                                          style: GoogleFonts
-                                                              .roboto(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  )
-                              ],
+                              ),
                             ),
                           ),
                         ),
-                      ],
-                      SizedBox(height: 40),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.only(top: 40, bottom: 16),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              color: Colors.yellow.shade100,
-                            ),
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 10),
-                                Text(
-                                  'Warning Message',
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 14,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Make payments only through the app,\nit’s safer and more secure.',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Positioned(
-                            top: -30,
-                            left: 0,
-                            right: 0,
-                            child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white,
-                                ),
-                                child: Image.asset(
-                                  'assets/images/warning.png',
-                                  height: 70,
-                                  width: 70,
-                                  fit: BoxFit.contain,
-                                ),
+                        // Conditionally show assigned worker card only if assignedWorker is not null
+                        if (isAccepted && assignedWorker != null) ...[
+                          SizedBox(height: 20),
+                          Card(
+                            child: Container(
+                              height: 100,
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    if (isPending) ...[
-                      SizedBox(height: height * 0.02),
-                      /*hasAlreadyBid ? */
-                      biddingOrder!.userId == currentUserId || hasAlreadyBid
-                          ? GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    final TextEditingController
-                                        editamountController =
-                                        TextEditingController();
-                                    final TextEditingController
-                                        editdescriptionController =
-                                        TextEditingController();
-                                    final TextEditingController
-                                        editdurationController =
-                                        TextEditingController();
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      insetPadding: EdgeInsets.symmetric(
-                                          horizontal: width * 0.05),
-                                      title: Center(
-                                        child: Text(
-                                          "Bid",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: width * 0.05,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      content: SingleChildScrollView(
-                                        child: SizedBox(
-                                          width: width * 0.8,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Enter Amount",
-                                                style: GoogleFonts.roboto(
-                                                  fontSize: width * 0.035,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.005),
-                                              TextField(
-                                                controller:
-                                                    editamountController,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                decoration: InputDecoration(
-                                                  hintText: "₹0.00",
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            width * 0.02),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.01),
-                                              Text(
-                                                "Description",
-                                                style: GoogleFonts.roboto(
-                                                  fontSize: width * 0.035,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.005),
-                                              TextField(
-                                                controller:
-                                                    editdescriptionController,
-                                                maxLines: 3,
-                                                decoration: InputDecoration(
-                                                  hintText: "Enter Description",
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            width * 0.02),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.01),
-                                              Text(
-                                                "Duration",
-                                                style: GoogleFonts.roboto(
-                                                  fontSize: width * 0.035,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.005),
-                                              TextField(
-                                                controller:
-                                                    editdurationController,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                decoration: InputDecoration(
-                                                  hintText:
-                                                      "Enter Duration (in days)",
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            width * 0.02),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: height * 0.015),
-                                              Center(
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    String editbidAmout =
-                                                        editamountController
-                                                            .text
-                                                            .trim();
-                                                    String editbidmessage =
-                                                        editdescriptionController
-                                                            .text
-                                                            .trim();
-                                                    String editbidduration =
-                                                        editdurationController
-                                                            .text
-                                                            .trim();
-                                                    print(
-                                                        "Abhi:- edit bid amount print : amount : $editbidAmout editbidmessage : $editbidmessage editbidduration : $editbidduration");
-                                                    editBid(
-                                                        editbidAmout,
-                                                        editbidduration,
-                                                        editbidmessage);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      horizontal: width * 0.18,
-                                                      vertical: height * 0.012,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          Colors.green.shade700,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              width * 0.02),
-                                                    ),
-                                                    child: Text(
-                                                      "Edit Bid",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: width * 0.04,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: width * 0.18,
-                                    vertical: height * 0.012,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.shade700,
-                                    borderRadius:
-                                        BorderRadius.circular(width * 0.02),
-                                  ),
-                                  child: Text(
-                                    "Edit bid",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Center(
-                              child: GestureDetector(
-                                onTap: biddingOrder!.userId == currentUserId
-                                    ? () {
-
-                                        CustomSnackBar.show(
-                                            message:  'You cannot bid on your own order',
-                                            type: SnackBarType.error
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: Image.network(
+                                      assignedWorker!.image,
+                                      height: 70,
+                                      width: 70,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        print(
+                                            '❌ Worker image error: ${assignedWorker!.image}');
+                                        return Image.asset(
+                                          'assets/images/d_png/no_profile_image.png',
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.cover,
                                         );
-                                      }
-                                    : hasAlreadyBid
-                                        ? () {
-
-                                            CustomSnackBar.show(
-                                                message:'You have already placed a bid on this order' ,
-                                                type: SnackBarType.error
-                                            );
-                                          }
-                                        : () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                final TextEditingController
-                                                    amountController =
-                                                    TextEditingController();
-                                                final TextEditingController
-                                                    descriptionController =
-                                                    TextEditingController();
-                                                final TextEditingController
-                                                    durationController =
-                                                    TextEditingController();
-                                                return AlertDialog(
-                                                  backgroundColor: Colors.white,
-                                                  insetPadding:
-                                                      EdgeInsets.symmetric(
-                                                          horizontal:
-                                                              width * 0.05),
-                                                  title: Center(
-                                                    child: Text(
-                                                      "Bid",
-                                                      style: GoogleFonts.roboto(
-                                                        fontSize: width * 0.05,
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  content:
-                                                      SingleChildScrollView(
-                                                    child: SizedBox(
-                                                      width: width * 0.8,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "Enter Amount",
-                                                            style: GoogleFonts
-                                                                .roboto(
-                                                              fontSize:
-                                                                  width * 0.035,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.005),
-                                                          TextField(
-                                                            controller:
-                                                                amountController,
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              hintText: "₹0.00",
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(width *
-                                                                            0.02),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.01),
-                                                          Text(
-                                                            "Description",
-                                                            style: GoogleFonts
-                                                                .roboto(
-                                                              fontSize:
-                                                                  width * 0.035,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.005),
-                                                          TextField(
-                                                            controller:
-                                                                descriptionController,
-                                                            maxLines: 3,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              hintText:
-                                                                  "Enter Description",
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(width *
-                                                                            0.02),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.01),
-                                                          Text(
-                                                            "Duration",
-                                                            style: GoogleFonts
-                                                                .roboto(
-                                                              fontSize:
-                                                                  width * 0.035,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.005),
-                                                          TextField(
-                                                            controller:
-                                                                durationController,
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              hintText:
-                                                                  "Enter Duration (in days)",
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(width *
-                                                                            0.02),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                              height: height *
-                                                                  0.015),
-                                                          Center(
-                                                            child:
-                                                                GestureDetector(
-                                                              onTap: () {
-                                                                String amount =
-                                                                    amountController
-                                                                        .text
-                                                                        .trim();
-                                                                String
-                                                                    description =
-                                                                    descriptionController
-                                                                        .text
-                                                                        .trim();
-                                                                String
-                                                                    duration =
-                                                                    durationController
-                                                                        .text
-                                                                        .trim();
-                                                                submitBid(
-                                                                    amount,
-                                                                    description,
-                                                                    duration);
-                                                                Navigator.pop(
-                                                                    context);
-                                                              },
-                                                              child: Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                  horizontal:
-                                                                      width *
-                                                                          0.18,
-                                                                  vertical:
-                                                                      height *
-                                                                          0.012,
-                                                                ),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .green
-                                                                      .shade700,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          width *
-                                                                              0.02),
-                                                                ),
-                                                                child: Text(
-                                                                  "Bid",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        width *
-                                                                            0.04,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              assignedWorker!.name,
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                          ],
+                                        ),
+                                        SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              assignedWorker!.address,
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        WorkerListViewProfileScreen(
+                                                      workerId:
+                                                          assignedWorker!.id,
                                                     ),
                                                   ),
                                                 );
                                               },
-                                            );
-                                          },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: width * 0.18,
-                                    vertical: height * 0.012,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        biddingOrder!.userId == currentUserId ||
-                                                hasAlreadyBid
-                                            ? Colors.grey.shade400
-                                            : Colors.green.shade700,
-                                    borderRadius:
-                                        BorderRadius.circular(width * 0.02),
-                                  ),
-                                  child: Text(
-                                    "Bid",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: width * 0.04,
-                                      fontWeight: FontWeight.bold,
+                                              child: Container(
+                                                height: 30,
+                                                width: 70,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green.shade700,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "View",
+                                                    style: GoogleFonts.roboto(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (isAccepted) ...[
+                          SizedBox(height: 20),
+                          Card(
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.white,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      'Payment Details',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Divider(thickness: 0.8),
+                                  const SizedBox(height: 10),
+                                  if (biddingOrder!.servicePayment != null &&
+                                      biddingOrder!.servicePayment![
+                                              'payment_history'] !=
+                                          null &&
+                                      biddingOrder!
+                                          .servicePayment!['payment_history']
+                                          .isNotEmpty)
+                                    ...List.generate(
+                                      biddingOrder!
+                                          .servicePayment!['payment_history']
+                                          .length,
+                                      (index) {
+                                        final item =
+                                            biddingOrder!.servicePayment![
+                                                'payment_history'][index];
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Flexible(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      "${index + 1}. ${item['description'] ?? 'No Description'}",
+                                                      style: GoogleFonts.roboto(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    flex: 3,
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Flexible(
+                                                          child: Text(
+                                                            "${item['status'] == 'success' ? 'Paid' : item['status'] == 'pending' ? 'Pending' : 'Failed'}",
+                                                            style: GoogleFonts
+                                                                .roboto(
+                                                              color: item['status'] ==
+                                                                      'success'
+                                                                  ? Colors.green
+                                                                  : item['status'] ==
+                                                                          'pending'
+                                                                      ? Colors
+                                                                          .orange
+                                                                      : Colors
+                                                                          .red,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight.w500,
+                                                            ),
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 10),
+                                                        Flexible(
+                                                          child: Text(
+                                                            "₹${item['amount']}",
+                                                            style: GoogleFonts
+                                                                .roboto(
+                                                              fontWeight:
+                                                                  FontWeight.w500,
+                                                            ),
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                            maxLines: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                        SizedBox(height: 40),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.only(top: 40, bottom: 16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.yellow.shade100,
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'Warning Message',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Make payments only through the app,\nit’s safer and more secure.',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              top: -30,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.white,
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/warning.png',
+                                    height: 70,
+                                    width: 70,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
                             ),
-                      SizedBox(height: height * 0.02),
-                      NegotiationCard(
-                        key: ValueKey(offerPrice),
-                        width: width,
-                        height: height,
-                        offerPrice: offerPrice,
-                        bidAmount: getCurrentUserBidAmount(),
-                        onNegotiate: (amount) {
-                          if (hasAlreadyBid && biddingOfferId != null) {
-                            startNegotiation(amount);
-                          } else {
-
-                            CustomSnackBar.show(
-                                message: 'Please place a bid first.',
-                                type: SnackBarType.error
-                            );
-                          }
-                        },
-                        onAccept: () {
-                          if (hasAlreadyBid && biddingOfferId != null) {
-                            acceptNegotiation();
-                          } else {
-
-                            CustomSnackBar.show(
-                                message: 'Please place a bid first.' ,
-                                type: SnackBarType.error
-                            );
-                          }
-                        },
-                      ),
-                      SizedBox(height: height * 0.02),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: width * 0.05),
-                        child: Column(
-                          children: [
-                            SizedBox(height: height * 0.015),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedIndex = 0;
-                                    });
-                                  },
-                                  child: Container(
-                                    height: height * 0.045,
-                                    width: width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: _selectedIndex == 0
-                                          ? Colors.green.shade700
-                                          : Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(width: width * 0.02),
-                                          Text(
-                                            "Bidders",
-                                            style: TextStyle(
-                                              color: _selectedIndex == 0
-                                                  ? Colors.white
-                                                  : Colors.grey.shade700,
+                          ],
+                        ),
+                      ],
+                      if (isPending) ...[
+                        SizedBox(height: height * 0.02),
+                        /*hasAlreadyBid ? */
+                        biddingOrder!.userId == currentUserId || hasAlreadyBid
+                            ? GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      final TextEditingController
+                                          editamountController =
+                                          TextEditingController();
+                                      final TextEditingController
+                                          editdescriptionController =
+                                          TextEditingController();
+                                      final TextEditingController
+                                          editdurationController =
+                                          TextEditingController();
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        insetPadding: EdgeInsets.symmetric(
+                                            horizontal: width * 0.05),
+                                        title: Center(
+                                          child: Text(
+                                            "Bid",
+                                            style: GoogleFonts.roboto(
                                               fontSize: width * 0.05,
+                                              color: Colors.black,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: width * 0.0),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedIndex = 1;
-                                    });
-                                  },
+                                        ),
+                                        content: SingleChildScrollView(
+                                          child: SizedBox(
+                                            width: width * 0.8,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Enter Amount",
+                                                  style: GoogleFonts.roboto(
+                                                    fontSize: width * 0.035,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.005),
+                                                TextField(
+                                                  controller:
+                                                      editamountController,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration: InputDecoration(
+                                                    hintText: "₹0.00",
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              width * 0.02),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.01),
+                                                Text(
+                                                  "Description",
+                                                  style: GoogleFonts.roboto(
+                                                    fontSize: width * 0.035,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.005),
+                                                TextField(
+                                                  controller:
+                                                      editdescriptionController,
+                                                  maxLines: 3,
+                                                  decoration: InputDecoration(
+                                                    hintText: "Enter Description",
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              width * 0.02),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.01),
+                                                Text(
+                                                  "Duration",
+                                                  style: GoogleFonts.roboto(
+                                                    fontSize: width * 0.035,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.005),
+                                                TextField(
+                                                  controller:
+                                                      editdurationController,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration: InputDecoration(
+                                                    hintText:
+                                                        "Enter Duration (in days)",
+                                                    border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              width * 0.02),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: height * 0.015),
+                                                Center(
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      String editbidAmout =
+                                                          editamountController
+                                                              .text
+                                                              .trim();
+                                                      String editbidmessage =
+                                                          editdescriptionController
+                                                              .text
+                                                              .trim();
+                                                      String editbidduration =
+                                                          editdurationController
+                                                              .text
+                                                              .trim();
+                                                      print(
+                                                          "Abhi:- edit bid amount print : amount : $editbidAmout editbidmessage : $editbidmessage editbidduration : $editbidduration");
+                                                      editBid(
+                                                          editbidAmout,
+                                                          editbidduration,
+                                                          editbidmessage);
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                        horizontal: width * 0.18,
+                                                        vertical: height * 0.012,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            Colors.green.shade700,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                width * 0.02),
+                                                      ),
+                                                      child: Text(
+                                                        "Edit Bid",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: width * 0.04,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Center(
                                   child: Container(
-                                    height: height * 0.045,
-                                    width: width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: _selectedIndex == 1
-                                          ? Colors.green.shade700
-                                          : Colors.grey.shade300,
-                                      borderRadius: BorderRadius.circular(8),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: width * 0.18,
+                                      vertical: height * 0.012,
                                     ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(width: width * 0.02),
-                                          Text(
-                                            "Related Worker",
-                                            style: TextStyle(
-                                              color: _selectedIndex == 1
-                                                  ? Colors.white
-                                                  : Colors.grey.shade700,
-                                              fontSize: width * 0.04,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade700,
+                                      borderRadius:
+                                          BorderRadius.circular(width * 0.02),
+                                    ),
+                                    child: Text(
+                                      "Edit bid",
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                            if (_selectedIndex == 0)
-                              Padding(
-                                padding: EdgeInsets.only(top: height * 0.01),
-                                child: bidders.isEmpty
-                                    ? Center(
-                                        child: Text(
-                                          'No bidders found',
-                                          style: TextStyle(
-                                            fontSize: width * 0.04,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      )
-                                    : ListView.builder(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: bidders.length,
-                                        itemBuilder: (context, index) {
-                                          final bidder = bidders[index];
-                                          return Container(
-                                            margin: EdgeInsets.symmetric(
-                                              vertical: height * 0.01,
-                                              horizontal: width * 0.01,
-                                            ),
-                                            padding:
-                                                EdgeInsets.all(width * 0.02),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.2),
-                                                  spreadRadius: 1,
-                                                  blurRadius: 5,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  child: Image.asset(
-                                                    "assets/images/d_png/no_profile_image.png",
-                                                    height: 90,
-                                                    width: 90,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                SizedBox(width: width * 0.03),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        bidder['name'],
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.045,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                          height:
-                                                              height * 0.005),
-                                                      Text(
-                                                        'Status: ${bidder['status']}',
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                          height:
-                                                              height * 0.005),
-                                                      Text(
-                                                        bidder['address'],
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                          height:
-                                                              height * 0.005),
-                                                      Text(
-                                                        bidder['bid_amount'],
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.green,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
                               )
-                            else
-                              Padding(
-                                padding: EdgeInsets.only(top: height * 0.01),
-                                child: relatedWorkers.isEmpty
-                                    ? Center(
-                                        child: Text(
-                                          'No related workers found',
-                                          style: TextStyle(
-                                            fontSize: width * 0.04,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      )
-                                    : ListView.builder(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: relatedWorkers.length,
-                                        itemBuilder: (context, index) {
-                                          final worker = relatedWorkers[index];
-                                          return Container(
-                                            margin: EdgeInsets.symmetric(
-                                              vertical: height * 0.01,
-                                              horizontal: width * 0.01,
-                                            ),
-                                            padding:
-                                                EdgeInsets.all(width * 0.02),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.2),
-                                                  spreadRadius: 1,
-                                                  blurRadius: 5,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  child: Image.asset(
-                                                    "assets/images/d_png/no_profile_image.png",
-                                                    height: 90,
-                                                    width: 90,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                SizedBox(width: width * 0.03),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Flexible(
-                                                            child: Text(
-                                                              worker['name'],
-                                                              style: TextStyle(
+                            : Center(
+                                child: GestureDetector(
+                                  onTap: biddingOrder!.userId == currentUserId
+                                      ? () {
+        
+                                          CustomSnackBar.show(
+                                              message:  'You cannot bid on your own order',
+                                              type: SnackBarType.error
+                                          );
+                                        }
+                                      : hasAlreadyBid
+                                          ? () {
+        
+                                              CustomSnackBar.show(
+                                                  message:'You have already placed a bid on this order' ,
+                                                  type: SnackBarType.error
+                                              );
+                                            }
+                                          : () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  final TextEditingController
+                                                      amountController =
+                                                      TextEditingController();
+                                                  final TextEditingController
+                                                      descriptionController =
+                                                      TextEditingController();
+                                                  final TextEditingController
+                                                      durationController =
+                                                      TextEditingController();
+                                                  return AlertDialog(
+                                                    backgroundColor: Colors.white,
+                                                    insetPadding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal:
+                                                                width * 0.05),
+                                                    title: Center(
+                                                      child: Text(
+                                                        "Bid",
+                                                        style: GoogleFonts.roboto(
+                                                          fontSize: width * 0.05,
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    content:
+                                                        SingleChildScrollView(
+                                                      child: SizedBox(
+                                                        width: width * 0.8,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              "Enter Amount",
+                                                              style: GoogleFonts
+                                                                  .roboto(
                                                                 fontSize:
-                                                                    width *
-                                                                        0.045,
+                                                                    width * 0.035,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
                                                               ),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              maxLines: 1,
                                                             ),
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                "${worker['rating']}",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      width *
-                                                                          0.035,
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.005),
+                                                            TextField(
+                                                              controller:
+                                                                  amountController,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .number,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                hintText: "₹0.00",
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(width *
+                                                                              0.02),
                                                                 ),
                                                               ),
-                                                              Icon(
-                                                                Icons.star,
-                                                                size: width *
-                                                                    0.04,
-                                                                color: Colors
-                                                                    .yellow
-                                                                    .shade700,
+                                                            ),
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.01),
+                                                            Text(
+                                                              "Description",
+                                                              style: GoogleFonts
+                                                                  .roboto(
+                                                                fontSize:
+                                                                    width * 0.035,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
                                                               ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(
-                                                          height:
-                                                              height * 0.005),
-                                                      Text(
-                                                        worker['amount'],
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.green,
+                                                            ),
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.005),
+                                                            TextField(
+                                                              controller:
+                                                                  descriptionController,
+                                                              maxLines: 3,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                hintText:
+                                                                    "Enter Description",
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(width *
+                                                                              0.02),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.01),
+                                                            Text(
+                                                              "Duration",
+                                                              style: GoogleFonts
+                                                                  .roboto(
+                                                                fontSize:
+                                                                    width * 0.035,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.005),
+                                                            TextField(
+                                                              controller:
+                                                                  durationController,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .number,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                hintText:
+                                                                    "Enter Duration (in days)",
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(width *
+                                                                              0.02),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                                height: height *
+                                                                    0.015),
+                                                            Center(
+                                                              child:
+                                                                  GestureDetector(
+                                                                onTap: () {
+                                                                  String amount =
+                                                                      amountController
+                                                                          .text
+                                                                          .trim();
+                                                                  String
+                                                                      description =
+                                                                      descriptionController
+                                                                          .text
+                                                                          .trim();
+                                                                  String
+                                                                      duration =
+                                                                      durationController
+                                                                          .text
+                                                                          .trim();
+                                                                  submitBid(
+                                                                      amount,
+                                                                      description,
+                                                                      duration);
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: Container(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                    horizontal:
+                                                                        width *
+                                                                            0.18,
+                                                                    vertical:
+                                                                        height *
+                                                                            0.012,
+                                                                  ),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .green
+                                                                        .shade700,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            width *
+                                                                                0.02),
+                                                                  ),
+                                                                  child: Text(
+                                                                    "Bid",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontSize:
+                                                                          width *
+                                                                              0.04,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                      SizedBox(
-                                                          height:
-                                                              height * 0.005),
-                                                      Text(
-                                                        worker['location'],
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              width * 0.035,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: width * 0.18,
+                                      vertical: height * 0.012,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          biddingOrder!.userId == currentUserId ||
+                                                  hasAlreadyBid
+                                              ? Colors.grey.shade400
+                                              : Colors.green.shade700,
+                                      borderRadius:
+                                          BorderRadius.circular(width * 0.02),
+                                    ),
+                                    child: Text(
+                                      "Bid",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: width * 0.04,
+                                        fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                          ],
+                        SizedBox(height: height * 0.02),
+                        NegotiationCard(
+                          key: ValueKey(offerPrice),
+                          width: width,
+                          height: height,
+                          offerPrice: offerPrice,
+                          bidAmount: getCurrentUserBidAmount(),
+                          onNegotiate: (amount) {
+                            if (hasAlreadyBid && biddingOfferId != null) {
+                              startNegotiation(amount);
+                            } else {
+        
+                              CustomSnackBar.show(
+                                  message: 'Please place a bid first.',
+                                  type: SnackBarType.error
+                              );
+                            }
+                          },
+                          onAccept: () {
+                            if (hasAlreadyBid && biddingOfferId != null) {
+                              acceptNegotiation();
+                            } else {
+        
+                              CustomSnackBar.show(
+                                  message: 'Please place a bid first.' ,
+                                  type: SnackBarType.error
+                              );
+                            }
+                          },
                         ),
-                      ),
-                    ],
-                    if (isAccepted) ...[
-                      SizedBox(height: height * 0.02),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BiddingWorkerDisputeScreen(
-                                orderId: widget.orderId,
-                                flowType: "bidding",
+                        SizedBox(height: height * 0.02),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                          child: Column(
+                            children: [
+                              SizedBox(height: height * 0.015),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedIndex = 0;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: height * 0.045,
+                                      width: width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: _selectedIndex == 0
+                                            ? Colors.green.shade700
+                                            : Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(width: width * 0.02),
+                                            Text(
+                                              "Bidders",
+                                              style: TextStyle(
+                                                color: _selectedIndex == 0
+                                                    ? Colors.white
+                                                    : Colors.grey.shade700,
+                                                fontSize: width * 0.05,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: width * 0.0),
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedIndex = 1;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: height * 0.045,
+                                      width: width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: _selectedIndex == 1
+                                            ? Colors.green.shade700
+                                            : Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(width: width * 0.02),
+                                            Text(
+                                              "Related Worker",
+                                              style: TextStyle(
+                                                color: _selectedIndex == 1
+                                                    ? Colors.white
+                                                    : Colors.grey.shade700,
+                                                fontSize: width * 0.04,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_selectedIndex == 0)
+                                Padding(
+                                  padding: EdgeInsets.only(top: height * 0.01),
+                                  child: bidders.isEmpty
+                                      ? Center(
+                                          child: Text(
+                                            'No bidders found',
+                                            style: TextStyle(
+                                              fontSize: width * 0.04,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: bidders.length,
+                                          itemBuilder: (context, index) {
+                                            final bidder = bidders[index];
+                                            return Container(
+                                              margin: EdgeInsets.symmetric(
+                                                vertical: height * 0.01,
+                                                horizontal: width * 0.01,
+                                              ),
+                                              padding:
+                                                  EdgeInsets.all(width * 0.02),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.2),
+                                                    spreadRadius: 1,
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                    child: Image.asset(
+                                                      "assets/images/d_png/no_profile_image.png",
+                                                      height: 90,
+                                                      width: 90,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: width * 0.03),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          bidder['name'],
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.045,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.005),
+                                                        Text(
+                                                          'Status: ${bidder['status']}',
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.035,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.005),
+                                                        Text(
+                                                          bidder['address'],
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.035,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.005),
+                                                        Text(
+                                                          bidder['bid_amount'],
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.035,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                )
+                              else
+                                Padding(
+                                  padding: EdgeInsets.only(top: height * 0.01),
+                                  child: relatedWorkers.isEmpty
+                                      ? Center(
+                                          child: Text(
+                                            'No related workers found',
+                                            style: TextStyle(
+                                              fontSize: width * 0.04,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: relatedWorkers.length,
+                                          itemBuilder: (context, index) {
+                                            final worker = relatedWorkers[index];
+                                            return Container(
+                                              margin: EdgeInsets.symmetric(
+                                                vertical: height * 0.01,
+                                                horizontal: width * 0.01,
+                                              ),
+                                              padding:
+                                                  EdgeInsets.all(width * 0.02),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.2),
+                                                    spreadRadius: 1,
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                    child: Image.asset(
+                                                      "assets/images/d_png/no_profile_image.png",
+                                                      height: 90,
+                                                      width: 90,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: width * 0.03),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Flexible(
+                                                              child: Text(
+                                                                worker['name'],
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      width *
+                                                                          0.045,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  "${worker['rating']}",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        width *
+                                                                            0.035,
+                                                                  ),
+                                                                ),
+                                                                Icon(
+                                                                  Icons.star,
+                                                                  size: width *
+                                                                      0.04,
+                                                                  color: Colors
+                                                                      .yellow
+                                                                      .shade700,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.005),
+                                                        Text(
+                                                          worker['amount'],
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.035,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            height:
+                                                                height * 0.005),
+                                                        Text(
+                                                          worker['location'],
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                width * 0.035,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      if (isAccepted) ...[
+                        SizedBox(height: height * 0.02),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BiddingWorkerDisputeScreen(
+                                  orderId: widget.orderId,
+                                  flowType: "bidding",
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              color: Colors.red,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Cancel Task and Create Dispute',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Colors.red,
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Cancel Task and Create Dispute',
-                              style: GoogleFonts.roboto(
-                                fontSize: 14,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
