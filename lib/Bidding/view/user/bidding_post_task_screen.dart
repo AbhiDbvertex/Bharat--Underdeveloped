@@ -64,7 +64,8 @@ class PostTaskScreen extends StatelessWidget {
                   //  _pageHeader(context, controller),
                   _buildLabel("Title"),
                   _buildTextField(
-                      controller.titleController, "Enter Title of work"),
+                      controller.titleController, "Enter Title of work",
+                  inputFormatters:  [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z_.\s]'))]),
                   _buildLabel("Category"),
                   DropdownButtonFormField<String>(
                       iconEnabledColor: AppColors.primaryGreen,

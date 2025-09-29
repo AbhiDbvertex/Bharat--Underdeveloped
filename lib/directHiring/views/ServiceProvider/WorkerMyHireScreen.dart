@@ -477,61 +477,63 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           statusBarIconBrightness: Brightness.light,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              width: double.infinity,
-              height: screenHeight * 0.063,
-              color: Colors.green.shade100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildTabButton("Bidding Tasks", 0, screenWidth),
-                  _verticalDivider(screenHeight),
-                  _buildTabButton("Direct Hiring", 1, screenWidth),
-                  _verticalDivider(screenHeight),
-                  _buildTabButton("Emergency Tasks", 2, screenWidth),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(screenWidth * 0.053),
-              child: TextField(
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  hintText: selectedTab == 0
-                      ? 'Search for bidding tasks'
-                      : selectedTab == 1
-                      ? 'Search for direct hiring'
-                      : 'Search for emergency tasks',
-                  prefixIcon: Icon(Icons.search, color: Colors.green),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: double.infinity,
+                height: screenHeight * 0.063,
+                color: Colors.green.shade100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildTabButton("Bidding Tasks", 0, screenWidth),
+                    _verticalDivider(screenHeight),
+                    _buildTabButton("Direct Hiring", 1, screenWidth),
+                    _verticalDivider(screenHeight),
+                    _buildTabButton("Emergency Tasks", 2, screenWidth),
+                  ],
                 ),
-                controller: selectedTab == 0
-                    ? _biddingSearchController
-                    : selectedTab == 1
-                    ? _directSearchController
-                    : _emergencySearchController,
               ),
-            ),
-            SizedBox(height: screenHeight * 0.015),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : selectedTab == 0
-                  ? _buildBiddingTasksList(screenWidth, screenHeight)
-                  : selectedTab == 1
-                  ? _buildDirectHiringList(screenWidth, screenHeight)
-                  : _buildEmergencyList(screenWidth, screenHeight),
-            ),
-          ],
+              Padding(
+                padding: EdgeInsets.all(screenWidth * 0.053),
+                child: TextField(
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                    hintText: selectedTab == 0
+                        ? 'Search for bidding tasks'
+                        : selectedTab == 1
+                        ? 'Search for direct hiring'
+                        : 'Search for emergency tasks',
+                    prefixIcon: Icon(Icons.search, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                  ),
+                  controller: selectedTab == 0
+                      ? _biddingSearchController
+                      : selectedTab == 1
+                      ? _directSearchController
+                      : _emergencySearchController,
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.015),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : selectedTab == 0
+                    ? _buildBiddingTasksList(screenWidth, screenHeight)
+                    : selectedTab == 1
+                    ? _buildDirectHiringList(screenWidth, screenHeight)
+                    : _buildEmergencyList(screenWidth, screenHeight),
+              ),
+            ],
+          ),
         ),
       ),
     );

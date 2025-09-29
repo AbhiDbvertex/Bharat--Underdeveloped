@@ -507,7 +507,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Work Detail",
+        title: const Text("Work Details",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
@@ -650,7 +650,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                     //   ),*/
                     // ),
 
-                    // project id overlay (jaisa pehle)
                     Positioned(
                       bottom: 10,
                       left: 10,
@@ -784,7 +783,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       ),
                       const SizedBox(height: 6),
 
-                      /// TASK DETAILS
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: controller.subCategories.value
@@ -815,7 +813,7 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
                       const SizedBox(height: 20),
 
-                      /// CANCEL BUTTON
+
 
                       widget.isUser
                           ? controller.hireStatus == "pending"

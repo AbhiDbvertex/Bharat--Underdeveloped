@@ -619,7 +619,7 @@ class _SubCategoriesState extends State<SubCategories> {
                 padding: const EdgeInsets.all(16),
                 child: allSubCategories.isNotEmpty
                     ? GridView.count(
-                  crossAxisCount: 5,
+                  crossAxisCount: 4,
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 8,
                   childAspectRatio: 0.8,

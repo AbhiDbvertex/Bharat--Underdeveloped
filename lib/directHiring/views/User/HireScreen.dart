@@ -673,7 +673,12 @@ final orderId=decoded["order"]["_id"];
               const SizedBox(height: 20),
               buildLabel("Title"),
               const SizedBox(height: 6),
-              buildTextField("Enter Title of work", titleController),
+              buildTextField("Enter Title of work", titleController,
+              inputFormatters:   [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[a-zA-Z_.,\s]'), // Only letters, numbers and space
+                ),
+              ],),
               const SizedBox(height: 14),
               buildLabel("Platform Fees"),
               const SizedBox(height: 6),

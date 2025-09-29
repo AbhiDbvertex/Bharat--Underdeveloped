@@ -621,6 +621,7 @@ import 'package:developer/Emergency/utils/assets.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/Widgets/AppColors.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -884,6 +885,9 @@ class TaskView extends StatelessWidget {
               const SizedBox(height: 10),
               const Divider(color: Colors.grey, thickness: 0.3),
               const SizedBox(height: 10),
+              if (controller.selectedPaymentIndex.value != -1 ||
+                  controller.isCreatingNewPayment.value)
+                _buildPaymentInput(controller, context),
               if (controller.payments.isEmpty)
                 const Center(
                   child: Text(
@@ -1076,9 +1080,7 @@ class TaskView extends StatelessWidget {
                     );
                   },
                 ),
-              if (controller.selectedPaymentIndex.value != -1 ||
-                  controller.isCreatingNewPayment.value)
-                _buildPaymentInput(controller, context),
+
             ],
           ),
         ),
@@ -1142,12 +1144,15 @@ class TaskView extends StatelessWidget {
                 SizedBox(
                   width: 80,
                   child: TextField(
+
                     controller: controller.amountController,
                     cursorColor: AppColors.primaryGreen,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
+                      hintText: "0.0",
                       prefixText: '₹',
+                      hintStyle: TextStyle(color: Colors.grey.shade500),
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 8),
                       border: OutlineInputBorder(
@@ -1165,21 +1170,56 @@ class TaskView extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            // Payment Method Selection
+            Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () => controller.cancelPaymentInput(),
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppColors.primaryGreen,
-                    side: const BorderSide(color: AppColors.primaryGreen),
-                  ),
-                  child: const Text('Cancel'),
+                Radio<String>(
+                  value: "cod",
+                  groupValue: controller.paymentMethod.value,
+                  activeColor: AppColors.primaryGreen,
+                  onChanged: (val) {
+                    controller.paymentMethod.value = val!;
+                  },
                 ),
-                const SizedBox(width: 10),
+                const Text("COD"),
+                const SizedBox(width: 20),
+                Radio<String>(
+                  value: "online",
+                  groupValue: controller.paymentMethod.value,
+                  activeColor: AppColors.primaryGreen,
+                  onChanged: (val) {
+                    controller.paymentMethod.value = val!;
+                  },
+                ),
+                const Text("Online"),
+
+              ],
+            )),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+
+              children: [
                 ElevatedButton(
-                  onPressed: () => controller.submitPayment(context),
+                  onPressed: ()  {
+                    if (controller.paymentMethod.value.isEmpty) {
+                      CustomSnackBar.show(message: "Please select a payment method",type: SnackBarType.error);
+                      return;
+                    }
+                    if(controller.paymentMethod.value == "online"){
+                      controller.submitPayment(context);
+
+                    }else{
+                      if (controller.payments.length >= 5) {
+                        CustomSnackBar.show(message: "Sorry: Working in progress",type: SnackBarType.info);
+                      } else {
+                        CustomSnackBar.show(message: "Cash on Delivery will be enabled only after you complete 5 successful payments.",type: SnackBarType.info);
+                      }
+                    }
+                    },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
                     shape: RoundedRectangleBorder(
@@ -1190,6 +1230,21 @@ class TaskView extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
+
+                 SizedBox(width: 0.15.toWidthPercent()),
+                TextButton(
+                  onPressed: () => controller.cancelPaymentInput(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.primaryGreen,
+                    side: const BorderSide(color: AppColors.primaryGreen),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)
+                    )
+                  ),
+                  child: const Text('Cancel'),
+                ),
+
               ],
             ),
           ],
