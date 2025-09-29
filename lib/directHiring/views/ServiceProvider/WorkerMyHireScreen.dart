@@ -654,12 +654,16 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: SizedBox(
-        width: 1.toWidthPercent(),
-        height: 2.toWidthPercent(),
-        child: ListView.builder(
-          itemCount: spEmergencyOrders!.data.length,
-          itemBuilder: (context, index) => _buildEmergencyCard(
-              spEmergencyOrders!.data[index], screenWidth, screenHeight),
+        // width: 1.toWidthPercent(),
+        // height: 1.4.toWidthPercent(),
+        child: Expanded(
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: spEmergencyOrders!.data.length,
+            itemBuilder: (context, index) => _buildEmergencyCard(
+                spEmergencyOrders!.data[index], screenWidth, screenHeight),
+          ),
         ),
       ),
     );
