@@ -264,7 +264,7 @@ class SpEmergencyServiceController extends GetxController {
     } catch (e, stack) {
       bwDebug("[_fetchOrders] exception: $e", tag: tag);
       bwDebug("[_fetchOrders] stacktrace: $stack", tag: tag);
-      Get.snackbar('Error', 'An error occurred: $e');
+      CustomSnackBar.show(message: "Something went wrong.Try again...",type: SnackBarType.error);
     } finally {
       isLoading.value = false;
       bwDebug("[_fetchOrders] API call completed", tag: tag);

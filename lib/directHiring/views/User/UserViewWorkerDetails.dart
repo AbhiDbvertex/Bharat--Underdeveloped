@@ -1660,19 +1660,21 @@
 //   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 // }
 
-
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/Emergency/utils/size_ratio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../Widgets/AppColors.dart';
+
 import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/view/user/nagotiate_card.dart';
 import '../../../chat/APIServices.dart';
@@ -1682,7 +1684,6 @@ import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../models/userModel/UserViewWorkerDetailsModel.dart';
-import '../ServiceProvider/FullImageScreen.dart';
 import '../comm/view_images_screen.dart';
 import 'HireScreen.dart';
 
@@ -1713,6 +1714,9 @@ class UserViewWorkerDetails extends StatefulWidget {
 }
 
 class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
+  bool _showReviews = true;
+  bool _showAllSubCategories = false;
+  bool _showAllEmergencySubCategories = false;
   bool isHisWork = true;
   File? _pickedImage;
   ServiceProviderDetailModel? workerData;
@@ -1724,13 +1728,15 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
 
   @override
   void initState() {
-bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
-    ".subcategreyId: ${widget.subcategreyId},"
-    ".hirebuttonhide: ${widget.hirebuttonhide},."
-    "oderId: ${widget.oderId},"
-    ".biddingOfferId: ${widget.biddingOfferId},"
-    ".UserId: ${widget.UserId},"
-    ".hideonly: ${widget.hideonly},",tag: "UserViewWorkDetail");
+    bwDebug(
+        ".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
+        ".subcategreyId: ${widget.subcategreyId},"
+        ".hirebuttonhide: ${widget.hirebuttonhide},."
+        "oderId: ${widget.oderId},"
+        ".biddingOfferId: ${widget.biddingOfferId},"
+        ".UserId: ${widget.UserId},"
+        ".hideonly: ${widget.hideonly},",
+        tag: "UserViewWorkDetail");
     super.initState();
     fetchWorkerDetails();
   }
@@ -1754,14 +1760,11 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
       final token = prefs.getString('token');
 
       if (token == null) {
-         CustomSnackBar.show(
-            message:"No auth token found" ,
-            type: SnackBarType.warning
-        );
+        CustomSnackBar.show(
+            message: "No auth token found", type: SnackBarType.warning);
 
         return;
       }
-
 
       print("Abhi:- worker details screen :-- workerId  : ${widget.workerId}");
 
@@ -1781,28 +1784,23 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
             isLoading = false;
           });
         } else {
-            CustomSnackBar.show(
-              message:"Worker data not found" ,
-              type: SnackBarType.error
-          );
-
+          CustomSnackBar.show(
+              message: "Worker data not found", type: SnackBarType.error);
         }
       } else {
         throw Exception("Failed to load worker details");
       }
     } catch (e) {
       bwDebug("error : $e");
-       CustomSnackBar.show(
-          message: "Error loading worker details",
-          type: SnackBarType.error
-      );
-
+      CustomSnackBar.show(
+          message: "Error loading worker details", type: SnackBarType.error);
     }
   }
 
   ///--------------       Added chat code ------------------///
 
-  Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
+  Future<Map<String, dynamic>> fetchUserById(
+      String userId, String token) async {
     try {
       print("Abhi:- Fetching user by ID: $userId");
       final response = await http.get(
@@ -1813,7 +1811,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
           'Accept': 'application/json',
         },
       );
-      print("Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+      print(
+          "Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
         if (body['success'] == true) {
@@ -1839,8 +1838,10 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
     print("Abhi:- Warning: Unexpected _id format: $id");
     return id.toString();
   }
+
 // Yeh function InkWell ke onTap mein call hota hai
-  Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
+  Future<void> _startOrFetchConversation(
+      BuildContext context, String receiverId) async {
     try {
       // Step 1: User ID fetch karo
       final prefs = await SharedPreferences.getInstance();
@@ -1875,7 +1876,9 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
       if (body['status'] != true) {
         print("Abhi:- Error fetching profile: ${body['message']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Failed to fetch profile: ${body['message']}')),
+          SnackBar(
+              content:
+                  Text('Error: Failed to fetch profile: ${body['message']}')),
         );
         return;
       }
@@ -1890,10 +1893,11 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
       }
 
       // Step 3: Check if conversation exists
-      print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+      print(
+          "Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
       final convs = await ApiService.fetchConversations(userId);
       dynamic currentChat = convs.firstWhere(
-            (conv) {
+        (conv) {
           final members = conv['members'] as List? ?? [];
           if (members.isEmpty) return false;
           if (members[0] is String) {
@@ -1908,23 +1912,28 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
 
       // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
       if (currentChat == null) {
-        print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+        print(
+            "Abhi:- No existing conversation, starting new with receiverId: $receiverId");
         currentChat = await ApiService.startConversation(userId, receiverId);
       }
 
       // Step 5: Agar members strings hain, toh full user details fetch karo
-      if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
+      if (currentChat['members'].isNotEmpty &&
+          currentChat['members'][0] is String) {
         print("Abhi:- New conversation, fetching user details for members");
         final otherId = currentChat['members'].firstWhere((id) => id != userId);
         final otherUserData = await fetchUserById(otherId, token);
         final senderUserData = await fetchUserById(userId, token);
         currentChat['members'] = [senderUserData, otherUserData];
-        print("Abhi:- Updated members with full details: ${currentChat['members']}");
+        print(
+            "Abhi:- Updated members with full details: ${currentChat['members']}");
       }
 
       // Step 6: Messages fetch karo
-      final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
-      messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
+      final messages =
+          await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+      messages.sort((a, b) => DateTime.parse(b['createdAt'])
+          .compareTo(DateTime.parse(a['createdAt'])));
 
       // Step 7: Socket initialize karo
       SocketService.connect(userId);
@@ -1975,10 +1984,11 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
+        systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Color(0xFF9DF89D),
           statusBarIconBrightness: Brightness.dark,
         ),
+
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -1989,48 +1999,191 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
             child: Column(
               children: [
                 // Header
-                LayoutBuilder(
-                  builder: (context,constraints) {
-                    return ClipPath(
-                      clipper: BottomCurveClipper(),
-                      child: Container(
-                        width: constraints.maxWidth,
-                        color: const Color(0xFF9DF89D),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        height: 100,
-
-                      ),
-                    );
-                  }
-                ),
+                // LayoutBuilder(
+                //   builder: (context,constraints) {
+                //     return ClipPath(
+                //       clipper: BottomCurveClipper(),
+                //       child: Container(
+                //         width: constraints.maxWidth,
+                //         color: const Color(0xFF9DF89D),
+                //         padding: const EdgeInsets.symmetric(
+                //           horizontal: 16,
+                //           vertical: 16,
+                //         ),
+                //         height: 100,
+                //
+                //       ),
+                //     );
+                //   }
+                // ),
 
                 // Profile Image, Message, Call, Name, Location
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       // Message Button
+                //       GestureDetector(
+                //         onTap: () async {
+                //           final receiverId =
+                //               widget.workerId != null && widget.workerId != null
+                //                   ? widget.workerId?.toString() ?? 'Unknown'
+                //                   : 'Unknown';
+                //           final fullName = widget.workerId != null &&
+                //                   workerData?.fullName != null
+                //               ? workerData?.fullName ?? 'No data'
+                //               : 'Unknown';
+                //           print(
+                //               "Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                //
+                //           if (receiverId != 'Unknown' &&
+                //               receiverId.isNotEmpty) {
+                //             await _startOrFetchConversation(
+                //                 context, receiverId);
+                //           } else {
+                //             print("Abhi:- Error: Invalid receiver ID");
+                //             ScaffoldMessenger.of(context).showSnackBar(
+                //               SnackBar(
+                //                   content: Text('Error: Invalid receiver ID')),
+                //             );
+                //           }
+                //         },
+                //         child: Container(
+                //           height: 30,
+                //           width: 85,
+                //           padding: const EdgeInsets.all(5),
+                //           decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(8),
+                //             border: Border.all(
+                //               color: Colors.green.shade700,
+                //               width: 1.5,
+                //             ),
+                //           ),
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.center,
+                //             children: [
+                //               InkWell(
+                //                 child: Icon(
+                //                   Icons.message,
+                //                   color: Colors.green,
+                //                   size: 14,
+                //                 ),
+                //               ),
+                //               const SizedBox(width: 5),
+                //               Text(
+                //                 'Message',
+                //                 style: GoogleFonts.roboto(
+                //                   fontSize: 12,
+                //                   fontWeight: FontWeight.w500,
+                //                   color: Colors.green.shade700,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ),
+                //
+                //       const Spacer(), // Centering ke liye
+                //
+                //       // Profile Image with Tap
+                //       GestureDetector(
+                //         onTap: () {
+                //           print(
+                //               "Profile image tapped: ${workerData?.profilePic}");
+                //           if (workerData?.profilePic != null &&
+                //               workerData!.profilePic!.isNotEmpty) {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                 builder: (context) => ViewImage(
+                //                     imageUrl: workerData!.profilePic!),
+                //               ),
+                //             );
+                //           } else {
+                //             CustomSnackBar.show(
+                //                 message: "No profile image available",
+                //                 type: SnackBarType.info);
+                //           }
+                //         },
+                //         child: CircleAvatar(
+                //           radius: 50,
+                //           backgroundColor: Colors.grey.shade300,
+                //           backgroundImage: workerData?.profilePic != null &&
+                //                   workerData!.profilePic!.isNotEmpty
+                //               ? NetworkImage(workerData!.profilePic!)
+                //               : null,
+                //           child: workerData?.profilePic == null ||
+                //                   workerData!.profilePic!.isEmpty
+                //               ? const Icon(
+                //                   Icons.person,
+                //                   size: 50,
+                //                   color: Colors.white,
+                //                 )
+                //               : null,
+                //         ),
+                //       ),
+                //
+                //       const Spacer(), // Centering ke liye
+                //
+                //       // Call Button
+                //       Padding(
+                //         padding: const EdgeInsets.only(left: 18.0),
+                //         child: Container(
+                //           height: 30,
+                //           width: 80,
+                //           padding: const EdgeInsets.all(5),
+                //           decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(8),
+                //             border: Border.all(
+                //               color: Colors.green.shade700,
+                //               width: 1.4,
+                //             ),
+                //           ),
+                //           child: Row(
+                //             children: [
+                //               Icon(
+                //                 Icons.call,
+                //                 color: Colors.green.shade700,
+                //                 size: 17,
+                //               ),
+                //               const SizedBox(width: 10),
+                //               Text(
+                //                 'Call',
+                //                 style: GoogleFonts.roboto(
+                //                   fontSize: 12,
+                //                   fontWeight: FontWeight.w500,
+                //                   color: Colors.green.shade700,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Message Button
                       GestureDetector(
                         onTap: () async {
-                          final receiverId = widget.workerId != null && widget.workerId != null
-                              ? widget.workerId?.toString() ?? 'Unknown'
-                              : 'Unknown';
-                          final fullName = widget.workerId != null && workerData?.fullName != null
-                              ?  workerData?.fullName ?? 'No data'
-                              : 'Unknown';
-                          print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                          final receiverId =
+                              widget.workerId?.toString() ?? 'Unknown';
+                          final fullName = workerData?.fullName ?? 'Unknown';
 
-                          if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                            await _startOrFetchConversation(context, receiverId);
+                          if (receiverId != 'Unknown' &&
+                              receiverId.isNotEmpty) {
+                            await _startOrFetchConversation(
+                                context, receiverId);
                           } else {
-                            print("Abhi:- Error: Invalid receiver ID");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: Invalid receiver ID')),
-                            );
+                            CustomSnackBar.show(
+                                message: "Invalid receiver ID",
+                                type: SnackBarType.error);
                           }
                         },
                         child: Container(
@@ -2047,13 +2200,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              InkWell(
-                                child: Icon(
-                                  Icons.message,
-                                  color: Colors.green,
-                                  size: 14,
-                                ),
-                              ),
+                              Icon(Icons.message,
+                                  color: Colors.green, size: 14),
                               const SizedBox(width: 5),
                               Text(
                                 'Message',
@@ -2068,67 +2216,61 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                         ),
                       ),
 
-                      const Spacer(), // Centering ke liye
-
-                      // Profile Image with Tap
+                      // Profile Image
                       GestureDetector(
                         onTap: () {
-                          print("Profile image tapped: ${workerData?.profilePic}");
-                          if (workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty) {
+                          if (workerData?.profilePic != null &&
+                              workerData!.profilePic!.isNotEmpty) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ViewImage(imageUrl: workerData!.profilePic!),
+                                builder: (context) => ViewImage(
+                                    imageUrl: workerData!.profilePic!),
                               ),
                             );
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("No profile image available"),
-                              ),
-                            );
+                            CustomSnackBar.show(
+                                message: "No profile image available",
+                                type: SnackBarType.info);
                           }
                         },
                         child: CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.grey.shade300,
-                          backgroundImage: workerData?.profilePic != null && workerData!.profilePic!.isNotEmpty
+                          backgroundImage: workerData?.profilePic != null &&
+                                  workerData!.profilePic!.isNotEmpty
                               ? NetworkImage(workerData!.profilePic!)
                               : null,
-                          child: workerData?.profilePic == null || workerData!.profilePic!.isEmpty
-                              ? const Icon(
-                            Icons.person,
-                            size: 50,
-                            color: Colors.white,
-                          )
+                          child: workerData?.profilePic == null ||
+                                  workerData!.profilePic!.isEmpty
+                              ? const Icon(Icons.person,
+                                  size: 50, color: Colors.white)
                               : null,
                         ),
                       ),
 
-                      const Spacer(), // Centering ke liye
-
                       // Call Button
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18.0),
+                      GestureDetector(
+                        onTap: () {
+
+                        },
                         child: Container(
                           height: 30,
-                          width: 80,
+                          width: 85,
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: Colors.green.shade700,
-                              width: 1.4,
+                              width: 1.5,
                             ),
                           ),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.call,
-                                color: Colors.green.shade700,
-                                size: 17,
-                              ),
-                              const SizedBox(width: 10),
+                              Icon(Icons.call,
+                                  color: Colors.green.shade700, size: 17),
+                              const SizedBox(width: 5),
                               Text(
                                 'Call',
                                 style: GoogleFonts.roboto(
@@ -2144,6 +2286,7 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 8),
                 Text(
                   workerData?.fullName ?? '',
@@ -2164,16 +2307,19 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                         color: Colors.green.shade700,
                       ),
                       const SizedBox(width: 4),
-                      Flexible(  // ya Expanded bhi use kar sakti hai, but Flexible zyada flexible hai
+                      Flexible(
+                        // ya Expanded bhi use kar sakti hai, but Flexible zyada flexible hai
                         child: Text(
-                          workerData?.location?["address"] ?? "Location not available",
+                          workerData?.location?["address"] ??
+                              "Location not available",
                           style: GoogleFonts.roboto(
                             fontSize: 13,
                             color: Colors.black,
                             fontWeight: FontWeight.w700,
                           ),
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis, // overflow handle karne ke liye
+                          overflow: TextOverflow
+                              .ellipsis, // overflow handle karne ke liye
                         ),
                       ),
                     ],
@@ -2181,9 +2327,122 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                 ),
 
                 const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${workerData?.totalReview ?? 0} Reviews",
+                      style: GoogleFonts.roboto(
+                          fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 4),
+                    Row(
+                      children: [
+                        Text(
+                          '(${workerData?.rating ?? 0.0} ',
+                          style: GoogleFonts.roboto(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        Icon(Icons.star, color: Colors.amber, size: 14),
+                        Text(
+                          ')',
+                          style: GoogleFonts.roboto(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 _buildProfileCard(),
                 const SizedBox(height: 16),
-                _buildTabButtons(),
+                // _buildTabButtons(),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xffeaffea),
+                    borderRadius:
+                        BorderRadius.vertical(bottom: Radius.circular(14)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: 160,
+                            autoPlay: true,
+                            enlargeCenterPage: true,
+                            aspectRatio: 16 / 9,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            viewportFraction: 0.8,
+                          ),
+                          items: (_showReviews
+                                  ? (workerData?.hisWork?.isNotEmpty ?? false)
+                                      ? workerData!.hisWork!
+                                      : [
+                                          'assets/images/d_png/No_Image_Available.jpg'
+                                        ]
+                                  : (workerData?.customerReview?.isNotEmpty ??
+                                          false)
+                                      ? workerData!.customerReview!
+                                      : [
+                                          'assets/images/d_png/No_Image_Available.jpg'
+                                        ])
+                              .map((imageUrl) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return GestureDetector(
+                                  onTap: imageUrl.startsWith('assets/')
+                                      ? null
+                                      : () {
+                                          Get.to(() => ViewImage(
+                                                    imageUrl: imageUrl,
+                                                    title: "His Work",
+                                                  ) /*FullImageScreen(
+                                      imageUrl: imageUrl,
+                                    )*/
+                                              ); /*_showReviews
+                                  ? GalleryScreen(images: profile?.hisWork ?? [], serviceProviderId: profile?.id ?? "")
+                                  : ReviewImagesScreen(images: profile?.customerReview ?? []));*/
+                                        },
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: imageUrl.startsWith('assets/')
+                                          ? Image.asset(imageUrl,
+                                              fit: BoxFit.cover)
+                                          : Image.network(
+                                              imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error,
+                                                      stackTrace) =>
+                                                  Image.asset(
+                                                'assets/images/d_png/No_Image_Available.jpg',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _buildTabButtons(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 10),
 
                 // About My Skills
@@ -2236,7 +2495,7 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                 const SizedBox(height: 16),
 
                 // Document Section
-               /* Padding(
+                /* Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
                     height: 0.42.toWidthPercent(),
@@ -2350,12 +2609,14 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final validImages = workerData?.documents
-                          ?.where((doc) => doc.images != null && doc.images!.isNotEmpty)
-                          .expand((doc) => doc.images!)
-                          .toList() ??
+                              ?.where((doc) =>
+                                  doc.images != null && doc.images!.isNotEmpty)
+                              .expand((doc) => doc.images!)
+                              .toList() ??
                           [];
                       return Container(
-                        height: validImages.isEmpty ? 151.2 : null, // Use original height for empty case, else auto-size
+                        height: validImages.isEmpty ? 151.2 : null,
+                        // Use original height for empty case, else auto-size
                         width: constraints.maxWidth,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -2386,7 +2647,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                                   width: 82,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(color: Colors.green, width: 2),
+                                    border: Border.all(
+                                        color: Colors.green, width: 2),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -2421,48 +2683,56 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                             ),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height: validImages.isEmpty ? null : 72, // Image height when images exist
+                              height: validImages.isEmpty ? null : 72,
+                              // Image height when images exist
                               child: validImages.isEmpty
                                   ? Center(
-                                child: Text(
-                                  "No documents",
-                                  style: GoogleFonts.roboto(fontSize: 13),
-                                ),
-                              )
+                                      child: Text(
+                                        "No documents",
+                                        style: GoogleFonts.roboto(fontSize: 13),
+                                      ),
+                                    )
                                   : ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: validImages.length,
-                                itemBuilder: (context, index) {
-                                  final imageUrl = validImages[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ViewImage(imageUrl: imageUrl,title: "Document",),
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: validImages.length,
+                                      itemBuilder: (context, index) {
+                                        final imageUrl = validImages[index];
+                                        bwDebug(" image url: $imageUrl");
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ViewImage(
+                                                    imageUrl: imageUrl,
+                                                    title: "Document",
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Image.network(
+                                              imageUrl,
+                                              height: 72,
+                                              width: 100,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/d_png/No_Image_Available.jpg',
+                                                  height: 72,
+                                                  width: 100,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            ),
                                           ),
                                         );
                                       },
-                                      child: Image.network(
-                                        imageUrl,
-                                        height: 72,
-                                        width: 100,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/images/d_png/No_Image_Available.jpg',
-                                            height: 72,
-                                            width: 100,
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      ),
                                     ),
-                                  );
-                                },
-                              ),
                             ),
                           ],
                         ),
@@ -2495,55 +2765,97 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                 // Hire Button / Negotiation
                 widget.hirebuttonhide == 'hide'
                     ? NegotiationCardUser(
-                  key: ValueKey('negotiationCardKey'), // GlobalKey conflict fix
-                  workerId: widget.workerId,
-                  biddingOfferId: widget.biddingOfferId,
-                  oderId: widget.oderId,
-                  UserId: widget.UserId,
-                )
+                        key: ValueKey('negotiationCardKey'),
+                        // GlobalKey conflict fix
+                        workerId: widget.workerId,
+                        biddingOfferId: widget.biddingOfferId,
+                        oderId: widget.oderId,
+                        UserId: widget.UserId,
+                      )
                     : const SizedBox(),
 
-                widget.hideonly == 'hideOnly'
-                    ? const SizedBox()
-                    : GestureDetector(
-                  onTap: () {
-                    if (widget.workerId != null && widget.workerId!.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => HireScreen(
-                            firstProviderId: widget.workerId ?? "",
-                            categreyId: widget.categreyId,
-                            subcategreyId: widget.subcategreyId,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Container(
-                      height: 45,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.green,
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Hire",
-                          style: GoogleFonts.roboto(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // widget.hideonly == 'hideOnly'
+                //     ? const SizedBox()
+                //     : GestureDetector(
+                //         onTap: () {
+                //           if (widget.workerId != null &&
+                //               widget.workerId!.isNotEmpty) {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                 builder: (_) => HireScreen(
+                //                   firstProviderId: widget.workerId ?? "",
+                //                   categreyId: widget.categreyId,
+                //                   subcategreyId: widget.subcategreyId,
+                //                 ),
+                //               ),
+                //             );
+                //           }
+                //         },
+                //         child: Padding(
+                //           padding: const EdgeInsets.all(15.0),
+                //           child: Container(
+                //             height: 45,
+                //             width: double.infinity,
+                //             decoration: BoxDecoration(
+                //               borderRadius: BorderRadius.circular(15),
+                //               color: Colors.green,
+                //             ),
+                //             child: Center(
+                //               child: Text(
+                //                 "Hire",
+                //                 style: GoogleFonts.roboto(
+                //                   fontSize: 16,
+                //                   fontWeight: FontWeight.w500,
+                //                   color: Colors.white,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
                 const SizedBox(height: 40),
               ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar:   widget.hideonly == 'hideOnly'
+          ? const SizedBox()
+          : GestureDetector(
+        onTap: () {
+          if (widget.workerId != null &&
+              widget.workerId!.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HireScreen(
+                  firstProviderId: widget.workerId ?? "",
+                  categreyId: widget.categreyId,
+                  subcategreyId: widget.subcategreyId,
+                ),
+              ),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Container(
+            height: 45,
+            //width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.green,
+            ),
+            child: Center(
+              child: Text(
+                "Hire",
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ),
@@ -2663,12 +2975,12 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
           ],
         ),*/
 
-        Column(
+            Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               child: RichText(
                 text: TextSpan(
                   style: GoogleFonts.poppins(fontSize: 11),
@@ -2695,13 +3007,55 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
             ),
             const SizedBox(height: 4),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
               child: RichText(
                 text: TextSpan(
                   style: GoogleFonts.poppins(fontSize: 11),
-                  children: [
+                  // children: [
+                  // TextSpan(
+                  //   text: "Sub-Category: ",
+                  //   style: GoogleFonts.roboto(
+                  //     color: Colors.green.shade800,
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 13,
+                  //   ),
+                  // ),
+                  // TextSpan(
+                  //   text:
+                  //   workerData?.subcategoryNames?.join(', ') ?? 'N/A',
+                  //   style: const TextStyle(
+                  //     color: Colors.black,
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 12,
+                  //   ),
+                  // ),
+                  //
+                  //
+                  // ],
+                  children: _buildCategoryTextSpans(
+                    workerData?.subcategoryNames ?? [],
+                    _showAllSubCategories,
+                    () {
+                      setState(() {
+                        _showAllSubCategories = !_showAllSubCategories;
+                      });
+                    },
+                    "Sub-Category",
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            /*      (profile?.subEmergencyCategoryNames != null &&
+                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              child: RichText(
+                text: TextSpan(
+                  style: GoogleFonts.poppins(fontSize: 11),
+                  /* children: [
                     TextSpan(
-                      text: "Sub-Category: ",
+                      text: "Emergency Sub-Category: ",
                       style: GoogleFonts.roboto(
                         color: Colors.green.shade800,
                         fontWeight: FontWeight.bold,
@@ -2710,53 +3064,36 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                     ),
                     TextSpan(
                       text:
-                      workerData?.subcategoryNames?.join(', ') ?? 'N/A',
+                      workerData?.emergencySubcategoryNames?.join(', ') ??
+                          'N/A',
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
-                  ],
+                  ],*/
+                  children: _buildCategoryTextSpans(
+                    workerData?.emergencySubcategoryNames ?? [],
+                    _showAllEmergencySubCategories,
+                    () {
+                      setState(() {
+                        _showAllEmergencySubCategories =
+                            !_showAllEmergencySubCategories;
+                      });
+                    },
+                    "Emergency Sub-Category",
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 4),
-            /*      (profile?.subEmergencyCategoryNames != null &&
-                    profile!.subEmergencyCategoryNames!.isNotEmpty)? */Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14,vertical: 4),
-                      child: RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.poppins(fontSize: 11),
-                          children: [
-                            TextSpan(
-                              text: "Emergency Sub-Category: ",
-                              style: GoogleFonts.roboto(
-                                color: Colors.green.shade800,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                              workerData?.emergencySubcategoryNames?.join(', ') ?? 'N/A',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )/*:SizedBox()*/,
+            ) /*:SizedBox()*/,
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTabButtons() {
+/*  Widget _buildTabButtons() {
     return Row(
       children: [
         Expanded(
@@ -2770,7 +3107,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                   color: const Color(0xFF9DF89D),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isHisWork ? Colors.green.shade700 : Colors.transparent,
+                    color: isHisWork ? Colors.green.shade700 : Colors
+                        .transparent,
                     width: 2,
                   ),
                 ),
@@ -2799,7 +3137,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                   color: const Color(0xFF9DF89D),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: !isHisWork ? Colors.green.shade700 : Colors.transparent,
+                    color: !isHisWork ? Colors.green.shade700 : Colors
+                        .transparent,
                     width: 2,
                   ),
                 ),
@@ -2817,6 +3156,44 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
           ),
         ),
       ],
+    );
+  }*/
+  Widget _buildTabButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _tabButton("His Work", _showReviews, () {
+          setState(() => _showReviews = true);
+        }),
+        const SizedBox(width: 10),
+        _tabButton("Customer Review", !_showReviews, () {
+          setState(() => _showReviews = false);
+        }),
+      ],
+    );
+  }
+
+  Widget _tabButton(String title, bool selected, VoidCallback onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 35,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? Colors.green.shade700 : const Color(0xFFC3FBD8),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.green.shade700),
+          ),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              color: selected ? Colors.white : Colors.green.shade800,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -2840,7 +3217,7 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                 Row(
                   children: List.generate(
                     review.rating.round(),
-                        (index) => const Icon(
+                    (index) => const Icon(
                       Icons.star,
                       color: Colors.amber,
                       size: 18,
@@ -2867,7 +3244,8 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
                                 width: 50,
                                 height: 50,
                                 color: Colors.grey[300],
-                                child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                                child: const Icon(Icons.image_not_supported,
+                                    color: Colors.grey),
                               );
                             },
                           ),
@@ -2903,15 +3281,139 @@ bwDebug(".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
     }
     return null;
   }
-  // List<String> getAllDocumentImages(List<Document>? documents) {
-  //   if (documents == null || documents.isEmpty) {
-  //     return [];
-  //   }
-  //   return documents
-  //       .where((doc) => doc.images != null && doc.images!.isNotEmpty)
-  //       .expand((doc) => doc.images!) // Flatten all images into one list
-  //       .toList();
-  // }
+
+  List<TextSpan> _buildCategoryTextSpans(
+    List<String> names,
+    bool showAll,
+    VoidCallback toggleShowAll,
+    String categoryType,
+  ) {
+    if (names.isEmpty) {
+      return [
+        TextSpan(
+          text: "$categoryType: ",
+          style: GoogleFonts.roboto(
+            color: Colors.green.shade800,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+        const TextSpan(
+          text: 'N/A',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ];
+    }
+
+    const maxVisible = 3;
+    final visibleNames = showAll ? names : names.take(maxVisible).toList();
+    final moreCount = names.length - maxVisible;
+
+    List<TextSpan> spans = [
+      TextSpan(
+        text: "$categoryType: ",
+        style: GoogleFonts.roboto(
+          color: Colors.green.shade800,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
+      TextSpan(
+        text: visibleNames.join(', '),
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    ];
+
+    if (moreCount > 0 && !showAll) {
+      spans.add(
+        TextSpan(
+          text: " +$moreCount more",
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+        ),
+      );
+    } else if (showAll && names.length > maxVisible) {
+      spans.add(
+        TextSpan(
+          text: " Hide",
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+        ),
+      );
+    }
+
+    return spans;
+  }
+/*
+  List<TextSpan> _buildSubcategoryTextSpans(List<String> names) {
+    const maxVisible = 3; // ya 4
+    final visibleNames = names.take(maxVisible).toList();
+    final moreCount = names.length - maxVisible;
+
+    List<TextSpan> spans = [
+      TextSpan(
+        text: visibleNames.join(', '),
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      )
+    ];
+
+    if (moreCount > 0) {
+      spans.add(
+        TextSpan(
+          text: " +$moreCount more",
+          style: TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              // Yahan show dialog ya bottom sheet me full list dikha sakte ho
+              showDialog(
+                context: context,
+                builder: (_) =>
+                    AlertDialog(
+                      title: const Text("Sub-Categories"),
+                      content: Text(names.join(', ')),
+                    ),
+              );
+            },
+        ),
+      );
+    }
+
+    return spans;
+  }
+*/
+// List<String> getAllDocumentImages(List<Document>? documents) {
+//   if (documents == null || documents.isEmpty) {
+//     return [];
+//   }
+//   return documents
+//       .where((doc) => doc.images != null && doc.images!.isNotEmpty)
+//       .expand((doc) => doc.images!) // Flatten all images into one list
+//       .toList();
+// }
 }
 
 class BottomCurveClipper extends CustomClipper<Path> {

@@ -63,6 +63,9 @@ class ServiceProviderDetailModel {
   final Map<String, dynamic>? location;  // Location object
   final List<Map<String, dynamic>>? fullAddress;
   final List<String>? customerReview;
+  final int? totalReview;
+  final String? rating;
+
 
   ServiceProviderDetailModel({
     this.fullName,
@@ -77,6 +80,9 @@ class ServiceProviderDetailModel {
     this.location,
     this.fullAddress,
     this.customerReview,
+    this.totalReview,
+    this.rating,
+
   });
 
   factory ServiceProviderDetailModel.fromJson(Map<String, dynamic> json) {
@@ -94,6 +100,11 @@ class ServiceProviderDetailModel {
       documents: (json["documents"] as List<dynamic>?)?.map((e) => Document.fromJson(e as Map<String, dynamic>)).toList(),      location: json["location"],  // Location object
       fullAddress: (json["full_address"] as List?)?.map((e) => e as Map<String, dynamic>).toList(),  // Full address list
       customerReview: List<String>.from(json["customerReview"] ?? []),
+      totalReview:
+      json['totalReview'] is int
+          ? json['totalReview']
+          : int.tryParse(json['totalReview'].toString()),
+      rating: json['rating']?.toString(),
     );
   }
 }
@@ -117,6 +128,7 @@ class Review {
       rating: json["rating"]?.toDouble() ?? 0.0,
       images: List<String>.from(json["images"] ?? []),
       createdAt: json["createdAt"],
+
     );
   }
 }class Document {

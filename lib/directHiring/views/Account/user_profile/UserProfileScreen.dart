@@ -2489,6 +2489,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:developer/directHiring/views/Account/user_profile/user_role_profile_update.dart';
+import 'package:developer/utility/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -2497,6 +2498,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
@@ -2671,9 +2673,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final token = prefs.getString('token');
       if (token == null) {
         print("Abhi:- No token found, skipping fetch");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("No token found, please login again")),
+
+        CustomSnackBar.show(
+            message: "No token found, please login again",
+            type: SnackBarType.error
         );
+
         return;
       }
 
@@ -2708,20 +2713,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           print("Abhi:- User Profile Fetched - Age: $userAge, Gender: $userGender, VerificationStatus: $verificationStatus");
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(body['message'] ?? 'Failed to fetch profile')),
+
+          CustomSnackBar.show(
+              message:body['message'] ?? 'Failed to fetch profile' ,
+              type: SnackBarType.error
           );
+
+
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Server error, profile fetch failed!')),
+
+        CustomSnackBar.show(
+            message:'Server error, profile fetch failed!' ,
+            type: SnackBarType.error
         );
+
       }
     } catch (e) {
       debugPrint('❌ fetchProfileFromAPI Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Something went wrong, try again!')),
+
+      CustomSnackBar.show(
+          message:'Something went wrong, try again!' ,
+          type: SnackBarType.error
       );
+
     }
   }
 
@@ -2786,10 +2801,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           aboutController.text = aboutText;
         });
         await _fetchProfileFromAPI();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profile updated successfully")),
-        );
+        CustomSnackBar.show(message: "Profile updated successfully",type: SnackBarType.success);
         Navigator.pop(context);
       }
     }
@@ -3012,6 +3024,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _uploadCombinedProfileData(fullName ?? '', aboutUs ?? '', file);
     }
   }
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+                title: const Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo, color: AppColors.primaryGreen),
+                title: const Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // agar source camera hai to safe path pe copy kar lo
+      if (source == ImageSource.camera) {
+        final directory = await getApplicationDocumentsDirectory();
+        final newPath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+        imageFile = await imageFile.copy(newPath);
+      }
+      await _uploadCombinedProfileData(fullName ?? '', aboutUs ?? '', imageFile);
+
+      // setState(() {
+      //   _pickedImage = imageFile;
+      // });
+
+    }
+  }
+
 
 
   Widget _buildProfileImage() {
@@ -3026,7 +3092,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Stack(
       children: [
         InkWell(
-          onTap: _selectAndUploadImage,
+          onTap: _showImagePickerOptions,
           child: Container(
             padding: EdgeInsets.all(3), // border width
             decoration: BoxDecoration(
@@ -3050,7 +3116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           bottom: 14,
           right: 4,
           child: GestureDetector(
-            onTap: _selectAndUploadImage,
+            onTap: _showImagePickerOptions,
             child: const Icon(Icons.camera_alt, color: Colors.black, size: 18),
           ),
         ),

@@ -195,6 +195,7 @@
 //   }
 // }
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -231,7 +232,7 @@ class _WorkerListViewProfileScreenState
     try {
       await controller.fetchWorkerProfile(widget.workerId);
     } catch (e) {
-
+      bwDebug("Something wrong $e",tag: "WorkerListViewProfileScreen");
        CustomSnackBar.show(
           message:'Something went wrong' ,
           type: SnackBarType.error

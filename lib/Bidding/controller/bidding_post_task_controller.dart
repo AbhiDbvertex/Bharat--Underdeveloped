@@ -572,45 +572,105 @@ class PostTaskController extends GetxController {
     }
   }
 
-  Future<void> pickImage() async {
+ //  Future<void> pickImage() async {
+ //    if (selectedImages.length >= 5) {
+ // CustomSnackBar.show(
+ //          message:"Maximum 5 images allowed.",
+ //      type: SnackBarType.error
+ //      );
+ //      return;
+ //    }
+ //
+ //    final picker = ImagePicker();
+ //    final int remaining = 5 - selectedImages.length;
+ //
+ //    if (remaining == 1) {
+ //      final XFile? pickedImage = await picker.pickImage(
+ //        source: ImageSource.gallery,
+ //        imageQuality: 70,
+ //      );
+ //      if (pickedImage != null) {
+ //        selectedImages.add(File(pickedImage.path));
+ //      }
+ //    } else {
+ //      final List<XFile>? pickedImages = await picker.pickMultiImage(
+ //        imageQuality: 70,
+ //      );
+ //      if (pickedImages != null && pickedImages.isNotEmpty) {
+ //        final newImages = pickedImages.map((x) => File(x.path)).toList();
+ //        final totalImages = selectedImages.length + newImages.length;
+ //        if (totalImages > 5) {
+ // CustomSnackBar.show(
+ //          message:"Cannot select more than 5 images.",
+ //      type: SnackBarType.error
+ //      );
+ //          selectedImages.addAll(newImages.take(5 - selectedImages.length));
+ //        } else {
+ //          selectedImages.addAll(newImages);
+ //        }
+ //      }
+ //    }
+ //  }
+///////////////////////////////////////////////////////////////////
+
+  void showImagePickerOptions() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt,color: AppColors.primaryGreen,),
+              title: Text("Camera"),
+              onTap: () {
+                pickImageFromSource(ImageSource.camera);
+                Get.back();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library,color: AppColors.primaryGreen,),
+              title: Text("Gallery"),
+              onTap: () {
+                pickImageFromSource(ImageSource.gallery);
+                Get.back();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> pickImageFromSource(ImageSource source) async {
     if (selectedImages.length >= 5) {
- CustomSnackBar.show(
-          message:"Maximum 5 images allowed.",
-      type: SnackBarType.error
+      CustomSnackBar.show(
+        message: "Maximum 5 images allowed.",
+        type: SnackBarType.error,
       );
       return;
     }
 
     final picker = ImagePicker();
-    final int remaining = 5 - selectedImages.length;
-
-    if (remaining == 1) {
-      final XFile? pickedImage = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 70,
-      );
+    if (source == ImageSource.gallery) {
+      final List<XFile>? pickedImages = await picker.pickMultiImage(imageQuality: 70);
+      if (pickedImages != null && pickedImages.isNotEmpty) {
+        final newImages = pickedImages.map((x) => File(x.path)).toList();
+        selectedImages.addAll(newImages.take(5 - selectedImages.length));
+      }
+    } else {
+      final XFile? pickedImage = await picker.pickImage(source: source, imageQuality: 70);
       if (pickedImage != null) {
         selectedImages.add(File(pickedImage.path));
       }
-    } else {
-      final List<XFile>? pickedImages = await picker.pickMultiImage(
-        imageQuality: 70,
-      );
-      if (pickedImages != null && pickedImages.isNotEmpty) {
-        final newImages = pickedImages.map((x) => File(x.path)).toList();
-        final totalImages = selectedImages.length + newImages.length;
-        if (totalImages > 5) {
- CustomSnackBar.show(
-          message:"Cannot select more than 5 images.",
-      type: SnackBarType.error
-      );
-          selectedImages.addAll(newImages.take(5 - selectedImages.length));
-        } else {
-          selectedImages.addAll(newImages);
-        }
-      }
     }
   }
+
+
+  //////////////////////////////////////////////////////////////
 
   Future<void> getCurrentLocation() async {
     try {

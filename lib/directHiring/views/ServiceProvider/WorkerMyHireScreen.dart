@@ -804,10 +804,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
                               subcategreyId: subcategreyId,
                             ),
                           ),
-                        ).then((_) {
-                          //  Abhishek check screen refrase the code
+                        ).then((_) async {
 
-                          fetchDirectOrders();
+                           await fetchDirectOrders();
                         });
                       },
                       style: TextButton.styleFrom(
