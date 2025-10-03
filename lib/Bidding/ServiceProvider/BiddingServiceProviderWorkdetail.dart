@@ -1577,155 +1577,172 @@ print("user: ${biddingOrder!.userId?.id}");
                             )
                           : SizedBox(),
                       if (isAccepted) ...[
-                        Card(
-                          child: Container(
-                            height: 100,
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: biddingOrder!.userId != null &&
-                                          biddingOrder!.userId!.profilePic !=
-                                              null &&
-                                          biddingOrder!
-                                              .userId!.profilePic!.isNotEmpty
-                                      ? Image.network(
-                                          biddingOrder!.userId!.profilePic!
-                                                  .startsWith('http')
-                                              ? biddingOrder!.userId!.profilePic!
-                                                  .replaceFirst(
-                                                      'http://', 'https://')
-                                              : 'https://api.thebharatworks.com${biddingOrder!.userId!.profilePic}',
-                                          height: 70,
-                                          width: 70,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            print(
-                                                '❌ Profile image error: ${biddingOrder!.userId!.profilePic}');
-                                            return Image.asset(
-                                              'assets/images/d_png/no_profile_image.png',
-                                              height: 70,
-                                              width: 70,
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          'assets/images/d_png/no_profile_image.png',
-                                          height: 70,
-                                          width: 70,
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            biddingOrder!.userId?.fullName ??
-                                                'Unknown',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewUserProfileScreen(
+                                          userId: biddingOrder!
+                                              .userId?.id ??
+                                              'Unknown',
+                                          profileImage: biddingOrder!
+                                              .userId
+                                              ?.profilePic ??
+                                              'Unknown',
+                                        )));
+                          },
+                          child: Card(
+                            child: Container(
+                              height: 100,
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: biddingOrder!.userId != null &&
+                                            biddingOrder!.userId!.profilePic !=
+                                                null &&
+                                            biddingOrder!
+                                                .userId!.profilePic!.isNotEmpty
+                                        ? Image.network(
+                                            biddingOrder!.userId!.profilePic!
+                                                    .startsWith('http')
+                                                ? biddingOrder!.userId!.profilePic!
+                                                    .replaceFirst(
+                                                        'http://', 'https://')
+                                                : 'https://api.thebharatworks.com${biddingOrder!.userId!.profilePic}',
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              print(
+                                                  '❌ Profile image error: ${biddingOrder!.userId!.profilePic}');
+                                              return Image.asset(
+                                                'assets/images/d_png/no_profile_image.png',
+                                                height: 70,
+                                                width: 70,
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          )
+                                        : Image.asset(
+                                            'assets/images/d_png/no_profile_image.png',
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
                                           ),
-                                          Spacer(),
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.grey.withOpacity(0.1),
-                                            ),
-                                            child: IconButton(
-                                              icon: Icon(
-                                                Icons.call,
-                                                color: Colors.green.shade700,
-                                                size: 14,
-                                              ),
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Awarded amount: ₹${biddingOrder!.cost.toStringAsFixed(0)}',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 17,
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.grey.withOpacity(0.1),
-                                            ),
-                                            child: IconButton(
-                                              icon: Icon(
-                                                Icons.message_rounded,
-                                                color: Colors.green.shade700,
-                                                size: 14,
-                                              ),
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: height * 0.008,
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ViewUserProfileScreen(
-                                                          userId: biddingOrder!
-                                                                  .userId?.id ??
-                                                              'Unknown',
-                                                          profileImage: biddingOrder!
-                                                                  .userId
-                                                                  ?.profilePic ??
-                                                              'Unknown',
-                                                        )));
-                                          },
-                                          child: Text(
-                                            "View Profile",
-                                            style: GoogleFonts.roboto(
-                                              color: Colors.green,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              biddingOrder!.userId?.fullName ??
+                                                  'Unknown',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Container(
+                                              height: 30,
+                                              width: 30,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.grey.withOpacity(0.1),
+                                              ),
+                                              child: IconButton(
+                                                icon: Icon(
+                                                  Icons.call,
+                                                  color: Colors.green.shade700,
+                                                  size: 14,
+                                                ),
+                                                onPressed: () {},
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Awarded amount: ₹${biddingOrder!.cost.toStringAsFixed(0)}',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 17,
+                                            ),
+                                            Spacer(),
+                                            Container(
+                                              height: 30,
+                                              width: 30,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.grey.withOpacity(0.1),
+                                              ),
+                                              child: IconButton(
+                                                icon: Icon(
+                                                  Icons.message_rounded,
+                                                  color: Colors.green.shade700,
+                                                  size: 14,
+                                                ),
+                                                onPressed: () {},
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.008,
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ViewUserProfileScreen(
+                                                            userId: biddingOrder!
+                                                                    .userId?.id ??
+                                                                'Unknown',
+                                                            profileImage: biddingOrder!
+                                                                    .userId
+                                                                    ?.profilePic ??
+                                                                'Unknown',
+                                                          )));
+                                            },
+                                            child: Text(
+                                              "View Profile",
+                                              style: GoogleFonts.roboto(
+                                                color: Colors.green,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -1762,103 +1779,117 @@ print("user: ${biddingOrder!.userId?.id}");
                         // Conditionally show assigned worker card only if assignedWorker is not null
                         if (isAccepted && assignedWorker != null) ...[
                           SizedBox(height: 20),
-                          Card(
-                            child: Container(
-                              height: 100,
-                              width: double.infinity,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
-                                    child: Image.network(
-                                      assignedWorker!.image,
-                                      height: 70,
-                                      width: 70,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        print(
-                                            '❌ Worker image error: ${assignedWorker!.image}');
-                                        return Image.asset(
-                                          'assets/images/d_png/no_profile_image.png',
-                                          height: 70,
-                                          width: 70,
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      WorkerListViewProfileScreen(
+                                        workerId:
+                                        assignedWorker!.id,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              child: Container(
+                                height: 100,
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: Image.network(
+                                        assignedWorker!.image,
+                                        height: 70,
+                                        width: 70,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          print(
+                                              '❌ Worker image error: ${assignedWorker!.image}');
+                                          return Image.asset(
+                                            'assets/images/d_png/no_profile_image.png',
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              assignedWorker!.name,
-                                              style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Spacer(),
-                                          ],
-                                        ),
-                                        SizedBox(height: 5),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              assignedWorker!.address,
-                                              style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        WorkerListViewProfileScreen(
-                                                      workerId:
-                                                          assignedWorker!.id,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Container(
-                                                height: 30,
-                                                width: 70,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.green.shade700,
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "View",
-                                                    style: GoogleFonts.roboto(
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                assignedWorker!.name,
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                              Spacer(),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                assignedWorker!.address,
+                                                style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          WorkerListViewProfileScreen(
+                                                        workerId:
+                                                            assignedWorker!.id,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 70,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green.shade700,
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      "View",
+                                                      style: GoogleFonts.roboto(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),

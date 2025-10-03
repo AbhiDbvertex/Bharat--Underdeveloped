@@ -1,12 +1,14 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -34,6 +36,8 @@ class SellerScreen extends StatefulWidget {
 }
 
 class _SellerScreenState extends State<SellerScreen> {
+  bool _showAllSubCategories = false;
+  bool _showAllEmergencySubCategories = false;
   bool _isSwitched = false;
   bool _isToggling = false;
   File? _pickedImage;
@@ -200,6 +204,106 @@ class _SellerScreenState extends State<SellerScreen> {
       }
     }
   }
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+                title: const Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo, color: AppColors.primaryGreen),
+                title: const Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // agar source camera hai to safe path pe copy kar lo
+      if (source == ImageSource.camera) {
+        final directory = await getApplicationDocumentsDirectory();
+        final newPath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+        imageFile = await imageFile.copy(newPath);
+      }
+
+      setState(() {
+        _pickedImage = imageFile;
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null || token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("🔐 Token not found. Please login again.")),
+        );
+        return;
+      }
+
+      final url = Uri.parse("https://api.thebharatworks.com/api/user/updateProfilePic");
+
+      try {
+        var request = http.MultipartRequest("PUT", url)
+          ..headers['Authorization'] = 'Bearer $token'
+          ..files.add(await http.MultipartFile.fromPath('profilePic', imageFile.path));
+
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          final responseData = await response.stream.bytesToString();
+          final jsonData = jsonDecode(responseData);
+          debugPrint("✅ Response: $jsonData");
+
+          if (jsonData['profilePic'] != null) {
+            setState(() {
+              profile?.profilePic = jsonData['profilePic'];
+              profile?.fullName = jsonData['full_name'];
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("✅ Profile picture updated")),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(jsonData['message'] ?? "❌ Upload failed")),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("❌ Upload failed! Try again.")),
+          );
+        }
+      } catch (e) {
+        debugPrint("Upload error: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Something went wrong!")),
+        );
+      }
+    }
+  }
+
 
   Future<void> switchRoleRequest() async {
     final String url =
@@ -373,7 +477,7 @@ class _SellerScreenState extends State<SellerScreen> {
                         clipBehavior: Clip.none,
                         children: [
                           InkWell(
-                            onTap: _pickImageFromCamera,
+                            onTap: _showImagePickerOptions,
                             child: Container(
                               padding: EdgeInsets.all(3),
                               decoration: BoxDecoration(
@@ -403,7 +507,8 @@ class _SellerScreenState extends State<SellerScreen> {
                             bottom: 4,
                             right: 4,
                             child: InkWell(
-                              onTap: _pickImageFromCamera,
+                              // onTap: _pickImageFromCamera,
+                              onTap: _showImagePickerOptions,
                               child: const Icon(Icons.camera_alt,
                                   size: 20, color: Colors.black),
                             ),
@@ -941,7 +1046,7 @@ class _SellerScreenState extends State<SellerScreen> {
                   child: RichText(
                     text: TextSpan(
                       style: GoogleFonts.poppins(fontSize: 11),
-                      children: [
+                /*      children: [
                         TextSpan(
                           text: "Sub-Category: ",
                           style: GoogleFonts.roboto(
@@ -959,7 +1064,18 @@ class _SellerScreenState extends State<SellerScreen> {
                             fontSize: 12,
                           ),
                         ),
-                      ],
+                      ],*/
+
+                      children: _buildCategoryTextSpans(
+                        profile?.subCategoryNames ?? [],
+                        _showAllSubCategories,
+                            () {
+                          setState(() {
+                            _showAllSubCategories = !_showAllSubCategories;
+                          });
+                        },
+                        "Sub-Category",
+                      ),
                     ),
                   ),
                 ),
@@ -971,7 +1087,7 @@ class _SellerScreenState extends State<SellerScreen> {
                       child: RichText(
                         text: TextSpan(
                           style: GoogleFonts.poppins(fontSize: 11),
-                          children: [
+                      /*    children: [
                             TextSpan(
                               text: "Emergency Sub-Category: ",
                               style: GoogleFonts.roboto(
@@ -989,7 +1105,18 @@ class _SellerScreenState extends State<SellerScreen> {
                                 fontSize: 12,
                               ),
                             ),
-                          ],
+                          ],*/
+                          children: _buildCategoryTextSpans(
+                            profile?.subEmergencyCategoryNames ?? [],
+                            _showAllEmergencySubCategories,
+                                () {
+                              setState(() {
+                                _showAllEmergencySubCategories = !_showAllEmergencySubCategories;
+                              });
+                            },
+                            "Emergency Sub-Category",
+                          ),
+
                         ),
                       ),
                     )/*:SizedBox()*/,
@@ -1432,7 +1559,85 @@ class _SellerScreenState extends State<SellerScreen> {
       ),
     );
   }
-}
+
+  List<TextSpan> _buildCategoryTextSpans(
+      List<String> names,
+      bool showAll,
+      VoidCallback toggleShowAll,
+      String categoryType,
+      ) {
+    if (names.isEmpty) {
+      return [
+        TextSpan(
+          text: "$categoryType: ",
+          style: GoogleFonts.roboto(
+            color: Colors.green.shade800,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+        const TextSpan(
+          text: 'N/A',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ];
+    }
+
+    const maxVisible = 3;
+    final visibleNames = showAll ? names : names.take(maxVisible).toList();
+    final moreCount = names.length - maxVisible;
+
+    List<TextSpan> spans = [
+      TextSpan(
+        text: "$categoryType: ",
+        style: GoogleFonts.roboto(
+          color: Colors.green.shade800,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
+      TextSpan(
+        text: visibleNames.join(', '),
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    ];
+
+    if (moreCount > 0 && !showAll) {
+      spans.add(
+        TextSpan(
+          text: " +$moreCount more",
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+        ),
+      );
+    } else if (showAll && names.length > maxVisible) {
+      spans.add(
+        TextSpan(
+          text: " Hide",
+          style: const TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+        ),
+      );
+    }
+
+    return spans;
+  }}
 
 class BottomCurveClipper extends CustomClipper<Path> {
   @override

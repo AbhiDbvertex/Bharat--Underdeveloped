@@ -217,25 +217,83 @@ class _HireScreenState extends State<HireScreen> {
     }
   }
 
-  // ✅ Images select karne ka function
-  Future<void> pickImages() async {
-    final picker = ImagePicker();
-    final pickedList = await picker.pickMultiImage();
-    if (pickedList.isNotEmpty) {
-      setState(() {
-        if (selectedImages.length + pickedList.length <= 5) {
-          selectedImages.addAll(pickedList);
-        } else {
+  // Future<void> pickImages() async {
+  //   final picker = ImagePicker();
+  //   final pickedList = await picker.pickMultiImage();
+  //   if (pickedList.isNotEmpty) {
+  //     setState(() {
+  //       if (selectedImages.length + pickedList.length <= 5) {
+  //         selectedImages.addAll(pickedList);
+  //       } else {
+  //
+  //           CustomSnackBar.show(
+  //             message: "Maximum 5 images allowed",
+  //             type: SnackBarType.error
+  //         );
+  //       }
+  //     });
+  //   }
+  // }
 
-            CustomSnackBar.show(
-              message: "Maximum 5 images allowed",
-              type: SnackBarType.error
-          );
-        }
-      });
-    }
+  void showImagePickerOptions() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: AppColors.primaryGreen),
+              title: Text("Camera"),
+              onTap: () {
+                pickImagesFromSource(ImageSource.camera);
+                Get.back();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: AppColors.primaryGreen),
+              title: Text("Gallery"),
+              onTap: () {
+                pickImagesFromSource(ImageSource.gallery);
+                Get.back();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
+  Future<void> pickImagesFromSource(ImageSource source) async {
+    final picker = ImagePicker();
+
+    if (selectedImages.length >= 5) {
+      CustomSnackBar.show(
+        message: "Maximum 5 images allowed.",
+        type: SnackBarType.error,
+      );
+      return;
+    }
+
+    if (source == ImageSource.gallery) {
+      final pickedList = await picker.pickMultiImage(imageQuality: 70);
+      if (pickedList != null && pickedList.isNotEmpty) {
+        setState(() {
+          selectedImages.addAll(pickedList.take(5 - selectedImages.length));
+        });
+      }
+    } else {
+      final pickedImage = await picker.pickImage(source: source, imageQuality: 70);
+      if (pickedImage != null) {
+        setState(() {
+          selectedImages.add(pickedImage);
+        });
+      }
+    }
+  }
 
   Future<void> getCurrentLocation() async {
     try {
@@ -1035,7 +1093,8 @@ final orderId=decoded["order"]["_id"];
 
       child: selectedImages.isEmpty
           ? GestureDetector(
-        onTap: pickImages,
+        // onTap: pickImages,
+        onTap: showImagePickerOptions,
         child: const Center(
           child: Row(crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1054,7 +1113,8 @@ final orderId=decoded["order"]["_id"];
         itemBuilder: (context, index) {
           if (index == selectedImages.length) {
             return GestureDetector(
-              onTap: pickImages,
+              // onTap: pickImages,
+              onTap: showImagePickerOptions,
               child: Container(
                 width: 100,
                 height: 100,
@@ -1102,7 +1162,7 @@ final orderId=decoded["order"]["_id"];
                           offset: Offset(0,2),
                         )
                       ]
-                    
+
                     ),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),

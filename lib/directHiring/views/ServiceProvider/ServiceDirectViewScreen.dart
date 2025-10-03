@@ -2853,6 +2853,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/directHiring/views/ServiceProvider/view_user_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -2923,6 +2924,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
         return;
       }
 
+      bwDebug("orderid: ${widget.id}");
       final response = await http.get(
         Uri.parse(
           'https://api.thebharatworks.com/api/direct-order/getDirectOrderWithWorker/${widget.id}',

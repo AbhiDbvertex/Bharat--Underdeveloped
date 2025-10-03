@@ -7,6 +7,7 @@ import '../../controllers/AccountController/BankController.dart';
 import 'AccountScreen.dart';
 
 enum InputType { text, number, ifsc }
+enum TextSubType { normal, onlyAlpha }
 
 class BankScreen extends StatefulWidget {
   const BankScreen({super.key});
@@ -92,6 +93,7 @@ class _BankScreenState extends State<BankScreen> {
                   "Bank Name",
                   controller.bankNameController,
                   InputType.text,
+                  subType: TextSubType.onlyAlpha
                 ),
                 _buildInputField(
                   "Enter Account Number",
@@ -104,6 +106,7 @@ class _BankScreenState extends State<BankScreen> {
                   "Account Holder Name",
                   controller.accountHolderNameController,
                   InputType.text,
+                    subType: TextSubType.onlyAlpha
                 ),
                 _buildInputField(
                   "Enter IFSC Code",
@@ -116,6 +119,7 @@ class _BankScreenState extends State<BankScreen> {
                   "UPI Id",
                   controller.upiIdController,
                   InputType.text,
+                    subType: TextSubType.normal
                 ),
 
                 const SizedBox(height: 40),
@@ -155,8 +159,7 @@ class _BankScreenState extends State<BankScreen> {
       String hint,
       String label,
       TextEditingController inputController,
-      InputType type,
-      ) {
+      InputType type, {TextSubType subType = TextSubType.normal}) {
     List<TextInputFormatter> formatters = [];
     TextInputType keyboardType = TextInputType.text;
 
@@ -164,7 +167,16 @@ class _BankScreenState extends State<BankScreen> {
       case InputType.text:
         keyboardType = TextInputType.name;
         // user name max 20 char
-        formatters = [LengthLimitingTextInputFormatter(20)];
+        // formatters = [LengthLimitingTextInputFormatter(20)];
+        if (subType == TextSubType.onlyAlpha) {
+          formatters = [
+            FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z ]")),
+            LengthLimitingTextInputFormatter(20),
+          ];
+        } else {
+          // sab char allow, max 20
+          formatters = [LengthLimitingTextInputFormatter(20)];
+        }
         break;
 
       case InputType.number:
@@ -179,7 +191,11 @@ class _BankScreenState extends State<BankScreen> {
       case InputType.ifsc:
         keyboardType = TextInputType.text;
         // IFSC usually 11 character hota hai
-        formatters = [LengthLimitingTextInputFormatter(11)];
+        // formatters = [LengthLimitingTextInputFormatter(11)];
+        formatters = [
+          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+          LengthLimitingTextInputFormatter(11),
+        ];
         break;
     }
 

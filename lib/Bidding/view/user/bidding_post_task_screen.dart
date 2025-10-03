@@ -369,7 +369,8 @@ class PostTaskScreen extends StatelessWidget {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: controller.pickImage,
+                  // onTap: controller.pickImage,
+                  onTap: controller.showImagePickerOptions,
                   child: Container(
                     height: 120,
                     width: 270,
@@ -455,7 +456,8 @@ class PostTaskScreen extends StatelessWidget {
                   )),
               if (controller.selectedImages.length < 5)
                 GestureDetector(
-                  onTap: controller.pickImage,
+                  // onTap: controller.pickImage,
+                  onTap: controller.showImagePickerOptions,
                   child: Container(
                     height: 100,
                     width: 100,

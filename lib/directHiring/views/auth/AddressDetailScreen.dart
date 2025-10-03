@@ -689,7 +689,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
-                    widget.editlocationId != null ? 'Edit Location' : 'Select your location by scroll the pin on map.',
+                    widget.editlocationId != null ? 'Edit Location' : 'Select your location by scrolling the pin on map.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 15,

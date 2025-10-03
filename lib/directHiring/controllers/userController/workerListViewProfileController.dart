@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,6 +66,7 @@ class WorkerListViewProfileController {
           imageUrl = data['image']?.isNotEmpty == true ? data['image'] : null;
 
           print('✅ Worker profile loaded successfully');
+          bwDebug('✅ Worker profile loaded successfully');
         } else {
           print('❌ Invalid format or worker not found');
           throw Exception('Invalid response format');
@@ -76,6 +78,7 @@ class WorkerListViewProfileController {
       }
     } catch (e) {
       print('🚨 Error in fetchWorkerProfile: $e');
+      bwDebug('🚨 Error in fetchWorkerProfile: $e');
       rethrow;
     }
   }
