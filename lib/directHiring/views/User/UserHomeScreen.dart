@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
@@ -1015,39 +1016,24 @@ class CategoryItemWidget extends StatelessWidget {
               border:
                   isSelected ? Border.all(color: Colors.black, width: 1) : null,
             ),
-            /*child: ClipOval(
-              child: imagePath.isNotEmpty
-                  ? imagePath.startsWith('http')
-                  ? Image.network(
-                imagePath,
-                height: 42,
-                width: 42,
-                // fit: BoxFit.fitHeight,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.broken_image, size: 22);
-                },
-              )
-                  : Image.asset(
-                'assets/images/$imagePath',
-                height: 42,
-                width: 42,
-                // fit: BoxFit.cover,
-              )
-                  : const Icon(Icons.person, size: 22),
-            ),*/
             child: ClipOval(
               child: imagePath.isNotEmpty
                   ? imagePath.startsWith('http')
                       ? Padding(
                           padding: const EdgeInsets.all(5.0),
-                          child: Image.network(
-                            imagePath,
+                          child: CachedNetworkImage(
+                            imageUrl: imagePath,
                             height: 42,
                             width: 42,
-                            // fit: BoxFit.cover, // 👈 yeh important
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.broken_image, size: 22);
-                            },
+                            // child: Image.network(
+                            //   imagePath,
+                            //   height: 42,
+                            //   width: 42,
+                            //   // fit: BoxFit.cover, // 👈 yeh important
+                            //   errorBuilder: (context, error, stackTrace) {
+                            //     return const Icon(Icons.broken_image, size: 22);
+                            //   },
+                            // ),
                           ),
                         )
                       : Image.asset(

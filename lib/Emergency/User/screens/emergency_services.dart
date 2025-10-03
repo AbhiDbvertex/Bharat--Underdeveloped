@@ -63,6 +63,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     final postTaskController = Get.put(PostTaskController(), permanent: false);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
@@ -105,14 +106,14 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTitle("Work Category"),
+                      _buildTitle("Work Category *"),
                       Obx(() {
                         return DropdownButtonFormField<String>(
                           focusColor: AppColors.primaryGreen,
                           value: controller.selectedCategoryId.value.isEmpty
                               ? null
                               : controller.selectedCategoryId.value,
-                          hint: Text("Select Category", style: fieldHintStyle),
+                          hint: Text("Select Category ", style: fieldHintStyle),
                           icon: Icon(
                             Icons.keyboard_arrow_down_sharp,
                             color: AppColors.primaryGreen,
@@ -154,7 +155,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       SizedBox(height: .04.toWidthPercent()),
         
                       _buildTitle("Choose your problem ",
-                          otherText: "(Multiple Select)"),
+                          otherText: "(Multiple Select) *"),
                       customMultiSelectDropdown(
                         hint: "Select Subcategories",
                         items: controller.subCategories,
@@ -165,36 +166,50 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildTitle("Google Address (GPS)"),
-                          InkWell(
-                            onTap: postTaskController.navigateToLocationScreen,
-                            child: Container(
-                              width: 0.35.toWidthPercent(),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryGreen,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  "Change location",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
+                          _buildTitle("Google Address (GPS) *"),
+                          // InkWell(
+                          //   onTap: postTaskController.navigateToLocationScreen,
+                          //   child: Container(
+                          //     width: 0.35.toWidthPercent(),
+                          //     decoration: BoxDecoration(
+                          //       color: AppColors.primaryGreen,
+                          //       borderRadius: BorderRadius.circular(5),
+                          //     ),
+                          //     child: const Center(
+                          //       child: Text(
+                          //         "Change location",
+                          //         style: TextStyle(color: Colors.white),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       //customTextField(hint: "Abc gali 145 banglow no. Indore"),
-                      _googleLocationField(controller.googleAddressController),
+                      // _googleLocationField(controller.googleAddressController,postTaskController),
+                      GestureDetector(
+                       onTap: postTaskController.navigateToLocationScreen,
+                        child: TextFormField(
+                          onTap: postTaskController.navigateToLocationScreen,
+                          style: TextStyle(color: Colors.green),
+                          enabled: false,
+                          maxLines: 1,
+                          controller: controller.googleAddressController,
+                          // decoration: _inputDecoration("Location", icon: Icons.my_location,),
+                          decoration: _inputDecoration("Location", icon: Icons.my_location),
+
+                          validator: (val) => val == null || val.isEmpty ? "Required field" : null,
+                        ),
+                      ),
                       SizedBox(height: .04.toWidthPercent()),
         
-                      _buildTitle("Detailed Address (Landmark)"),
+                      _buildTitle("Detailed Address (Landmark) *"),
                       customTextField(
                           hint: "Enter address",
                           controller: controller.detailedAddressController),
                       SizedBox(height: .04.toWidthPercent()),
         
-                      _buildTitle("Contact"),
+                      _buildTitle("Contact *"),
                       customTextField(
                           hint: "Enter Number",
                           keyboardType: TextInputType.phone,
@@ -205,7 +220,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           maxLength: 10),
                       SizedBox(height: .04.toWidthPercent()),
         
-                      _buildTitle("Task Completed by(Date & Time)"),
+                      _buildTitle("Estimated Time of Completion *"),
                       customDateTimePicker(
                         context: context,
                         selectedDateTime: controller.selectedDateTime,
@@ -230,22 +245,21 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                 ),
         
                 // Task Fee
-                Obx(() => Container(
-                  height: 0.12.toWidthPercent(),
-                      width: double.infinity,
-                      color: Color(0xfff17773),
-                      child: Center(
-                        child: Text(
-                          "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
-                          style: TextStyle(
-                            fontSize: 0.040.toWidthPercent(),
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    )),
-        
-                SizedBox(height: 20),
+                // Obx(() => Container(
+                //   height: 0.12.toWidthPercent(),
+                //       width: double.infinity,
+                //       color: Color(0xfff17773),
+                //       child: Center(
+                //         child: Text(
+                //           "Emergency Task Fees - RS. ${controller.taskFee.value} /-",
+                //           style: TextStyle(
+                //             fontSize: 0.040.toWidthPercent(),
+                //             color: Colors.white,
+                //           ),
+                //         ),
+                //       ),
+                //     )),
+              //  SizedBox(height: 20),
         
                 Padding(
                     padding: const EdgeInsets.all(25),
@@ -269,7 +283,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                                     color: AppColors.primaryGreen,
                                   ),
                                 )
-                              : Text("Pay"),
+                              : Text("Proceed"),
                         )))
               ],
             ),
@@ -527,7 +541,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
     );
   }
 
-  Widget _googleLocationField(googleAddressController) {
+  Widget _googleLocationField(googleAddressController,postTaskController) {
     return
         /*GestureDetector(
       onTap: () async {
@@ -542,8 +556,9 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         child: */
 
         TextFormField(
+          onTap: postTaskController.navigateToLocationScreen,
       enabled: false,
-      maxLines: 2,
+      maxLines: 1,
       controller: googleAddressController,
       // decoration: _inputDecoration("Location", icon: Icons.my_location,),
       decoration: _inputDecoration("Location", icon: Icons.my_location),
@@ -576,7 +591,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderSide: BorderSide(color: Colors.green, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),

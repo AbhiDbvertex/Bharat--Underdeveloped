@@ -6,6 +6,7 @@ import 'package:developer/Emergency/User/screens/PaymentConformation.dart';
 import 'package:developer/Emergency/utils/ApiUrl.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:developer/utility/custom_snack_bar.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -104,7 +105,7 @@ class EmergencyServiceController extends GetxController {
   //     images.addAll(pickedFiles.map((e) => File(e.path)));
   //   }
   // }
-  Future<void> pickImageFromCamera(BuildContext context) async {
+  /*Future<void> pickImageFromCamera(BuildContext context) async {
     final picked = await _picker.pickImage(source: ImageSource.camera);
     if (picked != null) {
       if (images.length < 5) {
@@ -141,7 +142,69 @@ class EmergencyServiceController extends GetxController {
 
     }
   }
+*/
 
+  /// ------------------ COMPRESS IMAGE FUNCTION -------------------
+  Future<File> compressImage(File file) async {
+    final filePath = file.absolute.path;
+
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final split = filePath.substring(0, lastIndex);
+    final outPath = "${split}_compressed.jpg";
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      filePath,
+      outPath,
+      quality: 70,
+      minWidth: 800,
+      minHeight: 800,
+    );
+
+    // Explicitly cast kar diya
+    return (compressedFile ?? file) as File;
+  }
+
+
+
+  /// ------------------ CAMERA PICK -------------------
+  Future<void> pickImageFromCamera(BuildContext context) async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked != null) {
+      if (images.length < 5) {
+        File compressed = await compressImage(File(picked.path));
+        images.add(compressed);
+      } else {
+        CustomSnackBar.show(
+          message: "Max 5 images allowed",
+          type: SnackBarType.warning,
+        );
+      }
+    }
+  }
+
+  /// ------------------ GALLERY PICK -------------------
+  Future<void> pickImagesFromGallery(BuildContext context) async {
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      if (images.length + pickedFiles.length > 5) {
+        CustomSnackBar.show(
+          message: "You can upload max 5 images",
+          type: SnackBarType.error,
+        );
+        return;
+      }
+
+      for (var f in pickedFiles) {
+        File compressed = await compressImage(File(f.path));
+        images.add(compressed);
+      }
+
+      CustomSnackBar.show(
+        message: "${pickedFiles.length} images selected",
+        type: SnackBarType.info,
+      );
+    }
+  }
 
 
   void removeImage(File file) {
@@ -195,8 +258,8 @@ class EmergencyServiceController extends GetxController {
         googleAddressController.text.isEmpty ||
         detailedAddressController.text.isEmpty ||
         contactController.text.isEmpty ||
-        selectedDateTime.value == null ||
-        images.isEmpty) {
+        selectedDateTime.value == null /*||
+        images.isEmpty*/) {
       // Get.snackbar("Error", "Please fill all fields",colorText: Colors.red);
       if (!context.mounted) return;
       CustomSnackBar.show( message: "Please fill all fields",type: SnackBarType.error);

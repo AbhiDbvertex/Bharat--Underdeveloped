@@ -10,12 +10,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:open_filex/open_filex.dart';
 
-import '../testingfile.dart';
 import 'APIServices.dart';
 import 'SocketService.dart';
-
+import 'chatScreen.dart';
 class ChatScreen extends StatefulWidget {
   final String initialReceiverId;
 
@@ -702,9 +702,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   print("Abhi:- Error finding other user in ChatListScreen for conversation ${conv['_id']}: $e");
                   otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
                   SchedulerBinding.instance.addPostFrameCallback((_) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: Failed to load chat user in list: $e')),
-                    );
+                    print("Abhi:- get exception with post frame callback $e");
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(content: Text('Error: Failed to load chat user in list: $e')),
+                    // );
                   });
                 }
                 final isOnline = widget.onlineUsers.contains(otherUser['_id'].toString());

@@ -636,43 +636,43 @@ await controller.getEmergencyOrder(widget.orderId);
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         leading: const BackButton(color: Colors.black),
         actions: [
-          Padding(
-            padding:  EdgeInsets.only(right: 0.04.toWidthPercent()),
-            child: GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AddWorkerScreen()),
-                );
-                if (result == true) {
-                  fetchWorkers();
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Worker added successfully"),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              },
-              child: Row(
-                children: [
-                  Card(
-                    margin: EdgeInsets.symmetric(vertical: 0.05.toWidthPercent(),horizontal: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.015.toWidthPercent())),
-
-                  color: AppColors.primaryGreen,
-                  child: Center(
-                    child: Icon(Icons.add,color: Colors.white,size: 0.05.toWidthPercent(),),
-                  ),
-                  ),
-                  Text(
-                    "Add Worker",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 0.035.toWidthPercent()),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding:  EdgeInsets.only(right: 0.04.toWidthPercent()),
+          //   child: GestureDetector(
+          //     onTap: () async {
+          //       final result = await Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (_) => const AddWorkerScreen()),
+          //       );
+          //       if (result == true) {
+          //         fetchWorkers();
+          //         if (!context.mounted) return;
+          //         ScaffoldMessenger.of(context).showSnackBar(
+          //           const SnackBar(
+          //             content: Text("Worker added successfully"),
+          //             backgroundColor: Colors.green,
+          //           ),
+          //         );
+          //       }
+          //     },
+          //     child: Row(
+          //       children: [
+          //         Card(
+          //           margin: EdgeInsets.symmetric(vertical: 0.05.toWidthPercent(),horizontal: 2),
+          //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.015.toWidthPercent())),
+          //
+          //         color: AppColors.primaryGreen,
+          //         child: Center(
+          //           child: Icon(Icons.add,color: Colors.white,size: 0.05.toWidthPercent(),),
+          //         ),
+          //         ),
+          //         Text(
+          //           "Add Worker",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 0.035.toWidthPercent()),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
         ],
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,

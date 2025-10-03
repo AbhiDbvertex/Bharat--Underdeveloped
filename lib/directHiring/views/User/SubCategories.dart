@@ -369,6 +369,7 @@
 
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -558,15 +559,24 @@ class _SubCategoriesState extends State<SubCategories> {
                 child: imagePath.isNotEmpty
                     ? Padding(
                   padding: const EdgeInsets.all(5.0),
-                  child: Image.network(
+                  child: /*Image.network(
                     imagePath,
-                    height: 42,
-                    width: 42,
+                    height: 92,
+                    width: 120,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(Icons.broken_image, size: 22);
                     },
-                  ),
+                  ),*/
+                  CachedNetworkImage(
+                    imageUrl:imagePath,
+                      height: 92,
+                      width: 120,
+                      fit: BoxFit.cover,
+                    errorWidget: (context, url, error) {
+                      return const Icon(Icons.broken_image, size: 22);
+                    },
+                  )
                 )
                     : const Icon(Icons.image, size: 22),
               ),

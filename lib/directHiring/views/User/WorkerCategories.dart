@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -124,88 +125,148 @@ class _WorkerCategoriesState extends State<WorkerCategories> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  // Container(
+                                  //   height: 42,
+                                  //   width: 42,
+                                  //   decoration: BoxDecoration(
+                                  //     color:
+                                  //         selectedIndex == index
+                                  //             ? Colors.green
+                                  //             : Colors.green.shade100,
+                                  //     shape: BoxShape.circle,
+                                  //     border:
+                                  //         selectedIndex == index
+                                  //             ? Border.all(
+                                  //               color: Colors.black,
+                                  //               width: 1,
+                                  //             )
+                                  //             : null,
+                                  //   ),
+                                  //   child: Center(
+                                  //     child: ClipOval(
+                                  //       child:
+                                  //           imagePath.isNotEmpty
+                                  //
+                                  //               ? Padding(
+                                  //                 padding: const EdgeInsets.all(6.0),
+                                  //                 child: Image.network(
+                                  //                   imagePath.startsWith('http')
+                                  //                       ? imagePath
+                                  //                       : '${AppConstants.baseUrl}$imagePath',
+                                  //                   height: 42,
+                                  //                   width: 42,
+                                  //                   fit: BoxFit.cover,
+                                  //                   loadingBuilder: (
+                                  //                     context,
+                                  //                     child,
+                                  //                     loadingProgress,
+                                  //                   ) {
+                                  //                     if (loadingProgress == null)
+                                  //                       return child;
+                                  //                     return Container(
+                                  //                       height: 42,
+                                  //                       width: 42,
+                                  //                       color:
+                                  //                           Colors.grey.shade100,
+                                  //                       child: const Icon(
+                                  //                         Icons.image_outlined,
+                                  //                         size: 22,
+                                  //                         color: Colors.grey,
+                                  //                       ),
+                                  //                     );
+                                  //                   },
+                                  //                   errorBuilder: (
+                                  //                     context,
+                                  //                     error,
+                                  //                     stackTrace,
+                                  //                   ) {
+                                  //                     print(
+                                  //                       "Image load failed in WorkerCategories: $imagePath, Error: $error",
+                                  //                     );
+                                  //                     return Container(
+                                  //                       height: 42,
+                                  //                       width: 42,
+                                  //                       color:
+                                  //                           Colors.grey.shade100,
+                                  //                       child: const Icon(
+                                  //                         Icons.image_outlined,
+                                  //                         size: 22,
+                                  //                         color: Colors.grey,
+                                  //                       ),
+                                  //                     );
+                                  //                   },
+                                  //                 ),
+                                  //               )
+                                  //               : Container(
+                                  //                 height: 42,
+                                  //                 width: 42,
+                                  //                 color: Colors.grey.shade100,
+                                  //                 child: const Icon(
+                                  //                   Icons.image_outlined,
+                                  //                   size: 22,
+                                  //                   color: Colors.grey,
+                                  //                 ),
+                                  //               ),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   Container(
                                     height: 42,
                                     width: 42,
                                     decoration: BoxDecoration(
-                                      color:
-                                          selectedIndex == index
-                                              ? Colors.green
-                                              : Colors.green.shade100,
+                                      color: selectedIndex == index ? Colors.green : Colors.green.shade100,
                                       shape: BoxShape.circle,
-                                      border:
-                                          selectedIndex == index
-                                              ? Border.all(
-                                                color: Colors.black,
-                                                width: 1,
-                                              )
-                                              : null,
+                                      border: selectedIndex == index
+                                          ? Border.all(
+                                        color: Colors.black,
+                                        width: 1,
+                                      )
+                                          : null,
                                     ),
                                     child: Center(
                                       child: ClipOval(
-                                        child:
-                                            imagePath.isNotEmpty
-
-                                                ? Padding(
-                                                  padding: const EdgeInsets.all(6.0),
-                                                  child: Image.network(
-                                                    imagePath.startsWith('http')
-                                                        ? imagePath
-                                                        : '${AppConstants.baseUrl}$imagePath',
-                                                    height: 42,
-                                                    width: 42,
-                                                    fit: BoxFit.cover,
-                                                    loadingBuilder: (
-                                                      context,
-                                                      child,
-                                                      loadingProgress,
-                                                    ) {
-                                                      if (loadingProgress == null)
-                                                        return child;
-                                                      return Container(
-                                                        height: 42,
-                                                        width: 42,
-                                                        color:
-                                                            Colors.grey.shade100,
-                                                        child: const Icon(
-                                                          Icons.image_outlined,
-                                                          size: 22,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      );
-                                                    },
-                                                    errorBuilder: (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      print(
-                                                        "Image load failed in WorkerCategories: $imagePath, Error: $error",
-                                                      );
-                                                      return Container(
-                                                        height: 42,
-                                                        width: 42,
-                                                        color:
-                                                            Colors.grey.shade100,
-                                                        child: const Icon(
-                                                          Icons.image_outlined,
-                                                          size: 22,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                )
-                                                : Container(
-                                                  height: 42,
-                                                  width: 42,
-                                                  color: Colors.grey.shade100,
-                                                  child: const Icon(
-                                                    Icons.image_outlined,
-                                                    size: 22,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
+                                        child: imagePath.isNotEmpty
+                                            ? Padding(
+                                          padding: const EdgeInsets.all(6.0),
+                                          child: CachedNetworkImage(
+                                            imageUrl: imagePath.startsWith('http')
+                                                ? imagePath
+                                                : '${AppConstants.baseUrl}$imagePath',
+                                            height: 42,
+                                            width: 42,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => Container(
+                                              height: 42,
+                                              width: 42,
+                                              color: Colors.grey.shade100,
+                                              child: const Icon(
+                                                Icons.image_outlined,
+                                                size: 22,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            errorWidget: (context, url, error) => Container(
+                                              height: 42,
+                                              width: 42,
+                                              color: Colors.grey.shade100,
+                                              child: const Icon(
+                                                Icons.image_outlined,
+                                                size: 22,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                            : Container(
+                                          height: 42,
+                                          width: 42,
+                                          color: Colors.grey.shade100,
+                                          child: const Icon(
+                                            Icons.image_outlined,
+                                            size: 22,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),

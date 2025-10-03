@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(seconds: 5), () async {
       await _navigateToNextScreen();
     });
-    AutomaticNoConnectionDialog.startListening();
+    //AutomaticNoConnectionDialog.startListening();
   }
 
   /// ✅ Core navigation logic after splash screen

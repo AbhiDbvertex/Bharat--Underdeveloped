@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // Delay listener until the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       bwDebug('Starting network listener after first frame', tag: "InternetCheck");
-      AutomaticNoConnectionDialog.startListening();
+      //AutomaticNoConnectionDialog.startListening();
     });
   }
   @override
@@ -97,42 +97,42 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
       // YourWidget(buddingOderId: '68ae9954d57712243b24df60',),
     );
   }
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-   switch (state) {
-      case AppLifecycleState.resumed:
-
-        if (getBwGlobalContext() != null) {
-          AutomaticNoConnectionDialog.startListening();
-        } else {
-          bwDebug('Context not available on resume, delaying listener', tag: "InternetCheck");
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            AutomaticNoConnectionDialog.startListening();
-          });
-        }
-             break;
-
-      case AppLifecycleState.detached:
-              AutomaticNoConnectionDialog.dispose(); // Dispose of connection dialog resources
-        break;
-      case AppLifecycleState.paused:
-            AutomaticNoConnectionDialog.dispose(); // Dispose of connection dialog resources
-
-        break;
-      case AppLifecycleState.inactive:
-        // TODO: Handle this case.
-      //  throw UnimplementedError();
-      case AppLifecycleState.hidden:
-        // TODO: Handle this case.
-        //throw UnimplementedError();
-    } //widget tree,  element tree , render tree
-  }
+  // @override
+  // Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+  //  switch (state) {
+  //     case AppLifecycleState.resumed:
+  //
+  //       if (getBwGlobalContext() != null) {
+  //         AutomaticNoConnectionDialog.startListening();
+  //       } else {
+  //         bwDebug('Context not available on resume, delaying listener', tag: "InternetCheck");
+  //         WidgetsBinding.instance.addPostFrameCallback((_) {
+  //           AutomaticNoConnectionDialog.startListening();
+  //         });
+  //       }
+  //            break;
+  //
+  //     case AppLifecycleState.detached:
+  //             AutomaticNoConnectionDialog.dispose(); // Dispose of connection dialog resources
+  //       break;
+  //     case AppLifecycleState.paused:
+  //           AutomaticNoConnectionDialog.dispose(); // Dispose of connection dialog resources
+  //
+  //       break;
+  //     case AppLifecycleState.inactive:
+  //       // TODO: Handle this case.
+  //     //  throw UnimplementedError();
+  //     case AppLifecycleState.hidden:
+  //       // TODO: Handle this case.
+  //       //throw UnimplementedError();
+  //   } //widget tree,  element tree , render tree
+  // }
 
   @override
   void dispose() {
     bwDebug('dispose callllllllllllll', tag: " gadgeeeeeeeee");
     WidgetsBinding.instance.removeObserver(this);
-    AutomaticNoConnectionDialog.dispose();
+    // AutomaticNoConnectionDialog.dispose();
     super.dispose();
   }
 }

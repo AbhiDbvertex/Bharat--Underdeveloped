@@ -1677,6 +1677,7 @@ import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/view/user/nagotiate_card.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
+import '../../../chat/chatScreen.dart';
 import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';

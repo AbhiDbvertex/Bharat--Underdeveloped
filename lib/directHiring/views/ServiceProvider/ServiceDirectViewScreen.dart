@@ -2865,6 +2865,7 @@ import '../../../../Widgets/AppColors.dart';
 import '../../../Widgets/address_map_class.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
+import '../../../chat/chatScreen.dart';
 import '../../../testingfile.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';

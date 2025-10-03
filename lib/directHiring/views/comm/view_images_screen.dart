@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
@@ -35,7 +36,7 @@ class ViewImage extends StatelessWidget {
   Widget _buildImageView() {
     // Check if imageUrl is a single String
     if (imageUrl is String) {
-      return InteractiveViewer(
+      return /*InteractiveViewer(
         panEnabled: true,
         scaleEnabled: true,
         minScale: 0.5,
@@ -52,7 +53,26 @@ class ViewImage extends StatelessWidget {
             );
           },
         ),
-      );
+      );*/
+        InteractiveViewer(
+          panEnabled: true,
+          scaleEnabled: true,
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            errorWidget: (context, url, error) => Center(
+              child: Image.asset(
+                'assets/images/d_png/No_Image_Available.jpg',
+                fit: BoxFit.contain,
+              ),
+            ),
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        );
     }
     // Check if imageUrl is a List<String>
     else if (imageUrl is List<String>) {

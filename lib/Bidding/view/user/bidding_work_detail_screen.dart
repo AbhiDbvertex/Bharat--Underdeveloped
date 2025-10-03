@@ -17,6 +17,7 @@ import '../../../Widgets/AppColors.dart';
 import '../../../Widgets/address_map_class.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
+import '../../../chat/chatScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import '../../../testingfile.dart';

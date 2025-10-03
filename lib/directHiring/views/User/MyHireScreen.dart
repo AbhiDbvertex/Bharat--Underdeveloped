@@ -1234,6 +1234,7 @@
 
 
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
 import 'package:developer/Emergency/User/screens/work_detail.dart';
 import 'package:developer/Emergency/utils/logger.dart';
@@ -1251,6 +1252,7 @@ import '../../../Emergency/utils/map_launcher_lat_long.dart';
 import '../../../Widgets/AppColors.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
+import '../../../chat/chatScreen.dart';
 import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
@@ -1731,10 +1733,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                 hintText: selectedTab == 0
-                ? 'Search for bidding tasks'
+                ? 'Search by name'
                 : selectedTab == 1
-                ? 'Search for direct hiring'
-                : 'Search for emergency tasks',
+                ? 'Search by name'
+                : 'Search by name',
                 prefixIcon: Icon(Icons.search, color: Colors.green),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -1954,7 +1956,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                     padding: const EdgeInsets.only(top: 8.0,bottom: 8),
                                     child: Container(
                                       color: Colors.grey,
-                                      child: ClipRRect(
+                                      child: /*ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: imageUrl.isNotEmpty
                                             ? Image.network(
@@ -1966,6 +1968,32 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                           },
                                         )
                                             : Icon(Icons.image_not_supported_outlined, size: 100),
+                                      ),*/
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: imageUrl.isNotEmpty
+                                            ? CachedNetworkImage(
+                                          imageUrl: 'https://api.thebharatworks.com/$imageUrl',
+                                          height: 125,
+                                          width: 100,
+                                          // fit: BoxFit.cover,
+                                          placeholder: (context, url) => Container(
+                                            height: 125,
+                                            width: 100,
+                                            color: Colors.grey.shade200,
+                                            child: const Center(
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) => const Icon(
+                                            Icons.image_not_supported_outlined,
+                                            size: 100,
+                                          ),
+                                        )
+                                            : const Icon(
+                                          Icons.image_not_supported_outlined,
+                                          size: 100,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -2012,6 +2040,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                  Text(address,style: TextStyle(fontWeight: FontWeight.w600),),
                                   SizedBox(height: 3),
                                   Text(
                                     description,
@@ -2067,13 +2096,13 @@ class _MyHireScreenState extends State<MyHireScreen> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Color(0xffF27773),
+                                            color: Colors.transparent /* Color(0xffF27773)*/,
                                             borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: Text(
                                             address,
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: Colors.transparent,
                                               fontSize: 12,
                                             ),
                                             overflow: TextOverflow.ellipsis,
@@ -2349,7 +2378,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
             child: Stack(
               children:[ Container(
                 color: Colors.grey,
-                child: ClipRRect(
+                child:/* ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: imageshow != null && imageshow.isNotEmpty
                       ? Image.network(
@@ -2358,6 +2387,36 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     width: 100,
                     // fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/task.png',
+                      height: 180,
+                      width: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : Image.asset(
+                    'assets/images/task.png',
+                    height: 180,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  ),
+                ),*/
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: imageshow != null && imageshow.isNotEmpty
+                      ? CachedNetworkImage(
+                    imageUrl: imageshow,
+                    height: 180,
+                    width: 100,
+                    // fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      height: 180,
+                      width: 100,
+                      color: Colors.grey.shade200,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Image.asset(
                       'assets/images/task.png',
                       height: 180,
                       width: 100,
@@ -2417,8 +2476,9 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        darectHiringData.description,
-                        style: _cardBody(),
+                        // darectHiringData.description,
+                        darectHiringData.address ?? "",
+                        style: TextStyle(fontWeight: FontWeight.w600),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -2464,20 +2524,41 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Container(
-                      height: 25,
-                      width: 105,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: const Text(
-                          "Review",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                    // Container(
+                    //   height: 25,
+                    //   width: 105,
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.black,
+                    //     borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    //   child: Center(
+                    //     child: const Text(
+                    //       "Review",
+                    //       style: TextStyle(
+                    //         color: Colors.white,
+                    //         fontSize: 12,
+                    //         fontWeight: FontWeight.w500,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        height: 25,
+                        width: 105,
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(displayStatus),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text(
+                            displayStatus.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
@@ -2486,84 +2567,68 @@ class _MyHireScreenState extends State<MyHireScreen> {
                 ),
                 const SizedBox(height: 8),
                 // status
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                    height: 25,
-                    width: 105,
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(displayStatus),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        displayStatus.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+Text(darectHiringData.description,style: TextStyle(),),
                 const SizedBox(height: 10),
                 // address + button
                 Row(
                   children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: (){
-                          MapLauncher.openMap(latitude: darectHiringData.latitude, longitude: darectHiringData.longitude,address: darectHiringData.address);
-                          // MapLauncher.openMap(address:  data.address);
+                    // Expanded(
+                    //   child: InkWell(
+                    //     onTap: (){
+                    //       MapLauncher.openMap(latitude: darectHiringData.latitude, longitude: darectHiringData.longitude,address: darectHiringData.address);
+                    //       // MapLauncher.openMap(address:  data.address);
+                    //     },
+                    //     child: Container(
+                    //       padding: const EdgeInsets.symmetric(
+                    //           horizontal: 6, vertical: 6),
+                    //       decoration: BoxDecoration(
+                    //         color: const Color(0xffF27773),
+                    //         borderRadius: BorderRadius.circular(8),
+                    //       ),
+                    //       child: Text(
+                    //         darectHiringData.address ?? "",
+                    //         maxLines: 1,
+                    //         overflow: TextOverflow.ellipsis,
+                    //         style:
+                    //         const TextStyle(color: Colors.white, fontSize: 12),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Expanded(child: Icon(Icons.add,color: Colors.transparent,)),
+                    const SizedBox(width: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DirectViewScreen(
+                                id: darectHiringData.id,
+                                categreyId: categoryId ?? '68443fdbf03868e7d6b74874',
+                                subcategreyId:
+                                subCategoryId ?? '684e7226962b4919ae932af5',
+                              ),
+                            ),
+                          ).then((_) {
+                            fetchDirectOrders();
+                          });
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xffF27773),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.green.shade700,
+                          minimumSize: const Size(90, 36),
+                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
-                            darectHiringData.address ?? "",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
-                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DirectViewScreen(
-                              id: darectHiringData.id,
-                              categreyId: categoryId ?? '68443fdbf03868e7d6b74874',
-                              subcategreyId:
-                              subCategoryId ?? '684e7226962b4919ae932af5',
-                            ),
+                        child: Text(
+                          "View Details",
+                          style: GoogleFonts.roboto(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ).then((_) {
-                          fetchDirectOrders();
-                        });
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.green.shade700,
-                        minimumSize: const Size(90, 36),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        "View Details",
-                        style: GoogleFonts.roboto(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -2609,37 +2674,99 @@ class _MyHireScreenState extends State<MyHireScreen> {
       ),
       child: Row(
         children: [
+          // Container(
+          //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color:Colors.grey,),
+          //   // color: Colors.grey,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(8),
+          //     child: Stack(
+          //       children: [
+          //         hasImage
+          //             ? Image.network(
+          //           data.imageUrls!.first, // first image show karenge
+          //           height: 0.4.toWidthPercent(),
+          //           width: 0.25.toWidthPercent(),
+          //           // fit: BoxFit.cover,
+          //           loadingBuilder: (context, child, loadingProgress) {
+          //             if (loadingProgress == null) return child;
+          //             return Container(
+          //               height: 0.4.toWidthPercent(),
+          //               width: 0.25.toWidthPercent(),
+          //               alignment: Alignment.center,
+          //               child: const CircularProgressIndicator(
+          //                 color: AppColors.primaryGreen,
+          //                 strokeWidth: 2.5,
+          //               ),
+          //             );
+          //           },
+          //           errorBuilder: (context, error, stackTrace) =>
+          //               Image.asset('assets/images/task.png',
+          //                   height: 150, width: 110, fit: BoxFit.cover),
+          //         )
+          //             : Image.asset('assets/images/task.png',
+          //             height: 150, width: 110, fit: BoxFit.cover),
+          //         Positioned(
+          //           bottom: 5,
+          //           left: 5,
+          //           right: 5,
+          //           child: Container(
+          //             decoration: BoxDecoration(
+          //               color: Colors.black.withOpacity(0.7),
+          //               borderRadius: BorderRadius.circular(15), // corner circle
+          //             ),
+          //             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          //             child: Text(
+          //               "${data.projectId ?? 'N/A'}", // product id
+          //               style: TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 12,
+          //                 fontWeight: FontWeight.bold,
+          //               ),
+          //               overflow: TextOverflow.ellipsis,
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),color:Colors.grey,),
-            // color: Colors.grey,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey,
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Stack(
                 children: [
                   hasImage
-                      ? Image.network(
-                    data.imageUrls!.first, // first image show karenge
+                      ? CachedNetworkImage(
+                    imageUrl: data.imageUrls!.first,
                     height: 0.4.toWidthPercent(),
                     width: 0.25.toWidthPercent(),
-                    // fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 0.4.toWidthPercent(),
-                        width: 0.25.toWidthPercent(),
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(
-                          color: AppColors.primaryGreen,
-                          strokeWidth: 2.5,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) =>
-                        Image.asset('assets/images/task.png',
-                            height: 150, width: 110, fit: BoxFit.cover),
+                   // fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      height: 0.4.toWidthPercent(),
+                      width: 0.25.toWidthPercent(),
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                        strokeWidth: 2.5,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Image.asset(
+                      'assets/images/task.png',
+                      height: 150,
+                      width: 110,
+                      fit: BoxFit.cover,
+                    ),
                   )
-                      : Image.asset('assets/images/task.png',
-                      height: 150, width: 110, fit: BoxFit.cover),
+                      : Image.asset(
+                    'assets/images/task.png',
+                    height: 150,
+                    width: 110,
+                    fit: BoxFit.cover,
+                  ),
                   Positioned(
                     bottom: 5,
                     left: 5,
@@ -2647,12 +2774,12 @@ class _MyHireScreenState extends State<MyHireScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(15), // corner circle
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                       child: Text(
-                        "${data.projectId ?? 'N/A'}", // product id
-                        style: TextStyle(
+                        "${data.projectId ?? 'N/A'}",
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -2684,6 +2811,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                Text("${data.googleAddress}",style: TextStyle(fontWeight: FontWeight.w600),maxLines: 2,),
                 Container(
                   height: 1, // thickness
                   color: Colors.grey.shade200, // light color
@@ -2707,34 +2835,34 @@ class _MyHireScreenState extends State<MyHireScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) => DirectViewScreen(
-                        //       id: data.id ?? '',
-                        //       categreyId: data.categoryId?._id ?? '',
-                        //       subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
-                        //           ? data.subCategoryIds!.first._id!
-                        //           : '',
-                        //     ),
-                        //   ),
-                        // ).then((_) => fetchDirectOrders());
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Color(0xff353026),
-                        minimumSize: const Size(70, 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        "Review",
-                        style: GoogleFonts.roboto(
-                            color: Colors.white, fontSize: 12),
-                      ),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     // Navigator.push(
+                    //     //   context,
+                    //     //   MaterialPageRoute(
+                    //     //     builder: (_) => DirectViewScreen(
+                    //     //       id: data.id ?? '',
+                    //     //       categreyId: data.categoryId?._id ?? '',
+                    //     //       subcategreyId: data.subCategoryIds != null && data.subCategoryIds!.isNotEmpty
+                    //     //           ? data.subCategoryIds!.first._id!
+                    //     //           : '',
+                    //     //     ),
+                    //     //   ),
+                    //     // ).then((_) => fetchDirectOrders());
+                    //   },
+                    //   style: TextButton.styleFrom(
+                    //     backgroundColor: Color(0xff353026),
+                    //     minimumSize: const Size(70, 20),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     "Review",
+                    //     style: GoogleFonts.roboto(
+                    //         color: Colors.white, fontSize: 12),
+                    //   ),
+                    // ),
                   ],
                 ),
                 Row(
@@ -2795,7 +2923,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 5, vertical: 5),
                             decoration: BoxDecoration(
-                              color: Color(0xffF27773),
+                              color: Colors.transparent /*Color(0xffF27773)*/,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -2803,7 +2931,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                               maxLines: 1, //
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 12),
+                                  color: Colors.transparent, fontSize: 12),
                             ),
                           ),
                         ),
