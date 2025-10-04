@@ -149,7 +149,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: "Search for services...",
+                        hintText: "Search by name..",
                         hintStyle: GoogleFonts.roboto(
                           fontSize: 14,
                           color: const Color(0xFF616161),

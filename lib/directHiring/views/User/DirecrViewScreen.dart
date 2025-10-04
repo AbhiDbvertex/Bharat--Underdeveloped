@@ -544,10 +544,10 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         } else {
           print("❌ Send offer failed: ${data['message']}");
 
-            CustomSnackBar.show(
-              message: 'Something wrong',
-              type: SnackBarType.error
-          );
+          //   CustomSnackBar.show(
+          //     message: 'Something wrong',
+          //     type: SnackBarType.error
+          // );
 
         }
       } else {
@@ -1021,7 +1021,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            order?['hire_status'] == 'accepted'
+            order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
                 ? Center(
               child: Card(
                 elevation: 3,
@@ -1381,6 +1381,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
             )
                 : SizedBox(),
 
+            ///            this is assing worker
             order != null && order?['hire_status'] == 'accepted' && workerId != null
                 ? Card(
               color: Colors.white,
@@ -1799,61 +1800,61 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               ),
             ) :SizedBox(),
 
-            order!['hire_status'] == 'cancelled'
-                ? Center(
-              child: Container(
-                height: 35,
-                width: 250,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.warning_amber, color: Colors.red),
-                    Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                  ],
-                ),
-              ),
-            )
-                : SizedBox(),
-            order!['hire_status'] == 'cancelledDispute'
-                ? Center(
-              child: Container(
-                height: 40,
-                width: double.infinity,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.warning_amber, color: Colors.red),
-                    Flexible(
-                      child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
-                        style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                    ),
-                  ],
-                ),
-              ),
-            )
-                : SizedBox(),
-
-            order!['hire_status'] == 'completed'
-                ? Center(
-              child: Container(
-                height: 35,
-                width: 300,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check_circle_outline, color: Colors.green),
-                    Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
-                  ],
-                ),
-              ),
-            )
-                : SizedBox(),
+            // order!['hire_status'] == 'cancelled'
+            //     ? Center(
+            //   child: Container(
+            //     height: 35,
+            //     width: 250,
+            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         Icon(Icons.warning_amber, color: Colors.red),
+            //         Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+            //       ],
+            //     ),
+            //   ),
+            // )
+            //     : SizedBox(),
+            // order!['hire_status'] == 'cancelledDispute'
+            //     ? Center(
+            //   child: Container(
+            //     height: 40,
+            //     width: double.infinity,
+            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         Icon(Icons.warning_amber, color: Colors.red),
+            //         Flexible(
+            //           child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
+            //             style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // )
+            //     : SizedBox(),
+            //
+            // order!['hire_status'] == 'completed'
+            //     ? Center(
+            //   child: Container(
+            //     height: 35,
+            //     width: 300,
+            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       crossAxisAlignment: CrossAxisAlignment.center,
+            //       children: [
+            //         Icon(Icons.check_circle_outline, color: Colors.green),
+            //         Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+            //       ],
+            //     ),
+            //   ),
+            // )
+            //     : SizedBox(),
             order!['hire_status'] == 'rejected'
                 ? Center(
               child: Container(
@@ -2100,6 +2101,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                     onPressed: () async {
                                       if (order?['_id'] != null && worker.id != null) {
                                         await sendNextOffer(order!['_id'], worker.id!);
+                                        await fetchOrderDetail();
                                       } else {
                                          CustomSnackBar.show(
                                             message:  'Invalid order or provider ID' ,
@@ -2128,11 +2130,12 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               ),
 
             order!['hire_status'] == 'accepted' ? SizedBox() : const SizedBox(height: 10),
-            order!['hire_status'] == 'accepted'
+            order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
                 ? PaymentScreen(
               orderId: widget.id,
               orderProviderId: orderProviderId,
               paymentHistory: order!['service_payment']?['payment_history'],
+              status: order?['hire_status'],
             )
                 : const SizedBox(),
           ],

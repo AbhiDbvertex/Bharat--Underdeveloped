@@ -93,35 +93,36 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  // // Cancel the timer when user navigates to feedback screen
-                  // _navigationTimer?.cancel();
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => UserFeedback(providerId: widget.providerId , oderId:widget.orderId , oderType: 'direct',),
-                  //   ),
-                  // );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade700,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 102,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  "Share Feedback",
-                  style: GoogleFonts.roboto(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+             Center(child: Text('Please wait 5 second',style: TextStyle(color: Colors.grey),),)
+              // ElevatedButton(
+              //   onPressed: () {
+              //     // // Cancel the timer when user navigates to feedback screen
+              //     // _navigationTimer?.cancel();
+              //     // Navigator.push(
+              //     //   context,
+              //     //   MaterialPageRoute(
+              //     //     builder: (context) => UserFeedback(providerId: widget.providerId , oderId:widget.orderId , oderType: 'direct',),
+              //     //   ),
+              //     // );
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.green.shade700,
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 102,
+              //       vertical: 12,
+              //     ),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(10),
+              //     ),
+              //   ),
+              //   child: Text(
+              //     "Share Feedback",
+              //     style: GoogleFonts.roboto(
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
