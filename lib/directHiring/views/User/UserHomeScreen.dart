@@ -77,8 +77,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         setState(() => isBannerLoading = false);
         return;
       }
-      final url =
-          Uri.parse('https://api.thebharatworks.com/api/banner/getAllBannerImages');
+      final url = Uri.parse(
+          'https://api.thebharatworks.com/api/banner/getAllBannerImages');
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $token'},
@@ -151,11 +151,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       });
       debugPrint("📍 Using saved or default location: $userLocation");
       if (mounted) {
-         CustomSnackBar.show(
-            message:'Authentication failed, please log in again!' ,
-            type: SnackBarType.error
-        );
-
+        CustomSnackBar.show(
+            message: 'Authentication failed, please log in again!',
+            type: SnackBarType.error);
       }
       return;
     }
@@ -256,12 +254,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           });
           debugPrint("❌ API error: ${responseData['message']}");
           if (mounted) {
-
-             CustomSnackBar.show(
+            CustomSnackBar.show(
                 message: responseData['message'] ?? 'Failed to fetch profile',
-                type: SnackBarType.error
-            );
-
+                type: SnackBarType.error);
           }
         }
       } else {
@@ -271,12 +266,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         });
         debugPrint("❌ API call failed: ${response.statusCode}");
         if (mounted) {
-
-            CustomSnackBar.show(
-              message:'Failed to fetch profile data!' ,
-              type: SnackBarType.error
-          );
-
+          CustomSnackBar.show(
+              message: 'Failed to fetch profile data!',
+              type: SnackBarType.error);
         }
       }
     } catch (e) {
@@ -286,12 +278,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         isLoading = false;
       });
       if (mounted) {
-
-         CustomSnackBar.show(
-            message:'Error fetching location ',
-            type: SnackBarType.error
-        );
-
+        CustomSnackBar.show(
+            message: 'Error fetching location ', type: SnackBarType.error);
       }
     }
   }
@@ -304,13 +292,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     if (newAddress.isEmpty || latitude == 0.0 || longitude == 0.0) {
       debugPrint("❌ Invalid location data: $newAddress, $latitude, $longitude");
       if (mounted) {
-
-         CustomSnackBar.show(
-            message:"Invalid location data" ,
-            type: SnackBarType.error
-        );
-
-
+        CustomSnackBar.show(
+            message: "Invalid location data", type: SnackBarType.error);
       }
       return;
     }
@@ -369,41 +352,29 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             "📍 Saved new location and updated UI: $newAddress (ID: $newAddressId)",
           );
           if (mounted) {
-
-             CustomSnackBar.show(
-                message:"Location updated successfully : $newAddress" ,
-                type: SnackBarType.success
-            );
+            CustomSnackBar.show(
+                message: "Location updated successfully : $newAddress",
+                type: SnackBarType.success);
           }
         } else {
           if (mounted) {
-
-             CustomSnackBar.show(
+            CustomSnackBar.show(
                 message: "Location update failed: ${data['message']}",
-                type: SnackBarType.error
-            );
-
+                type: SnackBarType.error);
           }
         }
       } else {
         if (mounted) {
-
-            CustomSnackBar.show(
+          CustomSnackBar.show(
               message: "Server error, location update failed!",
-              type: SnackBarType.error
-          );
-
+              type: SnackBarType.error);
         }
       }
     } catch (e) {
       debugPrint("❌ Error updating location: $e");
       if (mounted) {
-
-         CustomSnackBar.show(
-            message:"Error updating location" ,
-            type: SnackBarType.error
-        );
-
+        CustomSnackBar.show(
+            message: "Error updating location", type: SnackBarType.error);
       }
     }
   }
@@ -443,12 +414,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       } else {
         debugPrint("❌ Invalid location data received: $result");
         if (mounted) {
-
-            CustomSnackBar.show(
+          CustomSnackBar.show(
               message: "Invalid location data, please try again!",
-              type: SnackBarType.error
-          );
-
+              type: SnackBarType.error);
         }
       }
     }
@@ -504,7 +472,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        appBar:/* AppBar(
+        appBar: /* AppBar(
           backgroundColor: Colors.green.shade800,
           centerTitle: true,
           elevation: 0,
@@ -512,7 +480,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           automaticallyImplyLeading: false,
         ),*/
 
-        AppBar(
+            AppBar(
           elevation: 0,
           backgroundColor: Colors.white,
           centerTitle: false,
@@ -549,7 +517,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),
                   );
                 },
-                child: SvgPicture.asset('assets/svg_images/notificationIcon.svg'),
+                child:
+                    SvgPicture.asset('assets/svg_images/notificationIcon.svg'),
               ),
             ],
           ),
@@ -677,29 +646,38 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                       );
                                     },
                                     child: Container(
-
-                                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 5),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
                                           image,
                                           fit: BoxFit.fill,
-                                          loadingBuilder: (context, child, loadingProgress) {
-                                            if (loadingProgress == null) return child;
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
                                             return Center(
                                               child: CircularProgressIndicator(
-                                                value: loadingProgress.expectedTotalBytes != null
-                                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
                                                     : null,
                                               ),
                                             );
                                           },
-                                          errorBuilder: (context, error, stackTrace) {
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
                                             return Container(
                                               color: Colors.grey[200],
                                               child: Center(
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     const Icon(
                                                       Icons.image_not_supported,
@@ -713,7 +691,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                                         fontSize: 12,
                                                         color: Colors.grey,
                                                       ),
-                                                      textAlign: TextAlign.center,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                     ),
                                                   ],
                                                 ),
@@ -940,6 +919,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
           ),
         ),
+
+/*
         floatingActionButton: SizedBox(
           height: 70,
           width: 70,
@@ -979,7 +960,42 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+*/
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
+          child: SizedBox(
+            height: 50,
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PostTaskScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade800,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+              ),
+              icon: Container(
+                  decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(5)),
+                  child: const Icon(Icons.add, color: Colors.green, size: 20)),
+              label: Text(
+                "Post the Task",
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }

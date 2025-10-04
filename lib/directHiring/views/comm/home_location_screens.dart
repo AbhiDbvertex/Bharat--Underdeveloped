@@ -1416,6 +1416,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
   String? selectedAddressId;
   String? selectedTitle;
   String? selectedLandmark;
+  String? selectedHouseNumber;
+  String? selectedStreet;
+  String? selectedArea;
+  String? selectedPinCode;
 
   static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -1455,9 +1459,14 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     String? savedAddressId = prefs.getString("selected_address_id");
     String? savedTitle = prefs.getString("selected_title");
     String? savedLandmark = prefs.getString("selected_landmark");
+    String? savedHouseNumber = prefs.getString("selected_house_no");
+    String? savedStreet = prefs.getString("selected_street");
+    String? savedArea = prefs.getString("selected_area");
+    String? savedPinCode = prefs.getString("selected_pin_code");
 
     print(
-      "Debug: SharedPreferences se data - savedLocation: $savedLocation, savedAddressId: $savedAddressId, savedTitle: $savedTitle, savedLandmark: $savedLandmark",
+      "Debug: SharedPreferences se data - savedLocation: $savedLocation, savedAddressId: $savedAddressId, savedTitle: $savedTitle, savedLandmark: $savedLandmark\n"
+          "savedHoseNum: $savedHouseNumber,savedStreet: $savedStreet,savedArea: $savedArea,savedPinCode: $savedPinCode,",
     );
 
     String? token = await _getToken();
@@ -1493,12 +1502,20 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                   savedLocation = savedAddresses[0]['address'] ?? "Select Location";
                   savedTitle = savedAddresses[0]['title']?.toString() ?? 'N/A';
                   savedLandmark = savedAddresses[0]['landmark']?.toString() ?? 'N/A';
+                  savedHouseNumber = savedAddresses[0]['houseno']?.toString() ?? 'N/A';
+                  savedStreet = savedAddresses[0]['street']?.toString() ?? 'N/A';
+                  savedArea = savedAddresses[0]['area']?.toString() ?? 'N/A';
+                  savedPinCode = savedAddresses[0]['pincode']?.toString() ?? 'N/A';
                 }
 
                 selectedAddressId = savedAddressId;
                 selectedLocation = savedLocation ?? "Select Location";
                 selectedTitle = savedTitle ?? 'N/A';
                 selectedLandmark = savedLandmark ?? 'N/A';
+                selectedHouseNumber = savedHouseNumber ?? 'N/A';
+                selectedStreet = savedStreet ?? 'N/A';
+                selectedArea = savedArea ?? 'N/A';
+                selectedPinCode = savedPinCode ?? 'N/A';
 
                 print("📍 UI mein location set: $selectedLocation, ID: $savedAddressId");
               } else {
@@ -1506,6 +1523,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                 selectedLocation = "Select Location";
                 selectedTitle = 'N/A';
                 selectedLandmark = 'N/A';
+                selectedHouseNumber = 'N/A';
+                selectedStreet = 'N/A';
+                selectedArea = 'N/A';
+                selectedPinCode = 'N/A';
                 print("Debug: Koi saved addresses nahi mile.");
               }
             });
@@ -1567,7 +1588,7 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         uniqueAddresses.add(address);
       } else {
         print(
-          "Debug: Duplicate address hata diya - ID: $id, address: ${address['address']}",
+          "Debug: remove Duplicate address  - ID: $id, address: ${address['address']}",
         );
       }
     }
@@ -1588,6 +1609,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
         String? addressId,
         String? title,
         String? landmark,
+        String? houseNumber,
+        String? street,
+        String? area,
+        String? pinCode,
+
       }) async {
     print("Debug: Saving location: $location, ID: $addressId");
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1598,6 +1624,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
     if (addressId != null) await prefs.setString("selected_address_id", addressId);
     if (title != null) await prefs.setString("selected_title", title);
     if (landmark != null) await prefs.setString("selected_landmark", landmark);
+    if (houseNumber != null) await prefs.setString("selected_house_no", houseNumber);
+    if (street != null) await prefs.setString("selected_street", street);
+    if (area != null) await prefs.setString("selected_area", area);
+    if (pinCode != null) await prefs.setString("selected_pin_code", pinCode);
     print("Debug: Location saved to SharedPreferences");
   }
 
@@ -1708,6 +1738,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           final longitude = data['longitude']?.toDouble();
           final title = data['title']?.toString() ?? 'N/A';
           final landmark = data['landmark']?.toString() ?? 'N/A';
+          final houseNo = data['houseno']?.toString() ?? 'N/A';
+          final street = data['street']?.toString() ?? 'N/A';
+          final area = data['area']?.toString() ?? 'N/A';
+          final pinCode = data['pincode']?.toString() ?? 'N/A';
 
           if (address == null || address.isEmpty || latitude == null || longitude == null) {
             if (mounted) {
@@ -1727,6 +1761,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
             'longitude': longitude,
             'title': title,
             'landmark': landmark,
+            'houseno': houseNo,
+            'street': street,
+            'area': area,
+            'pincode': pinCode,
           };
         } else {
           print("Debug: Location details API failed: ${data['message']}");
@@ -1776,6 +1814,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
       String addressId,
       String title,
       String landmark,
+      String houseNumber,
+      String street,
+      String area,
+      String pinCode,
+
       ) async {
     if (address.isEmpty || latitude == 0.0 || longitude == 0.0) {
       if (mounted) {
@@ -1820,6 +1863,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
           'address': address,
           'title': title,
           'landmark': landmark,
+          'houseno': houseNumber,
+          'street': street,
+          'area': area,
+          'pincode': pinCode,
         }),
       );
 
@@ -1839,11 +1886,19 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
               'longitude': longitude,
               'title': title,
               'landmark': landmark,
+              'houseno': houseNumber,
+              'street': street,
+              'area': area,
+              'pincode': pinCode,
             });
             selectedLocation = address;
             selectedAddressId = newAddressId;
             selectedTitle = title;
             selectedLandmark = landmark;
+            selectedHouseNumber = houseNumber;
+            selectedStreet = street;
+            selectedArea = area;
+            selectedPinCode = pinCode;
             savedAddresses = _removeDuplicateAddresses(savedAddresses);
             print("Debug: Updated address ID: $newAddressId, address: $address");
             print("Debug: Deduplicated savedAddresses after update: $savedAddresses");
@@ -1857,6 +1912,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
             addressId: newAddressId,
             title: title,
             landmark: landmark,
+            houseNumber: houseNumber,
+            street: street,
+            area: area,
+            pinCode: pinCode
+
           );
 
           // if (mounted) {
@@ -2000,6 +2060,18 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                 selectedLandmark = savedAddresses.isNotEmpty
                     ? savedAddresses[0]['landmark']?.toString() ?? 'N/A'
                     : 'N/A';
+                selectedHouseNumber = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['houseno']?.toString() ?? 'N/A'
+                    : 'N/A';
+                selectedStreet = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['street']?.toString() ?? 'N/A'
+                    : 'N/A';
+                selectedArea = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['area']?.toString() ?? 'N/A'
+                    : 'N/A';
+                selectedPinCode = savedAddresses.isNotEmpty
+                    ? savedAddresses[0]['pincode']?.toString() ?? 'N/A'
+                    : 'N/A';
                 print("📍 UI mein location set after delete: $selectedLocation");
               }
               print("Debug: Address deleted, updated savedAddresses: $savedAddresses");
@@ -2097,6 +2169,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                               selectedAddressId = result['addressId'];
                               selectedTitle = result['title']?.toString() ?? 'N/A';
                               selectedLandmark = result['landmark']?.toString() ?? 'N/A';
+                              selectedHouseNumber = result['houseno']?.toString() ?? 'N/A';
+                              selectedStreet = result['street']?.toString() ?? 'N/A';
+                              selectedArea = result['area']?.toString() ?? 'N/A';
+                              selectedPinCode = result['pincode']?.toString() ?? 'N/A';
                               if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId)) {
                                 savedAddresses.add({
                                   '_id': selectedAddressId,
@@ -2105,6 +2181,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                   'longitude': result['longitude']?.toDouble() ?? 0.0,
                                   'title': selectedTitle,
                                   'landmark': selectedLandmark,
+                                  'houseno': selectedHouseNumber,
+                                  'street': selectedStreet,
+                                  'area': selectedArea,
+                                  'pincode': selectedPinCode,
+
                                 });
                                 print("Debug: Added new address: $selectedLocation, ID: $selectedAddressId");
                               }
@@ -2166,7 +2247,12 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                               itemBuilder: (context, index) {
                                 final address = savedAddresses[index];
                                 print(
-                                  "Debug: Rendering address: ID: ${address['_id']}, address: ${address['address']}, title: ${address['title']}, landmark: ${address['landmark']}",
+                                  "Debug: Rendering address: ID: ${address['_id']}, address: ${address['address']}, title: ${address['title']},"
+                                      " landmark: ${address['landmark']},"
+                                      " houseno: ${address['houseno']},"
+                                      " street: ${address['street']},"
+                                      " area: ${address['area']},"
+                                      " pincode: ${address['pincode']}",
                                 );
                                 return GestureDetector(
                                   onTap: () {
@@ -2175,6 +2261,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                     final addressText = address['address']?.toString();
                                     final title = address['title']?.toString() ?? 'N/A';
                                     final landmark = address['landmark']?.toString() ?? 'N/A';
+                                    final houseNo = address['houseno']?.toString() ?? 'N/A';
+                                    final street = address['street']?.toString() ?? 'N/A';
+                                    final area = address['area']?.toString() ?? 'N/A';
+                                    final pinCode = address['pincode']?.toString() ?? 'N/A';
+
 
                                     if (addressText == null || addressText.isEmpty) {
                                        CustomSnackBar.show(
@@ -2199,6 +2290,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                       selectedLocation = addressText;
                                       selectedTitle = title;
                                       selectedLandmark = landmark;
+                                      selectedHouseNumber = houseNo;
+                                      selectedStreet = street;
+                                      selectedArea = area;
+                                      selectedPinCode = pinCode;
+
                                       print("📍 UI mein location set: $addressText");
                                     });
                                   },
@@ -2232,6 +2328,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                 final addressText = address['address']?.toString();
                                                 final title = address['title']?.toString() ?? 'N/A';
                                                 final landmark = address['landmark']?.toString() ?? 'N/A';
+                                                final houseNo = address['houseno']?.toString() ?? 'N/A';
+                                                final street = address['street']?.toString() ?? 'N/A';
+                                                final area = address['area']?.toString() ?? 'N/A';
+                                                final pinCode = address['pincode']?.toString() ?? 'N/A';
                                                 if (addressText == null || addressText.isEmpty) {
 
                                                    CustomSnackBar.show(
@@ -2257,6 +2357,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                   selectedLocation = addressText;
                                                   selectedTitle = title;
                                                   selectedLandmark = landmark;
+                                                  selectedHouseNumber = houseNo;
+                                                  selectedStreet = street;
+                                                  selectedArea = area;
+                                                  selectedPinCode = pinCode;
                                                   print("📍 UI mein location set: $addressText");
                                                 });
                                               },
@@ -2315,6 +2419,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                       ),
                                                       initialTitle: address['title']?.toString(),
                                                       initialLandmark: address['landmark']?.toString(),
+                                                      initialHouseNo: address['houseno']?.toString(),
+                                                      initialStreet: address['street']?.toString(),
+                                                      initialArea: address['area']?.toString(),
+                                                      initialPinCode: address['pincode']?.toString(),
                                                     ),
                                                   ),
                                                 ).then((result) {
@@ -2326,6 +2434,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                       selectedAddressId = result['addressId'] ?? oldAddressId;
                                                       selectedTitle = result['title']?.toString() ?? 'N/A';
                                                       selectedLandmark = result['landmark']?.toString() ?? 'N/A';
+                                                      selectedHouseNumber = result['houseno']?.toString() ?? 'N/A';
+                                                      selectedStreet = result['street']?.toString() ?? 'N/A';
+                                                      selectedArea = result['area']?.toString() ?? 'N/A';
+                                                      selectedPinCode = result['pincode']?.toString() ?? 'N/A';
 
                                                       savedAddresses.removeWhere((addr) => addr['_id'] == oldAddressId);
 
@@ -2338,6 +2450,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                           'longitude': result['longitude']?.toDouble(),
                                                           'title': selectedTitle,
                                                           'landmark': selectedLandmark,
+                                                          'houseno': selectedHouseNumber,
+                                                          'street': selectedStreet,
+                                                          'area': selectedArea,
+                                                          'pincode': selectedPinCode,
                                                         });
                                                         print("Debug: Added new edited address ID: $selectedAddressId, address: $selectedLocation");
                                                       } else {
@@ -2348,6 +2464,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                           'longitude': result['longitude']?.toDouble(),
                                                           'title': selectedTitle,
                                                           'landmark': selectedLandmark,
+                                                          'houseno': selectedHouseNumber,
+                                                          'street': selectedStreet,
+                                                          'area': selectedArea,
+                                                          'pincode': selectedPinCode,
                                                         };
                                                         print("Debug: Updated existing address ID: $selectedAddressId, address: $selectedLocation");
                                                       }
@@ -2363,6 +2483,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                                       addressId: selectedAddressId,
                                                       title: selectedTitle,
                                                       landmark: selectedLandmark,
+                                                      houseNumber: selectedHouseNumber,
+                                                      street: selectedStreet,
+                                                      area: selectedArea,
+                                                      pinCode: selectedPinCode
                                                     );
                                                     _loadSavedLocation();
                                                   }
@@ -2435,6 +2559,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                         selectedAddressId = suggestion['place_id'];
                                         selectedTitle = locationData['title']?.toString() ?? 'N/A';
                                         selectedLandmark = locationData['landmark']?.toString() ?? 'N/A';
+                                        selectedHouseNumber = locationData['houseno']?.toString() ?? 'N/A';
+                                        selectedStreet = locationData['street']?.toString() ?? 'N/A';
+                                        selectedArea = locationData['area']?.toString() ?? 'N/A';
+                                        selectedPinCode = locationData['pincode']?.toString() ?? 'N/A';
                                         if (!savedAddresses.any((addr) => addr['_id'] == selectedAddressId)) {
                                           savedAddresses.add({
                                             '_id': selectedAddressId,
@@ -2443,6 +2571,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                                             'longitude': locationData['longitude']?.toDouble() ?? 0.0,
                                             'title': selectedTitle,
                                             'landmark': selectedLandmark,
+                                            'houseno': selectedHouseNumber,
+                                            'street': selectedStreet,
+                                            'area': selectedArea,
+                                            'pincode': selectedPinCode,
                                           });
                                           print("Debug: Added suggestion address: $selectedLocation, ID: $selectedAddressId");
                                         }
@@ -2502,6 +2634,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                       final addressText = selectedAddress['address']?.toString();
                       final title = selectedAddress['title']?.toString() ?? 'N/A';
                       final landmark = selectedAddress['landmark']?.toString() ?? 'N/A';
+                      final houseNo = selectedAddress['houseno']?.toString() ?? 'N/A';
+                      final street = selectedAddress['street']?.toString() ?? 'N/A';
+                      final area = selectedAddress['area']?.toString() ?? 'N/A';
+                      final pinCode = selectedAddress['pincode']?.toString() ?? 'N/A';
 
                       if (addressText == null || addressText.isEmpty || latitude == null || longitude == null || latitude == 0.0 || longitude == 0.0) {
 
@@ -2523,6 +2659,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                         selectedAddressId!,
                         title,
                         landmark,
+                        houseNo,
+                        street,
+                        area,
+                        pinCode
                       );
 
                       setState(() {
@@ -2535,6 +2675,11 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                         'longitude': longitude,
                         'title': title,
                         'landmark': landmark,
+                        'houseno': houseNo,
+                        'street': street,
+                        'area': area,
+                        'pincode': pinCode,
+
                       });
 
                       await _saveLocation(
@@ -2544,6 +2689,10 @@ class _LocationSelectionScreenState extends State<LocationSelectionScreen>
                         addressId: selectedAddressId,
                         title: title,
                         landmark: landmark,
+                        houseNumber: houseNo,
+                        street: street,
+                        area: area,
+                        pinCode: pinCode,
                       );
 
                       Navigator.pop(context);

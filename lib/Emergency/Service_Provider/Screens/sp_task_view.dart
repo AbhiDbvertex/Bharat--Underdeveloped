@@ -430,9 +430,11 @@ class _SpTaskViewState extends State<SpTaskView> {
                         children: [
                           SizedBox(
                             width: 30,
-                            child: Text(
-                              '${index + 1}.',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            child: Expanded(
+                              child: Text(
+                                '${index + 1}.',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                           Expanded(
@@ -445,7 +447,7 @@ class _SpTaskViewState extends State<SpTaskView> {
                             ),
                           ),
                           SizedBox(
-                            width: 50,
+                            width: 70,
                             child: payment.status == 'success'
                                 ?  Text(
                               statusText,
@@ -454,7 +456,7 @@ class _SpTaskViewState extends State<SpTaskView> {
                                 : const SizedBox(),
                           ),
                           SizedBox(
-                            width: 80,
+                            width: 60,
                             child: Text(
                               '₹${totalAmount}/-',
                               style: const TextStyle(fontWeight: FontWeight.bold),
