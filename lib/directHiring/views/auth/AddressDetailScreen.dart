@@ -22,6 +22,10 @@ class AddressDetailScreen extends StatefulWidget {
   final LatLng? initialLocation;
   final String? initialTitle;
   final String? initialLandmark;
+  final String?  initialHouseNo;
+  final String? initialStreet;
+  final String? initialArea;
+  final String? initialPinCode;
   final String? editlocationId;
   final String? name;
   final String? refralCode;
@@ -36,6 +40,10 @@ class AddressDetailScreen extends StatefulWidget {
     this.initialLocation,
     this.initialTitle,
     this.initialLandmark,
+    this.  initialHouseNo,
+    this. initialStreet,
+    this.   initialArea,
+    this. initialPinCode,
     this.editlocationId,
     this.name,
     this.refralCode,
@@ -54,6 +62,11 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController landmarkController = TextEditingController();
+  final TextEditingController houseNoController = TextEditingController();
+  final TextEditingController streetController = TextEditingController();
+  final TextEditingController areaController = TextEditingController();
+  final TextEditingController pinCodeController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   LatLng _initialPosition = const LatLng(22.7196, 75.8577);
   bool _isLoadingAddress = false;
@@ -70,6 +83,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     titleController.text = widget.initialTitle ?? '';
     addressController.text = widget.initialAddress ?? '';
     landmarkController.text = widget.initialLandmark ?? '';
+    houseNoController.text = widget.initialHouseNo ?? '';
+    streetController.text = widget.initialStreet ?? '';
+    areaController.text = widget.initialArea ?? '';
+    pinCodeController.text = widget.initialPinCode ?? '';
     _initialPosition = widget.initialLocation ?? const LatLng(22.7196, 75.8577);
     if (widget.initialAddress == null) {
       _getCurrentLocation();
@@ -82,6 +99,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     titleController.dispose();
     addressController.dispose();
     landmarkController.dispose();
+    houseNoController.dispose();
+    streetController.dispose();
+    areaController.dispose();
+    pinCodeController.dispose();
     mapController.dispose();
     super.dispose();
   }
@@ -218,6 +239,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     required String hint,
     List<TextInputFormatter>? formatters,
     required String? Function(String?) validator,
+    TextInputType textInputType=TextInputType.text,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +253,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             inputFormatters: formatters,
             decoration: getInputDecoration(hint),
             style: const TextStyle(fontSize: 13),
-            keyboardType: TextInputType.text,
+            keyboardType: textInputType,
             validator: validator,
           ),
         ),
@@ -293,6 +315,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
+              'houseno': houseNoController.text,
+              'street': streetController.text,
+              'area': areaController.text,
+              'pincode': pinCodeController.text,
               'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
@@ -412,6 +438,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
+              'houseno': houseNoController.text,
+              'street': streetController.text,
+              'area': areaController.text,
+              'pincode': pinCodeController.text,
               'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
@@ -476,7 +506,6 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         }
       } catch (e) {
         if (mounted) {
-          // _showMessage('Error adding address: $e');
             CustomSnackBar.show(
               message: 'Error adding address: $e',
               type: SnackBarType.error
@@ -486,7 +515,6 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         }
       }
     } else {
-      // _showMessage('Please fill all fields correctly.');
        CustomSnackBar.show(
           message:'Please fill all fields correctly.' ,
           type: SnackBarType.warning
@@ -543,6 +571,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               'title': titleController.text,
               'address': _selectedAddress ?? addressController.text,
               'landmark': landmarkController.text,
+              'houseno': houseNoController.text,
+              'street': streetController.text,
+              'area': areaController.text,
+              'pincode': pinCodeController.text,
               'latitude': _selectedLocation?.latitude ?? _initialPosition.latitude,
               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
             }
@@ -598,6 +630,10 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                               'longitude': _selectedLocation?.longitude ?? _initialPosition.longitude,
                               'title': titleController.text,
                               'landmark': landmarkController.text,
+                              'houseno': houseNoController.text,
+                              'street': streetController.text,
+                              'area': areaController.text,
+                              'pincode': pinCodeController.text,
                               'isEdit': widget.editlocationId != null, // true if editing, false if adding
                             });
 
@@ -648,8 +684,8 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Location",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(widget.editlocationId != null ?"Edit Location":"Add Location",
+            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         leading: const BackButton(color: Colors.black),
         actions: [],
         systemOverlayStyle:  SystemUiOverlayStyle(
@@ -688,12 +724,14 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    widget.editlocationId != null ? 'Edit Location' : 'Select your location by scrolling the pin on map.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  child: Center(
+                    child: Text(
+                    /*  widget.editlocationId != null ?*/ 'Select your location by scrolling the pin on map.' /*: 'Select your location by scrolling the pin on map.'*/,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -826,8 +864,131 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                           LengthLimitingTextInputFormatter(50),
                         ],
                         validator: (value) {
-                          if (value != null && value.isNotEmpty && value.length < 3) {
+                          if (value == null || value.isEmpty) {
+                            return 'Landmark cannot be empty.';
+                          }
+                          if (value.length < 3) {
                             return 'Landmark must be at least 3 characters long.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          'House Number',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      buildCustomField(
+                        controllerField: houseNoController,
+                        hint: 'Enter House No.',
+                        formatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r"[a-zA-Z0-9\s,()/-_]+"),
+                          ),
+                          LengthLimitingTextInputFormatter(20),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'House number cannot be empty.';
+                          }
+                          if (value.length < 2) {
+                            return 'House number must be at least 2 characters long.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          'Street',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      buildCustomField(
+                        controllerField: streetController,
+                        hint: 'Enter Street',
+                        formatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r"[a-zA-Z\s]+"),
+                          ),
+                          LengthLimitingTextInputFormatter(20),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Street cannot be empty.';
+                          }
+                          if (value.length < 3) {
+                            return 'Street must be at least 3 characters long.';
+                          }
+                          return null;
+                        },
+                      ),      const SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          'Area / Location',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      buildCustomField(
+                        controllerField: areaController,
+                        hint: 'Enter Area / Location',
+                        formatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r"[a-zA-Z\s]+"),
+                          ),
+                          LengthLimitingTextInputFormatter(20),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Area / Location cannot be empty.';
+                          }
+                          if (value.length < 3) {
+                            return 'Area / Location must be at least 3 characters long.';
+                          }
+                          return null;
+                        },
+                      ),      const SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          'Pin Code',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      buildCustomField(
+                        controllerField: pinCodeController,
+                        hint: 'Enter Pin Code',
+                        textInputType: TextInputType.number,
+
+                        formatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r"[0-9]+"),
+                          ),
+                          LengthLimitingTextInputFormatter(6),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pin Code cannot be empty.';
+                          }
+                          if (value.length < 6) {
+                            return 'Pin Code must be at least 6 characters long.';
                           }
                           return null;
                         },
