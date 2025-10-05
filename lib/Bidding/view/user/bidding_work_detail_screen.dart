@@ -786,37 +786,18 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        //  const SizedBox(height: 10),
-                        // Row(
-                        //   children: [
-                        //     GestureDetector(
-                        //       onTap: () => Navigator.pop(context),
-                        //       child: const Padding(
-                        //         padding: EdgeInsets.only(left: 15.0),
-                        //         child:
-                        //             Icon(Icons.arrow_back_outlined, size: 22),
-                        //       ),
-                        //     ),
-                        //     const SizedBox(width: 90),
-                        //     Text(
-                        //       'Worker details',
-                        //       style: GoogleFonts.poppins(
-                        //         fontSize: 18,
-                        //         fontWeight: FontWeight.bold,
-                        //         color: AppColors.black,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-                        //  SizedBox(height: height * 0.01),
                         Container(
                           color: Colors.grey,
-                          child: CarouselSlider(
+                          child: /*CarouselSlider(
                             options: CarouselOptions(
                               height: height * 0.25,
                               enlargeCenterPage: true,
-                              autoPlay: imageUrls.isNotEmpty,
+                              // autoPlay: imageUrls.isNotEmpty,
+                              autoPlay: imageUrls.length > 1,
                               viewportFraction: 0.85,
+                              scrollPhysics: imageUrls.length > 1
+                                  ? const BouncingScrollPhysics()
+                                  : const NeverScrollableScrollPhysics(),
                             ),
                             items: imageUrls.isNotEmpty
                                 ? imageUrls
@@ -849,6 +830,42 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                       ),
                                     ),
                                   ],
+                          ),*/
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              height: height * 0.25,
+                              enlargeCenterPage: true,
+                              autoPlay: imageUrls.length > 1, // auto play only if more than one
+                              viewportFraction: 0.85,
+                              scrollPhysics: imageUrls.length > 1
+                                  ? const BouncingScrollPhysics()
+                                  : const NeverScrollableScrollPhysics(),
+                            ),
+                            items: imageUrls.isNotEmpty
+                                ? imageUrls.map((url) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  url.trim(),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/Bid.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
+                              );
+                            }).toList()
+                                : [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  'assets/images/Bid.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: height * 0.015),

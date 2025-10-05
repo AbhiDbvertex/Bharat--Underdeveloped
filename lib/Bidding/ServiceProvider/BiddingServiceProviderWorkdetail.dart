@@ -1224,7 +1224,7 @@ print("user: ${biddingOrder!.userId?.id}");
                     children: [
                       Container(
                         color: Colors.grey,
-                        child: CarouselSlider(
+                        child: /*CarouselSlider(
                           options: CarouselOptions(
                             height: height * 0.25,
                             enlargeCenterPage: true,
@@ -1264,6 +1264,48 @@ print("user: ${biddingOrder!.userId?.id}");
                                     ),
                                   ),
                                 ],
+                        ),*/
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: height * 0.25,
+                            enlargeCenterPage: true,
+                            autoPlay: biddingOrder!.imageUrls.length > 1, // only autoplay if more than 1
+                            enableInfiniteScroll: biddingOrder!.imageUrls.length > 1, // stop infinite loop
+                            viewportFraction: 1,
+                            scrollPhysics: biddingOrder!.imageUrls.length > 1
+                                ? const BouncingScrollPhysics()
+                                : const NeverScrollableScrollPhysics(),
+                          ),
+                          items: biddingOrder!.imageUrls.isNotEmpty
+                              ? biddingOrder!.imageUrls.map((item) {
+                            print('🖼️ Image: $item');
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(width * 0.025),
+                              child: Image.network(
+                                item,
+                                fit: BoxFit.cover,
+                                width: width,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print('Image error: $item, Error: $error');
+                                  return Image.asset(
+                                    'assets/images/chair.png',
+                                    fit: BoxFit.cover,
+                                    width: width,
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList()
+                              : [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(width * 0.025),
+                              child: Image.asset(
+                                'assets/images/chair.png',
+                                fit: BoxFit.cover,
+                                width: width,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(height: height * 0.015),

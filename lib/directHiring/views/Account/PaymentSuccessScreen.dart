@@ -34,15 +34,23 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
 
     // ⏳ Set up a timer for 3 seconds to navigate to Bottombar
     _navigationTimer = Timer(const Duration(seconds: 3), () {
-
+      int count = 0;
       if (mounted) {
 
-        Navigator.pushAndRemoveUntil(
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (_) => MyHireScreen(passIndex: 1,) /*Bottombar(initialIndex: 1),*/
+        //   ),
+        //       (Route<dynamic> route) => false, // Remove all previous routes
+        // );
+        Navigator.of(context).popUntil((route) {
+          return count++ == 5;
+        });
+
+        Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => Bottombar(initialIndex: 1),
-          ),
-              (Route<dynamic> route) => false, // Remove all previous routes
+          MaterialPageRoute(builder: (_) => MyHireScreen(passIndex: 1,)),
         );
       }
     });

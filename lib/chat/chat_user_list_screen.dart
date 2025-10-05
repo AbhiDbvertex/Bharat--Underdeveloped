@@ -1,18 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import 'package:open_filex/open_filex.dart';
-
 import 'APIServices.dart';
 import 'SocketService.dart';
 import 'chatScreen.dart';

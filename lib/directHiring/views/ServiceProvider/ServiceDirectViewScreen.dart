@@ -366,16 +366,16 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
           // _showSnackBar("Offer rejected!");
         } else {
           print("❌ Reject Failed: ${data['message']}");
-          // Navigator.pop(context);
-          // Fluttertoast.showToast(
-          //   msg: "Offer rejected successfully!",
-          //   toastLength: Toast.LENGTH_SHORT,
-          //   gravity: ToastGravity.BOTTOM,
-          //   backgroundColor: Colors.green,
-          //   textColor: Colors.white,
-          //   fontSize: 16.0,
-          // );
-          // _showSnackBar("Not Rejected: ${data['message']}");
+          Navigator.pop(context);
+          Fluttertoast.showToast(
+            msg: "Offer rejected successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          _showSnackBar("Not Rejected: ${data['message']}");
         }
       } else {
         final err = json.decode(response.body);
@@ -589,7 +589,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
             _isOrderAccepted = true;
             order!['hire_status'] = 'accepted';
           });
-          _showSnackBar("Offer accepted!");
+          // _showSnackBar("Offer accepted!");
           await fetchOrderDetail();
           // Navigator.pop(context);
         } else {
@@ -941,7 +941,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                               overflow: TextOverflow.ellipsis,)),),
                         ],
                       ),
-
                       const SizedBox(height: 10),
                       Text(
                         "Completion Date - ${order!['deadline']?.toString().substring(0, 10) ?? 'N/A'}",
@@ -962,30 +961,30 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                       ),
                       const SizedBox(height: 20),
                       // Status Containers
-                      if (order!['hire_status'] == 'cancelled')
-                        Center(
-                          child: Container(
-                            height: 35,
-                            width: 250,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.warning_amber, color: Colors.red),
-                                Text(
-                                  "This order is cancelled by user",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.red),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      // if (order!['hire_status'] == 'cancelled')
+                      //   Center(
+                      //     child: Container(
+                      //       height: 35,
+                      //       width: 250,
+                      //       decoration: BoxDecoration(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         border: Border.all(color: Colors.red),
+                      //       ),
+                      //       child: Row(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         crossAxisAlignment: CrossAxisAlignment.center,
+                      //         children: [
+                      //           Icon(Icons.warning_amber, color: Colors.red),
+                      //           Text(
+                      //             "This order is cancelled by user",
+                      //             style: TextStyle(
+                      //                 fontWeight: FontWeight.w600,
+                      //                 color: Colors.red),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
                       // if (order!['hire_status'] == 'completed')
                       //   Center(
                       //     child: Container(
@@ -1032,20 +1031,20 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                           ),
                         ),
                       /*if (order?['hire_status']?.toLowerCase() ==
-                          'pending')*/
+                          'pending')*/ //cancelled
                       if (status == 'pending') ...[
-                        GestureDetector(
+                        order?['hire_status']?.toLowerCase() == 'cancelled'? SizedBox(): GestureDetector(
                           onTap: _isProcessing || _isOrderAccepted
                               ? null
                               : () {
                                   if (order == null || order!['_id'] == null) {
-                                    print("❌ Order not found!");
+                                    print("Order not found!");
                                     _showSnackBar("Order Data not found!");
                                     return;
                                   }
                                   String orderId = order!['_id'].toString();
                                   print(
-                                      "✅ OrderId $orderId ke liye Accept dabaya!");
+                                      "OrderId $orderId ke liye Accept dabaya!");
                                   acceptOffer(orderId);
                                 },
                           child: Container(
@@ -1082,8 +1081,8 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Container(
+                        order?['hire_status']?.toLowerCase() == 'cancelled'? SizedBox():   SizedBox(height: 10),
+                        order?['hire_status']?.toLowerCase() == 'cancelled'? SizedBox(): Container(
                           width: double.infinity,
                           height: 50,
                           decoration: BoxDecoration(
@@ -1764,7 +1763,29 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                             ),
                           ),
                         )
-                            : (order!['hire_status'] == 'completed')
+                            : order!['hire_status'] == 'cancelled' ?  Center(
+                          child: Container(
+                            height: 35,
+                            width: 250,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(Icons.warning_amber, color: Colors.red),
+                                Text(
+                                  "This order is cancelled by user",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.red),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ) : (order!['hire_status'] == 'completed')
                          ? Center(
                             child: Container(
                               height: 35,

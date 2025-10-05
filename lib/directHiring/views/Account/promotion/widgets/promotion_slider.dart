@@ -33,21 +33,103 @@ class _PromotionCarouselSliderState extends State<PromotionCarouselSlider> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // CarouselSlider.builder(
+          //   carouselController: _controller,
+          //   itemCount: imgList.length,
+          //   itemBuilder: (context, index, realIndex) {
+          //     final urlImage = imgList[index];
+          //     return InkWell(
+          //       onTap: (){
+          //         //showTopImageDialog(context,imgList[activeIndex]);
+          //         Navigator.push(context, MaterialPageRoute(builder: (context) => ViewCarosuleImage(imagePath: imgList[index],)));
+          //       },
+          //       child: Container(
+          //         margin: EdgeInsets.symmetric(horizontal: 8),
+          //         decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(12),
+          //           //image: DecorationImage( image: NetworkImage(urlImage), fit: BoxFit.cover, ),
+          //         ),
+          //         child: ClipRRect(
+          //           borderRadius: BorderRadius.circular(12),
+          //           child: Image.network(
+          //             urlImage,
+          //             fit: BoxFit.cover,
+          //             loadingBuilder: (context, child, loadingProgress) {
+          //               if (loadingProgress == null) {
+          //                 return child; // ✅ return child when fully loaded
+          //               }
+          //               return const SizedBox(
+          //                 height: 60,
+          //                 width: 60,
+          //                 child: Center(
+          //                   child: CircularProgressIndicator(color: Colors.green),
+          //                 ),
+          //               );
+          //             },
+          //             errorBuilder: (context, error, stackTrace) {
+          //               return Image.asset(
+          //                 "assets/images/no-image.png",
+          //                 fit: BoxFit.cover,
+          //               );
+          //             },
+          //           ),
+          //         ),
+          //
+          //         /* FadeInImage.assetNetwork(
+          //           placeholder: "assets/images/no-image.png",
+          //           image: urlImage,
+          //           fit: BoxFit.cover,
+          //           imageErrorBuilder: (context, error, stackTrace) {
+          //             return SizedBox(
+          //               height: 100,
+          //                 width: 60,
+          //                 child: Image.asset("assets/images/no-image.png",));
+          //           },
+          //         )*/
+          //         /*Image.network(
+          //           urlImage,
+          //           fit: BoxFit.cover,
+          //           loadingBuilder: (context, child, loadingProgress) {
+          //             if (loadingProgress == null)
+          //               , fit: BoxFit.cover); // loaded
+          //             return Image.asset("assets/images/no-image.png", fit: BoxFit.cover);
+          //           },
+          //           errorBuilder: (context, error, stackTrace) {
+          //             return Image.asset("assets/images/no-image.png", fit: BoxFit.cover);
+          //           },
+          //         ),*/
+          //
+          //         ),
+          //       );
+          //   },
+          //   options: CarouselOptions(
+          //     height: 200,
+          //     autoPlay: true,
+          //     enlargeCenterPage: true,
+          //     enableInfiniteScroll: true,
+          //     viewportFraction: 0.8,
+          //     onPageChanged: (index, reason) =>
+          //         setState(() => activeIndex = index),
+          //   ),
+          // ),
           CarouselSlider.builder(
             carouselController: _controller,
             itemCount: imgList.length,
             itemBuilder: (context, index, realIndex) {
               final urlImage = imgList[index];
               return InkWell(
-                onTap: (){
-                  //showTopImageDialog(context,imgList[activeIndex]);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ViewCarosuleImage(imagePath: imgList[index],)));
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ViewCarosuleImage(imagePath: imgList[index]),
+                    ),
+                  );
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    //image: DecorationImage( image: NetworkImage(urlImage), fit: BoxFit.cover, ),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -55,9 +137,7 @@ class _PromotionCarouselSliderState extends State<PromotionCarouselSlider> {
                       urlImage,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child; // ✅ return child when fully loaded
-                        }
+                        if (loadingProgress == null) return child;
                         return const SizedBox(
                           height: 60,
                           width: 60,
@@ -74,42 +154,19 @@ class _PromotionCarouselSliderState extends State<PromotionCarouselSlider> {
                       },
                     ),
                   ),
-
-                  /* FadeInImage.assetNetwork(
-                    placeholder: "assets/images/no-image.png",
-                    image: urlImage,
-                    fit: BoxFit.cover,
-                    imageErrorBuilder: (context, error, stackTrace) {
-                      return SizedBox(
-                        height: 100,
-                          width: 60,
-                          child: Image.asset("assets/images/no-image.png",));
-                    },
-                  )*/
-                  /*Image.network(
-                    urlImage,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null)
-                        , fit: BoxFit.cover); // loaded
-                      return Image.asset("assets/images/no-image.png", fit: BoxFit.cover);
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset("assets/images/no-image.png", fit: BoxFit.cover);
-                    },
-                  ),*/
-
-                  ),
-                );
+                ),
+              );
             },
             options: CarouselOptions(
               height: 200,
-              autoPlay: true,
+              autoPlay: imgList.length > 1, // ✅ only autoplay if more than 1
               enlargeCenterPage: true,
-              enableInfiniteScroll: true,
+              enableInfiniteScroll: imgList.length > 1, // ✅ only scroll if more than 1
               viewportFraction: 0.8,
-              onPageChanged: (index, reason) =>
-                  setState(() => activeIndex = index),
+              scrollPhysics: imgList.length > 1
+                  ? const BouncingScrollPhysics()
+                  : const NeverScrollableScrollPhysics(), // ✅ disable swipe if 1 image
+              onPageChanged: (index, reason) => setState(() => activeIndex = index),
             ),
           ),
           const SizedBox(height: 20),

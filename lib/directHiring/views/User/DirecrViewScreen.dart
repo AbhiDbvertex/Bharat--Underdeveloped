@@ -849,7 +849,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     print("Abhi:- darect oder id ${widget.id}");
     print("Abhi:- darect oder id categaroyid : ${getcategoryId}");
     print("Abhi:- darect oder id subcategaroyid : ${getsubCategoryIds}");
-
+    final images = (order?['image_url'] as List?) ?? [];
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -890,7 +890,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 },
                 child: Container(
                   color: Colors.grey,
-                  child: CarouselSlider(
+                  child:/* CarouselSlider(
                     options: CarouselOptions(
                       height: 200,
                       autoPlay: true,
@@ -909,6 +909,37 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                             width: double.infinity,
                             height: 200,
                             // fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
+                              'assets/images/task.png',
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),*/
+                  CarouselSlider(
+
+                    options: CarouselOptions(
+                      height: 200,
+                      autoPlay: images.length > 1, // agar ek image hai to autoplay band
+                      enlargeCenterPage: images.length > 1,
+                      aspectRatio: 16 / 9,
+                      viewportFraction: 1.0,
+                      autoPlayInterval: const Duration(seconds: 3),
+                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                    ),
+                    items: images.map((imageUrl) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.network(
+                            '$imageUrl',
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) => Image.asset(
                               'assets/images/task.png',
                               width: double.infinity,
@@ -956,22 +987,8 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     children: [
                       InkWell(
                         onTap: (){                                  //           Abhishek add map
-
-                            // openMap(order?['user_id']?['location']?['latitude'] ?? 'No lat',
-                            //   order?['user_id']?['location']?['longitude'] ?? 'No long',);
                             openMap(order?['latitude'] ?? 'No lat',
                               order?['longitude'] ?? 'No long',);
-
-
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => MapScreen(
-                          //       latitude: order?['user_id']?['location']?['latitude'] ?? 'No lat',
-                          //       longitude: order?['user_id']?['location']?['longitude'] ?? 'No long',
-                          //     ),
-                          //   ),
-                          // );
                           print("Abhi:- print lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
                         },
                         child: Container(
@@ -983,7 +1000,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                             color: Colors.red,
                           ),
                           child: Text(
-                            order!['address'] ?? '',
+                            order?['address'] ?? '',
                             // order?['user_id']?['location']?['address'] ?? 'No lat',
                             style: const TextStyle(
                               color: Colors.white,

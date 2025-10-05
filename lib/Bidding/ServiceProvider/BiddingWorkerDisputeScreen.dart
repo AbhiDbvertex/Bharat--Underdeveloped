@@ -277,8 +277,8 @@ class _BiddingWorkerDisputeScreenState
   Future<void> submitDispute() async {
     if (_amountController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
-        _requirementController.text.isEmpty ||
-        _selectedImages.isEmpty) {
+        _requirementController.text.isEmpty /*||
+        _selectedImages.isEmpty*/) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -336,6 +336,7 @@ class _BiddingWorkerDisputeScreenState
             ),
           );
           Navigator.pop(context);
+          Navigator.pop(context);
         }
       } else {
         print("Abhi:- dispute response ${res.body}");
@@ -390,13 +391,13 @@ class _BiddingWorkerDisputeScreenState
           children: [
             const SizedBox(height: 50),
             _buildLabel("Enter Amount"),
-            _buildTextField(_amountController, TextInputType.number),
+            _buildTextField(_amountController, TextInputType.number,maxlength: 6),
             _buildLabel("Description"),
             _buildTextField(_descriptionController, TextInputType.text,
-                maxLines: 4),
+                maxLines: 4,maxlength: 120),
             _buildLabel("Requirement"),
             _buildTextField(_requirementController, TextInputType.text,
-                maxLines: 4),
+                maxLines: 4,maxlength: 120),
             _buildLabel("Upload Images"),
             GestureDetector(
               onTap: pickImages,
@@ -510,7 +511,7 @@ class _BiddingWorkerDisputeScreenState
   // 🧾 Input TextField
   Widget _buildTextField(
       TextEditingController controller, TextInputType keyboardType,
-      {int maxLines = 1}) {
+      {int maxLines = 1,int maxlength = 1}) {
     return Container(
       width: 320,
       margin: const EdgeInsets.only(bottom: 20),
@@ -520,10 +521,11 @@ class _BiddingWorkerDisputeScreenState
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(
+        maxLength: maxlength,
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
-        decoration: const InputDecoration(border: InputBorder.none),
+        decoration: const InputDecoration(border: InputBorder.none,counterText: ""),
       ),
     );
   }

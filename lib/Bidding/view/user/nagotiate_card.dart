@@ -199,6 +199,7 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.oderId}';
     print("Abhi:- CreatebiddingPlateformfee url: $url");
+    print("Abhi:- CreatebiddingPlateformfee url: ${widget.oderId}");
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';

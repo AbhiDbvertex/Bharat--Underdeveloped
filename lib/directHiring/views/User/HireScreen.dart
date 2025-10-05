@@ -636,29 +636,6 @@ class _HireScreenState extends State<HireScreen> {
               const SizedBox(height: 6),
               buildImageUpload(),
               const SizedBox(height: 60),
-              // Center(
-              //   child: SizedBox(
-              //     width: 200,
-              //     child: ElevatedButton(
-              //       onPressed: isLoading ? null : submitForm,
-              //       style: ElevatedButton.styleFrom(
-              //         backgroundColor: Colors.green.shade700,
-              //         padding: const EdgeInsets.symmetric(vertical: 12),
-              //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              //       ),
-              //       child: isLoading
-              //           ? const SizedBox(
-              //         height: 20,
-              //         width: 20,
-              //         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              //       )
-              //           : Text(
-              //         "Hire",
-              //         style: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),

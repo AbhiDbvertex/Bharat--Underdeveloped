@@ -60,10 +60,10 @@
 //   int selectedTab = 0; // 0 = Bidding, 1 = Direct Hiring, 2 = Emergency
 //   String? currentProviderId;
 //   final TextEditingController _biddingSearchController =
-//       TextEditingController();
+//   TextEditingController();
 //   final TextEditingController _directSearchController = TextEditingController();
 //   final TextEditingController _emergencySearchController =
-//       TextEditingController();
+//   TextEditingController();
 //   SpEmergencyOrderListModel? spEmergencyOrders;
 //
 //   @override
@@ -127,8 +127,8 @@
 //
 //       final res = await http.get(
 //         Uri.parse(
-//             // 'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
-//             //     Abhishek added new link
+//           // 'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
+//           //     Abhishek added new link
 //             'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
 //         // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
 //         headers: {
@@ -206,82 +206,6 @@
 //       isLoading = false;
 //     }
 //   }
-//
-//   // // Fetch Direct Orders
-//   // Future<void> fetchDirectOrders() async {
-//   //   setState(() => isLoading = true);
-//   //   try {
-//   //     final prefs = await SharedPreferences.getInstance();
-//   //     final token = prefs.getString('token') ?? '';
-//   //     print('🔐 Token: $token');
-//   //
-//   //     final res = await http.get(
-//   //       Uri.parse(
-//   //           'https://api.thebharatworks.com/api/direct-order/getOrdersByProvider'),
-//   //       headers: {
-//   //         'Authorization': 'Bearer $token',
-//   //         'Content-Type': 'application/json',
-//   //       },
-//   //     );
-//   //
-//   //     print('📥 Direct Response Status: ${res.statusCode}');
-//   //     print('📥 Direct Response Body: ${res.body}');
-//   //
-//   //     if (res.statusCode == 200) {
-//   //       final decoded = json.decode(res.body);
-//   //       if (decoded.containsKey('data') && decoded['data'] is List) {
-//   //         final List<dynamic> data = decoded['data'];
-//   //         setState(() {
-//   //           directOrders = data.map((e) {
-//   //             final order = DirectOrder.fromJson(e);
-//   //             String finalStatus = order.status.toLowerCase();
-//   //             if (e['offer_history'] != null && currentProviderId != null) {
-//   //               for (var offer in e['offer_history']) {
-//   //                 if (offer['provider_id']?['_id'] == currentProviderId) {
-//   //                   final offerStatus =
-//   //                       offer['status']?.toString().toLowerCase();
-//   //                   print(
-//   //                       '📩 Offer History for Order ${order.id}: Provider $currentProviderId, Status: $offerStatus');
-//   //                   if (offerStatus == 'rejected' ||
-//   //                       offerStatus == 'cancelled') {
-//   //                     finalStatus = 'rejected';
-//   //                   } else if (offerStatus == 'accepted') {
-//   //                     finalStatus = 'accepted';
-//   //                   }
-//   //                   break;
-//   //                 }
-//   //               }
-//   //             }
-//   //             print('📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})');
-//   //             return DirectOrder(
-//   //               id: order.id,
-//   //               title: order.title,
-//   //               description: order.description,
-//   //               date: order.date,
-//   //               status: finalStatus,
-//   //               image: order.image,
-//   //               user_id: order.user_id,
-//   //               offer_history: order.offer_history,
-//   //             );
-//   //           }).toList();
-//   //           filteredDirectOrders = directOrders;
-//   //         });
-//   //         print("Direct Orders Fetched: ${directOrders.length}");
-//   //       } else {
-//   //         print("'data' key missing or invalid: ${decoded['data']}");
-//   //         _showSnackBar("Direct orders data not found!");
-//   //       }
-//   //     } else {
-//   //       print("API Error Status: ${res.statusCode}");
-//   //       // _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
-//   //     }
-//   //   } catch (e) {
-//   //     print("API Exception: $e");
-//   //     // _showSnackBar("Something went wrong: $e");
-//   //   } finally {
-//   //     setState(() => isLoading = false);
-//   //   }
-//   // }
 //
 //   Future<void> fetchDirectOrders() async {
 //     setState(() => isLoading = true);
@@ -635,7 +559,7 @@
 //           setState(() => isLoading = true);
 //
 //           final orders =
-//               await SpEmergencyServiceController().getEmergencySpOrderByRole();
+//           await SpEmergencyServiceController().getEmergencySpOrderByRole();
 //           setState(() {
 //             spEmergencyOrders = orders;
 //             isLoading = false;
@@ -646,7 +570,7 @@
 //       },
 //       style: ElevatedButton.styleFrom(
 //         backgroundColor:
-//             isSelected ? Colors.green.shade700 : Colors.green.shade100,
+//         isSelected ? Colors.green.shade700 : Colors.green.shade100,
 //         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
 //         shape: RoundedRectangleBorder(
 //             borderRadius: BorderRadius.circular(screenWidth * 0.05)),
@@ -676,7 +600,7 @@
 //     return Column(
 //       children: List.generate(
 //         filteredDirectOrders.length,
-//         (index) => _buildHireCard(
+//             (index) => _buildHireCard(
 //           filteredDirectOrders[index],
 //           widget.categreyId,
 //           widget.subcategreyId,
@@ -698,7 +622,7 @@
 //     return Column(
 //       children: List.generate(
 //         filteredBiddingOrders.length,
-//         (index) => _buildBiddingCard(
+//             (index) => _buildBiddingCard(
 //           filteredBiddingOrders[index],
 //           widget.categreyId,
 //           widget.subcategreyId,
@@ -709,24 +633,6 @@
 //     );
 //   }
 //
-//   // Widget _buildEmergencyList(double screenWidth, double screenHeight) {
-//   //   if (spEmergencyOrders == null || spEmergencyOrders!.data.isEmpty) {
-//   //     return const Center(child: Text("No Emergency Orders Found"));
-//   //   }
-//   //
-//   //   return Padding(
-//   //     padding: const EdgeInsets.symmetric(horizontal: 12),
-//   //     child: SizedBox(
-//   //       height: 550,
-//   //       width: 1.toWidthPercent(),
-//   //       child: ListView.builder(
-//   //         itemCount: spEmergencyOrders!.data.length,
-//   //         itemBuilder: (context, index) => _buildEmergencyCard(
-//   //             spEmergencyOrders!.data[index], screenWidth, screenHeight),
-//   //       ),
-//   //     ),
-//   //   );
-//   // }
 //   Widget _buildEmergencyList(double screenWidth, double screenHeight) {
 //     if (spEmergencyOrders == null || spEmergencyOrders!.data.isEmpty) {
 //       return const Center(child: Text("No Emergency Orders Found"));
@@ -749,335 +655,6 @@
 //       ),
 //     );
 //   }
-//
-// /*  Widget _buildHireCard(
-//     DirectOrder data,
-//     String? categreyId,
-//     String? subcategreyId,
-//     double screenWidth,
-//     double screenHeight,
-//   ) {
-//     final bool hasImage = data.image.isNotEmpty;
-//
-//     return Container(
-//       margin: EdgeInsets.only(bottom: screenHeight * 0.015),
-//       padding: EdgeInsets.all(screenWidth * 0.025),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(screenWidth * 0.035),
-//         border: Border.all(color: AppColors.primaryGreen),
-//         boxShadow: const [
-//           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-//         ],
-//       ),
-//       child: Row(
-//         children: [
-//           Container(
-//             decoration: BoxDecoration(
-//
-//               borderRadius: BorderRadius.circular(screenWidth * 0.03),
-//               color: Colors.grey,
-//             ),
-//
-//           child: Stack(
-//             children: [ ClipRRect(
-//               borderRadius: BorderRadius.circular(screenWidth * 0.02),
-//               child: hasImage
-//                   ? Image.network(
-//                       data.image,
-//                       height: screenHeight * 0.15,
-//                       width: screenWidth * 0.3,
-//                       // fit: BoxFit.cover,
-//                       errorBuilder: (context, error, stackTrace) {
-//                         print(
-//                             'Image load nahi hui: ${data.image}, Error: $error');
-//                         return Image.asset(
-//                           'assets/images/task.png',
-//                           height: screenHeight * 0.15,
-//                           width: screenWidth * 0.3,
-//                           fit: BoxFit.cover,
-//                         );
-//                       },
-//                     )
-//                   : Image.asset(
-//                       'assets/images/task.png',
-//                       height: screenHeight * 0.15,
-//                       width: screenWidth * 0.3,
-//                       fit: BoxFit.cover,
-//                     ),
-//             ),
-//               Positioned(
-//                 bottom: 10,
-//                 left: 20,
-//                 child: Container(
-//                   decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-//                   child: Center(child: Text(data.projectid ?? "",style: TextStyle(color: Colors.white), maxLines: 1,
-//                     overflow: TextOverflow.ellipsis,)),),
-//               ),
-//           ],),
-//           ),
-//           SizedBox(width: screenWidth * 0.025),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   data.title,
-//                   style: _cardTitle(fontSize: screenWidth * 0.04),
-//                   maxLines: 1,
-//                   overflow: TextOverflow.ellipsis,
-//                 ),
-//                 SizedBox(height: screenHeight * 0.005),
-//                 Text(
-//                   data.description,
-//                   style: _cardBody(fontSize: screenWidth * 0.035),
-//                   maxLines: 2,
-//                   overflow: TextOverflow.ellipsis,
-//                 ),
-//                 SizedBox(height: screenHeight * 0.005),
-//                 Text(
-//                   "Posted Date: ${data.date}",
-//                   style: _cardDate(fontSize: screenWidth * 0.03),
-//                 ),
-//                 SizedBox(height: screenHeight * 0.008),
-//                 Row(
-//                   children: [
-//                     Container(
-//                       width: screenWidth * 0.3,
-//                       height: screenHeight * 0.03,
-//                       // padding: EdgeInsets.symmetric(
-//                       //   horizontal: screenWidth * 0.05,
-//                       //   vertical: screenHeight * 0.005,
-//                       // ),
-//                       decoration: BoxDecoration(
-//                         color: _getStatusColor(data.status),
-//                         borderRadius:
-//                             BorderRadius.circular(screenWidth * 0.015),
-//                       ),
-//                       child: Center(
-//                         child: *//*Text(
-//                           data.status.isEmpty
-//                               ? 'Pending'
-//                               : data.status == 'cancelleddispute'
-//                                   ? 'Cancelled Dispute'
-//                                   : data.status[0].toUpperCase() +
-//                                       data.status.substring(1),
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: screenWidth * 0.03,
-//                           ),
-//                         ),*//*
-//                         Text(data.offer_history.)
-//                       ),
-//                     ),
-//                     const Spacer(),
-//                     TextButton(
-//                       onPressed: () {
-//                         print(
-//                             "🔍 ServiceDirectViewScreen pe ja raha hai, Order ID: ${data.id}");
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(
-//                             builder: (_) => ServiceDirectViewScreen(
-//                               id: data.id,
-//                               categreyId: categreyId,
-//                               subcategreyId: subcategreyId,
-//                             ),
-//                           ),
-//                         ).then((_) async {
-//
-//                            await fetchDirectOrders();
-//                         });
-//                       },
-//                       style: TextButton.styleFrom(
-//                         backgroundColor: Colors.green.shade700,
-//                         minimumSize:
-//                             Size(screenWidth * 0.25, screenHeight * 0.05),
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius:
-//                               BorderRadius.circular(screenWidth * 0.015),
-//                         ),
-//                       ),
-//                       child: Text(
-//                         "View Details",
-//                         style: GoogleFonts.roboto(
-//                           color: Colors.white,
-//                           fontSize: screenWidth * 0.03,
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }*/
-//
-//   // Widget _buildHireCard(
-//   //     DirectOrder data,
-//   //     String? categreyId,
-//   //     String? subcategreyId,
-//   //     double screenWidth,
-//   //     double screenHeight,
-//   //     ) {
-//   //   final bool hasImage = data.image.isNotEmpty;
-//   //
-//   //   return Container(
-//   //     margin: EdgeInsets.only(bottom: screenHeight * 0.015),
-//   //     padding: EdgeInsets.all(screenWidth * 0.025),
-//   //     decoration: BoxDecoration(
-//   //       color: Colors.white,
-//   //       borderRadius: BorderRadius.circular(screenWidth * 0.035),
-//   //       border: Border.all(color: AppColors.primaryGreen),
-//   //       boxShadow: const [
-//   //         BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-//   //       ],
-//   //     ),
-//   //     child: Row(
-//   //       children: [
-//   //         Container(
-//   //           decoration: BoxDecoration(
-//   //             borderRadius: BorderRadius.circular(screenWidth * 0.03),
-//   //             color: Colors.grey,
-//   //           ),
-//   //           child: Stack(
-//   //             children: [
-//   //               ClipRRect(
-//   //                 borderRadius: BorderRadius.circular(screenWidth * 0.02),
-//   //                 child: hasImage
-//   //                     ? Image.network(
-//   //                   data.image,
-//   //                   height: screenHeight * 0.15,
-//   //                   width: screenWidth * 0.3,
-//   //                   errorBuilder: (context, error, stackTrace) {
-//   //                     print('Image load nahi hui: ${data.image}, Error: $error');
-//   //                     return Image.asset(
-//   //                       'assets/images/task.png',
-//   //                       height: screenHeight * 0.15,
-//   //                       width: screenWidth * 0.3,
-//   //                       fit: BoxFit.cover,
-//   //                     );
-//   //                   },
-//   //                 )
-//   //                     : Image.asset(
-//   //                   'assets/images/task.png',
-//   //                   height: screenHeight * 0.15,
-//   //                   width: screenWidth * 0.3,
-//   //                   fit: BoxFit.cover,
-//   //                 ),
-//   //               ),
-//   //               Positioned(
-//   //                 bottom: 10,
-//   //                 left: 20,
-//   //                 child: Container(
-//   //                   decoration: BoxDecoration(
-//   //                     color: Colors.black54,
-//   //                     borderRadius: BorderRadius.circular(5),
-//   //                   ),
-//   //                   child: Center(
-//   //                     child: Text(
-//   //                       data.projectid ?? "",
-//   //                       style: TextStyle(color: Colors.white),
-//   //                       maxLines: 1,
-//   //                       overflow: TextOverflow.ellipsis,
-//   //                     ),
-//   //                   ),
-//   //                 ),
-//   //               ),
-//   //             ],
-//   //           ),
-//   //         ),
-//   //         SizedBox(width: screenWidth * 0.025),
-//   //         Expanded(
-//   //           child: Column(
-//   //             crossAxisAlignment: CrossAxisAlignment.start,
-//   //             children: [
-//   //               Text(
-//   //                 data.title,
-//   //                 style: _cardTitle(fontSize: screenWidth * 0.04),
-//   //                 maxLines: 1,
-//   //                 overflow: TextOverflow.ellipsis,
-//   //               ),
-//   //               SizedBox(height: screenHeight * 0.005),
-//   //               Text(
-//   //                 data.description,
-//   //                 style: _cardBody(fontSize: screenWidth * 0.035),
-//   //                 maxLines: 2,
-//   //                 overflow: TextOverflow.ellipsis,
-//   //               ),
-//   //               SizedBox(height: screenHeight * 0.005),
-//   //               Text(
-//   //                 "Posted Date: ${data.date}",
-//   //                 style: _cardDate(fontSize: screenWidth * 0.03),
-//   //               ),
-//   //               SizedBox(height: screenHeight * 0.008),
-//   //               Row(
-//   //                 children: [
-//   //                   Container(
-//   //                     width: screenWidth * 0.3,
-//   //                     height: screenHeight * 0.03,
-//   //                     decoration: BoxDecoration(
-//   //                       color: _getStatusColor(data.status), // Use data.status
-//   //                       borderRadius: BorderRadius.circular(screenWidth * 0.015),
-//   //                     ),
-//   //                     child: Center(
-//   //                       child: Text(
-//   //                         data.status.isEmpty
-//   //                             ? 'Pending'
-//   //                             : data.status == 'cancelleddispute'
-//   //                             ? 'Cancelled Dispute'
-//   //                             : data.status[0].toUpperCase() + data.status.substring(1),
-//   //                         style: TextStyle(
-//   //                           color: Colors.white,
-//   //                           fontSize: screenWidth * 0.03,
-//   //                         ),
-//   //                       ),
-//   //                     ),
-//   //                   ),
-//   //                   const Spacer(),
-//   //                   TextButton(
-//   //                     onPressed: () {
-//   //                       print("🔍 ServiceDirectViewScreen pe ja raha hai, Order ID: ${data.id}");
-//   //                       Navigator.push(
-//   //                         context,
-//   //                         MaterialPageRoute(
-//   //                           builder: (_) => ServiceDirectViewScreen(
-//   //                             id: data.id,
-//   //                             categreyId: categreyId,
-//   //                             subcategreyId: subcategreyId,
-//   //                           ),
-//   //                         ),
-//   //                       ).then((_) async {
-//   //                         await fetchDirectOrders();
-//   //                       });
-//   //                     },
-//   //                     style: TextButton.styleFrom(
-//   //                       backgroundColor: Colors.green.shade700,
-//   //                       minimumSize: Size(screenWidth * 0.25, screenHeight * 0.05),
-//   //                       shape: RoundedRectangleBorder(
-//   //                         borderRadius: BorderRadius.circular(screenWidth * 0.015),
-//   //                       ),
-//   //                     ),
-//   //                     child: Text(
-//   //                       "View Details",
-//   //                       style: GoogleFonts.roboto(
-//   //                         color: Colors.white,
-//   //                         fontSize: screenWidth * 0.03,
-//   //                       ),
-//   //                     ),
-//   //                   ),
-//   //                 ],
-//   //               ),
-//   //             ],
-//   //           ),
-//   //         ),
-//   //       ],
-//   //     ),
-//   //   );
-//   // }
 //
 //   Widget _buildHireCard(
 //       DirectOrder data,
@@ -1243,12 +820,12 @@
 //   }
 //
 //   Widget _buildBiddingCard(
-//     BiddingOrder data,
-//     String? categoryId,
-//     String? subcategoryId,
-//     double screenWidth,
-//     double screenHeight,
-//   ) {
+//       BiddingOrder data,
+//       String? categoryId,
+//       String? subcategoryId,
+//       double screenWidth,
+//       double screenHeight,
+//       ) {
 //     print("Building card for Task: ${data.title} ,projectId : ${data.projectId}, Status: ${data.hireStatus}, Project ID: ${data.projectId}, Category ID: ${data.categoryId}, Subcategory IDs: ${data.subcategoryIds}");
 //
 //     print("Image URLs: ${data.imageUrls}");
@@ -1281,27 +858,27 @@
 //                   alignment: Alignment.topCenter,
 //                   child: data.imageUrls.isNotEmpty
 //                       ? Image.network(
-//                           data.imageUrls.first,
-//                           height: screenHeight * 0.16,
-//                           width: screenWidth * 0.32,
-//                           // fit: BoxFit.cover,
-//                           errorBuilder: (context, error, stackTrace) {
-//                             print(
-//                                 'Error loading image: ${data.imageUrls.first}, Error: $error');
-//                             return Image.asset(
-//                               'assets/images/chair.png',
-//                               height: screenHeight * 0.16,
-//                               width: screenWidth * 0.32,
-//                               fit: BoxFit.cover,
-//                             );
-//                           },
-//                         )
+//                     data.imageUrls.first,
+//                     height: screenHeight * 0.16,
+//                     width: screenWidth * 0.32,
+//                     // fit: BoxFit.cover,
+//                     errorBuilder: (context, error, stackTrace) {
+//                       print(
+//                           'Error loading image: ${data.imageUrls.first}, Error: $error');
+//                       return Image.asset(
+//                         'assets/images/chair.png',
+//                         height: screenHeight * 0.16,
+//                         width: screenWidth * 0.32,
+//                         fit: BoxFit.cover,
+//                       );
+//                     },
+//                   )
 //                       : Image.asset(
-//                           'assets/images/chair.png',
-//                           height: screenHeight * 0.16,
-//                           width: screenWidth * 0.32,
-//                           fit: BoxFit.cover,
-//                         ),
+//                     'assets/images/chair.png',
+//                     height: screenHeight * 0.16,
+//                     width: screenWidth * 0.32,
+//                     fit: BoxFit.cover,
+//                   ),
 //                 ),
 //               ),
 //             ),
@@ -1313,7 +890,7 @@
 //                   child: Center(child: Text(data.projectId,style: TextStyle(color: Colors.white), maxLines: 1,
 //                     overflow: TextOverflow.ellipsis,)),),
 //               )
-//           ],),
+//             ],),
 //           SizedBox(width: screenWidth * 0.025),
 //           Expanded(
 //             child: Column(
@@ -1358,16 +935,16 @@
 //                           decoration: BoxDecoration(
 //                             color: _getStatusColor(data.hireStatus),
 //                             borderRadius:
-//                                 BorderRadius.circular(screenWidth * 0.015),
+//                             BorderRadius.circular(screenWidth * 0.015),
 //                           ),
 //                           child: Center(
 //                             child: Text(
 //                               data.hireStatus.isEmpty
 //                                   ? 'Pending'
 //                                   : data.hireStatus == 'cancelledDispute'
-//                                       ? 'Cancelled Dispute'
-//                                       : data.hireStatus[0].toUpperCase() +
-//                                           data.hireStatus.substring(1),
+//                                   ? 'Cancelled Dispute'
+//                                   : data.hireStatus[0].toUpperCase() +
+//                                   data.hireStatus.substring(1),
 //                               style: GoogleFonts.roboto(
 //                                 color: Colors.white,
 //                                 fontSize: screenWidth * 0.022,
@@ -1418,9 +995,9 @@
 //                           MaterialPageRoute(
 //                             builder: (context) =>
 //                                 Biddingserviceproviderworkdetail(
-//                               orderId: data.id,
-//                               hireStatus: data.hireStatus,
-//                             ),
+//                                   orderId: data.id,
+//                                   hireStatus: data.hireStatus,
+//                                 ),
 //                           ),
 //                         ).then((_) {
 //                           print(
@@ -1440,7 +1017,7 @@
 //                             decoration: BoxDecoration(
 //                               color: Colors.green.shade700,
 //                               borderRadius:
-//                                   BorderRadius.circular(screenWidth * 0.02),
+//                               BorderRadius.circular(screenWidth * 0.02),
 //                             ),
 //                             child: Center(
 //                               child: Text(
@@ -1475,7 +1052,7 @@
 //         data.acceptedByProviders!.isNotEmpty &&
 //         displayStatus != 'cancelled' &&
 //         displayStatus != 'completed') {
-//     //  displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
+//       //  displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
 //     }
 //
 //     final bool hasImage = data.imageUrls != null && data.imageUrls!.isNotEmpty;
@@ -1502,35 +1079,35 @@
 //               children: [
 //                 hasImage
 //                     ? Container(
-//                       color: Colors.grey,
-//                       child: Image.network(
-//                           data.imageUrls!.first,
-//                           height: screenHeight * 0.2,
-//                           width: screenWidth * 0.3,
-//                           // fit: BoxFit.cover,
-//                           loadingBuilder: (context, child, loadingProgress) {
-//                             if (loadingProgress == null) return child;
-//                             return Container(
-//                               height: screenHeight * 0.2,
-//                               width: screenWidth * 0.3,
-//                               alignment: Alignment.center,
-//                               child: const CircularProgressIndicator(
-//                                 color: AppColors.primaryGreen,
-//                                 strokeWidth: 2.5,
-//                               ),
-//                             );
-//                           },
-//                           errorBuilder: (context, error, stackTrace) =>
-//                               Image.asset('assets/images/task.png',
-//                                   height: screenHeight * 0.2,
-//                                   width: screenWidth * 0.3,
-//                                   fit: BoxFit.cover),
-//                         ),
-//                     )
-//                     : Image.asset('assets/images/task.png',
+//                   color: Colors.grey,
+//                   child: Image.network(
+//                     data.imageUrls!.first,
+//                     height: screenHeight * 0.2,
+//                     width: screenWidth * 0.3,
+//                     // fit: BoxFit.cover,
+//                     loadingBuilder: (context, child, loadingProgress) {
+//                       if (loadingProgress == null) return child;
+//                       return Container(
 //                         height: screenHeight * 0.2,
 //                         width: screenWidth * 0.3,
-//                         fit: BoxFit.cover),
+//                         alignment: Alignment.center,
+//                         child: const CircularProgressIndicator(
+//                           color: AppColors.primaryGreen,
+//                           strokeWidth: 2.5,
+//                         ),
+//                       );
+//                     },
+//                     errorBuilder: (context, error, stackTrace) =>
+//                         Image.asset('assets/images/task.png',
+//                             height: screenHeight * 0.2,
+//                             width: screenWidth * 0.3,
+//                             fit: BoxFit.cover),
+//                   ),
+//                 )
+//                     : Image.asset('assets/images/task.png',
+//                     height: screenHeight * 0.2,
+//                     width: screenWidth * 0.3,
+//                     fit: BoxFit.cover),
 //                 Positioned(
 //                   bottom: 5,
 //                   left: 5,
@@ -1587,9 +1164,9 @@
 //                       child: Text(
 //                         data.subCategoryIds.isNotEmpty
 //                             ? data.subCategoryIds
-//                                 .take(2)
-//                                 .map((e) => e.name)
-//                                 .join(", ")
+//                             .take(2)
+//                             .map((e) => e.name)
+//                             .join(", ")
 //                             : "",
 //                         style: _cardDate(fontSize: screenWidth * 0.03),
 //                         maxLines: 1,
@@ -1603,7 +1180,7 @@
 //                           SpReviewModel(
 //                             title: "Made a computer table",
 //                             description:
-//                                 "It is a long established fact that a reader will be distracted...",
+//                             "It is a long established fact that a reader will be distracted...",
 //                             date: "14 Apr, 2023",
 //                             rating: 4,
 //                             images: [
@@ -1625,10 +1202,10 @@
 //                       style: TextButton.styleFrom(
 //                         backgroundColor: const Color(0xff353026),
 //                         minimumSize:
-//                             Size(screenWidth * 0.2, screenHeight * 0.03),
+//                         Size(screenWidth * 0.2, screenHeight * 0.03),
 //                         shape: RoundedRectangleBorder(
 //                           borderRadius:
-//                               BorderRadius.circular(screenWidth * 0.025),
+//                           BorderRadius.circular(screenWidth * 0.025),
 //                         ),
 //                       ),
 //                       child: Text(
@@ -1655,15 +1232,15 @@
 //                       decoration: BoxDecoration(
 //                         color: _getStatusColor(displayStatus),
 //                         borderRadius:
-//                             BorderRadius.circular(screenWidth * 0.025),
+//                         BorderRadius.circular(screenWidth * 0.025),
 //                       ),
 //                       child: Text(
 //                         displayStatus.isEmpty
 //                             ? 'Pending'
 //                             : displayStatus == 'cancelledDispute'
-//                                 ? 'Cancelled Dispute'
-//                                 : displayStatus[0].toUpperCase() +
-//                                     displayStatus.substring(1),
+//                             ? 'Cancelled Dispute'
+//                             : displayStatus[0].toUpperCase() +
+//                             displayStatus.substring(1),
 //                         style: GoogleFonts.roboto(
 //                           color: Colors.white,
 //                           fontSize: screenWidth * 0.029,
@@ -1690,7 +1267,7 @@
 //                           decoration: BoxDecoration(
 //                             color: const Color(0xffF27773),
 //                             borderRadius:
-//                                 BorderRadius.circular(screenWidth * 0.025),
+//                             BorderRadius.circular(screenWidth * 0.025),
 //                           ),
 //                           child: Text(
 //                             data.googleAddress ?? 'N/A',
@@ -1710,11 +1287,11 @@
 //                           context,
 //                           MaterialPageRoute(
 //                               builder: (_) => SpWorkDetail(
-//                                     data.id,
-//                                     isUser: true,
-//                                   )),
+//                                 data.id,
+//                                 isUser: true,
+//                               )),
 //                         ).then(
-//                           (_) async {
+//                               (_) async {
 //                             final orders = await SpEmergencyServiceController()
 //                                 .getEmergencySpOrderByRole();
 //                             setState(() {
@@ -1726,10 +1303,10 @@
 //                       style: TextButton.styleFrom(
 //                         backgroundColor: Colors.green.shade700,
 //                         minimumSize:
-//                             Size(screenWidth * 0.2, screenHeight * 0.03),
+//                         Size(screenWidth * 0.2, screenHeight * 0.03),
 //                         shape: RoundedRectangleBorder(
 //                           borderRadius:
-//                               BorderRadius.circular(screenWidth * 0.025),
+//                           BorderRadius.circular(screenWidth * 0.025),
 //                         ),
 //                       ),
 //                       child: Text(
@@ -1765,6 +1342,7 @@
 //       GoogleFonts.roboto(fontSize: fontSize, color: Colors.grey[700]);
 // }
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:developer/Emergency/Service_Provider/Screens/sp_work_detail.dart';
 import 'package:developer/Emergency/utils/logger.dart';
@@ -1867,11 +1445,27 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
+  // @override
+  // void didPopNext() {
+  //   print("🔄 Returned to WorkerMyHireScreen, refreshing data");
+  //   fetchBiddingOrders();
+  //   fetchDirectOrders();
+  // }
+
   @override
   void didPopNext() {
     print("🔄 Returned to WorkerMyHireScreen, refreshing data");
-    fetchBiddingOrders();
-    fetchDirectOrders();
+    if (mounted) {
+      setState(() => isLoading = true);
+      fetchBiddingOrders();
+      fetchDirectOrders();
+      if (selectedTab == 2) {
+        SpEmergencyServiceController().getEmergencySpOrderByRole().then((orders) {
+          if (mounted) setState(() => spEmergencyOrders = orders);
+        });
+      }
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -1885,7 +1479,97 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
   }
 
   // Fetch Bidding Orders
+  // Future<void> fetchBiddingOrders() async {
+  //   setState(() => isLoading = true);
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token') ?? '';
+  //     print('🔐 Token: $token');
+  //
+  //     final res = await http.get(
+  //       Uri.parse(
+  //         // 'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
+  //         //     Abhishek added new link
+  //           'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
+  //       // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+  //
+  //     print('📥 Bidding Response Status: ${res.statusCode}');
+  //     print('📥 Bidding Response Body: ${res.body}');
+  //
+  //     if (res.statusCode == 200) {
+  //       final decoded = json.decode(res.body);
+  //       if (decoded.containsKey('data') && decoded['data'] is List) {
+  //         final List<dynamic> data = decoded['data'];
+  //         setState(() {
+  //           biddingOrders = data.map((e) {
+  //             final order = BiddingOrder.fromJson(e);
+  //             String finalStatus = order.hireStatus.toLowerCase();
+  //             if (e['accepted_negotiation_id'] != null &&
+  //                 currentProviderId != null) {
+  //               final negotiation = e['accepted_negotiation_id'];
+  //               if (negotiation['service_provider'] == currentProviderId) {
+  //                 if (!negotiation['is_accepted_by_user']) {
+  //                   finalStatus = 'pending';
+  //                 }
+  //               }
+  //             }
+  //             print('📋 Bidding Order ID: ${order.id}, Status: $finalStatus');
+  //             return BiddingOrder(
+  //               id: order.id,
+  //               projectId: order.projectId,
+  //               title: order.title,
+  //               description: order.description,
+  //               address: order.address,
+  //               cost: order.cost,
+  //               deadline: order.deadline,
+  //               hireStatus: finalStatus,
+  //               serviceProviderId: order.serviceProviderId,
+  //               imageUrls: order.imageUrls,
+  //               userId: order.userId,
+  //               categoryId: order.categoryId,
+  //               subcategoryIds: order.subcategoryIds,
+  //               servicePayment: order.servicePayment,
+  //               latitude: order.latitude,
+  //               longitude: order.longitude,
+  //             );
+  //           }).toList();
+  //           filteredBiddingOrders = biddingOrders;
+  //           print("✅ Bidding Orders Fetched: ${biddingOrders.length}");
+  //           print(
+  //               "Hire Statuses: ${biddingOrders.map((e) => e.hireStatus).toList()}");
+  //           print(
+  //               "Image URLs in Orders: ${biddingOrders.map((e) => e.imageUrls).toList()}");
+  //           print(
+  //               "Project IDs: ${biddingOrders.map((e) => e.projectId).toList()}");
+  //           print(
+  //               "Category IDs: ${biddingOrders.map((e) => e.categoryId).toList()}");
+  //           print(
+  //               "Subcategory IDs: ${biddingOrders.map((e) => e.subcategoryIds).toList()}");
+  //         });
+  //       } else {
+  //         print("❌ 'data' key missing or invalid: ${decoded['data']}");
+  //         _showSnackBar("Bidding orders data not found!");
+  //       }
+  //     } else {
+  //       print("❌ API Error Status: ${res.statusCode}");
+  //       // _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
+  //     }
+  //   } catch (e) {
+  //     print("❌ API Exception: $e");
+  //     // _showSnackBar("Something went wrong: $e");
+  //   } finally {
+  //     // setState(() => isLoading = false);
+  //     isLoading = false;
+  //   }
+  // }
+
   Future<void> fetchBiddingOrders() async {
+    if (!mounted) return; // Early exit if widget is not mounted
     setState(() => isLoading = true);
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1893,16 +1577,14 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
       print('🔐 Token: $token');
 
       final res = await http.get(
-        Uri.parse(
-          // 'https://api.thebharatworks.com/api/bidding-order/getAvailableBiddingOrders'),
-          //     Abhishek added new link
-            'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
-        // 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
+        Uri.parse('https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(Duration(seconds: 30), onTimeout: () { // Add timeout
+        throw Exception('Bidding API request timed out');
+      });
 
       print('📥 Bidding Response Status: ${res.statusCode}');
       print('📥 Bidding Response Body: ${res.body}');
@@ -1911,70 +1593,138 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         final decoded = json.decode(res.body);
         if (decoded.containsKey('data') && decoded['data'] is List) {
           final List<dynamic> data = decoded['data'];
-          setState(() {
-            biddingOrders = data.map((e) {
-              final order = BiddingOrder.fromJson(e);
-              String finalStatus = order.hireStatus.toLowerCase();
-              if (e['accepted_negotiation_id'] != null &&
-                  currentProviderId != null) {
-                final negotiation = e['accepted_negotiation_id'];
-                if (negotiation['service_provider'] == currentProviderId) {
-                  if (!negotiation['is_accepted_by_user']) {
-                    finalStatus = 'pending';
+          if (mounted) { // Check mounted before setState
+            setState(() {
+              biddingOrders = data.map((e) {
+                final order = BiddingOrder.fromJson(e);
+                String finalStatus = order.hireStatus.toLowerCase();
+                if (e['accepted_negotiation_id'] != null && currentProviderId != null) {
+                  final negotiation = e['accepted_negotiation_id'];
+                  if (negotiation['service_provider'] == currentProviderId) {
+                    if (!negotiation['is_accepted_by_user']) {
+                      finalStatus = 'pending';
+                    }
                   }
                 }
-              }
-              print('📋 Bidding Order ID: ${order.id}, Status: $finalStatus');
-              return BiddingOrder(
-                id: order.id,
-                projectId: order.projectId,
-                title: order.title,
-                description: order.description,
-                address: order.address,
-                cost: order.cost,
-                deadline: order.deadline,
-                hireStatus: finalStatus,
-                serviceProviderId: order.serviceProviderId,
-                imageUrls: order.imageUrls,
-                userId: order.userId,
-                categoryId: order.categoryId,
-                subcategoryIds: order.subcategoryIds,
-                servicePayment: order.servicePayment,
-                latitude: order.latitude,
-                longitude: order.longitude,
-              );
-            }).toList();
-            filteredBiddingOrders = biddingOrders;
-            print("✅ Bidding Orders Fetched: ${biddingOrders.length}");
-            print(
-                "Hire Statuses: ${biddingOrders.map((e) => e.hireStatus).toList()}");
-            print(
-                "Image URLs in Orders: ${biddingOrders.map((e) => e.imageUrls).toList()}");
-            print(
-                "Project IDs: ${biddingOrders.map((e) => e.projectId).toList()}");
-            print(
-                "Category IDs: ${biddingOrders.map((e) => e.categoryId).toList()}");
-            print(
-                "Subcategory IDs: ${biddingOrders.map((e) => e.subcategoryIds).toList()}");
-          });
+                print('📋 Bidding Order ID: ${order.id}, Status: $finalStatus');
+                return BiddingOrder(
+                  id: order.id,
+                  projectId: order.projectId,
+                  title: order.title,
+                  description: order.description,
+                  address: order.address,
+                  cost: order.cost,
+                  deadline: order.deadline,
+                  hireStatus: finalStatus,
+                  serviceProviderId: order.serviceProviderId,
+                  imageUrls: order.imageUrls,
+                  userId: order.userId,
+                  categoryId: order.categoryId,
+                  subcategoryIds: order.subcategoryIds,
+                  servicePayment: order.servicePayment,
+                  latitude: order.latitude,
+                  longitude: order.longitude,
+                );
+              }).toList();
+              filteredBiddingOrders = biddingOrders;
+              print("✅ Bidding Orders Fetched: ${biddingOrders.length}");
+            });
+          }
         } else {
           print("❌ 'data' key missing or invalid: ${decoded['data']}");
-          _showSnackBar("Bidding orders data not found!");
+          if (mounted) _showSnackBar("Bidding orders data not found!");
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        // _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
+        if (mounted) _showSnackBar("Failed to fetch bidding orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      // _showSnackBar("Something went wrong: $e");
+      if (mounted) _showSnackBar("Something went wrong: $e");
     } finally {
-      // setState(() => isLoading = false);
-      isLoading = false;
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
+  // Future<void> fetchDirectOrders() async {
+  //   setState(() => isLoading = true);
+  //   try {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token') ?? '';
+  //     print('🔐 Token: $token');
+  //
+  //     final res = await http.get(
+  //       Uri.parse('https://api.thebharatworks.com/api/direct-order/getOrdersByProvider'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+  //
+  //     print('📥 Direct Response Status: ${res.statusCode}');
+  //     print('📥 Direct Response Body: ${res.body}');
+  //
+  //     if (res.statusCode == 200) {
+  //       final decoded = json.decode(res.body);
+  //       if (decoded.containsKey('data') && decoded['data'] is List) {
+  //         final List<dynamic> data = decoded['data'];
+  //         setState(() {
+  //           directOrders = data.map((e) {
+  //             final order = DirectOrder.fromJson(e);
+  //             String finalStatus = order.status.toLowerCase(); // Default status
+  //
+  //             // Check offer_history for current provider
+  //             if (e['offer_history'] != null && currentProviderId != null) {
+  //               for (var offer in e['offer_history']) {
+  //                 if (offer['provider_id']?['_id'] == currentProviderId) {
+  //                   final offerStatus = offer['status']?.toString().toLowerCase();
+  //                   print('📩 Offer History for Order ${order.id}: Provider $currentProviderId, Status: $offerStatus');
+  //                   if (offerStatus == 'rejected' || offerStatus == 'cancelled') {
+  //                     finalStatus = 'rejected';
+  //                   } else if (offerStatus == 'accepted') {
+  //                     finalStatus = 'accepted';
+  //                   }
+  //                   break; // Exit loop after finding the matching provider
+  //                 }
+  //               }
+  //             }
+  //             print('📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})');
+  //             return DirectOrder(
+  //               id: order.id,
+  //               title: order.title,
+  //               description: order.description,
+  //               date: order.date,
+  //               status: finalStatus, // Updated status
+  //               image: order.image,
+  //               user_id: order.user_id,
+  //               offer_history: order.offer_history,
+  //               projectid: order.projectid,
+  //               address: order.address,
+  //               latitude: order.latitude,
+  //               longitude: order.longitude,
+  //             );
+  //           }).toList();
+  //           filteredDirectOrders = directOrders;
+  //         });
+  //         print("✅ Direct Orders Fetched: ${directOrders.length}");
+  //       } else {
+  //         print("❌ 'data' key missing or invalid: ${decoded['data']}");
+  //         _showSnackBar("Direct orders data not found!");
+  //       }
+  //     } else {
+  //       print("❌ API Error Status: ${res.statusCode}");
+  //       _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
+  //     }
+  //   } catch (e) {
+  //     print("❌ API Exception: $e");
+  //     _showSnackBar("Something went wrong: $e");
+  //   } finally {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
+
   Future<void> fetchDirectOrders() async {
+    if (!mounted) return; // Early exit if widget is not mounted
     setState(() => isLoading = true);
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1987,7 +1737,9 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
+      ).timeout(Duration(seconds: 30), onTimeout: () { // Add timeout
+        throw TimeoutException('Direct API request timed out');
+      });
 
       print('📥 Direct Response Status: ${res.statusCode}');
       print('📥 Direct Response Body: ${res.body}');
@@ -1996,58 +1748,58 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         final decoded = json.decode(res.body);
         if (decoded.containsKey('data') && decoded['data'] is List) {
           final List<dynamic> data = decoded['data'];
-          setState(() {
-            directOrders = data.map((e) {
-              final order = DirectOrder.fromJson(e);
-              String finalStatus = order.status.toLowerCase(); // Default status
-
-              // Check offer_history for current provider
-              if (e['offer_history'] != null && currentProviderId != null) {
-                for (var offer in e['offer_history']) {
-                  if (offer['provider_id']?['_id'] == currentProviderId) {
-                    final offerStatus = offer['status']?.toString().toLowerCase();
-                    print('📩 Offer History for Order ${order.id}: Provider $currentProviderId, Status: $offerStatus');
-                    if (offerStatus == 'rejected' || offerStatus == 'cancelled') {
-                      finalStatus = 'rejected';
-                    } else if (offerStatus == 'accepted') {
-                      finalStatus = 'accepted';
+          if (mounted) { // Check mounted before setState
+            setState(() {
+              directOrders = data.map((e) {
+                final order = DirectOrder.fromJson(e);
+                String finalStatus = order.status.toLowerCase();
+                if (e['offer_history'] != null && currentProviderId != null) {
+                  for (var offer in e['offer_history']) {
+                    if (offer['provider_id']?['_id'] == currentProviderId) {
+                      final offerStatus = offer['status']?.toString().toLowerCase();
+                      print('📩 Offer History for Order ${order.id}: Provider $currentProviderId, Status: $offerStatus');
+                      if (offerStatus == 'rejected' || offerStatus == 'cancelled') {
+                        finalStatus = 'rejected';
+                      } else if (offerStatus == 'accepted') {
+                        finalStatus = 'accepted';
+                      }
+                      break;
                     }
-                    break; // Exit loop after finding the matching provider
                   }
                 }
-              }
-              print('📋 Order ID: ${order.id}, Status: $finalStatus (Original: ${order.status})');
-              return DirectOrder(
-                id: order.id,
-                title: order.title,
-                description: order.description,
-                date: order.date,
-                status: finalStatus, // Updated status
-                image: order.image,
-                user_id: order.user_id,
-                offer_history: order.offer_history,
-                projectid: order.projectid,
-                address: order.address,
-                latitude: order.latitude,
-                longitude: order.longitude,
-              );
-            }).toList();
-            filteredDirectOrders = directOrders;
-          });
-          print("✅ Direct Orders Fetched: ${directOrders.length}");
+                print('📋 Order ID: ${order.id}, Status: $finalStatus');
+                return DirectOrder(
+                  id: order.id,
+                  title: order.title,
+                  description: order.description,
+                  date: order.date,
+                  status: finalStatus,
+                  image: order.image,
+                  user_id: order.user_id,
+                  offer_history: order.offer_history,
+                  projectid: order.projectid,
+                  address: order.address,
+                  latitude: order.latitude,
+                  longitude: order.longitude,
+                );
+              }).toList();
+              filteredDirectOrders = directOrders;
+            });
+            print("✅ Direct Orders Fetched: ${directOrders.length}");
+          }
         } else {
           print("❌ 'data' key missing or invalid: ${decoded['data']}");
-          _showSnackBar("Direct orders data not found!");
+          if (mounted) _showSnackBar("Direct orders data not found!");
         }
       } else {
         print("❌ API Error Status: ${res.statusCode}");
-        _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
+        if (mounted) _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
       }
     } catch (e) {
       print("❌ API Exception: $e");
-      _showSnackBar("Something went wrong: $e");
+      if (mounted) _showSnackBar("Something went wrong: $e");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -2118,112 +1870,6 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         return Colors.grey;
     }
   }
-
-/*  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-    //  backgroundColor: Colors.white,
-      appBar:AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text("My Work",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: SizedBox(),
-        actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
-          statusBarColor: AppColors.primaryGreen,
-          statusBarIconBrightness: Brightness.light,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              width: double.infinity,
-              height: screenHeight * 0.063,
-              color: Colors.green.shade100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildTabButton("Bidding Tasks", 0, screenWidth),
-                  _verticalDivider(screenHeight),
-                  _buildTabButton("Direct Hiring", 1, screenWidth),
-                  _verticalDivider(screenHeight),
-                  _buildTabButton("Emergency Tasks", 2, screenWidth),
-                ],
-              ),
-            ),
-            // Padding(
-            //   padding: EdgeInsets.all(screenWidth * 0.053),
-            //   child: Expanded(
-            //         child: TextField(
-            //           decoration: InputDecoration(
-            //             contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-            //             hintText: selectedTab == 0
-            //                 ? 'Search for bidding tasks'
-            //                 : selectedTab == 1
-            //                 ? 'Search for direct hiring'
-            //                 : 'Search for emergency tasks',
-            //             prefixIcon: Icon(Icons.search, color: Colors.green),
-            //             border: OutlineInputBorder(
-            //               borderRadius: BorderRadius.circular(10),
-            //             ),
-            //             filled: true,
-            //             fillColor: Colors.grey.shade100,
-            //           ),
-            //           controller: selectedTab == 0
-            //               ? _biddingSearchController
-            //               : selectedTab == 1
-            //                   ? _directSearchController
-            //                   : _emergencySearchController,
-            //         ),
-            //       ),
-            // ),
-            Padding(
-              padding: EdgeInsets.all(screenWidth * 0.053),
-              child: TextField(
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                  hintText: selectedTab == 0
-                      ? 'Search for bidding tasks'
-                      : selectedTab == 1
-                      ? 'Search for direct hiring'
-                      : 'Search for emergency tasks',
-                  prefixIcon: Icon(Icons.search, color: Colors.green),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                ),
-                controller: selectedTab == 0
-                    ? _biddingSearchController
-                    : selectedTab == 1
-                    ? _directSearchController
-                    : _emergencySearchController,
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.015),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : selectedTab == 0
-                      ? _buildBiddingTasksList(screenWidth, screenHeight)
-                      : selectedTab == 1
-                          ? _buildDirectHiringList(screenWidth, screenHeight)
-                          : _buildEmergencyList(screenWidth, screenHeight),
-            ),
-          ],
-        ),
-      ),
-    );
-  }*/
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -2309,7 +1955,49 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
     );
   }
 
-  Widget _buildTabButton(String title, int tabIndex, double screenWidth) {
+  // Widget _buildTabButton(String title, int tabIndex, double screenWidth) {
+  //   final isSelected = selectedTab == tabIndex;
+  //   return ElevatedButton(
+  //     onPressed: () async {
+  //       setState(() {
+  //         selectedTab = tabIndex;
+  //         _biddingSearchController.clear();
+  //         _directSearchController.clear();
+  //         _emergencySearchController.clear();
+  //         filteredBiddingOrders = biddingOrders;
+  //         filteredDirectOrders = directOrders;
+  //         filteredEmergencyItems = emergencyItems;
+  //       });
+  //       if (selectedTab == 2) {
+  //         setState(() => isLoading = true);
+  //
+  //         final orders =
+  //         await SpEmergencyServiceController().getEmergencySpOrderByRole();
+  //         setState(() {
+  //           spEmergencyOrders = orders;
+  //           isLoading = false;
+  //         });
+  //       } else {
+  //         setState(() => isLoading = false);
+  //       }
+  //     },
+  //     style: ElevatedButton.styleFrom(
+  //       backgroundColor:
+  //       isSelected ? Colors.green.shade700 : Colors.green.shade100,
+  //       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+  //       shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(screenWidth * 0.05)),
+  //     ),
+  //     child: Text(
+  //       title,
+  //       style: _tabText(
+  //           color: isSelected ? Colors.white : Colors.black,
+  //           fontSize: screenWidth * 0.034),
+  //     ),
+  //   );
+  // }
+
+  /*Widget _buildTabButton(String title, int tabIndex, double screenWidth) {
     final isSelected = selectedTab == tabIndex;
     return ElevatedButton(
       onPressed: () async {
@@ -2318,26 +2006,90 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
           _biddingSearchController.clear();
           _directSearchController.clear();
           _emergencySearchController.clear();
-          filteredBiddingOrders = biddingOrders;
-          filteredDirectOrders = directOrders;
-          filteredEmergencyItems = emergencyItems;
+          isLoading = true; // Start loading for any tab switch
         });
-        if (selectedTab == 2) {
-          setState(() => isLoading = true);
 
-          final orders =
-          await SpEmergencyServiceController().getEmergencySpOrderByRole();
+        if (tabIndex == 0) {
+          await fetchBiddingOrders(); // Refresh bidding data
+          setState(() {
+            filteredBiddingOrders = biddingOrders; // Reset filters after fetch
+          });
+        } else if (tabIndex == 1) {
+          await fetchDirectOrders(); // Refresh direct data
+          setState(() {
+            filteredDirectOrders = directOrders; // Reset filters after fetch
+          });
+        } else if (tabIndex == 2) {
+          final orders = await SpEmergencyServiceController().getEmergencySpOrderByRole();
           setState(() {
             spEmergencyOrders = orders;
-            isLoading = false;
+            filteredEmergencyItems = emergencyItems; // If you have filters for emergency, reset here
           });
-        } else {
-          setState(() => isLoading = false);
+        }
+
+        setState(() => isLoading = false); // Stop loading after fetch
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? Colors.green.shade700 : Colors.green.shade100,
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(screenWidth * 0.05)),
+      ),
+      child: Text(
+        title,
+        style: _tabText(
+            color: isSelected ? Colors.white : Colors.black,
+            fontSize: screenWidth * 0.034),
+      ),
+    );
+  }*/
+
+  Widget _buildTabButton(String title, int tabIndex, double screenWidth) {
+    final isSelected = selectedTab == tabIndex;
+    return ElevatedButton(
+      onPressed: () async {
+        if (!mounted) return;
+        setState(() {
+          selectedTab = tabIndex;
+          _biddingSearchController.clear();
+          _directSearchController.clear();
+          _emergencySearchController.clear();
+          isLoading = true;
+        });
+
+        try {
+          if (tabIndex == 0) {
+            await fetchBiddingOrders();
+            if (mounted) {
+              setState(() {
+                filteredBiddingOrders = biddingOrders;
+              });
+            }
+          } else if (tabIndex == 1) {
+            await fetchDirectOrders();
+            if (mounted) {
+              setState(() {
+                filteredDirectOrders = directOrders;
+              });
+            }
+          } else if (tabIndex == 2) {
+            final orders = await SpEmergencyServiceController().getEmergencySpOrderByRole();
+            if (mounted) {
+              setState(() {
+                spEmergencyOrders = orders;
+                filteredEmergencyItems = emergencyItems; // Or update to filter spEmergencyOrders.data
+              });
+            }
+          }
+        } catch (e) {
+          print("❌ Tab $tabIndex fetch error: $e");
+          if (mounted) _showSnackBar("Failed to refresh data: $e");
+        } finally {
+          if (mounted) setState(() => isLoading = false);
         }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-        isSelected ? Colors.green.shade700 : Colors.green.shade100,
+        backgroundColor: isSelected ? Colors.green.shade700 : Colors.green.shade100,
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(screenWidth * 0.05)),

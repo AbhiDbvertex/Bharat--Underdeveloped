@@ -896,7 +896,7 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                   ),
                 ),
               )
-                  : Column(
+                  : /*Column(
                 children: [
                   CarouselSlider.builder(
                     carouselController: _carouselController,
@@ -988,6 +988,111 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
                         height: 8.0,
                         margin: const EdgeInsets.symmetric(
                             horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: _currentIndex == index
+                              ? Colors.green.shade800
+                              : Colors.grey,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              )*/
+              Column(
+                children: [
+                  CarouselSlider.builder(
+                    carouselController: _carouselController,
+                    itemCount: bannerImages.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final image = bannerImages[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ViewImage(
+                                imageUrl: image,
+                                title: "Banner Image",
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              image,
+                              fit: BoxFit.fill,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.image_not_supported,
+                                          size: 40,
+                                          color: Colors.grey,
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          "Image Failed to Load",
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    options: CarouselOptions(
+                      height: 170,
+                      viewportFraction: 0.9,
+                      initialPage: 0,
+                      enableInfiniteScroll: bannerImages.length > 1,
+                      autoPlay: bannerImages.length > 1, // only autoplay if more than 1
+                      autoPlayInterval: const Duration(seconds: 3),
+                      scrollPhysics: bannerImages.length > 1
+                          ? const BouncingScrollPhysics()
+                          : const NeverScrollableScrollPhysics(),
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: bannerImages.map((image) {
+                      int index = bannerImages.indexOf(image);
+                      return Container(
+                        width: _currentIndex == index ? 16.0 : 8.0,
+                        height: 8.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 2.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4),
                           color: _currentIndex == index

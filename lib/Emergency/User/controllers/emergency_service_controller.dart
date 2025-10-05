@@ -105,7 +105,7 @@ class EmergencyServiceController extends GetxController {
   //     images.addAll(pickedFiles.map((e) => File(e.path)));
   //   }
   // }
-  /*Future<void> pickImageFromCamera(BuildContext context) async {
+  Future<void> pickImageFromCamera(BuildContext context) async {
     final picked = await _picker.pickImage(source: ImageSource.camera);
     if (picked != null) {
       if (images.length < 5) {
@@ -142,9 +142,8 @@ class EmergencyServiceController extends GetxController {
 
     }
   }
-*/
 
-  /// ------------------ COMPRESS IMAGE FUNCTION -------------------
+/*  /// ------------------ COMPRESS IMAGE FUNCTION -------------------
   Future<File> compressImage(File file) async {
     final filePath = file.absolute.path;
 
@@ -204,7 +203,7 @@ class EmergencyServiceController extends GetxController {
         type: SnackBarType.info,
       );
     }
-  }
+  }*/
 
 
   void removeImage(File file) {

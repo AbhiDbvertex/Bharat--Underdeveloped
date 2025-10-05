@@ -566,8 +566,8 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                         Obx(
                               () => Container(
                                 color: Colors.grey,
-                                child: CarouselSlider(
-                                                            options: CarouselOptions(
+                                child: /*CarouselSlider(
+                                  options: CarouselOptions(
                                 height: 200,
                                 viewportFraction: 1.0,
                                 enableInfiniteScroll: true,
@@ -620,7 +620,77 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                                   ),
                                 );
                                                             }).toList(),
-                                                          ),
+                                                          ),*/
+                                CarouselSlider(
+                                  options: CarouselOptions(
+                                    height: 200,
+                                    viewportFraction: 1.0,
+                                    enableInfiniteScroll: controller.imageUrls.length > 1, // only scroll if more than 1
+                                    autoPlay: controller.imageUrls.length > 1, // autoplay only if more than 1
+                                    autoPlayInterval: const Duration(seconds: 3),
+                                    scrollPhysics: controller.imageUrls.length > 1
+                                        ? const BouncingScrollPhysics()
+                                        : const NeverScrollableScrollPhysics(),
+                                    onPageChanged: (index, reason) {
+                                      controller.currentImageIndex.value = index;
+                                    },
+                                  ),
+                                  items: controller.imageUrls.isNotEmpty
+                                      ? controller.imageUrls.map((url) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ViewImage(
+                                              imageUrl: url,
+                                              title: "Product Image",
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(0),
+                                        child: Image.network(
+                                          url,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (context, child, loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return Container(
+                                              color: Colors.grey.shade200,
+                                              height: 200,
+                                              child: const Center(
+                                                child: CircularProgressIndicator(
+                                                  color: AppColors.primaryGreen,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey.shade200,
+                                              height: 200,
+                                              child: const Center(
+                                                child: Icon(Icons.broken_image,
+                                                    size: 50, color: Colors.grey),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  }).toList()
+                                      : [
+                                    Container(
+                                      color: Colors.grey.shade200,
+                                      height: 200,
+                                      child: const Center(
+                                        child: Icon(Icons.image, size: 50, color: Colors.grey),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                         ),
 

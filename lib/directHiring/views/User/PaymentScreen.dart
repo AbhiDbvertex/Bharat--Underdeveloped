@@ -319,12 +319,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                       child: Column(
                         children: [
-                          // Row(
-                          //   children: [
-                          //     Icon(Icons.warning,color: Colors.amber,),
-                          //     Text("Access denied. Complete 5 successful online\norders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,)
-                          //   ],
-                          // ),
+                          Row(
+                            children: [
+                              Icon(Icons.warning,color: Colors.amber,),
+                              Text("Info. Complete 5 successful online\norders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,)
+                            ],
+                          ),
                           Row(
                             children: [
                               Expanded(
@@ -342,7 +342,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     setState(() {
                                       _description = value;
                                     });
-                                  },
+                                  },//a,y,a,d,s,s,t,m,m,u,a,n
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -352,15 +352,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   maxLength: 6,
                                   controller: _amountController,
                                   keyboardType: TextInputType.number,
-                                  inputFormatters: [
+                                  // inputFormatters: [
                                    // Allows decimals up to 2 places. For integers only, use:
                                    //  FilteringTextInputFormatter.digitsOnly
-                                    FilteringTextInputFormatter.allow(
-                                        RegExp(r'^\d*\.?\d{0,2}$')),
-
-                                  ],
-                                /*inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),],*/
+                                  //   FilteringTextInputFormatter.allow(
+                                  //       RegExp(r'^\d*\.?\d{0,2}$')),
+                                  // ],
+                                inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),],
                                   decoration: InputDecoration(
                                     hintText: 'Enter amount',
                                     counterText: '',
