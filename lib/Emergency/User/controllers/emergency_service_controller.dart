@@ -358,10 +358,11 @@ class EmergencyServiceController extends GetxController {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => PaymentSuccessScreen(from:"emergency"
+          builder: (context) => PaymentSuccessScreen(from:"emergency",
             // categreyId: widget.categreyId,
             // subcategreyId: widget.subcategreyId,
             // providerId: widget.providerId,
+            passIndex: 3,                        //     this code is currectd you replace only 3 to 2
           ),
         ),
       );
@@ -437,6 +438,5 @@ class EmergencyServiceController extends GetxController {
       isLoading.value=false;
       return null;
     }
-
   }
   }

@@ -56,8 +56,8 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
   Future<void> submitDispute() async {
     if (_amountController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
-        _requirementController.text.isEmpty ||
-        _selectedImages.isEmpty) {
+        _requirementController.text.isEmpty /*||
+        _selectedImages.isEmpty*/) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -172,7 +172,7 @@ class _ServiceDisputeScreenState extends State<ServiceDisputeScreen> {
             _buildTextField(_descriptionController, TextInputType.text, maxLines: 4),
             _buildLabel("Requirement"),
             _buildTextField(_requirementController,TextInputType.text, maxLines: 4),
-            _buildLabel("Upload Images Abhi"),
+            _buildLabel("Upload Images"),
             GestureDetector(
               onTap: pickImages,
               child: Container(

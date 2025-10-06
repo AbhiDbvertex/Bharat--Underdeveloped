@@ -21,6 +21,7 @@ import '../../../../Widgets/AppColors.dart';
 import '../../models/userModel/subCategoriesModel.dart';
 import '../ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../comm/view_images_screen.dart';
+import 'MyHireScreen.dart';
 import 'PaymentScreen.dart';
 import 'UserViewWorkerDetails.dart';
 
@@ -28,12 +29,14 @@ class DirectViewScreen extends StatefulWidget {
   final String id;
   final String? categreyId; // Note: Typo in 'categreyId', consider renaming to 'categoryId'
   final String? subcategreyId; // Note: Typo in 'subcategreyId', consider renaming to 'subcategoryId'
+  final passIndex;
 
   const DirectViewScreen({
     super.key,
     required this.id,
     this.categreyId,
     this.subcategreyId,
+    this.passIndex,
   });
 
   @override
@@ -68,6 +71,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     _scrollController.dispose();
     super.dispose();
   }
+
   String? getcategoryId;
   List<String> getsubCategoryIds = [];
   String? workerName;
@@ -416,28 +420,28 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
         } else {
           print("⚠️ No providers in API response");
 
-            CustomSnackBar.show(
-              message:'No provider found!' ,
-              type: SnackBarType.error
-          );
+          //   CustomSnackBar.show(
+          //     message:'No provider found!' ,
+          //     type: SnackBarType.error
+          // );
 
         }
       } else {
         print("❌ API Error: ${response.statusCode}");
 
-         CustomSnackBar.show(
-            message:"Somthing went wrong." ,
-            type: SnackBarType.error
-        );
+        //  CustomSnackBar.show(
+        //     message:"Somthing went wrong." ,
+        //     type: SnackBarType.error
+        // );
 
       }
     } catch (e) {
       print("❗ Error: $e");
 
-       CustomSnackBar.show(
-          message:'Error' ,
-          type: SnackBarType.error
-      );
+      //  CustomSnackBar.show(
+      //     message:'Error' ,
+      //     type: SnackBarType.error
+      // );
 
     }
   }
@@ -846,634 +850,378 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Abhi:- darect oder id ${widget.id}");
+    print("Abhi:- darect order passIndex ${widget.passIndex} ");
     print("Abhi:- darect oder id categaroyid : ${getcategoryId}");
     print("Abhi:- darect oder id subcategaroyid : ${getsubCategoryIds}");
     final images = (order?['image_url'] as List?) ?? [];
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text("Work Details",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: const BackButton(color: Colors.black),
-        actions: [],
-        systemOverlayStyle:  SystemUiOverlayStyle(
-          statusBarColor: AppColors.primaryGreen,
-          statusBarIconBrightness: Brightness.light,
+    return WillPopScope(
+          onWillPop: () async {
+            if (widget.passIndex == 1) {
+              // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 1,)),
+              );
+              return false; // default back ko cancel karo
+            }
+            return true; // normal back chalega
+          },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text("Work Details",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: const BackButton(color: Colors.black),
+          actions: [],
+          systemOverlayStyle:  SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
         ),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : order == null
-          ? const Center(child: Text("No data found"))
-          : SingleChildScrollView(
-        controller: _scrollController,
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (order!['image_url'] != null &&
-                order!['image_url'] is List &&
-                (order!['image_url'] as List).isNotEmpty)
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ViewImage(
-                        imageUrl: 'https://api.thebharatworks.com/uploads/hiswork/1752481481201.jpg${order!['image_url'] ?? ""}',
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  color: Colors.grey,
-                  child:/* CarouselSlider(
-                    options: CarouselOptions(
-                      height: 200,
-                      autoPlay: true,
-                      enlargeCenterPage: true,
-                      aspectRatio: 16 / 9,
-                      viewportFraction: 1.0,
-                      autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                    ),
-                    items: (order!['image_url'] as List).map((imageUrl) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Image.network(
-                            '$imageUrl',
-                            width: double.infinity,
-                            height: 200,
-                            // fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Image.asset(
-                              'assets/images/task.png',
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),*/
-                  CarouselSlider(
-
-                    options: CarouselOptions(
-                      height: 200,
-                      autoPlay: images.length > 1, // agar ek image hai to autoplay band
-                      enlargeCenterPage: images.length > 1,
-                      aspectRatio: 16 / 9,
-                      viewportFraction: 1.0,
-                      autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                    ),
-                    items: images.map((imageUrl) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Image.network(
-                            '$imageUrl',
-                            width: double.infinity,
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Image.asset(
-                              'assets/images/task.png',
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
-              )
-            else
-              Image.asset(
-                'assets/images/task.png',
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        order?['title'] ?? '',
-                        style: GoogleFonts.roboto(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : order == null
+            ? const Center(child: Text("No data found"))
+            : SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (order!['image_url'] != null &&
+                  order!['image_url'] is List &&
+                  (order!['image_url'] as List).isNotEmpty)
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewImage(
+                          imageUrl: 'https://api.thebharatworks.com/uploads/hiswork/1752481481201.jpg${order!['image_url'] ?? ""}',
                         ),
                       ),
-                Container(
-                  decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-                  child: Center(child: Text(order?['project_id'] ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
-                    overflow: TextOverflow.ellipsis,)),)
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: (){                                  //           Abhishek add map
-                            openMap(order?['latitude'] ?? 'No lat',
-                              order?['longitude'] ?? 'No long',);
-                          print("Abhi:- print lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
-                        },
-                        child: Container(
-                          height: 24,
-                          width: 160,
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.red,
-                          ),
-                          child: Text(
-                            order?['address'] ?? '',
-                            // order?['user_id']?['location']?['address'] ?? 'No lat',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+                    );
+                  },
+                  child: Container(
+                    color: Colors.grey,
+                    child:/* CarouselSlider(
+                      options: CarouselOptions(
+                        height: 200,
+                        autoPlay: true,
+                        enlargeCenterPage: true,
+                        aspectRatio: 16 / 9,
+                        viewportFraction: 1.0,
+                        autoPlayInterval: const Duration(seconds: 3),
+                        autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                        autoPlayCurve: Curves.fastOutSlowIn,
                       ),
-                      Text(
-                        "Posted: ${order?['createdAt']?.toString().substring(0, 10) ?? ''}",
-                        style: GoogleFonts.roboto(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Completion Date - ${order?['deadline']?.toString().substring(0, 10) ?? ''}",
-                    style: const TextStyle(color: Colors.black87),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Task Details",
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    order?['description'] ?? "No description available.",
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
-                ? Center(
-              child: Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipOval(
-                        child: Image.network(
-                          "${order?['service_provider_id']?['profile_pic'] ?? ''}",
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.image_not_supported_outlined,
-                              size: 56,
+                      items: (order!['image_url'] as List).map((imageUrl) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Image.network(
+                              '$imageUrl',
+                              width: double.infinity,
+                              height: 200,
+                              // fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                                'assets/images/task.png',
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
                             );
                           },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "${order?['service_provider_id']?['full_name'] ?? ''}",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.grey.shade200,
-                                  ),
-                                  child: const Icon(
-                                    Icons.call,
-                                    size: 16,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Project Fees - ₹${order?['platform_fee'] ?? "200"}/-",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                // InkWell(
-                                //     onTap: () async {
-                                //       final receiverId = order != null && order!['user_id'] != null
-                                //           ? order!['user_id']['_id']?.toString() ?? 'Unknown'
-                                //           : 'Unknown';
-                                //       final fullName = order != null && order!['user_id'] != null
-                                //           ?  order!['user_id']['full_name'] ?? 'Unknown'
-                                //           : 'Unknown';
-                                //       print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-                                //
-                                //       if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                //         await _startOrFetchConversation(context, receiverId);
-                                //       } else {
-                                //         print("Abhi:- Error: Invalid receiver ID");
-                                //         ScaffoldMessenger.of(context).showSnackBar(
-                                //           SnackBar(content: Text('Error: Invalid receiver ID')),
-                                //         );
-                                //       }
-                                //     },
-                                //   child: Container(
-                                //     padding: const EdgeInsets.all(6),
-                                //     decoration: BoxDecoration(
-                                //       shape: BoxShape.circle,
-                                //       color: Colors.grey.shade300,
-                                //     ),
-                                //     child: const Icon(
-                                //       Icons.message,
-                                //       size: 16,
-                                //       color: Colors.green,
-                                //     ),
-                                //   ),
-                                // ),
-                                InkWell(
-                                  onTap: () async {
-                                    print("Abhi:- tap user chat button");
-                                    final receiverId = order != null && order!['user_id'] != null
-                                        ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
-                                        : 'Unknown';
-                                    print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
-                                    final fullName = order != null && order?['service_provider_id'] != null
-                                        ?  order?['service_provider_id']?['full_name'] ?? 'Unknown'
-                                        : 'Unknown';
-                                    print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                        );
+                      }).toList(),
+                    ),*/
+                    CarouselSlider(
 
-                                    if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                      await _startOrFetchConversation(context, receiverId);
-                                    } else {
-                                      print("Abhi:- Error: Invalid receiver ID");
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Error: Invalid receiver ID')),
-                                      );
-                                    }
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 14,
-                                    backgroundColor: Colors.grey[300],
-                                    child: Icon(
-                                      Icons.message,
-                                      color: Colors.green,
-                                      size: 18,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => /*ViewServiceProviderProfileScreen(
-                                      serviceProviderId: order!['service_provider_id']?['_id'] ?? '',
-                                    ),*/
-                                    UserViewWorkerDetails(
-                                      workerId: order?['service_provider_id']?['_id'] ?? '',
-                                      categreyId: widget.categreyId,
-                                      subcategreyId:
-                                      widget.subcategreyId,
-                                      hirebuttonhide: "hideOnly",
-                                      hideonly: 'hideOnly',
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: Text(
-                                  "View Profile",
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 13,
-                                    color: Colors.green.shade700,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      options: CarouselOptions(
+                        height: 200,
+                        autoPlay: images.length > 1, // agar ek image hai to autoplay band
+                        enlargeCenterPage: images.length > 1,
+                        aspectRatio: 16 / 9,
+                        viewportFraction: 1.0,
+                        autoPlayInterval: const Duration(seconds: 3),
+                        autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                        autoPlayCurve: Curves.fastOutSlowIn,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-                : SizedBox(),
-            // this is show only pending time for serviceprovider
-
-            order!['hire_status'] == 'pending'
-                ? ListView.builder(
-              shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
-              physics: const NeverScrollableScrollPhysics(), // Parent SingleChildScrollView scroll handle karega
-              itemCount: order!['offer_history']?.length ?? 0, // Dynamic itemCount offer_history ke length se
-              itemBuilder: (context, index) {
-                final pendingProviderData = order!['offer_history'][index]['provider_id']; // provider_id se data
-                print("Abhi:- print status in provider : ${pendingProviderData['status']}");
-                return Center(
-                  child: Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    child: Container(
-                      height: 120,
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipOval(
-                            child: Image.network(
-                              pendingProviderData['profile_pic'] ?? '', // provider_id se profile_pic
-                              height: 80,
-                              width: 80,
+                      items: images.map((imageUrl) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return Image.network(
+                              '$imageUrl',
+                              width: double.infinity,
+                              height: 200,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.image_not_supported_outlined,
-                                  size: 80,
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        pendingProviderData['full_name'] ?? 'Unknown', // provider_id se full_name
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.grey.shade200,
-                                      ),
-                                      child: const Icon(
-                                        Icons.call,
-                                        size: 16,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "Project Fees - ₹${order!['platform_fee'] ?? '200'}/-", // Platform fee same rakha
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    // Container(
-                                    //   padding: const EdgeInsets.all(6),
-                                    //   decoration: BoxDecoration(
-                                    //     shape: BoxShape.circle,
-                                    //     color: Colors.grey.shade300,
-                                    //   ),
-                                    //   child: const Icon(
-                                    //     Icons.message,
-                                    //     size: 16,
-                                    //     color: Colors.green,
-                                    //   ),
-                                    // ),
-                                    InkWell(
-                                      onTap: () async {
-                                        print("Abhi:- tap user chat button");
-                                        final receiverId = pendingProviderData != null && pendingProviderData['_id'] != null
-                                            ?  pendingProviderData['_id']?.toString() ?? 'Unknown'
-                                            : 'Unknown';
-                                        print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
-                                        final fullName = order != null && pendingProviderData['_id'] != null
-                                            ?  pendingProviderData['full_name'] ?? 'Unknown'
-                                            : 'Unknown';
-                                        print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-
-                                        if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                          await _startOrFetchConversation(context, receiverId);
-                                        } else {
-                                          print("Abhi:- Error: Invalid receiver ID");
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Error: Invalid receiver ID')),
-                                          );
-                                        }
-                                      },
-                                      child: CircleAvatar(
-                                        radius: 14,
-                                        backgroundColor: Colors.grey[300],
-                                        child: Icon(
-                                          Icons.message,
-                                          color: Colors.green,
-                                          size: 18,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => /*ViewServiceProviderProfileScreen(
-                                          serviceProviderId: pendingProviderData['_id'] ?? '', // provider_id se _id
-                                        ),*/
-
-                                        UserViewWorkerDetails(
-                                          workerId: pendingProviderData['_id'] ?? '',
-                                          categreyId: widget.categreyId,
-                                          subcategreyId:
-                                          widget.subcategreyId,
-                                          hirebuttonhide: "hideOnly",
-                                          hideonly: 'hideOnly',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Center(child: Text(order!['offer_history'][index]['status'] ??"NO STATUS",style: TextStyle(color: Colors.white),)),
-                                        height: 23,width: 78,decoration: BoxDecoration(color: order!['offer_history'][index]['status'] == "rejected" ? Colors.red : AppColors.primaryGreen,borderRadius: BorderRadius.circular(3)),),
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Text(
-                                          "View Profile",
-                                          style: GoogleFonts.roboto(
-                                            fontSize: 13,
-                                            color: Colors.green.shade700,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                                'assets/images/task.png',
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
                     ),
                   ),
-                );
-              },
-            )
-                : SizedBox(),
-
-            ///            this is assing worker
-            order != null && order?['hire_status'] == 'accepted' && workerId != null
-                ? Card(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                )
+              else
+                Image.asset(
+                  'assets/images/task.png',
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          order?['title'] ?? '',
+                          style: GoogleFonts.roboto(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                  Container(
+                    decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
+                    child: Center(child: Text(order?['project_id'] ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
+                      overflow: TextOverflow.ellipsis,)),)
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: (){                                  //           Abhishek add map
+                              openMap(order?['latitude'] ?? 'No lat',
+                                order?['longitude'] ?? 'No long',);
+                            print("Abhi:- print lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
+                          },
+                          child: Container(
+                            height: 24,
+                            width: 160,
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.red,
+                            ),
+                            child: Text(
+                              order?['address'] ?? '',
+                              // order?['user_id']?['location']?['address'] ?? 'No lat',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          "Posted: ${order?['createdAt']?.toString().substring(0, 10) ?? ''}",
+                          style: GoogleFonts.roboto(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
-                      "Assigned Person",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
+                      "Completion Date - ${order?['deadline']?.toString().substring(0, 10) ?? ''}",
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Task Details",
+                      style: GoogleFonts.roboto(
                         fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 12),
-                    Row(
+                    const SizedBox(height: 6),
+                    Text(
+                      order?['description'] ?? "No description available.",
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
+                  ? Center(
+                child: Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: Container(
+                    height: 120,
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        workerImageUrl != null
-                            ? CircleAvatar(
-                          radius: 40,
-                          backgroundImage: NetworkImage(workerImageUrl!),
-                          onBackgroundImageError: (_, __) => Icon(Icons.person, color: Colors.grey),
-                        )
-                            : CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.grey[200],
-                          child: Icon(Icons.person, color: Colors.grey),
+                        ClipOval(
+                          child: Image.network(
+                            "${order?['service_provider_id']?['profile_pic'] ?? ''}",
+                            height: 80,
+                            width: 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 56,
+                              );
+                            },
+                          ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                workerName ?? 'Unknown',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Text(
-                                workerAddress ?? 'No address',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Container(
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryGreen,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => WorkerListViewProfileScreen(
-                                          workerId: workerId!,
-                                        ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "${order?['service_provider_id']?['full_name'] ?? ''}",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey.shade200,
+                                    ),
+                                    child: const Icon(
+                                      Icons.call,
+                                      size: 16,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "Project Fees - ₹${order?['platform_fee'] ?? "200"}/-",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  // InkWell(
+                                  //     onTap: () async {
+                                  //       final receiverId = order != null && order!['user_id'] != null
+                                  //           ? order!['user_id']['_id']?.toString() ?? 'Unknown'
+                                  //           : 'Unknown';
+                                  //       final fullName = order != null && order!['user_id'] != null
+                                  //           ?  order!['user_id']['full_name'] ?? 'Unknown'
+                                  //           : 'Unknown';
+                                  //       print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                                  //
+                                  //       if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                  //         await _startOrFetchConversation(context, receiverId);
+                                  //       } else {
+                                  //         print("Abhi:- Error: Invalid receiver ID");
+                                  //         ScaffoldMessenger.of(context).showSnackBar(
+                                  //           SnackBar(content: Text('Error: Invalid receiver ID')),
+                                  //         );
+                                  //       }
+                                  //     },
+                                  //   child: Container(
+                                  //     padding: const EdgeInsets.all(6),
+                                  //     decoration: BoxDecoration(
+                                  //       shape: BoxShape.circle,
+                                  //       color: Colors.grey.shade300,
+                                  //     ),
+                                  //     child: const Icon(
+                                  //       Icons.message,
+                                  //       size: 16,
+                                  //       color: Colors.green,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  InkWell(
+                                    onTap: () async {
+                                      print("Abhi:- tap user chat button");
+                                      final receiverId = order != null && order!['user_id'] != null
+                                          ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
+                                          : 'Unknown';
+                                      print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                      final fullName = order != null && order?['service_provider_id'] != null
+                                          ?  order?['service_provider_id']?['full_name'] ?? 'Unknown'
+                                          : 'Unknown';
+                                      print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                                      if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                        await _startOrFetchConversation(context, receiverId);
+                                      } else {
+                                        print("Abhi:- Error: Invalid receiver ID");
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error: Invalid receiver ID')),
+                                        );
+                                      }
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 14,
+                                      backgroundColor: Colors.grey[300],
+                                      child: Icon(
+                                        Icons.message,
+                                        color: Colors.green,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => /*ViewServiceProviderProfileScreen(
+                                        serviceProviderId: order!['service_provider_id']?['_id'] ?? '',
+                                      ),*/
+                                      UserViewWorkerDetails(
+                                        workerId: order?['service_provider_id']?['_id'] ?? '',
+                                        categreyId: widget.categreyId,
+                                        subcategreyId:
+                                        widget.subcategreyId,
+                                        hirebuttonhide: "hideOnly",
+                                        hideonly: 'hideOnly',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
                                   child: Text(
-                                    "View profile",
-                                    style: TextStyle(color: Colors.white),
+                                    "View Profile",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 13,
+                                      color: Colors.green.shade700,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1482,209 +1230,882 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            )
-                : Container(), // Empty container if conditions are not met
+              )
+                  : SizedBox(),
+              // this is show only pending time for serviceprovider
 
-            //         Abhishek add assign
-            order!['hire_status'] == 'pending'  ?
-            SizedBox(
-              // height: 200,
-              child: ListView.builder(
-                key: _listViewKey,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: providerslist.length,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+              order!['hire_status'] == 'pending'
+                  ? ListView.builder(
+                shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
+                physics: const NeverScrollableScrollPhysics(), // Parent SingleChildScrollView scroll handle karega
+                itemCount: order!['offer_history']?.length ?? 0, // Dynamic itemCount offer_history ke length se
                 itemBuilder: (context, index) {
-                  final worker = providerslist[index];
-                  final imageUrl = worker.hisWork.isNotEmpty
-                      ? "https://api.thebharatworks.com/${worker.hisWork.first.replaceAll("\\", "/")}"
-                      : null;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+                  final pendingProviderData = order!['offer_history'][index]['provider_id']; // provider_id se data
+                  print("Abhi:- print status in provider : ${pendingProviderData['status']}");
+                  return Center(
+                    child: Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      child: Container(
+                        height: 120,
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: imageUrl != null
-                                ? Center(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipOval(
                               child: Image.network(
-                                imageUrl,
-                                height: 120,
-                                width: 120,
+                                pendingProviderData['profile_pic'] ?? '', // provider_id se profile_pic
+                                height: 80,
+                                width: 80,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  print("📸 Image load error: $error");
                                   return const Icon(
-                                    Icons.broken_image,
-                                    size: 60,
+                                    Icons.image_not_supported_outlined,
+                                    size: 80,
                                   );
                                 },
                               ),
-                            )
-                                : Image.asset(
-                              "assets/images/d_png/no_profile_image.png",
-                              height: 80,
-                              width: 80,
-                              fit: BoxFit.cover,
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 10),
-                              Row(
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      worker.fullName ?? "Unknown",
-                                      style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                  Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            worker.rating?.toStringAsFixed(1) ?? "0.0",
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                      Expanded(
+                                        child: Text(
+                                          pendingProviderData['full_name'] ?? 'Unknown', // provider_id se full_name
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
-                                          const Icon(
-                                            Icons.star,
-                                            size: 18,
-                                            color: Colors.yellow,
-                                          ),
-                                        ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.grey.shade200,
+                                        ),
+                                        child: const Icon(
+                                          Icons.call,
+                                          size: 16,
+                                          color: Colors.green,
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "₹200.00",
-                                    style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey[700],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 100),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final url = "https://api.thebharatworks.com/api/user/getServiceProvider/${worker.id}";
-                                      try {
-                                        final prefs = await SharedPreferences.getInstance();
-                                        final token = prefs.getString('token');
-                                        if (token == null) {
+                                  const SizedBox(height: 5),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "Project Fees - ₹${order!['platform_fee'] ?? '200'}/-", // Platform fee same rakha
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      // Container(
+                                      //   padding: const EdgeInsets.all(6),
+                                      //   decoration: BoxDecoration(
+                                      //     shape: BoxShape.circle,
+                                      //     color: Colors.grey.shade300,
+                                      //   ),
+                                      //   child: const Icon(
+                                      //     Icons.message,
+                                      //     size: 16,
+                                      //     color: Colors.green,
+                                      //   ),
+                                      // ),
+                                      InkWell(
+                                        onTap: () async {
+                                          print("Abhi:- tap user chat button");
+                                          final receiverId = pendingProviderData != null && pendingProviderData['_id'] != null
+                                              ?  pendingProviderData['_id']?.toString() ?? 'Unknown'
+                                              : 'Unknown';
+                                          print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                          final fullName = order != null && pendingProviderData['_id'] != null
+                                              ?  pendingProviderData['full_name'] ?? 'Unknown'
+                                              : 'Unknown';
+                                          print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
 
-                                           CustomSnackBar.show(
-                                              message: 'Login Required, User not logged in.',
-                                              type: SnackBarType.error
-                                          );
-
-                                          return;
-                                        }
-                                        final response = await http.get(
-                                          Uri.parse(url),
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                            'Authorization': 'Bearer $token',
-                                          },
-                                        );
-                                        if (response.statusCode == 200) {
-                                          final data = jsonDecode(response.body);
-                                          if (mounted) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => WorkerListViewProfileScreen(
-                                                  workerId: worker.id!,
-                                                ),
-                                              ),
+                                          if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                            await _startOrFetchConversation(context, receiverId);
+                                          } else {
+                                            print("Abhi:- Error: Invalid receiver ID");
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Error: Invalid receiver ID')),
                                             );
                                           }
-                                        } else {
+                                        },
+                                        child: CircleAvatar(
+                                          radius: 14,
+                                          backgroundColor: Colors.grey[300],
+                                          child: Icon(
+                                            Icons.message,
+                                            color: Colors.green,
+                                            size: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => /*ViewServiceProviderProfileScreen(
+                                            serviceProviderId: pendingProviderData['_id'] ?? '', // provider_id se _id
+                                          ),*/
 
-                                           CustomSnackBar.show(
-                                              message: 'Failed: ${response.statusCode}',
-                                              type: SnackBarType.error
-                                          );
-
-                                        }
-                                      } catch (e) {
-
-                                         CustomSnackBar.show(
-                                            message:  'Error: $e',
-                                            type: SnackBarType.error
-                                        );
-
-                                      }
+                                          UserViewWorkerDetails(
+                                            workerId: pendingProviderData['_id'] ?? '',
+                                            categreyId: widget.categreyId,
+                                            subcategreyId:
+                                            widget.subcategreyId,
+                                            hirebuttonhide: "hideOnly",
+                                            hideonly: 'hideOnly',
+                                          ),
+                                        ),
+                                      );
                                     },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
+                                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          child: Center(child: Text(order!['offer_history'][index]['status'] ??"NO STATUS",style: TextStyle(color: Colors.white),)),
+                                          height: 23,width: 78,decoration: BoxDecoration(color: order!['offer_history'][index]['status'] == "rejected" ? Colors.red : AppColors.primaryGreen,borderRadius: BorderRadius.circular(3)),),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Text(
+                                            "View Profile",
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 13,
+                                              color: Colors.green.shade700,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+                  : SizedBox(),
+
+              ///            this is assing worker
+              order != null && order?['hire_status'] == 'accepted' && workerId != null
+                  ? Card(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Assigned Person",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          workerImageUrl != null
+                              ? CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(workerImageUrl!),
+                            onBackgroundImageError: (_, __) => Icon(Icons.person, color: Colors.grey),
+                          )
+                              : CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.grey[200],
+                            child: Icon(Icons.person, color: Colors.grey),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  workerName ?? 'Unknown',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  workerAddress ?? 'No address',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Container(
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryGreen,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => WorkerListViewProfileScreen(
+                                            workerId: workerId!,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      "View profile",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              )
+                  : Container(), // Empty container if conditions are not met
+
+              //         Abhishek add assign
+              order!['hire_status'] == 'pending'  ?
+              SizedBox(
+                // height: 200,
+                child: ListView.builder(
+                  key: _listViewKey,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: providerslist.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemBuilder: (context, index) {
+                    final worker = providerslist[index];
+                    final imageUrl = worker.hisWork.isNotEmpty
+                        ? "https://api.thebharatworks.com/${worker.hisWork.first.replaceAll("\\", "/")}"
+                        : null;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: imageUrl != null
+                                  ? Center(
+                                child: Image.network(
+                                  imageUrl,
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print("📸 Image load error: $error");
+                                    return const Icon(
+                                      Icons.broken_image,
+                                      size: 60,
+                                    );
+                                  },
+                                ),
+                              )
+                                  : Image.asset(
+                                "assets/images/d_png/no_profile_image.png",
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
                                       child: Text(
-                                        'View Profile',
+                                        worker.fullName ?? "Unknown",
                                         style: GoogleFonts.roboto(
-                                          fontSize: 11,
-                                          color: Colors.green.shade700,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                worker.skill ?? "No skill info",
-                                style: GoogleFonts.roboto(
-                                  fontSize: 11,
-                                  color: Colors.grey[700],
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              worker.rating?.toStringAsFixed(1) ?? "0.0",
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const Icon(
+                                              Icons.star,
+                                              size: 18,
+                                              color: Colors.yellow,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  InkWell(
-                                    onTap: (){
+                                Row(
+                                  children: [
+                                    Text(
+                                      "₹200.00",
+                                      style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey[700],
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 100),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final url = "https://api.thebharatworks.com/api/user/getServiceProvider/${worker.id}";
+                                        try {
+                                          final prefs = await SharedPreferences.getInstance();
+                                          final token = prefs.getString('token');
+                                          if (token == null) {
 
-                                    },
-                                    child: Container(
+                                             CustomSnackBar.show(
+                                                message: 'Login Required, User not logged in.',
+                                                type: SnackBarType.error
+                                            );
+
+                                            return;
+                                          }
+                                          final response = await http.get(
+                                            Uri.parse(url),
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                              'Authorization': 'Bearer $token',
+                                            },
+                                          );
+                                          if (response.statusCode == 200) {
+                                            final data = jsonDecode(response.body);
+                                            if (mounted) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => WorkerListViewProfileScreen(
+                                                    workerId: worker.id!,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else {
+
+                                             CustomSnackBar.show(
+                                                message: 'Failed: ${response.statusCode}',
+                                                type: SnackBarType.error
+                                            );
+
+                                          }
+                                        } catch (e) {
+
+                                           CustomSnackBar.show(
+                                              message:  'Error: $e',
+                                              type: SnackBarType.error
+                                          );
+
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'View Profile',
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 11,
+                                            color: Colors.green.shade700,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  worker.skill ?? "No skill info",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 11,
+                                    color: Colors.grey[700],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+
+                                      },
+                                      child: Container(
+                                        width: 120,
+                                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF27773),
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        child: Text(
+                                          worker.location?['address'] ?? "No address",
+                                          style: GoogleFonts.roboto(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green.shade700,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        minimumSize: const Size(60, 28),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                      ),
+                                      onPressed: () async {
+                                        if (order?['_id'] != null && worker.id != null) {
+                                          await sendNextOffer(order!['_id'], worker.id!);
+                                        } else {
+
+                                           CustomSnackBar.show(
+                                              message: 'Invalid order or provider ID',
+                                              type: SnackBarType.error
+                                          );
+
+                                        }
+                                      },
+                                      child: Text(
+                                        "Send Offer",
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 12,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ) : SizedBox(),
+
+              const SizedBox(height: 20),
+              order!['hire_status'] == 'pending'
+                  ?
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _scrollToListView();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade700,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Send offer",
+                            style: GoogleFonts.roboto(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEE2121),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          await _clearHiredProviders();
+                          cancelDarectOder();
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ) :SizedBox(),
+
+              // order!['hire_status'] == 'cancelled'
+              //     ? Center(
+              //   child: Container(
+              //     height: 35,
+              //     width: 250,
+              //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: [
+              //         Icon(Icons.warning_amber, color: Colors.red),
+              //         Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+              //       ],
+              //     ),
+              //   ),
+              // )
+              //     : SizedBox(),
+              // order!['hire_status'] == 'cancelledDispute'
+              //     ? Center(
+              //   child: Container(
+              //     height: 40,
+              //     width: double.infinity,
+              //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: [
+              //         Icon(Icons.warning_amber, color: Colors.red),
+              //         Flexible(
+              //           child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
+              //             style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // )
+              //     : SizedBox(),
+              //
+              // order!['hire_status'] == 'completed'
+              //     ? Center(
+              //   child: Container(
+              //     height: 35,
+              //     width: 300,
+              //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: [
+              //         Icon(Icons.check_circle_outline, color: Colors.green),
+              //         Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+              //       ],
+              //     ),
+              //   ),
+              // )
+              //     : SizedBox(),
+              order!['hire_status'] == 'rejected'
+                  ? Center(
+                child: Container(
+                  height: 35,
+                  width: 300,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.block, color: Colors.grey),
+                      Text("The order is rejected"),
+                    ],
+                  ),
+                ),
+              )
+                  : SizedBox(),
+              order!['hire_status'] == 'accepted' ? const SizedBox(height: 20) : SizedBox(),
+              if (providerslist.isEmpty && order!['hire_status'] == 'pending')
+                const Center(
+                  child: Text(
+                    "No providers available",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              else if (order!['hire_status'] == 'pending')
+                ListView.builder(
+                  key: _listViewKey,
+                  shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
+                  physics: const NeverScrollableScrollPhysics(), // Parent SingleChildScrollView scroll handle karega
+                  itemCount: providerslist.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemBuilder: (context, index) {
+                    final worker = providerslist[index];
+                    final imageUrl = worker.hisWork.isNotEmpty
+                        ? "https://api.thebharatworks.com/${worker.hisWork.first.replaceAll("\\", "/")}"
+                        : null;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: imageUrl != null
+                                  ? Center(
+                                child: Image.network(
+                                  imageUrl,
+                                  height: 100,
+                                  width: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(
+                                    Icons.broken_image,
+                                    size: 60,
+                                  ),
+                                ),
+                              )
+                                  : Image.asset(
+                                "assets/images/d_png/no_profile_image.png",
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        worker.fullName ?? "Unknown",
+                                        style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              worker.rating.toStringAsFixed(1),
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const Icon(
+                                              Icons.star,
+                                              size: 18,
+                                              color: Colors.yellow,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "₹200.00",
+                                      style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey[700],
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 100),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final url = "https://api.thebharatworks.com/api/user/getServiceProvider/${worker.id}";
+                                        try {
+                                          final prefs = await SharedPreferences.getInstance();
+                                          final token = prefs.getString('token');
+                                          if (token == null) {
+
+                                             CustomSnackBar.show(
+                                                message: 'Login Required, User not logged in.',
+                                                type: SnackBarType.error
+                                            );
+
+                                            return;
+                                          }
+                                          final response = await http.get(
+                                            Uri.parse(url),
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                              'Authorization': 'Bearer $token',
+                                            },
+                                          );
+                                          if (response.statusCode == 200) {
+                                            final data = jsonDecode(response.body);
+                                            if (mounted) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => /*ViewServiceProviderProfileScreen(
+                                                    serviceProviderId: worker.id,
+                                                  ),*/
+                                                  UserViewWorkerDetails(
+                                                    workerId: worker.id!,
+                                                    categreyId: widget.categreyId,
+                                                    subcategreyId:
+                                                    widget.subcategreyId,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else {
+
+                                             CustomSnackBar.show(
+                                                message:'Failed: ${response.statusCode}' ,
+                                                type: SnackBarType.error
+                                            );
+
+                                          }
+                                        } catch (e) {
+
+                                           CustomSnackBar.show(
+                                              message:'Error: something wrong' ,
+                                              type: SnackBarType.error
+                                          );
+
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'View Profile',
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 11,
+                                            color: Colors.green.shade700,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  worker.skill ?? "No skill info",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 11,
+                                    color: Colors.grey[700],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Container(
                                       width: 120,
                                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
                                       decoration: BoxDecoration(
@@ -1702,460 +2123,56 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                         maxLines: 1,
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green.shade700,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                      minimumSize: const Size(60, 28),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                                    ),
-                                    onPressed: () async {
-                                      if (order?['_id'] != null && worker.id != null) {
-                                        await sendNextOffer(order!['_id'], worker.id!);
-                                      } else {
-
-                                         CustomSnackBar.show(
-                                            message: 'Invalid order or provider ID',
-                                            type: SnackBarType.error
-                                        );
-
-                                      }
-                                    },
-                                    child: Text(
-                                      "Send Offer",
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 12,
-                                        color: Colors.white,
+                                    const SizedBox(width: 20),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green.shade700,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        minimumSize: const Size(60, 28),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ) : SizedBox(),
-
-            const SizedBox(height: 20),
-            order!['hire_status'] == 'pending'
-                ?
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _scrollToListView();
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade700,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Send offer",
-                          style: GoogleFonts.roboto(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEE2121),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: TextButton(
-                      onPressed: () async {
-                        await _clearHiredProviders();
-                        cancelDarectOder();
-                      },
-                      child: Text(
-                        "Cancel",
-                        style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-            ) :SizedBox(),
-
-            // order!['hire_status'] == 'cancelled'
-            //     ? Center(
-            //   child: Container(
-            //     height: 35,
-            //     width: 250,
-            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Icon(Icons.warning_amber, color: Colors.red),
-            //         Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-            //       ],
-            //     ),
-            //   ),
-            // )
-            //     : SizedBox(),
-            // order!['hire_status'] == 'cancelledDispute'
-            //     ? Center(
-            //   child: Container(
-            //     height: 40,
-            //     width: double.infinity,
-            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Icon(Icons.warning_amber, color: Colors.red),
-            //         Flexible(
-            //           child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
-            //             style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // )
-            //     : SizedBox(),
-            //
-            // order!['hire_status'] == 'completed'
-            //     ? Center(
-            //   child: Container(
-            //     height: 35,
-            //     width: 300,
-            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       children: [
-            //         Icon(Icons.check_circle_outline, color: Colors.green),
-            //         Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
-            //       ],
-            //     ),
-            //   ),
-            // )
-            //     : SizedBox(),
-            order!['hire_status'] == 'rejected'
-                ? Center(
-              child: Container(
-                height: 35,
-                width: 300,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.grey)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.block, color: Colors.grey),
-                    Text("The order is rejected"),
-                  ],
-                ),
-              ),
-            )
-                : SizedBox(),
-            order!['hire_status'] == 'accepted' ? const SizedBox(height: 20) : SizedBox(),
-            if (providerslist.isEmpty && order!['hire_status'] == 'pending')
-              const Center(
-                child: Text(
-                  "No providers available",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              )
-            else if (order!['hire_status'] == 'pending')
-              ListView.builder(
-                key: _listViewKey,
-                shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
-                physics: const NeverScrollableScrollPhysics(), // Parent SingleChildScrollView scroll handle karega
-                itemCount: providerslist.length,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                itemBuilder: (context, index) {
-                  final worker = providerslist[index];
-                  final imageUrl = worker.hisWork.isNotEmpty
-                      ? "https://api.thebharatworks.com/${worker.hisWork.first.replaceAll("\\", "/")}"
-                      : null;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: imageUrl != null
-                                ? Center(
-                              child: Image.network(
-                                imageUrl,
-                                height: 100,
-                                width: 80,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => const Icon(
-                                  Icons.broken_image,
-                                  size: 60,
-                                ),
-                              ),
-                            )
-                                : Image.asset(
-                              "assets/images/d_png/no_profile_image.png",
-                              height: 80,
-                              width: 80,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 10),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      worker.fullName ?? "Unknown",
-                                      style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            worker.rating.toStringAsFixed(1),
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const Icon(
-                                            Icons.star,
-                                            size: 18,
-                                            color: Colors.yellow,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "₹200.00",
-                                    style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey[700],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 100),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final url = "https://api.thebharatworks.com/api/user/getServiceProvider/${worker.id}";
-                                      try {
-                                        final prefs = await SharedPreferences.getInstance();
-                                        final token = prefs.getString('token');
-                                        if (token == null) {
-
-                                           CustomSnackBar.show(
-                                              message: 'Login Required, User not logged in.',
-                                              type: SnackBarType.error
-                                          );
-
-                                          return;
-                                        }
-                                        final response = await http.get(
-                                          Uri.parse(url),
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                            'Authorization': 'Bearer $token',
-                                          },
-                                        );
-                                        if (response.statusCode == 200) {
-                                          final data = jsonDecode(response.body);
-                                          if (mounted) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => /*ViewServiceProviderProfileScreen(
-                                                  serviceProviderId: worker.id,
-                                                ),*/
-                                                UserViewWorkerDetails(
-                                                  workerId: worker.id!,
-                                                  categreyId: widget.categreyId,
-                                                  subcategreyId:
-                                                  widget.subcategreyId,
-                                                ),
-                                              ),
-                                            );
-                                          }
+                                      onPressed: () async {
+                                        if (order?['_id'] != null && worker.id != null) {
+                                          await sendNextOffer(order!['_id'], worker.id!);
+                                          await fetchOrderDetail();
                                         } else {
-
                                            CustomSnackBar.show(
-                                              message:'Failed: ${response.statusCode}' ,
+                                              message:  'Invalid order or provider ID' ,
                                               type: SnackBarType.error
                                           );
 
                                         }
-                                      } catch (e) {
-
-                                         CustomSnackBar.show(
-                                            message:'Error: something wrong' ,
-                                            type: SnackBarType.error
-                                        );
-
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
+                                      },
                                       child: Text(
-                                        'View Profile',
+                                        "Send Offer",
                                         style: GoogleFonts.roboto(
-                                          fontSize: 11,
-                                          color: Colors.green.shade700,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                worker.skill ?? "No skill info",
-                                style: GoogleFonts.roboto(
-                                  fontSize: 11,
-                                  color: Colors.grey[700],
+                                  ],
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF27773),
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Text(
-                                      worker.location?['address'] ?? "No address",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green.shade700,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                      minimumSize: const Size(60, 28),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                                    ),
-                                    onPressed: () async {
-                                      if (order?['_id'] != null && worker.id != null) {
-                                        await sendNextOffer(order!['_id'], worker.id!);
-                                        await fetchOrderDetail();
-                                      } else {
-                                         CustomSnackBar.show(
-                                            message:  'Invalid order or provider ID' ,
-                                            type: SnackBarType.error
-                                        );
-
-                                      }
-                                    },
-                                    child: Text(
-                                      "Send Offer",
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
 
-            order!['hire_status'] == 'accepted' ? SizedBox() : const SizedBox(height: 10),
-            order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
-                ? PaymentScreen(
-              orderId: widget.id,
-              orderProviderId: orderProviderId,
-              paymentHistory: order!['service_payment']?['payment_history'],
-              status: order?['hire_status'],
-            )
-                : const SizedBox(),
-          ],
+              order!['hire_status'] == 'accepted' ? SizedBox() : const SizedBox(height: 10),
+              order?['hire_status'] == 'accepted' || order?['hire_status'] == 'completed'|| order?['hire_status'] == 'cancelled'|| order?['hire_status'] == 'cancelledDispute'
+                  ? PaymentScreen(
+                orderId: widget.id,
+                orderProviderId: orderProviderId,
+                paymentHistory: order!['service_payment']?['payment_history'],
+                status: order?['hire_status'],
+              )
+                  : const SizedBox(),
+            ],
+          ),
         ),
       ),
     );

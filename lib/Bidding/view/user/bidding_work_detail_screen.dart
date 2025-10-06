@@ -849,10 +849,10 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                   url.trim(),
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
+                                    return /*Image.asset(
                                       'assets/images/Bid.png',
                                       fit: BoxFit.cover,
-                                    );
+                                    )*/ Icon(Icons.image_not_supported_outlined);
                                   },
                                 ),
                               );
@@ -860,10 +860,11 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                 : [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
-                                child: Image.asset(
+                                child: /*Image.asset(
                                   'assets/images/Bid.png',
                                   fit: BoxFit.cover,
-                                ),
+                                ),*/
+                                Icon(Icons.image_not_supported_outlined)
                               ),
                             ],
                           ),

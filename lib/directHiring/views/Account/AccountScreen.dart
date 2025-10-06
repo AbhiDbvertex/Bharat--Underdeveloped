@@ -504,10 +504,10 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (e) {
       print("Error: $e");
 
-       CustomSnackBar.show(
-          message: "Something went wrong, try again!",
-          type: SnackBarType.error
-      );
+      //  CustomSnackBar.show(
+      //     message: "Something went wrong, try again!",
+      //     type: SnackBarType.error
+      // );
     }
   }
 

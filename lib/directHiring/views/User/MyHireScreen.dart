@@ -28,7 +28,7 @@
 // class MyHireScreen extends StatefulWidget {
 //   final String? categreyId;
 //   final String? subcategreyId;
-//   final passIndex;
+//   final int? passIndex; // Changed to int? to handle null case
 //
 //   const MyHireScreen({super.key, this.categreyId, this.subcategreyId, this.passIndex});
 //
@@ -45,26 +45,36 @@
 //   String? subCategoryId;
 //
 //   int selectedTab = 0; // 0 = Bidding, 1 = Direct Hiring, 2 = Emergency
-//   // int selectedTab = 0; // 0 = Bidding, 1 = Direct Hiring, 2 = Emergency
 //
 //   TextEditingController _searchController = TextEditingController();
-//   List<dynamic> filteredBiddingData = []; // Bidding ke liye filtered list
-//   List<DirectOrder> filteredDirectOrders = []; // Direct ke liye
-//   List<dynamic> filteredEmergencyData = []; // Emergency ke liye
-//   String searchQuery = ''; // Current search text store karne ke liye
+//   List<dynamic> filteredBiddingData = [];
+//   List<DirectOrder> filteredDirectOrders = [];
+//   List<dynamic> filteredEmergencyData = [];
+//   String searchQuery = '';
 //
 //   @override
 //   void initState() {
 //     super.initState();
+//     // Set initial tab based on passIndex
+//     if (widget.passIndex == 1) {
+//       selectedTab = 1; // Set to Direct Hiring tab
+//     } else if(widget.passIndex == 2) {
+//       selectedTab = 2; // Default to Bidding tab
+//     }else {
+//       selectedTab = 0;
+//     }
+//
+//     // Initialize data fetching
 //     _loadCategoryIdsAndFetchOrders();
-//     getEmergencyOrder();
-//     getBudingAllOders();
-//     // Search controller ko listen kar, filter update karne ke liye
+//     // Fetch data for the selected tab
+//     _fetchInitialData();
+//
+//     // Add search listener
 //     _searchController.addListener(() {
 //       setState(() {
 //         searchQuery = _searchController.text.toLowerCase();
 //       });
-//       _filterData(); // Filter function call kar (Step 3 me banayenge)
+//       _filterData();
 //     });
 //   }
 //
@@ -74,31 +84,60 @@
 //     super.dispose();
 //   }
 //
-//   getEmergencyOrder() async {
-//     await EmergencyServiceController().getEmergencyOrder();
+//   Future<void> _fetchInitialData() async {
+//     setState(() => isLoading = true);
+//     try {
+//       if (selectedTab == 0) {
+//         await getBudingAllOders();
+//       } else if (selectedTab == 1) {
+//         await fetchDirectOrders();
+//       } else if (selectedTab == 2) {
+//         final orders = await EmergencyServiceController().getEmergencyOrder();
+//         setState(() {
+//           emergencyOrders = orders;
+//         });
+//       }
+//     } catch (e) {
+//       print("Error fetching initial data for tab $selectedTab: $e");
+//       if (mounted) {
+//         CustomSnackBar.show(
+//           message: "Error fetching data",
+//           type: SnackBarType.error,
+//         );
+//       }
+//     } finally {
+//       setState(() => isLoading = false);
+//     }
+//   }
+//
+//   Future<void> getEmergencyOrder() async {
+//     final orders = await EmergencyServiceController().getEmergencyOrder();
+//     setState(() {
+//       emergencyOrders = orders;
+//     });
 //   }
 //
 //   Future<void> _loadCategoryIdsAndFetchOrders() async {
 //     final prefs = await SharedPreferences.getInstance();
-//
-//     // Use widget.categreyId/subcategreyId if available, else fallback to SharedPreferences or null
 //     categoryId = widget.categreyId ?? prefs.getString('category_id') ?? null;
-//     subCategoryId =
-//         widget.subcategreyId ?? prefs.getString('sub_category_id') ?? null;
+//     subCategoryId = widget.subcategreyId ?? prefs.getString('sub_category_id') ?? null;
 //
 //     print("✅ MyHireScreen using categoryId: $categoryId");
 //     print("✅ MyHireScreen using subCategoryId: $subCategoryId");
 //
-//     fetchDirectOrders();
+//     // Fetch direct orders only if Direct Hiring tab is selected initially
+//     if (widget.passIndex == 1) {
+//       await fetchDirectOrders();
+//     } else if (widget.passIndex == 2){
+//       getEmergencyOrder();
+//     }
 //   }
 //
 //   Future<void> fetchDirectOrders() async {
 //     setState(() => isLoading = true);
-//
 //     try {
 //       final prefs = await SharedPreferences.getInstance();
 //       final token = prefs.getString('token') ?? '';
-//
 //       final res = await http.get(
 //         Uri.parse('${AppConstants.baseUrl}${ApiEndpoint.MyHireScreen}'),
 //         headers: {
@@ -123,19 +162,16 @@
 //           print("🔍 Processing Order: ${order['_id']}");
 //
 //           bool matchesCategory = categoryId == null ||
-//               (order['category_id'] != null &&
-//                   order['category_id'] == categoryId) ||
+//               (order['category_id'] != null && order['category_id'] == categoryId) ||
 //               (order['offer_history'] != null &&
 //                   (order['offer_history'] as List).any(
 //                         (offer) =>
 //                     offer['provider_id'] is Map &&
 //                         offer['provider_id']['category_id'] is Map &&
-//                         offer['provider_id']['category_id']['_id'] ==
-//                             categoryId,
+//                         offer['provider_id']['category_id']['_id'] == categoryId,
 //                   ));
 //           bool matchesSubCategory = subCategoryId == null ||
-//               (order['subcategory_id'] != null &&
-//                   order['subcategory_id'] == subCategoryId) ||
+//               (order['subcategory_id'] != null && order['subcategory_id'] == subCategoryId) ||
 //               (order['offer_history'] != null &&
 //                   (order['offer_history'] as List).any(
 //                         (offer) =>
@@ -146,29 +182,19 @@
 //                         ),
 //                   ));
 //
-//           print(
-//             "🔍 Order Category: ${order['category_id']}, Matches: $matchesCategory",
-//           );
-//           print(
-//             "🔍 Order SubCategory: ${order['subcategory_id']}, Matches: $matchesSubCategory",
-//           );
+//           print("🔍 Order Category: ${order['category_id']}, Matches: $matchesCategory");
+//           print("🔍 Order SubCategory: ${order['subcategory_id']}, Matches: $matchesSubCategory");
 //
-//           if (order['offer_history'] != null &&
-//               (order['offer_history'] as List).isNotEmpty) {
+//           if (order['offer_history'] != null && (order['offer_history'] as List).isNotEmpty) {
 //             List<dynamic> validOffers = order['offer_history'] as List;
-//
 //             print("🔍 All Offers for Order ${order['_id']}: $validOffers");
 //
-//             if (validOffers.isNotEmpty &&
-//                 matchesCategory &&
-//                 matchesSubCategory) {
+//             if (validOffers.isNotEmpty && matchesCategory && matchesSubCategory) {
 //               order['offer_history'] = validOffers;
 //               filteredOrders.add(order);
 //               print("✅ Added Order to filteredOrders: ${order['_id']}");
 //             } else {
-//               print(
-//                 "⚠️ No valid offers or category/subcategory mismatch for Order ${order['_id']}",
-//               );
+//               print("⚠️ No valid offers or category/subcategory mismatch for Order ${order['_id']}");
 //             }
 //           } else {
 //             print("⚠️ No offer_history or empty for Order ${order['_id']}");
@@ -179,23 +205,23 @@
 //           orders = filteredOrders.map((e) => DirectOrder.fromJson(e)).toList();
 //           print("✅ Final Orders Count: ${orders.length}");
 //           print("✅ Final Orders IDs: ${orders.map((o) => o.id).toList()}");
-//           _filterData(); // Add yeh
+//           _filterData();
 //         });
 //       } else {
 //         print("❌ API Error Status: ${res.statusCode}");
 //         if (mounted) {
-//             CustomSnackBar.show(
-//               message: "Error ${res.statusCode},Something went wrong",
-//               type: SnackBarType.error
+//           CustomSnackBar.show(
+//             message: "Error ${res.statusCode}, Something went wrong",
+//             type: SnackBarType.error,
 //           );
 //         }
 //       }
 //     } catch (e) {
 //       print("❌ API Exception: $e");
 //       if (mounted) {
-//          CustomSnackBar.show(
-//             message: "Error: Something went wrong",
-//             type: SnackBarType.error
+//         CustomSnackBar.show(
+//           message: "Error: Something went wrong",
+//           type: SnackBarType.error,
 //         );
 //       }
 //     } finally {
@@ -204,38 +230,6 @@
 //   }
 //
 //   var BudingData;
-//
-//   // Future<void> getBudingAllOders() async {
-//   //   try {
-//   //     final prefs = await SharedPreferences.getInstance();
-//   //     final token = prefs.getString('token') ?? '';
-//   //
-//   //     final response = await http.get(
-//   //       Uri.parse(
-//   //           'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders'),
-//   //       headers: {
-//   //         'Authorization': 'Bearer $token',
-//   //         'Content-Type': 'application/json',
-//   //       },
-//   //     );
-//   //
-//   //     if (response.statusCode == 200 || response.statusCode == 201) {
-//   //       var responseData = jsonDecode(response.body);
-//   //       setState(() {
-//   //         BudingData = responseData;
-//   //         _filterData(); // Add yeh
-//   //       });
-//   //       print("Abhi:- getBudingAllOders data : ${responseData}");
-//   //       print("Abhi:- getBudingAllOders response : ${response.body}");
-//   //       print("Abhi:- getBudingAllOders response : ${response.statusCode}");
-//   //     } else {
-//   //       print("Abhi:- else getBudingAllOders response : ${response.body}");
-//   //       print("Abhi:- else getBudingAllOders response : ${response.statusCode}");
-//   //     }
-//   //   } catch (e) {
-//   //     print("Abhi:- Exception $e");
-//   //   }
-//   // }
 //
 //   Future<void> getBudingAllOders() async {
 //     try {
@@ -253,7 +247,7 @@
 //         var responseData = jsonDecode(response.body);
 //         setState(() {
 //           BudingData = responseData;
-//           _filterData(); // Update filtered data
+//           _filterData();
 //         });
 //         print("Abhi:- getBudingAllOders data: $responseData");
 //       } else {
@@ -277,35 +271,27 @@
 //   }
 //
 //   Color _getStatusColor(String status) {
-//     // bwDebug("status : $status");
 //     switch (status.toLowerCase()) {
 //       case 'cancelled':
-//         return const Color(0xFFFF3B30); // Vibrant Apple Red
-//
+//         return const Color(0xFFFF3B30);
 //       case 'cancelleddispute':
 //         return const Color(0xFFFF3B30);
-//
 //       case 'accepted':
-//         return const Color(0xFF34C759); // Fresh Lime Green
-//
+//         return const Color(0xFF34C759);
 //       case 'completed':
-//         return const Color(0xFF0A84FF); // Premium Blue
-//
+//         return const Color(0xFF0A84FF);
 //       case 'pending':
-//         return const Color(0xFFFF9500); // Deep Amber Orange
-//
+//         return const Color(0xFFFF9500);
 //       case 'review':
-//         return const Color(0xFFAF52DE); // Luxury Purple
-//
+//         return const Color(0xFFAF52DE);
 //       default:
-//         return const Color(0xFF8d8E93); // Neutral Gray
+//         return const Color(0xFF8d8E93);
 //     }
 //   }
 //
 //   void _filterData() {
 //     setState(() {
 //       if (selectedTab == 0) {
-//         // Bidding filter
 //         if (BudingData == null || BudingData['data'] == null) {
 //           filteredBiddingData = [];
 //         } else {
@@ -316,21 +302,18 @@
 //           }).toList();
 //         }
 //       } else if (selectedTab == 1) {
-//         // Direct Hiring filter
 //         filteredDirectOrders = orders.where((order) {
 //           final title = (order.title ?? '').toLowerCase();
 //           final desc = (order.description ?? '').toLowerCase();
 //           return title.contains(searchQuery) || desc.contains(searchQuery);
 //         }).toList();
 //       } else if (selectedTab == 2) {
-//         // Emergency filter
 //         if (emergencyOrders == null || emergencyOrders!.data.isEmpty) {
 //           filteredEmergencyData = [];
 //         } else {
 //           filteredEmergencyData = emergencyOrders!.data.where((item) {
 //             final categoryName = (item.categoryId?.name ?? '').toLowerCase();
-//             // final desc = (item. ?? '').toString().toLowerCase(); // Ya jo field search karna hai
-//             return categoryName.contains(searchQuery) /*|| desc.contains(searchQuery)*/;
+//             return categoryName.contains(searchQuery);
 //           }).toList();
 //         }
 //       }
@@ -343,16 +326,17 @@
 //     final width = MediaQuery.of(context).size.width;
 //
 //     return Scaffold(
-//       //backgroundColor: Colors.white,
 //       appBar: AppBar(
 //         elevation: 0,
 //         backgroundColor: Colors.white,
 //         centerTitle: true,
-//         title: const Text("My Hire",
-//             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+//         title: const Text(
+//           "My Hire",
+//           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+//         ),
 //         leading: SizedBox(),
 //         actions: [],
-//         systemOverlayStyle:  SystemUiOverlayStyle(
+//         systemOverlayStyle: SystemUiOverlayStyle(
 //           statusBarColor: AppColors.primaryGreen,
 //           statusBarIconBrightness: Brightness.light,
 //         ),
@@ -376,7 +360,6 @@
 //             ),
 //           ),
 //           const SizedBox(height: 12),
-//          // Search Bar add kar yaha (SizedBox(height: 12) ke baad)
 //           Padding(
 //             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
 //             child: TextField(
@@ -384,10 +367,10 @@
 //               decoration: InputDecoration(
 //                 contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
 //                 hintText: selectedTab == 0
-//                 ? 'Search by name'
-//                 : selectedTab == 1
-//                 ? 'Search by name'
-//                 : 'Search by name',
+//                     ? 'Search by name'
+//                     : selectedTab == 1
+//                     ? 'Search by name'
+//                     : 'Search by name',
 //                 prefixIcon: Icon(Icons.search, color: Colors.green),
 //                 border: OutlineInputBorder(
 //                   borderRadius: BorderRadius.circular(10),
@@ -399,7 +382,7 @@
 //                 setState(() {
 //                   searchQuery = value.toLowerCase();
 //                 });
-//                 _filterData(); // Filter call
+//                 _filterData();
 //               },
 //             ),
 //           ),
@@ -415,7 +398,6 @@
 //                 } else if (selectedTab == 1) {
 //                   return _buildDirectHiringList();
 //                 } else {
-//                   // return const Center(child: Text("No Emergency Tasks Found"));
 //                   return _buildEmergencyList();
 //                 }
 //               },
@@ -426,69 +408,26 @@
 //     );
 //   }
 //
-//   // Widget _buildTabButton(String title, int tabIndex) {
-//   //   final isSelected = selectedTab == tabIndex;
-//   //   return ElevatedButton(
-//   //     onPressed: () async {
-//   //       setState(() {
-//   //         selectedTab = tabIndex;
-//   //         isLoading = true;
-//   //         _searchController.clear(); // Search clear kar
-//   //         searchQuery = '';
-//   //         filteredBiddingData.clear(); // Sab filtered lists clear
-//   //         filteredDirectOrders.clear();
-//   //         filteredEmergencyData.clear();
-//   //       });
-//   //       if (selectedTab == 2) {
-//   //         final orders = await EmergencyServiceController().getEmergencyOrder();
-//   //         setState(() {
-//   //           emergencyOrders = orders;
-//   //           isLoading = false;
-//   //           _filterData(); // Add yeh
-//   //         });
-//   //       } else {
-//   //         setState(() {
-//   //           isLoading = false;
-//   //           _filterData(); // Add yeh
-//   //         });
-//   //       }
-//   //     },
-//   //     style: ElevatedButton.styleFrom(
-//   //       backgroundColor: isSelected ? Colors.green.shade700 : Colors.green.shade100,
-//   //       padding: const EdgeInsets.symmetric(horizontal: 16),
-//   //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-//   //     ),
-//   //     child: Text(
-//   //       title,
-//   //       style: _tabText(color: isSelected ? Colors.white : Colors.black),
-//   //     ),
-//   //   );
-//   // }
-//
 //   Widget _buildTabButton(String title, int tabIndex) {
 //     final isSelected = selectedTab == tabIndex;
 //     return ElevatedButton(
 //       onPressed: () async {
 //         setState(() {
 //           selectedTab = tabIndex;
-//           isLoading = true; // Show loading indicator
-//           _searchController.clear(); // Clear search input
-//           searchQuery = ''; // Reset search query
-//           filteredBiddingData.clear(); // Clear filtered lists
+//           isLoading = true;
+//           _searchController.clear();
+//           searchQuery = '';
+//           filteredBiddingData.clear();
 //           filteredDirectOrders.clear();
 //           filteredEmergencyData.clear();
 //         });
 //
-//         // Fetch data based on the selected tab
 //         try {
 //           if (selectedTab == 0) {
-//             // Bidding Tasks
 //             await getBudingAllOders();
 //           } else if (selectedTab == 1) {
-//             // Direct Hiring
 //             await fetchDirectOrders();
 //           } else if (selectedTab == 2) {
-//             // Emergency Tasks
 //             final orders = await EmergencyServiceController().getEmergencyOrder();
 //             setState(() {
 //               emergencyOrders = orders;
@@ -504,8 +443,8 @@
 //           }
 //         } finally {
 //           setState(() {
-//             isLoading = false; // Hide loading indicator
-//             _filterData(); // Apply any existing filters
+//             isLoading = false;
+//             _filterData();
 //           });
 //         }
 //       },
@@ -525,7 +464,6 @@
 //     return Container(width: 1, height: 40, color: Colors.white38);
 //   }
 //
-//
 //   Widget _buildDirectHiringList() {
 //     List<DirectOrder> displayOrders = searchQuery.isEmpty ? orders : filteredDirectOrders;
 //
@@ -538,11 +476,9 @@
 //       child: ListView.builder(
 //         itemCount: displayOrders.length,
 //         itemBuilder: (context, index) => _buildHireCard(displayOrders[index]),
-//
 //       ),
 //     );
 //   }
-//
 //
 //   Widget _buildEmergencyList() {
 //     List<dynamic> displayEmergency = searchQuery.isEmpty
@@ -561,8 +497,6 @@
 //     );
 //   }
 //
-//
-//
 //   Widget _buildBiddingCard(dynamic biddingData) {
 //     if (biddingData == null) {
 //       return const Center(
@@ -572,21 +506,16 @@
 //       );
 //     }
 //
-//     // 👈 Yeh line change kar: Filtered data use kar
-//     final List dataList = searchQuery.isEmpty
-//         ? (biddingData['data'] ?? [])
-//         : filteredBiddingData;
+//     final List dataList = searchQuery.isEmpty ? (biddingData['data'] ?? []) : filteredBiddingData;
 //
-//     print("Abhi:- get bidding oderId : ${biddingData['data'] }");
+//     print("Abhi:- get bidding oderId : ${biddingData['data']}");
 //
 //     return Padding(
-//       padding: const EdgeInsets.only(left: 12.0,right: 12),
+//       padding: const EdgeInsets.only(left: 12.0, right: 12),
 //       child: SingleChildScrollView(
 //         child: Column(
 //           mainAxisAlignment: MainAxisAlignment.center,
 //           children: [
-//             // SizedBox(height: 10),
-//             // Check if dataList is empty (ab filtered pe check hoga)
 //             if (dataList.isEmpty)
 //               Center(
 //                 child: Text(
@@ -622,24 +551,22 @@
 //                   String userId = "";
 //                   String serviceProviderId = "";
 //
-//                   // user check
 //                   if (user is Map) {
 //                     userId = user['_id']?.toString() ?? "";
 //                   } else if (user is String) {
 //                     userId = user;
 //                   }
 //
-//                   // service provider check
 //                   if (serviceProvider is Map) {
 //                     serviceProviderId = serviceProvider['_id']?.toString() ?? "";
 //                   } else if (serviceProvider is String) {
 //                     serviceProviderId = serviceProvider;
 //                   }
 //
-//                   print("Abhi:- get bidding oderId : ${buddingOderId }");
-//                   print("Abhi:- get bidding oderId status : ${status}");
-//                   print("Abhi:- get bidding images : ${imageUrl}");
-//                   print("Abhi:- get bidding userId : ${userId}");
+//                   print("Abhi:- get bidding oderId : $buddingOderId");
+//                   print("Abhi:- get bidding oderId status : $status");
+//                   print("Abhi:- get bidding images : $imageUrl");
+//                   print("Abhi:- get bidding userId : $userId");
 //
 //                   return Card(
 //                     elevation: 2,
@@ -650,17 +577,16 @@
 //                     ),
 //                     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
 //                     child: Padding(
-//                       padding: const EdgeInsets.only(left: 8.0,right: 8,bottom: 10,top: 5),
+//                       padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 10, top: 5),
 //                       child: IntrinsicHeight(
 //                         child: Row(
 //                           crossAxisAlignment: CrossAxisAlignment.center,
 //                           children: [
-//                             // left image
 //                             Center(
 //                               child: Stack(
 //                                 children: [
 //                                   Padding(
-//                                     padding: const EdgeInsets.only(top: 8.0,bottom: 8),
+//                                     padding: const EdgeInsets.only(top: 8.0, bottom: 8),
 //                                     child: Container(
 //                                       color: Colors.grey,
 //                                       child: ClipRRect(
@@ -670,7 +596,6 @@
 //                                           imageUrl: 'https://api.thebharatworks.com/$imageUrl',
 //                                           height: 125,
 //                                           width: 100,
-//                                           // fit: BoxFit.cover,
 //                                           placeholder: (context, url) => Container(
 //                                             height: 125,
 //                                             width: 100,
@@ -696,7 +621,10 @@
 //                                     left: 10,
 //                                     right: 5,
 //                                     child: Container(
-//                                       decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(5)),
+//                                       decoration: BoxDecoration(
+//                                         color: Colors.black54,
+//                                         borderRadius: BorderRadius.circular(5),
+//                                       ),
 //                                       child: Center(
 //                                         child: Text(
 //                                           buddingprojectid,
@@ -711,7 +639,6 @@
 //                               ),
 //                             ),
 //                             SizedBox(width: 10),
-//                             // right content
 //                             Expanded(
 //                               child: Column(
 //                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,7 +661,10 @@
 //                                       fontWeight: FontWeight.bold,
 //                                     ),
 //                                   ),
-//                                   Text(address,style: TextStyle(fontWeight: FontWeight.w600),),
+//                                   Text(
+//                                     address,
+//                                     style: TextStyle(fontWeight: FontWeight.w600),
+//                                   ),
 //                                   SizedBox(height: 3),
 //                                   Text(
 //                                     description,
@@ -782,7 +712,11 @@
 //                                     children: [
 //                                       InkWell(
 //                                         onTap: () {
-//                                           MapLauncher.openMap(latitude: latitude, longitude: longitude, address: address);
+//                                           MapLauncher.openMap(
+//                                             latitude: latitude,
+//                                             longitude: longitude,
+//                                             address: address,
+//                                           );
 //                                         },
 //                                         child: Container(
 //                                           padding: EdgeInsets.symmetric(
@@ -790,7 +724,7 @@
 //                                             vertical: 4,
 //                                           ),
 //                                           decoration: BoxDecoration(
-//                                             color: Colors.transparent /* Color(0xffF27773)*/,
+//                                             color: Colors.transparent,
 //                                             borderRadius: BorderRadius.circular(20),
 //                                           ),
 //                                           child: Text(
@@ -819,7 +753,6 @@
 //                                           );
 //
 //                                           if (result == true) {
-//                                             // 👈 refresh function call kar do
 //                                             _loadCategoryIdsAndFetchOrders();
 //                                             getEmergencyOrder();
 //                                             getBudingAllOders();
@@ -861,7 +794,6 @@
 //       ),
 //     );
 //   }
-//   //              chat code
 //
 //   Future<Map<String, dynamic>> fetchUserById(String userId, String token) async {
 //     try {
@@ -879,7 +811,7 @@
 //         final body = json.decode(response.body);
 //         if (body['success'] == true) {
 //           final user = body['user'];
-//           user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+//           user['_id'] = getIdAsString(user['_id']);
 //           return user;
 //         } else {
 //           throw Exception(body['message'] ?? 'Failed to fetch user');
@@ -900,10 +832,9 @@
 //     print("Abhi:- Warning: Unexpected _id format: $id");
 //     return id.toString();
 //   }
-// // Yeh function InkWell ke onTap mein call hota hai
+//
 //   Future<void> _startOrFetchConversation(BuildContext context, String receiverId) async {
 //     try {
-//       // Step 1: User ID fetch karo
 //       final prefs = await SharedPreferences.getInstance();
 //       final token = prefs.getString('token');
 //       if (token == null) {
@@ -914,7 +845,6 @@
 //         return;
 //       }
 //
-//       // Step 2: User profile fetch karo
 //       final response = await http.get(
 //         Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
 //         headers: {
@@ -950,7 +880,6 @@
 //         return;
 //       }
 //
-//       // Step 3: Check if conversation exists
 //       print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
 //       final convs = await ApiService.fetchConversations(userId);
 //       dynamic currentChat = convs.firstWhere(
@@ -967,13 +896,11 @@
 //         orElse: () => null,
 //       );
 //
-//       // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
 //       if (currentChat == null) {
 //         print("Abhi:- No existing conversation, starting new with receiverId: $receiverId");
 //         currentChat = await ApiService.startConversation(userId, receiverId);
 //       }
 //
-//       // Step 5: Agar members strings hain, toh full user details fetch karo
 //       if (currentChat['members'].isNotEmpty && currentChat['members'][0] is String) {
 //         print("Abhi:- New conversation, fetching user details for members");
 //         final otherId = currentChat['members'].firstWhere((id) => id != userId);
@@ -983,11 +910,9 @@
 //         print("Abhi:- Updated members with full details: ${currentChat['members']}");
 //       }
 //
-//       // Step 6: Messages fetch karo
 //       final messages = await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
 //       messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
 //
-//       // Step 7: Socket initialize karo
 //       SocketService.connect(userId);
 //       final onlineUsers = <String>[];
 //       SocketService.listenOnlineUsers((users) {
@@ -995,7 +920,6 @@
 //         onlineUsers.addAll(users.map((u) => getIdAsString(u)));
 //       });
 //
-//       // Step 8: ChatDetailScreen push karo
 //       Navigator.push(
 //         context,
 //         MaterialPageRoute(
@@ -1018,7 +942,6 @@
 //     }
 //   }
 //
-//
 //   Widget _buildHireCard(DirectOrder darectHiringData) {
 //     String displayStatus = darectHiringData.status;
 //     String displayProjectId = darectHiringData.projectid ?? "";
@@ -1035,8 +958,7 @@
 //
 //     print("Abhi:- Provider ID: $firstProviderId");
 //
-//     // Use the first image from image_url directly
-//     final String? imageshow = darectHiringData.image; // This is already the first image URL
+//     final String? imageshow = darectHiringData.image;
 //     print("Abhi:- get darect oder status : ${darectHiringData.status}");
 //     print("Abhi:- get darect oder displayProjectId : ${darectHiringData.projectid}");
 //
@@ -1057,59 +979,68 @@
 //       child: Row(
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
-//           // Left side image
 //           Center(
 //             child: Stack(
-//               children:[ Container(
-//                 color: Colors.grey,
-//                 child: ClipRRect(
-//                   borderRadius: BorderRadius.circular(10),
-//                   child: imageshow != null && imageshow.isNotEmpty
-//                       ? CachedNetworkImage(
-//                     imageUrl: imageshow,
-//                     height: 180,
-//                     width: 100,
-//                     // fit: BoxFit.cover,
-//                     placeholder: (context, url) => Container(
+//               children: [
+//                 Container(
+//                   color: Colors.grey,
+//                   child: ClipRRect(
+//                     borderRadius: BorderRadius.circular(10),
+//                     child: imageshow != null && imageshow.isNotEmpty
+//                         ? CachedNetworkImage(
+//                       imageUrl: imageshow,
 //                       height: 180,
 //                       width: 100,
-//                       color: Colors.grey.shade200,
-//                       child: const Center(
-//                         child: CircularProgressIndicator(strokeWidth: 2),
+//                       placeholder: (context, url) => Container(
+//                         height: 180,
+//                         width: 100,
+//                         color: Colors.grey.shade200,
+//                         child: const Center(
+//                           child: CircularProgressIndicator(strokeWidth: 2),
+//                         ),
 //                       ),
-//                     ),
-//                     errorWidget: (context, url, error) => Image.asset(
+//                       errorWidget: (context, url, error) => Image.asset(
+//                         'assets/images/task.png',
+//                         height: 180,
+//                         width: 100,
+//                         fit: BoxFit.cover,
+//                       ),
+//                     )
+//                         : Image.asset(
 //                       'assets/images/task.png',
 //                       height: 180,
 //                       width: 100,
 //                       fit: BoxFit.cover,
 //                     ),
-//                   )
-//                       : Image.asset(
-//                     'assets/images/task.png',
-//                     height: 180,
-//                     width: 100,
-//                     fit: BoxFit.cover,
 //                   ),
 //                 ),
-//               ),
 //                 Positioned(
-//                     bottom: 7,
-//                     left: 10,
-//                     right: 5,
-//                     child: Container(
-//                       decoration: BoxDecoration(color: Colors.black54,borderRadius: BorderRadius.circular(5)),
-//                       child: Center(child: Text(darectHiringData.projectid ?? "No data",style: TextStyle(color: Colors.white), maxLines: 1,
-//                         overflow: TextOverflow.ellipsis,)),))
-//               ],),
+//                   bottom: 7,
+//                   left: 10,
+//                   right: 5,
+//                   child: Container(
+//                     decoration: BoxDecoration(
+//                       color: Colors.black54,
+//                       borderRadius: BorderRadius.circular(5),
+//                     ),
+//                     child: Center(
+//                       child: Text(
+//                         darectHiringData.projectid ?? "No data",
+//                         style: TextStyle(color: Colors.white),
+//                         maxLines: 1,
+//                         overflow: TextOverflow.ellipsis,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
 //           ),
 //           const SizedBox(width: 12),
-//           // Right side content (unchanged)
 //           Expanded(
 //             child: Column(
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
-//                 // title + chat button
 //                 Row(
 //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                   children: [
@@ -1121,62 +1052,57 @@
 //                         overflow: TextOverflow.ellipsis,
 //                       ),
 //                     ),
-//                     displayStatus == 'accepted' || displayStatus == 'pending' ?    CircleAvatar(
-//                       radius: 16,
-//                       backgroundColor: Colors.grey.shade200,
-//                       child: SvgPicture.asset(
-//                         "assets/svg_images/call.svg",
-//                         height: 18,
+//                     if (displayStatus == 'accepted' || displayStatus == 'pending')
+//                       CircleAvatar(
+//                         radius: 16,
+//                         backgroundColor: Colors.grey.shade200,
+//                         child: SvgPicture.asset(
+//                           "assets/svg_images/call.svg",
+//                           height: 18,
+//                         ),
 //                       ),
-//                     ) : SizedBox(),
 //                   ],
 //                 ),
 //                 const SizedBox(height: 6),
-//                 // description
 //                 Row(
 //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                   children: [
 //                     Expanded(
 //                       child: Text(
-//                         // darectHiringData.description,
 //                         darectHiringData.address ?? "",
 //                         style: TextStyle(fontWeight: FontWeight.w600),
 //                         maxLines: 2,
 //                         overflow: TextOverflow.ellipsis,
 //                       ),
 //                     ),
-//                     displayStatus == 'accepted' || displayStatus == 'pending' ?  GestureDetector(
-//                       onTap: () async {
-//                         final receiverId =  firstProviderId != null && firstProviderId != null
-//                             ? firstProviderId?.toString() ?? 'Unknown'
-//                             : 'Unknown';
-//                         final fullName =  firstProviderId != null && firstProviderId != null
-//                             ?  firstProviderId ?? 'Unknown'
-//                             : 'Unknown';
-//                         print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+//                     if (displayStatus == 'accepted' || displayStatus == 'pending')
+//                       GestureDetector(
+//                         onTap: () async {
+//                           final receiverId = firstProviderId != null ? firstProviderId.toString() : 'Unknown';
+//                           final fullName = firstProviderName ?? 'Unknown';
+//                           print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
 //
-//                         if (receiverId != 'Unknown' && receiverId!.isNotEmpty) {
-//                           await _startOrFetchConversation(context, receiverId);
-//                         } else {
-//                           print("Abhi:- Error: Invalid receiver ID");
-//                           ScaffoldMessenger.of(context).showSnackBar(
-//                             SnackBar(content: Text('Error: Invalid receiver ID')),
-//                           );
-//                         }
-//                       },
-//                       child:  CircleAvatar(
-//                         radius: 16,
-//                         backgroundColor: Colors.grey.shade200,
-//                         child: SvgPicture.asset(
-//                           "assets/svg_images/chat.svg",
-//                           height: 18,
+//                           if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+//                             await _startOrFetchConversation(context, receiverId);
+//                           } else {
+//                             print("Abhi:- Error: Invalid receiver ID");
+//                             ScaffoldMessenger.of(context).showSnackBar(
+//                               SnackBar(content: Text('Error: Invalid receiver ID')),
+//                             );
+//                           }
+//                         },
+//                         child: CircleAvatar(
+//                           radius: 16,
+//                           backgroundColor: Colors.grey.shade200,
+//                           child: SvgPicture.asset(
+//                             "assets/svg_images/chat.svg",
+//                             height: 18,
+//                           ),
 //                         ),
-//                       )
-//                     ) : SizedBox()
+//                       ),
 //                   ],
 //                 ),
 //                 const SizedBox(height: 6),
-//                 // date + call button
 //                 Row(
 //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                   children: [
@@ -1210,13 +1136,14 @@
 //                   ],
 //                 ),
 //                 const SizedBox(height: 8),
-//                 // status
-// Text(darectHiringData.description,style: TextStyle(),),
+//                 Text(
+//                   darectHiringData.description,
+//                   style: TextStyle(),
+//                 ),
 //                 const SizedBox(height: 10),
-//                 // address + button
 //                 Row(
 //                   children: [
-//                     Expanded(child: Icon(Icons.add,color: Colors.transparent,)),
+//                     Expanded(child: Icon(Icons.add, color: Colors.transparent)),
 //                     const SizedBox(width: 8),
 //                     Align(
 //                       alignment: Alignment.centerRight,
@@ -1228,8 +1155,7 @@
 //                               builder: (_) => DirectViewScreen(
 //                                 id: darectHiringData.id,
 //                                 categreyId: categoryId ?? '68443fdbf03868e7d6b74874',
-//                                 subcategreyId:
-//                                 subCategoryId ?? '684e7226962b4919ae932af5',
+//                                 subcategreyId: subCategoryId ?? '684e7226962b4919ae932af5',
 //                               ),
 //                             ),
 //                           ).then((_) {
@@ -1264,11 +1190,8 @@
 //   }
 //
 //   Widget _buildEmergencyCard(data) {
-//     //   bwDebug("[_buildEmergencyCard] call ",tag:"myHireScreen ");
-//
 //     String displayStatus = data.hireStatus ?? "pending";
 //
-//     // Last accepted status check karna
 //     if (data.acceptedByProviders != null &&
 //         data.acceptedByProviders!.isNotEmpty &&
 //         displayStatus != 'cancelled' &&
@@ -1276,7 +1199,6 @@
 //       displayStatus = data.acceptedByProviders!.last.status ?? displayStatus;
 //     }
 //
-//     // Image check
 //     final bool hasImage = data.imageUrls != null && data.imageUrls!.isNotEmpty;
 //
 //     return Container(
@@ -1289,8 +1211,8 @@
 //           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
 //         ],
 //         border: Border.all(
-//           color: AppColors.primaryGreen, // <-- primary color border
-//           width: 1.5, // thickness
+//           color: AppColors.primaryGreen,
+//           width: 1.5,
 //         ),
 //       ),
 //       child: Row(
@@ -1309,7 +1231,6 @@
 //                     imageUrl: data.imageUrls!.first,
 //                     height: 0.4.toWidthPercent(),
 //                     width: 0.25.toWidthPercent(),
-//                    // fit: BoxFit.cover,
 //                     placeholder: (context, url) => Container(
 //                       height: 0.4.toWidthPercent(),
 //                       width: 0.25.toWidthPercent(),
@@ -1371,39 +1292,38 @@
 //                 Text(
 //                   "₹${data.servicePayment.amount} " ?? "0",
 //                   style: _cardBody().copyWith(
-//                       color: AppColors.primaryGreen,
-//                       fontWeight: FontWeight.bold),
+//                     color: AppColors.primaryGreen,
+//                     fontWeight: FontWeight.bold,
+//                   ),
 //                   maxLines: 1,
 //                   overflow: TextOverflow.ellipsis,
 //                 ),
-//                 Text("${data.googleAddress}",style: TextStyle(fontWeight: FontWeight.w600),maxLines: 2,),
+//                 Text(
+//                   "${data.googleAddress}",
+//                   style: TextStyle(fontWeight: FontWeight.w600),
+//                   maxLines: 2,
+//                 ),
 //                 Container(
-//                   height: 1, // thickness
-//                   color: Colors.grey.shade200, // light color
+//                   height: 1,
+//                   color: Colors.grey.shade200,
 //                   margin: const EdgeInsets.symmetric(vertical: 4),
 //                 ),
 //                 Row(
-//                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   // crossAxisAlignment: CrossAxisAlignment.center,
 //                   children: [
 //                     Expanded(
 //                       child: Text(
 //                         data.subCategoryIds.isNotEmpty
-//                             ? data.subCategoryIds
-//                             .take(2)
-//                             .map((e) => e.name)
-//                             .join(", ")
+//                             ? data.subCategoryIds.take(2).map((e) => e.name).join(", ")
 //                             : "",
 //                         style: _cardDate(),
 //                         maxLines: 1,
 //                         overflow: TextOverflow.ellipsis,
 //                       ),
 //                     ),
-//                     const SizedBox(width: 8),],
+//                     const SizedBox(width: 8),
+//                   ],
 //                 ),
 //                 Row(
-//                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   // crossAxisAlignment: CrossAxisAlignment.center,
 //                   children: [
 //                     Expanded(
 //                       child: Text(
@@ -1413,8 +1333,7 @@
 //                     ),
 //                     const SizedBox(width: 8),
 //                     Container(
-//                       padding: const EdgeInsets.symmetric(
-//                           vertical: 8, horizontal: 12),
+//                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
 //                       decoration: BoxDecoration(
 //                         color: _getStatusColor(data.hireStatus),
 //                         borderRadius: BorderRadius.circular(10),
@@ -1427,7 +1346,7 @@
 //                           fontWeight: FontWeight.w500,
 //                         ),
 //                       ),
-//                     )
+//                     ),
 //                   ],
 //                 ),
 //                 const SizedBox(height: 6),
@@ -1435,37 +1354,32 @@
 //                   children: [
 //                     Expanded(
 //                       child: InkWell(
-//                         onTap:() async {
+//                         onTap: () async {
 //                           bwDebug("on tap call: ");
 //                           final address = data.googleAddress;
-//                           // bool success=await MapLauncher.openMap(address: address);
-//                           bool success=await MapLauncher.openMap(address: address,latitude: data.latitude,longitude: data.longitude);
-//                           if(!success) {
-//                             // SnackBarHelper.showSnackBar(context, "Could not open the map");
+//                           bool success = await MapLauncher.openMap(
+//                             address: address,
+//                             latitude: data.latitude,
+//                             longitude: data.longitude,
+//                           );
+//                           if (!success) {
 //                             CustomSnackBar.show(
-//                                 message: "Could not open the map",
-//                                 type: SnackBarType.error
+//                               message: "Could not open the map",
+//                               type: SnackBarType.error,
 //                             );
 //                           }
 //                         },
-//                         child: InkWell(
-//                           onTap: () {
-//                             MapLauncher.openMap(latitude: data.latitude!, longitude: data.longitude!,address: data.address);
-//                           },
-//                           child: Container(
-//                             padding: const EdgeInsets.symmetric(
-//                                 horizontal: 5, vertical: 5),
-//                             decoration: BoxDecoration(
-//                               color: Colors.transparent /*Color(0xffF27773)*/,
-//                               borderRadius: BorderRadius.circular(10),
-//                             ),
-//                             child: Text(
-//                               data.googleAddress,
-//                               maxLines: 1, //
-//                               overflow: TextOverflow.ellipsis,
-//                               style: const TextStyle(
-//                                   color: Colors.transparent, fontSize: 12),
-//                             ),
+//                         child: Container(
+//                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+//                           decoration: BoxDecoration(
+//                             color: Colors.transparent,
+//                             borderRadius: BorderRadius.circular(10),
+//                           ),
+//                           child: Text(
+//                             data.googleAddress,
+//                             maxLines: 1,
+//                             overflow: TextOverflow.ellipsis,
+//                             style: const TextStyle(color: Colors.transparent, fontSize: 12),
 //                           ),
 //                         ),
 //                       ),
@@ -1476,19 +1390,17 @@
 //                         Navigator.push(
 //                           context,
 //                           MaterialPageRoute(
-//                               builder: (_) => WorkDetailPage(
-//                                 data.id,
-//                                 isUser: true,
-//                               )),
-//                         ).then(
-//                               (_) async {
-//                             final orders = await EmergencyServiceController()
-//                                 .getEmergencyOrder();
-//                             setState(() {
-//                               emergencyOrders = orders;
-//                             });
-//                           },
-//                         );
+//                             builder: (_) => WorkDetailPage(
+//                               data.id,
+//                               isUser: true,
+//                             ),
+//                           ),
+//                         ).then((_) async {
+//                           final orders = await EmergencyServiceController().getEmergencyOrder();
+//                           setState(() {
+//                             emergencyOrders = orders;
+//                           });
+//                         });
 //                       },
 //                       style: TextButton.styleFrom(
 //                         backgroundColor: Colors.green.shade700,
@@ -1499,12 +1411,11 @@
 //                       ),
 //                       child: Text(
 //                         "View Details",
-//                         style: GoogleFonts.roboto(
-//                             color: Colors.white, fontSize: 12),
+//                         style: GoogleFonts.roboto(color: Colors.white, fontSize: 12),
 //                       ),
 //                     ),
 //                   ],
-//                 )
+//                 ),
 //               ],
 //             ),
 //           ),
@@ -1517,15 +1428,11 @@
 //     fontWeight: FontWeight.w500,
 //     fontSize: 12,
 //   );
-//
-//   TextStyle _cardTitle() =>
-//       GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.bold);
-//
+//   TextStyle _cardTitle() => GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.bold);
 //   TextStyle _cardBody() => GoogleFonts.roboto(fontSize: 13);
-//
-//   TextStyle _cardDate() =>
-//       GoogleFonts.roboto(fontSize: 11, color: Colors.grey[700]);
+//   TextStyle _cardDate() => GoogleFonts.roboto(fontSize: 11, color: Colors.grey[700]);
 // }
+
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:developer/Emergency/User/controllers/emergency_service_controller.dart';
@@ -1556,7 +1463,7 @@ import 'DirecrViewScreen.dart';
 class MyHireScreen extends StatefulWidget {
   final String? categreyId;
   final String? subcategreyId;
-  final int? passIndex; // Changed to int? to handle null case
+  final int? passIndex;
 
   const MyHireScreen({super.key, this.categreyId, this.subcategreyId, this.passIndex});
 
@@ -1580,15 +1487,52 @@ class _MyHireScreenState extends State<MyHireScreen> {
   List<dynamic> filteredEmergencyData = [];
   String searchQuery = '';
 
-  @override
+  /*@override
   void initState() {
     super.initState();
     // Set initial tab based on passIndex
     if (widget.passIndex == 1) {
       selectedTab = 1; // Set to Direct Hiring tab
+    } else if(widget.passIndex == 2) {
+      selectedTab = 2; // Default to Bidding tab
+    }else {
+      selectedTab = 0;
+    }
+
+    // Initialize data fetching
+    _loadCategoryIdsAndFetchOrders();
+    // Fetch data for the selected tab
+    _fetchInitialData();
+
+    // Add search listener
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text.toLowerCase();
+      });
+      _filterData();
+    });
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial tab based on passIndex
+    print("Abhi:-get pass index in myhireScreen : ${widget.passIndex} ");
+    if (widget.passIndex == 1) {
+      selectedTab = 1; // Set to Direct Hiring tab
+      print("✅ initState: passIndex == 1, selectedTab set to 1 (Direct Hiring)");
+    } else if (widget.passIndex == 2) {
+      selectedTab = 2; // Set to Emergency Tasks tab
+      print("✅ initState: passIndex == 2, selectedTab set to 2 (Emergency Tasks)");
     } else {
       selectedTab = 0; // Default to Bidding tab
+      print("✅ initState: passIndex == ${widget.passIndex}, selectedTab set to 0 (Bidding)");
     }
+
+    // Force UI rebuild to ensure selectedTab is reflected
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
 
     // Initialize data fetching
     _loadCategoryIdsAndFetchOrders();
@@ -1610,7 +1554,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchInitialData() async {
+  /*Future<void> _fetchInitialData() async {
     setState(() => isLoading = true);
     try {
       if (selectedTab == 0) {
@@ -1634,6 +1578,35 @@ class _MyHireScreenState extends State<MyHireScreen> {
     } finally {
       setState(() => isLoading = false);
     }
+  }*/
+
+  Future<void> _fetchInitialData() async {
+    setState(() => isLoading = true);
+    try {
+      if (selectedTab == 0) {
+        print("🔍 Fetching Bidding Orders");
+        await getBudingAllOders();
+      } else if (selectedTab == 1) {
+        print("🔍 Fetching Direct Orders");
+        await fetchDirectOrders();
+      } else if (selectedTab == 2) {
+        print("🔍 Fetching Emergency Orders");
+        final orders = await EmergencyServiceController().getEmergencyOrder();
+        setState(() {
+          emergencyOrders = orders;
+        });
+      }
+    } catch (e) {
+      print("❌ Error fetching initial data for tab $selectedTab: $e");
+      if (mounted) {
+        CustomSnackBar.show(
+          message: "Error fetching data",
+          type: SnackBarType.error,
+        );
+      }
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> getEmergencyOrder() async {
@@ -1643,6 +1616,22 @@ class _MyHireScreenState extends State<MyHireScreen> {
     });
   }
 
+  // Future<void> _loadCategoryIdsAndFetchOrders() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   categoryId = widget.categreyId ?? prefs.getString('category_id') ?? null;
+  //   subCategoryId = widget.subcategreyId ?? prefs.getString('sub_category_id') ?? null;
+  //
+  //   print("✅ MyHireScreen using categoryId: $categoryId");
+  //   print("✅ MyHireScreen using subCategoryId: $subCategoryId");
+  //
+  //   // Fetch direct orders only if Direct Hiring tab is selected initially
+  //   if (widget.passIndex == 1) {
+  //     await fetchDirectOrders();
+  //   } else if (widget.passIndex == 2){
+  //     getEmergencyOrder();
+  //   }
+  // }
+
   Future<void> _loadCategoryIdsAndFetchOrders() async {
     final prefs = await SharedPreferences.getInstance();
     categoryId = widget.categreyId ?? prefs.getString('category_id') ?? null;
@@ -1651,9 +1640,13 @@ class _MyHireScreenState extends State<MyHireScreen> {
     print("✅ MyHireScreen using categoryId: $categoryId");
     print("✅ MyHireScreen using subCategoryId: $subCategoryId");
 
-    // Fetch direct orders only if Direct Hiring tab is selected initially
+    // Fetch data based on passIndex
     if (widget.passIndex == 1) {
+      print("🔍 Loading Direct Orders for passIndex 1");
       await fetchDirectOrders();
+    } else if (widget.passIndex == 2) {
+      print("🔍 Loading Emergency Orders for passIndex 2");
+      await getEmergencyOrder();
     }
   }
 
@@ -1844,7 +1837,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
     });
   }
 
-  @override
+  /*@override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -1930,12 +1923,156 @@ class _MyHireScreenState extends State<MyHireScreen> {
         ],
       ),
     );
+  }*/
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
+    print("🔍 Building UI, selectedTab: $selectedTab");
+
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          "My Hire",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        leading: SizedBox(),
+        actions: [],
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: double.infinity,
+            height: 50,
+            color: Colors.green.shade100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildTabButton("Bidding Tasks", 0),
+                _verticalDivider(),
+                _buildTabButton("Direct Hiring", 1),
+                _verticalDivider(),
+                _buildTabButton("Emergency Tasks", 2),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                hintText: selectedTab == 0
+                    ? 'Search by name'
+                    : selectedTab == 1
+                    ? 'Search by name'
+                    : 'Search by name',
+                prefixIcon: Icon(Icons.search, color: Colors.green),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase();
+                });
+                _filterData();
+              },
+            ),
+          ),
+          Expanded(
+            child: Builder(
+              builder: (_) {
+                if (isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                print("🔍 Rendering content for selectedTab: $selectedTab");
+                if (selectedTab == 0) {
+                  return _buildBiddingCard(BudingData);
+                } else if (selectedTab == 1) {
+                  return _buildDirectHiringList();
+                } else {
+                  return _buildEmergencyList();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
+  // Widget _buildTabButton(String title, int tabIndex) {
+  //   final isSelected = selectedTab == tabIndex;
+  //   return ElevatedButton(
+  //     onPressed: () async {
+  //       setState(() {
+  //         selectedTab = tabIndex;
+  //         isLoading = true;
+  //         _searchController.clear();
+  //         searchQuery = '';
+  //         filteredBiddingData.clear();
+  //         filteredDirectOrders.clear();
+  //         filteredEmergencyData.clear();
+  //       });
+  //
+  //       try {
+  //         if (selectedTab == 0) {
+  //           await getBudingAllOders();
+  //         } else if (selectedTab == 1) {
+  //           await fetchDirectOrders();
+  //         } else if (selectedTab == 2) {
+  //           final orders = await EmergencyServiceController().getEmergencyOrder();
+  //           setState(() {
+  //             emergencyOrders = orders;
+  //           });
+  //         }
+  //       } catch (e) {
+  //         print("Error refreshing data for tab $tabIndex: $e");
+  //         if (mounted) {
+  //           CustomSnackBar.show(
+  //             message: "Error refreshing data",
+  //             type: SnackBarType.error,
+  //           );
+  //         }
+  //       } finally {
+  //         setState(() {
+  //           isLoading = false;
+  //           _filterData();
+  //         });
+  //       }
+  //     },
+  //     style: ElevatedButton.styleFrom(
+  //       backgroundColor: isSelected ? Colors.green.shade700 : Colors.green.shade100,
+  //       padding: const EdgeInsets.symmetric(horizontal: 16),
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+  //     ),
+  //     child: Text(
+  //       title,
+  //       style: _tabText(color: isSelected ? Colors.white : Colors.black),
+  //     ),
+  //   );
+  // }
 
   Widget _buildTabButton(String title, int tabIndex) {
     final isSelected = selectedTab == tabIndex;
+    print("🔍 Building tab: $title, index: $tabIndex, isSelected: $isSelected, selectedTab: $selectedTab");
     return ElevatedButton(
       onPressed: () async {
+        print("✅ Tab $tabIndex ($title) pressed, setting selectedTab to $tabIndex");
         setState(() {
           selectedTab = tabIndex;
           isLoading = true;
@@ -1948,17 +2085,20 @@ class _MyHireScreenState extends State<MyHireScreen> {
 
         try {
           if (selectedTab == 0) {
+            print("🔍 Fetching Bidding Orders for tab 0");
             await getBudingAllOders();
           } else if (selectedTab == 1) {
+            print("🔍 Fetching Direct Orders for tab 1");
             await fetchDirectOrders();
           } else if (selectedTab == 2) {
+            print("🔍 Fetching Emergency Orders for tab 2");
             final orders = await EmergencyServiceController().getEmergencyOrder();
             setState(() {
               emergencyOrders = orders;
             });
           }
         } catch (e) {
-          print("Error refreshing data for tab $tabIndex: $e");
+          print("❌ Error refreshing data for tab $tabIndex: $e");
           if (mounted) {
             CustomSnackBar.show(
               message: "Error refreshing data",
@@ -1974,8 +2114,10 @@ class _MyHireScreenState extends State<MyHireScreen> {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected ? Colors.green.shade700 : Colors.green.shade100,
+        foregroundColor: isSelected ? Colors.white : Colors.black, // Ensure text/icon color contrast
         padding: const EdgeInsets.symmetric(horizontal: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: isSelected ? 4 : 0, // Optional: Add elevation for selected tab
       ),
       child: Text(
         title,
@@ -2947,16 +3089,12 @@ class _MyHireScreenState extends State<MyHireScreen> {
       ),
     );
   }
-
   TextStyle _tabText({Color color = Colors.black}) => GoogleFonts.roboto(
     color: color,
     fontWeight: FontWeight.w500,
     fontSize: 12,
   );
-
   TextStyle _cardTitle() => GoogleFonts.roboto(fontSize: 15, fontWeight: FontWeight.bold);
-
   TextStyle _cardBody() => GoogleFonts.roboto(fontSize: 13);
-
   TextStyle _cardDate() => GoogleFonts.roboto(fontSize: 11, color: Colors.grey[700]);
 }

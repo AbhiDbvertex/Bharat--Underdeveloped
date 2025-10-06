@@ -465,6 +465,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../Widgets/AppColors.dart';
+import '../../../directHiring/views/User/MyHireScreen.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../utils/map_launcher_lat_long.dart';
 import '../controllers/work_detail_controller.dart';
@@ -472,8 +473,9 @@ import '../controllers/work_detail_controller.dart';
 class WorkDetailPage extends StatefulWidget {
   final data;
   final bool isUser;
+  final passIndex;
 
-  WorkDetailPage(this.data, {required this.isUser});
+  WorkDetailPage(this.data, {required this.isUser, this.passIndex});
 
   @override
   State<WorkDetailPage> createState() => _WorkDetailPageState();
@@ -501,573 +503,595 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
+    return WillPopScope(
+      onWillPop: () async {
+        // if (widget.passIndex == 2) {
+        //   // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 2,)),
+        //   );
+        //   return false; // default back ko cancel karo
+        // }
+        return true; // normal back chalega
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text("Work Details",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: const BackButton(color: Colors.black),
-        actions: [],
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: AppColors.primaryGreen,
-          statusBarIconBrightness: Brightness.light,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: const Text("Work Details",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          leading: const BackButton(color: Colors.black),
+          actions: [],
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: AppColors.primaryGreen,
+            statusBarIconBrightness: Brightness.light,
+          ),
         ),
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          // loading true -> show loader
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// IMAGE + CARD OVERLAY
-                // Stack(
-                //   children: [
-                //     Image.network(
-                //       controller.imageUrl.value,
-                //       height: 200,
-                //       width: double.infinity,
-                //       fit: BoxFit.cover,
-                //     ),
-                //     Positioned(
-                //       bottom: 10,
-                //       left: 10,
-                //       child: Container(
-                //         padding: const EdgeInsets.symmetric(
-                //             horizontal: 8, vertical: 4),
-                //         decoration: BoxDecoration(
-                //           color: Colors.black,
-                //           borderRadius: BorderRadius.circular(8),
-                //         ),
-                //         child: Text(
-                //           controller.projectId.value,
-                //           style: GoogleFonts.roboto(
-                //             color: Colors.white,
-                //             fontSize: 12,
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            // loading true -> show loader
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// IMAGE + CARD OVERLAY
+                  // Stack(
+                  //   children: [
+                  //     Image.network(
+                  //       controller.imageUrl.value,
+                  //       height: 200,
+                  //       width: double.infinity,
+                  //       fit: BoxFit.cover,
+                  //     ),
+                  //     Positioned(
+                  //       bottom: 10,
+                  //       left: 10,
+                  //       child: Container(
+                  //         padding: const EdgeInsets.symmetric(
+                  //             horizontal: 8, vertical: 4),
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.black,
+                  //           borderRadius: BorderRadius.circular(8),
+                  //         ),
+                  //         child: Text(
+                  //           controller.projectId.value,
+                  //           style: GoogleFonts.roboto(
+                  //             color: Colors.white,
+                  //             fontSize: 12,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
 
-                Stack(
-                  children: [
-                    Obx(
-                      () => Container(
-                        color: Colors.grey,
-                        child: /*CarouselSlider(
-                          options: CarouselOptions(
-                            height: 200,
-                            viewportFraction: 1.0,
-                            enableInfiniteScroll: true,
-                            autoPlay: true,
-                            autoPlayInterval: Duration(seconds: 3),
-                            onPageChanged: (index, reason) {
-                              controller.currentImageIndex.value = index;
-                            },
-                          ),
-                          items: controller.imageUrls.map((url) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
+                  Stack(
+                    children: [
+                      Obx(
+                        () => Container(
+                          color: Colors.grey,
+                          child: /*CarouselSlider(
+                            options: CarouselOptions(
+                              height: 200,
+                              viewportFraction: 1.0,
+                              enableInfiniteScroll: true,
+                              autoPlay: true,
+                              autoPlayInterval: Duration(seconds: 3),
+                              onPageChanged: (index, reason) {
+                                controller.currentImageIndex.value = index;
+                              },
+                            ),
+                            items: controller.imageUrls.map((url) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ViewImage(
+                                          imageUrl: url,
+                                          title: "Product Image",
+                                        ),
+                                      ));
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(0),
+                                  child: Image.network(
+                                    url,
+                                    width: double.infinity,
+                                    // fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        color: Colors.grey.shade200,
+                                        height: 200,
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.primaryGreen,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey.shade200,
+                                        height: 200,
+                                        child: const Center(
+                                          child: Icon(Icons.broken_image,
+                                              size: 50, color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),*/
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              height: 200,
+                              viewportFraction: 1.0,
+                              enableInfiniteScroll: controller.imageUrls.length > 1, // ✅ only if >1
+                              autoPlay: controller.imageUrls.length > 1, // ✅ only if >1
+                              autoPlayInterval: const Duration(seconds: 3),
+                              scrollPhysics: controller.imageUrls.length > 1
+                                  ? const BouncingScrollPhysics()
+                                  : const NeverScrollableScrollPhysics(), // ✅ disable swipe if 1 image
+                              onPageChanged: (index, reason) {
+                                controller.currentImageIndex.value = index;
+                              },
+                            ),//
+                            items: controller.imageUrls.isNotEmpty
+                                ? controller.imageUrls.map((url) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => ViewImage(
                                         imageUrl: url,
                                         title: "Product Image",
                                       ),
-                                    ));
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(0),
-                                child: Image.network(
-                                  url,
-                                  width: double.infinity,
-                                  // fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      color: Colors.grey.shade200,
-                                      height: 200,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.primaryGreen,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey.shade200,
-                                      height: 200,
-                                      child: const Center(
-                                        child: Icon(Icons.broken_image,
-                                            size: 50, color: Colors.grey),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),*/
-                        CarouselSlider(
-                          options: CarouselOptions(
-                            height: 200,
-                            viewportFraction: 1.0,
-                            enableInfiniteScroll: controller.imageUrls.length > 1, // ✅ only if >1
-                            autoPlay: controller.imageUrls.length > 1, // ✅ only if >1
-                            autoPlayInterval: const Duration(seconds: 3),
-                            scrollPhysics: controller.imageUrls.length > 1
-                                ? const BouncingScrollPhysics()
-                                : const NeverScrollableScrollPhysics(), // ✅ disable swipe if 1 image
-                            onPageChanged: (index, reason) {
-                              controller.currentImageIndex.value = index;
-                            },
-                          ),
-                          items: controller.imageUrls.isNotEmpty
-                              ? controller.imageUrls.map((url) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ViewImage(
-                                      imageUrl: url,
-                                      title: "Product Image",
                                     ),
-                                  ),
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(0),
-                                child: Image.network(
-                                  url,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      color: Colors.grey.shade200,
-                                      height: 200,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.primaryGreen,
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(0),
+                                  child: Image.network(
+                                    url,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        color: Colors.grey.shade200,
+                                        height: 200,
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.primaryGreen,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey.shade200,
-                                      height: 200,
-                                      child: const Center(
-                                        child: Icon(Icons.broken_image,
-                                            size: 50, color: Colors.grey),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey.shade200,
+                                        height: 200,
+                                        child: const Center(
+                                          child: Icon(Icons.broken_image,
+                                              size: 50, color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            }).toList()
+                                : [
+                              Container(
+                                color: Colors.grey.shade200,
+                                height: 200,
+                                child: const Center(
+                                  child: Icon(Icons.image, size: 50, color: Colors.grey),
                                 ),
                               ),
-                            );
-                          }).toList()
-                              : [
-                            Container(
-                              color: Colors.grey.shade200,
-                              height: 200,
-                              child: const Center(
-                                child: Icon(Icons.image, size: 50, color: Colors.grey),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // dots indicator
-                    // Positioned(
-                    //   bottom: 10,
-                    //   left: 0,
-                    //   right: 0,
-                    //   child: /*Obx(
-                    //     () => Row(
-                    //       mainAxisAlignment: MainAxisAlignment.center,
-                    //       children:
-                    //           controller.imageUrls.asMap().entries.map((entry) {
-                    //         int idx = entry.key;
-                    //         return Container(
-                    //           width: 8.0,
-                    //           height: 8.0,
-                    //           margin: const EdgeInsets.symmetric(horizontal: 3.0),
-                    //           decoration: BoxDecoration(
-                    //             shape: BoxShape.circle,
-                    //             color: controller.currentImageIndex.value == idx
-                    //                 ? AppColors.primaryGreen
-                    //                 : AppColors.primaryGreen.withAlpha(100),
-                    //           ),
-                    //         );
-                    //       }).toList(),
-                    //     ),
-                    //   ),*/
-                    // ),
-
-                    Positioned(
-                      bottom: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          controller.projectId.value,
-                          style: GoogleFonts.roboto(
-                            color: Colors.white,
-                            fontSize: 12,
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
 
-                Obx(
-                  () => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: controller.imageUrls.asMap().entries.map((entry) {
-                      int idx = entry.key;
-                      return Container(
-                        width: 8.0,
-                        height: 8.0,
-                        margin: const EdgeInsets.symmetric(horizontal: 3.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: controller.currentImageIndex.value == idx
-                              ? AppColors.primaryGreen
-                              : AppColors.primaryGreen.withAlpha(100),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+                      // Positioned(
+                      //   child:
+                      //   Center(
+                      //     child: TextButton(
+                      //         onPressed:(){},
+                      //         child: Align(alignment: Alignment.topRight,
+                      //         child: ,)),
+                      // ),),
 
-                /// BELOW IMAGE -> COLUMN
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// ROW 1
-                      GestureDetector(
-                        onTap: () async {
-                          bwDebug("on tap call: ", tag: tag);
-                          final address = controller.googleAddress.value;
-                          final latitude = controller.latitude.value;
-                          final longitude = controller.longitude.value;
-                          bool success = await MapLauncher.openMap(
-                              latitude: latitude,
-                              longitude: longitude,
-                              address: address);
-                          if (!success) {
+                      // dots indicator
+                      // Positioned(
+                      //   bottom: 10,
+                      //   left: 0,
+                      //   right: 0,
+                      //   child: /*Obx(
+                      //     () => Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children:
+                      //           controller.imageUrls.asMap().entries.map((entry) {
+                      //         int idx = entry.key;
+                      //         return Container(
+                      //           width: 8.0,
+                      //           height: 8.0,
+                      //           margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                      //           decoration: BoxDecoration(
+                      //             shape: BoxShape.circle,
+                      //             color: controller.currentImageIndex.value == idx
+                      //                 ? AppColors.primaryGreen
+                      //                 : AppColors.primaryGreen.withAlpha(100),
+                      //           ),
+                      //         );
+                      //       }).toList(),
+                      //     ),
+                      //   ),*/
+                      // ),
 
-                            CustomSnackBar.show(
-                                message:"Could not open the map" ,
-                                type: SnackBarType.error
-                            );
-                          }
-                        },
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 8),
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Color(0xfff27773),
+                            color: Colors.black,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            controller.googleAddress.value,
+                            controller.projectId.value,
                             style: GoogleFonts.roboto(
                               color: Colors.white,
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        controller.detailedAddress.value,
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  Obx(
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: controller.imageUrls.asMap().entries.map((entry) {
+                        int idx = entry.key;
+                        return Container(
+                          width: 8.0,
+                          height: 8.0,
+                          margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: controller.currentImageIndex.value == idx
+                                ? AppColors.primaryGreen
+                                : AppColors.primaryGreen.withAlpha(100),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  /// BELOW IMAGE -> COLUMN
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// ROW 1
+                        GestureDetector(
+                          onTap: () async {
+                            bwDebug("on tap call: ", tag: tag);
+                            final address = controller.googleAddress.value;
+                            final latitude = controller.latitude.value;
+                            final longitude = controller.longitude.value;
+                            bool success = await MapLauncher.openMap(
+                                latitude: latitude,
+                                longitude: longitude,
+                                address: address);
+                            if (!success) {
+
+                              CustomSnackBar.show(
+                                  message:"Could not open the map" ,
+                                  type: SnackBarType.error
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            decoration: BoxDecoration(
+                              color: Color(0xfff27773),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              controller.googleAddress.value,
+                              style: GoogleFonts.roboto(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      /// WORK TITLE
-                      Text(
-                        controller.categoryName.value,
-                        style: GoogleFonts.roboto(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-
-                      /// DATE
-                      Text(
-                        "Completion Date  - ${controller.deadline.value}",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12, color: Colors.grey.shade700),
-                      ),
-                      const SizedBox(height: 6),
-
-                      /// AMOUNT
-                      Text(
-                        "₹ 0",
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                        const SizedBox(height: 4),
+                        Text(
+                          controller.detailedAddress.value,
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
 
-                      Divider(color: Colors.grey.shade300, thickness: 1),
-                      const SizedBox(height: 6),
+                        const SizedBox(height: 10),
 
-                      Text(
-                        "Task Details",
-                        style: GoogleFonts.roboto(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
+                        /// WORK TITLE
+                        Text(
+                          controller.categoryName.value,
+                          style: GoogleFonts.roboto(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
 
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: controller.subCategories.value
-                            .split(", ")
-                            .map((subName) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("• ",
-                                    style: TextStyle(fontSize: 16)),
-                                // bullet
-                                Expanded(
-                                  child: Text(
-                                    subName,
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                      color: Colors.black,
+                        /// DATE
+                        Text(
+                          "Completion Date  - ${controller.deadline.value}",
+                          style: GoogleFonts.roboto(
+                              fontSize: 12, color: Colors.grey.shade700),
+                        ),
+                        const SizedBox(height: 6),
+
+                        /// AMOUNT
+                        Text(
+                          "₹ 0",
+                          style: GoogleFonts.roboto(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Divider(color: Colors.grey.shade300, thickness: 1),
+                        const SizedBox(height: 6),
+
+                        Text(
+                          "Task Details",
+                          style: GoogleFonts.roboto(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 6),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: controller.subCategories.value
+                              .split(", ")
+                              .map((subName) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("• ",
+                                      style: TextStyle(fontSize: 16)),
+                                  // bullet
+                                  Expanded(
+                                    child: Text(
+                                      subName,
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        const SizedBox(height: 20),
+
+
+
+                        widget.isUser
+                            ? controller.hireStatus == "pending"
+                                ? Center(
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        minimumSize: const Size(160, 40),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        controller.isLoading.value = true;
+                                        var orderId = "${controller.orderId}";
+                                        String status = await controller
+                                            .cancelEmergencyOrder(orderId);
+
+                                         CustomSnackBar.show(
+                                            message: status,
+                                            type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
+                                        );
+
+
+                                        controller.isLoading.value = false;
+                                        // cancel logic
+                                      },
+                                      icon: const Icon(
+                                          Icons.cancel_presentation_outlined,
+                                          color: Colors.white),
+                                      label: controller.isLoading.value
+                                          ? CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )
+                                          : Text(
+                                              "Cancel Task",
+                                              style: GoogleFonts.roboto(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            ),
+                                    ),
+                                  )
+                                : controller.hireStatus == "cancelled"
+                                    ? Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "Cancelled",
+                                            style: GoogleFonts.roboto(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      )
+                                    :controller.hireStatus == "completed"
+                            ? Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Mark as completed",
+                              style: GoogleFonts.roboto(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
                             ),
-                          );
-                        }).toList(),
-                      ),
-
-                      const SizedBox(height: 20),
-
-
-
-                      widget.isUser
-                          ? controller.hireStatus == "pending"
-                              ? Center(
-                                  child: ElevatedButton.icon(
+                          ),
+                        )
+                            : SizedBox()
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      minimumSize: const Size(160, 40),
+                                      backgroundColor: AppColors.primaryGreen,
+                                      minimumSize: const Size(140, 40),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
                                     onPressed: () async {
                                       controller.isLoading.value = true;
-                                      var orderId = "${controller.orderId}";
-                                      String status = await controller
-                                          .cancelEmergencyOrder(orderId);
+                                      String status =
+                                          await controller.acceptUserOrder(
+                                              controller.orderId.value);
 
-                                       CustomSnackBar.show(
+
+                                      CustomSnackBar.show(
                                           message: status,
-                                          type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
+                                          type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
                                       );
-
-
                                       controller.isLoading.value = false;
-                                      // cancel logic
+                                      // accept logic
                                     },
-                                    icon: const Icon(
-                                        Icons.cancel_presentation_outlined,
-                                        color: Colors.white),
-                                    label: controller.isLoading.value
-                                        ? CircularProgressIndicator(
-                                            color: Colors.white,
-                                          )
-                                        : Text(
-                                            "Cancel Task",
-                                            style: GoogleFonts.roboto(
-                                                color: Colors.white,
-                                                fontSize: 14),
-                                          ),
+                                    child: Text(
+                                      "Accept",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 15),
+                                    ),
                                   ),
-                                )
-                              : controller.hireStatus == "cancelled"
-                                  ? Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      minimumSize: const Size(140, 40),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          "Cancelled",
-                                          style: GoogleFonts.roboto(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                    )
-                                  :controller.hireStatus == "completed"
-                          ? Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Mark as completed",
-                            style: GoogleFonts.roboto(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
+                                    ),
+                                    onPressed: () async {
+                                      controller.isLoading.value = true;
+                                      String status =
+                                          await controller.rejectUserOrder(
+                                              "6871f5b5ed31367eed8d2210");
+                                    CustomSnackBar.show(
+                                          message: status,
+                                          type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
+                                      );
+                                      controller.isLoading.value = false;
+                                    },
+                                    child: Text(
+                                      "Reject",
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.white, fontSize: 15),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                  controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
+                          controller.hireStatus != "cancelledDispute" && controller.hireStatus != "completed"
+                      ? RequestAcceptedSection(orderId: controller.orderId.value)
+                      : controller.hireStatus != "assigned" && controller.hireStatus != "completed"&&controller.hireStatus == "cancelledDispute"? Center(
+                        child: Container(
+                          height: 40,
+                          width: double.infinity,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.warning_amber, color: Colors.red),
+                              Flexible(
+                                child: Text("The order has been cancelled due to a dispute.",
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                              ),
+                            ],
                           ),
                         ),
-                      )
-                          : SizedBox()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryGreen,
-                                    minimumSize: const Size(140, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    controller.isLoading.value = true;
-                                    String status =
-                                        await controller.acceptUserOrder(
-                                            controller.orderId.value);
+                      ):SizedBox(),
 
-
-                                    CustomSnackBar.show(
-                                        message: status,
-                                        type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
-                                    );
-                                    controller.isLoading.value = false;
-                                    // accept logic
-                                  },
-                                  child: Text(
-                                    "Accept",
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.white, fontSize: 15),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    minimumSize: const Size(140, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    controller.isLoading.value = true;
-                                    String status =
-                                        await controller.rejectUserOrder(
-                                            "6871f5b5ed31367eed8d2210");
-                                  CustomSnackBar.show(
-                                        message: status,
-                                        type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
-                                    );
-                                    controller.isLoading.value = false;
-                                  },
-                                  child: Text(
-                                    "Reject",
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.white, fontSize: 15),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-                controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
-                        controller.hireStatus != "cancelledDispute" && controller.hireStatus != "completed"
-                    ? RequestAcceptedSection(orderId: controller.orderId.value)
-                    : controller.hireStatus != "assigned" && controller.hireStatus != "completed"&&controller.hireStatus == "cancelledDispute"? Center(
-                      child: Container(
-                        height: 40,
-                        width: double.infinity,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning_amber, color: Colors.red),
-                            Flexible(
-                              child: Text("The order has been cancelled due to a dispute.",
-                                maxLines: 2,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ):SizedBox(),
-
-                controller.hireStatus.value == "assigned" &&
-                        controller.providerName.isNotEmpty
-                    ? TaskView(
-                        orderId: controller.orderId.value,
-                        // providerId:controller.providerId.value,
-                        // providerName: controller.providerName.value,
-                        // providerPhone: controller.providerPhone.value,
-                        // providerImage: controller.providerImage.value,
-                        // platFormFee:controller.plateFormFee.value,
-                        // isAssign: false,
-                      )
-                    : const SizedBox(),
-              ],
-            ),
-          );
-        }
-      }),
+                  controller.hireStatus.value == "assigned" &&
+                          controller.providerName.isNotEmpty
+                      ? TaskView(
+                          orderId: controller.orderId.value,
+                          // providerId:controller.providerId.value,
+                          // providerName: controller.providerName.value,
+                          // providerPhone: controller.providerPhone.value,
+                          // providerImage: controller.providerImage.value,
+                          // platFormFee:controller.plateFormFee.value,
+                          // isAssign: false,
+                        )
+                      : const SizedBox(),
+                ],
+              ),
+            );
+          }
+        }),
+      ),
     );
   }
 }

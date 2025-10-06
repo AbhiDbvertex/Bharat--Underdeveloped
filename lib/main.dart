@@ -12,6 +12,7 @@ import 'Emergency/utils/logger.dart';
 import 'NotificationService.dart';
 import 'chat/chatScreen.dart';
 import 'chat/chat_user_list_screen.dart';
+import 'directHiring/views/Account/PaymentSuccessScreen.dart';
 import 'directHiring/views/auth/RoleSelectionScreen.dart';
 import 'directHiring/views/auth/SplashScreen.dart';
 
@@ -89,8 +90,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
         colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryGreen,
     ),),
-    debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
       title: 'The Bharat Works',
+      // home: PaymentSuccessScreen(passIndex: 3,),
       home: SplashScreen(),
       // home: ChatScreen(initialReceiverId: '',),
       // home: DragToPayScreen(),

@@ -306,13 +306,13 @@ class _ServiceProviderHomeScreenState extends State<ServiceProviderHomeScreen> {
       }
     } catch (e) {
       print("❌ Error fetching profile: $e");
-      if (mounted) {
-         CustomSnackBar.show(
-            message:"Something went wrong, try again!" ,
-            type: SnackBarType.error
-        );
-
-      }
+      // if (mounted) {
+      //    CustomSnackBar.show(
+      //       message:"Something went wrong, try again!" ,
+      //       type: SnackBarType.error
+      //   );
+      //
+      // }
       setState(() {
         isLoading = false;
       });

@@ -182,6 +182,7 @@ class RazorpayScreen extends StatefulWidget {
   final int? taxAmount;
   final String? description;
   final String? orderId;
+  final passIndex;
 
   const RazorpayScreen({
     super.key,
@@ -195,6 +196,7 @@ class RazorpayScreen extends StatefulWidget {
     this.taxAmount,
     this.description,
     this.orderId,
+    this.passIndex,
   });
 
   @override
@@ -290,6 +292,7 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
                 subcategreyId: widget.subcategreyId,
                 providerId: widget.providerId,
                 orderId: widget.orderId,
+                passIndex: widget.passIndex,
               ),
             ),
           );
@@ -336,9 +339,8 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Abhi:-fast provider id razerpay screen:- ${widget.providerId}");
-    print(
-      "Abhi:- razorpay screen get categreyId ${widget.categreyId} : subCategreyId : ${widget.subcategreyId}",
+    print("Abhi:-fast provider id razerpay screen:- ${widget.providerId} passIndex : ${widget.passIndex}");
+    print("Abhi:- razorpay screen get categreyId ${widget.categreyId} : subCategreyId : ${widget.subcategreyId}",
     );
     return const Scaffold(
       body: Center(

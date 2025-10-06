@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Emergency/utils/logger.dart';
-import 'package:developer/directHiring/views/ServiceProvider/view_user_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,13 +9,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../../../../Widgets/AppColors.dart';
-import '../../../Widgets/address_map_class.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
-import '../../../testingfile.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/userModel/subCategoriesModel.dart';
@@ -62,102 +58,6 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
     super.initState();
     fetchOrderDetail();
   }
-
-  // Future<void> fetchOrderDetail() async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token') ?? '';
-  //     print("📋 Token mil gaya: $token");
-  //
-  //     if (token.isEmpty) {
-  //       setState(() => isLoading = false);
-  //       _showSnackBar("Please login first!");
-  //       return;
-  //     }
-  //
-  //     bwDebug("orderid: ${widget.id}");
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         'https://api.thebharatworks.com/api/direct-order/getDirectOrderWithWorker/${widget.id}',
-  //       ),
-  //       headers: {'Authorization': 'Bearer $token'},
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final decoded = json.decode(response.body);
-  //       print("📥 Pura Response: ${response.body}");
-  //       print("🔍 Order Data: ${decoded['data']['order']}");
-  //       print("🔍 Assigned Worker Data: ${decoded['data']['assignedWorker']}");
-  //
-  //       String? providerId;
-  //       String? categoryId;
-  //       String? subcategoryId;
-  //       String? Apistatus;
-  //
-  //       if (decoded['data']?['order']?['offer_history'] != null &&
-  //           (decoded['data']['order']['offer_history'] as List).isNotEmpty &&
-  //           decoded['data']['order']['offer_history'][0]['provider_id'] !=
-  //               null) {
-  //         providerId = decoded['data']['order']['offer_history'][0]
-  //                 ['provider_id']['_id']
-  //             ?.toString();
-  //         categoryId = decoded['data']['order']['offer_history'][0]
-  //                 ['provider_id']['category_id']?['_id']
-  //             ?.toString();
-  //         subcategoryId = decoded['data']['order']['offer_history'][0]
-  //                         ['provider_id']['subcategory_ids']
-  //                     ?.isNotEmpty ==
-  //                 true
-  //             ? decoded['data']['order']['offer_history'][0]['provider_id']
-  //                     ['subcategory_ids'][0]['_id']
-  //                 ?.toString()
-  //             : null;
-  //         Apistatus = decoded['data']['order']['offer_history'][0]
-  //         ['status'];
-  //
-  //         print("🚫 Provider ID mil gaya: $providerId");
-  //         print("📋 Category ID get : $categoryId, Subcategory ID: $subcategoryId status : $status");
-  //       } else {
-  //         print("⚠️ Offer history me provider_id nahi mila!");
-  //       }
-  //
-  //       setState(() {
-  //         order = {
-  //           ...decoded['data']['order'],
-  //           'assignedWorker': decoded['data']['assignedWorker'],
-  //         };
-  //         orderProviderId = providerId;
-  //         status = Apistatus;
-  //         _isOrderAccepted = order?['hire_status']?.toLowerCase() == 'accepted' ;
-  //         isLoading = false;
-  //       });
-  //
-  //       print("📋 Category ID get : $categoryId, Subcategory ID: $subcategoryId status : $status");
-  //
-  //       if (providerId != null) {
-  //         await _saveHiredProviderId(providerId);
-  //         await fetchProviderById(providerId);
-  //       }
-  //
-  //       if (categoryId != null && subcategoryId != null) {
-  //         await fetchServiceProvidersListinWorkDetails(
-  //             categoryId, subcategoryId);
-  //       } else {
-  //         print(
-  //             "⚠️ Category ID ya Subcategory ID nahi mila, skipping fetchServiceProviders!");
-  //         _showSnackBar("Category or subcategory ID missing!");
-  //       }
-  //     } else {
-  //       print("❌ API ne dhoka diya: ${response.statusCode} - ${response.body}");
-  //       setState(() => isLoading = false);
-  //       _showSnackBar("Order details not found!");
-  //     }
-  //   } catch (e) {
-  //     print("api call error: $e");
-  //     setState(() => isLoading = false);
-  //     _showSnackBar("Error aaya: $e");
-  //   }
-  // }
 
   Future<void> fetchOrderDetail() async {
     try {
@@ -208,10 +108,9 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
               : null;
           Apistatus = decoded['data']['order']['offer_history'][0]['status'];
 
-          print(
-              "🚫 Provider ID mil gaya: $providerId, Category: $categoryId, SubCategory: $subcategoryId, Status: $Apistatus");
+          print("Provider ID mil gaya: $providerId, Category: $categoryId, SubCategory: $subcategoryId, Status: $Apistatus");
         } else {
-          print("⚠️ Offer history me provider_id nahi mila!");
+          print("Provider id not found in Offer history!");
         }
 
         setState(() {
@@ -220,13 +119,13 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
             'assignedWorker': decoded['data']['assignedWorker'],
           };
           orderProviderId = providerId;
-          status = Apistatus; // ✅ yahi correct assignment hai
+          status = Apistatus; // yahi correct assignment hai
           _isOrderAccepted =
               order?['hire_status']?.toLowerCase() == 'accepted';
           isLoading = false;
         });
 
-        print("✅ Final Status in state: $status");
+        print("Final Status in state: $status");
 
         if (providerId != null) {
           await _saveHiredProviderId(providerId);
@@ -237,19 +136,18 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
           await fetchServiceProvidersListinWorkDetails(
               categoryId, subcategoryId);
         } else {
-          print(
-              "⚠️ Category ID ya Subcategory ID nahi mila, skipping fetchServiceProviders!");
+          print("Category ID ya Subcategory ID nahi mila, skipping fetchServiceProviders!");
           _showSnackBar("Category or subcategory ID missing!");
         }
       } else {
-        print("❌ API ne dhoka diya: ${response.statusCode} - ${response.body}");
+        print("API ne dhoka diya: ${response.statusCode} - ${response.body}");
         setState(() => isLoading = false);
         _showSnackBar("Order details not found!");
       }
     } catch (e) {
       print("api call error: $e");
       setState(() => isLoading = false);
-      _showSnackBar("Error aaya: $e");
+      // _showSnackBar("Error aaya: $e");
     }
   }
 
@@ -375,7 +273,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-          _showSnackBar("Not Rejected: ${data['message']}");
+          // _showSnackBar("Not Rejected: ${data['message']}");
         }
       } else {
         final err = json.decode(response.body);
@@ -900,25 +798,13 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                         children: [
                           InkWell(
                             onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => MapScreen(
-                              //       latitude: order?['service_provider_id']?['location']?['latitude'] ?? 'No lat',
-                              //       longitude: order?['service_provider_id']?['location']?['longitude'] ?? 'No long',
-                              //     ),
-                              //   ),
-                              // );
                               openMap(order?['latitude'] ?? 'No lat',
                                 order?['longitude'] ?? 'No long',);
-
                               print("Abhi:- get oder Details lat : ${order?['latitude'] ?? 'No lat'} long : ${order?['longitude'] ?? 'No long'}");
                             },
                             child: Container(
                               height: 24,
                               width: 160,
-                              // padding: const EdgeInsets.symmetric(
-                              //     horizontal: 18, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 borderRadius: BorderRadius.circular(10),

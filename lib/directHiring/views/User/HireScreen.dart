@@ -484,6 +484,7 @@ class _HireScreenState extends State<HireScreen> {
               amount: amount,
               providerId: widget.firstProviderId,
               orderId: orderId,
+              passIndex: 1,
             ),
           ),
         );
