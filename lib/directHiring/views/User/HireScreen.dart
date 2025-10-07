@@ -597,6 +597,47 @@ class _HireScreenState extends State<HireScreen> {
                 ),
               ),
               const SizedBox(height: 14),
+              buildLabel("Full Address"),
+              Obx(
+                    () => InkWell(
+                  onTap: controller.navigateToLocationScreen, // Make tappable
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          controller.fullAddress.value.isNotEmpty
+                              ? controller.fullAddress.value
+                              : "No address found",
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            color: Colors.black45,
+
+                          ),
+                        ),
+                        // const SizedBox(height: 4),
+                        // Text(
+                        //   controller.fullAddress.value,
+                        //   style: GoogleFonts.roboto(
+                        //     fontSize: 14,
+                        //     color: Colors.black87,
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
               buildLabel("Do you want to go to his shop? *"),
               Row(
                 children: [

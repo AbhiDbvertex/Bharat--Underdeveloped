@@ -43,6 +43,12 @@ class PostTaskController extends GetxController {
   var late;
   var long;
   var addre;
+// New variables for full address
+  var fullAddress = "".obs;
+  var selectedHouseNo = "".obs;
+  var selectedStreet = "".obs;
+  var selectedArea = "".obs;
+  var selectedPinCode = "".obs;
 
   @override
   void onInit() {
@@ -53,6 +59,7 @@ class PostTaskController extends GetxController {
     // Sync addressController with userLocation
     ever(userLocation, (String? newLocation) {
       addressController.text = newLocation ?? 'Select Location';
+      updateFullAddress();
     });
     fetchProfile();
   }
@@ -96,19 +103,42 @@ class PostTaskController extends GetxController {
     userLocation.value = "Select Location";
     isSwitched.value = false;
     address.value = "";
+    fullAddress.value = "";
+    selectedHouseNo.value = "";
+    selectedStreet.value = "";
+    selectedArea.value = "";
+    selectedPinCode.value = "";
     formKey.currentState?.reset(); // Reset form validation state
     debugPrint("📝 Form reset: All fields cleared");
   }
-
+  void updateFullAddress() {
+    if (selectedHouseNo.value.isNotEmpty &&
+        selectedStreet.value.isNotEmpty &&
+        selectedArea.value.isNotEmpty &&
+        selectedPinCode.value.isNotEmpty && selectedHouseNo.value !='N/A' && selectedHouseNo.value !='N/A' && selectedStreet.value !='N/A' && selectedArea.value !='N/A' ) {
+      fullAddress.value =
+      "${selectedHouseNo.value}, ${selectedStreet.value}, ${selectedArea.value}, ${selectedPinCode.value}";
+    } else {
+      fullAddress.value = "No detailed address available";
+    }
+  }
   Future<void> initializeLocation() async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
     String? savedLocation =
         prefs.getString("selected_location") ?? prefs.getString("address");
+    String? savedHouseNo = prefs.getString("selected_house_no");
+    String? savedStreet = prefs.getString("selected_street");
+    String? savedArea = prefs.getString("selected_area");
+    String? savedPinCode = prefs.getString("selected_pin_code");
 
     if (savedLocation != null && savedLocation != "Select Location") {
       userLocation.value = savedLocation;
       addressController.text = savedLocation; // Sync addressController
+      selectedHouseNo.value = savedHouseNo ?? "";
+      selectedStreet.value = savedStreet ?? "";
+      selectedArea.value = savedArea ?? "";
+      selectedPinCode.value = savedPinCode ?? "";
       isLoading.value = false;
       print("📍 Loaded saved location: $savedLocation");
       return;
@@ -117,16 +147,116 @@ class PostTaskController extends GetxController {
     await fetchProfile();
   }
 
+ //  Future<void> fetchProfile() async {
+ //    try {
+ //      final prefs = await SharedPreferences.getInstance();
+ //      final token = prefs.getString('token') ?? '';
+ //      if (token.isEmpty) {
+ //        if (Get.context != null && Get.context!.mounted) {
+ // CustomSnackBar.show(
+ //          message:"No token found. Please log in again." ,
+ //      type: SnackBarType.error
+ //      );
+ //        }
+ //        isLoading.value = false;
+ //        return;
+ //      }
+ //
+ //      final url = Uri.parse(
+ //        "https://api.thebharatworks.com/api/user/getUserProfileData",
+ //      );
+ //      final response = await http.get(
+ //        url,
+ //        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+ //      );
+ //      print("📡 Full API Response: ${response.body}");
+ //
+ //      if (response.statusCode == 200) {
+ //        final data = json.decode(response.body);
+ //        print("📋 Data: $data");
+ //
+ //        if (data['status'] == true) {
+ //          String apiLocation = 'Select Location';
+ //          String? addressId;
+ //
+ //          if (data['data']?['full_address'] != null &&
+ //              data['data']['full_address'].isNotEmpty) {
+ //            final addresses = data['data']['full_address'] as List;
+ //            final currentLocations =
+ //            addresses.where((addr) => addr['title'] == 'Current Location').toList();
+ //            if (currentLocations.isNotEmpty) {
+ //              final latestLocation = currentLocations.last;
+ //              apiLocation = latestLocation['address'] ?? 'Select Location';
+ //              addressId = latestLocation['_id'];
+ //            } else {
+ //              final latestAddress = addresses.last;
+ //              apiLocation = latestAddress['address'] ?? 'Select Location';
+ //              addressId = latestAddress['_id'];
+ //            }
+ //          }
+ //
+ //          final latitude;
+ //          final longitude;
+ //          final address;
+ //         latitude = data['data']?['location']?['latitude'];
+ //         longitude = data['data']?['location']?['longitude'];
+ //          address = data['data']?['location']?['address'];
+ //
+ //          late = latitude;
+ //          long = longitude;
+ //          addre = address;
+ //
+ //         print('Abhi:- get user lat : $latitude long : $longitude Address : $addre');
+ //
+ //          await prefs.setString("address", apiLocation);
+ //          if (addressId != null) {
+ //            await prefs.setString("selected_address_id", addressId);
+ //          }
+ //
+ //          profile.value = ServiceProviderProfileModel.fromJson(data['data']);
+ //          userLocation.value = apiLocation;
+ //          addressController.text = apiLocation; // Sync addressController
+ //          isLoading.value = false;
+ //          print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
+ //        } else {
+ //          if (Get.context != null && Get.context!.mounted) {
+ // CustomSnackBar.show(
+ //          message:data["message"] ?? "Failed to fetch profile.",
+ //      type: SnackBarType.error
+ //      );
+ //          }
+ //          isLoading.value = false;
+ //        }
+ //      } else {
+ //        if (Get.context != null && Get.context!.mounted) {
+ // CustomSnackBar.show(
+ //          message:"Server error. Failed to fetch profile.",
+ //      type: SnackBarType.error
+ //      );
+ //        }
+ //        isLoading.value = false;
+ //      }
+ //    } catch (e) {
+ //      print("❌ Error fetching profile: $e");
+ //      if (Get.context != null && Get.context!.mounted) {
+ // CustomSnackBar.show(
+ //          message:"Something went wrong. Please try again.",
+ //      type: SnackBarType.error
+ //      );
+ //      }
+ //      isLoading.value = false;
+ //    }
+ //  }
   Future<void> fetchProfile() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
       if (token.isEmpty) {
         if (Get.context != null && Get.context!.mounted) {
- CustomSnackBar.show(
-          message:"No token found. Please log in again." ,
-      type: SnackBarType.error
-      );
+          CustomSnackBar.show(
+            message: "No token found. Please log in again.",
+            type: SnackBarType.error,
+          );
         }
         isLoading.value = false;
         return;
@@ -148,71 +278,80 @@ class PostTaskController extends GetxController {
         if (data['status'] == true) {
           String apiLocation = 'Select Location';
           String? addressId;
+          String? houseNo;
+          String? street;
+          String? area;
+          String? pinCode;
 
           if (data['data']?['full_address'] != null &&
               data['data']['full_address'].isNotEmpty) {
             final addresses = data['data']['full_address'] as List;
-            final currentLocations =
-            addresses.where((addr) => addr['title'] == 'Current Location').toList();
-            if (currentLocations.isNotEmpty) {
-              final latestLocation = currentLocations.last;
-              apiLocation = latestLocation['address'] ?? 'Select Location';
-              addressId = latestLocation['_id'];
-            } else {
-              final latestAddress = addresses.last;
-              apiLocation = latestAddress['address'] ?? 'Select Location';
-              addressId = latestAddress['_id'];
-            }
+            final matchingAddress = addresses.firstWhere(
+                  (addr) =>
+              addr['latitude'] == data['data']['location']['latitude'] &&
+                  addr['longitude'] == data['data']['location']['longitude'],
+              orElse: () => addresses.last,
+            );
+            apiLocation = matchingAddress['address'] ?? 'Select Location';
+            addressId = matchingAddress['_id'];
+            houseNo = matchingAddress['houseno']?.toString() ?? "";
+            street = matchingAddress['street']?.toString() ?? "";
+            area = matchingAddress['area']?.toString() ?? "";
+            pinCode = matchingAddress['pincode']?.toString() ?? "";
           }
 
-          final latitude;
-          final longitude;
-          final address;
-         latitude = data['data']?['location']?['latitude'];
-         longitude = data['data']?['location']?['longitude'];
-          address = data['data']?['location']?['address'];
+          late = data['data']?['location']?['latitude'];
+          long = data['data']?['location']?['longitude'];
+          addre = data['data']?['location']?['address'];
 
-          late = latitude;
-          long = longitude;
-          addre = address;
-
-         print('Abhi:- get user lat : $latitude long : $longitude Address : $addre');
+          print('Abhi:- get user lat: $late long: $long Address: $addre');
 
           await prefs.setString("address", apiLocation);
+          await prefs.setString("selected_house_no", houseNo ?? "");
+          await prefs.setString("selected_street", street ?? "");
+          await prefs.setString("selected_area", area ?? "");
+          await prefs.setString("selected_pin_code", pinCode ?? "");
           if (addressId != null) {
             await prefs.setString("selected_address_id", addressId);
           }
 
+          selectedHouseNo.value = houseNo ?? "";
+          selectedStreet.value = street ?? "";
+          selectedArea.value = area ?? "";
+          selectedPinCode.value = pinCode ?? "";
+          updateFullAddress();
+
           profile.value = ServiceProviderProfileModel.fromJson(data['data']);
           userLocation.value = apiLocation;
-          addressController.text = apiLocation; // Sync addressController
+          addressController.text = apiLocation;
           isLoading.value = false;
-          print("📍 Saved and displayed location: $apiLocation (ID: $addressId)");
+          print(
+              "📍 Saved and displayed location: $apiLocation, full address: ${fullAddress.value}");
         } else {
           if (Get.context != null && Get.context!.mounted) {
- CustomSnackBar.show(
-          message:data["message"] ?? "Failed to fetch profile.",
-      type: SnackBarType.error
-      );
+            CustomSnackBar.show(
+              message: data["message"] ?? "Failed to fetch profile.",
+              type: SnackBarType.error,
+            );
           }
           isLoading.value = false;
         }
       } else {
         if (Get.context != null && Get.context!.mounted) {
- CustomSnackBar.show(
-          message:"Server error. Failed to fetch profile.",
-      type: SnackBarType.error
-      );
+          CustomSnackBar.show(
+            message: "Server error. Failed to fetch profile.",
+            type: SnackBarType.error,
+          );
         }
         isLoading.value = false;
       }
     } catch (e) {
       print("❌ Error fetching profile: $e");
       if (Get.context != null && Get.context!.mounted) {
- CustomSnackBar.show(
-          message:"Something went wrong. Please try again.",
-      type: SnackBarType.error
-      );
+        CustomSnackBar.show(
+          message: "Something went wrong. Please try again.",
+          type: SnackBarType.error,
+        );
       }
       isLoading.value = false;
     }
@@ -672,16 +811,83 @@ class PostTaskController extends GetxController {
 
   //////////////////////////////////////////////////////////////
 
+ //  Future<void> getCurrentLocation() async {
+ //    try {
+ //      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+ //      if (!serviceEnabled) {
+ //        bool opened = await Geolocator.openLocationSettings();
+ //        if (!opened) {
+ // CustomSnackBar.show(
+ //          message:"Please enable location services from settings.",
+ //      type: SnackBarType.error
+ //      );
+ //          return;
+ //        }
+ //        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+ //        if (!serviceEnabled) {
+ //          return;
+ //        }
+ //      }
+ //
+ //      LocationPermission permission = await Geolocator.checkPermission();
+ //      if (permission == LocationPermission.denied) {
+ //        permission = await Geolocator.requestPermission();
+ //        if (permission == LocationPermission.denied) {
+ // CustomSnackBar.show(
+ //          message:"Location permission denied.",
+ //      type: SnackBarType.error
+ //      );
+ //          return;
+ //        }
+ //      }
+ //
+ //      if (permission == LocationPermission.deniedForever) {
+ // CustomSnackBar.show(
+ //          message:   "Location permission permanently denied. Please enable from app settings.",
+ //      type: SnackBarType.error
+ //      );
+ //        await Geolocator.openAppSettings();
+ //        return;
+ //      }
+ //
+ //      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+ //      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+ //      if (placemarks.isNotEmpty) {
+ //        Placemark place = placemarks[0];
+ //        String formattedAddress = [
+ //          place.street,
+ //          place.subLocality,
+ //          place.locality,
+ //          place.postalCode,
+ //          place.administrativeArea,
+ //          place.country,
+ //        ].where((e) => e != null && e.isNotEmpty).join(', ');
+ //
+ //        addressController.text = formattedAddress;
+ //        userLocation.value = formattedAddress; // Sync userLocation
+ //      } else {
+ // CustomSnackBar.show(
+ //          message:  "Unable to fetch address from location.",
+ //      type: SnackBarType.error
+ //      );
+ //      }
+ //    } catch (e) {
+ // CustomSnackBar.show(
+ //          message:  "Failed to fetch location. Please try again.",
+ //      type: SnackBarType.error
+ //      );
+ //    }
+ //  }
   Future<void> getCurrentLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         bool opened = await Geolocator.openLocationSettings();
         if (!opened) {
- CustomSnackBar.show(
-          message:"Please enable location services from settings.",
-      type: SnackBarType.error
-      );
+          CustomSnackBar.show(
+            message: "Please enable location services from settings.",
+            type: SnackBarType.error,
+          );
           return;
         }
         serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -694,25 +900,28 @@ class PostTaskController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
- CustomSnackBar.show(
-          message:"Location permission denied.",
-      type: SnackBarType.error
-      );
+          CustomSnackBar.show(
+            message: "Location permission denied.",
+            type: SnackBarType.error,
+          );
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
- CustomSnackBar.show(
-          message:   "Location permission permanently denied. Please enable from app settings.",
-      type: SnackBarType.error
-      );
+        CustomSnackBar.show(
+          message:
+          "Location permission permanently denied. Please enable from app settings.",
+          type: SnackBarType.error,
+        );
         await Geolocator.openAppSettings();
         return;
       }
 
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      Position position =
+      await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         String formattedAddress = [
@@ -724,22 +933,37 @@ class PostTaskController extends GetxController {
           place.country,
         ].where((e) => e != null && e.isNotEmpty).join(', ');
 
+        // Update location and full address fields
+        userLocation.value = formattedAddress;
         addressController.text = formattedAddress;
-        userLocation.value = formattedAddress; // Sync userLocation
+        late = position.latitude;
+        long = position.longitude;
+        addre = formattedAddress;
+
+        // Since geocoding may not provide houseno, street, area, pincode,
+        // fetch from API or set defaults
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("selected_location", formattedAddress);
+        await prefs.setDouble("user_latitude", position.latitude);
+        await prefs.setDouble("user_longitude", position.longitude);
+
+        // Try to fetch detailed address from API
+        await fetchProfile(); // This will update full address fields if available
+
+        print("📍 Current location set: $formattedAddress, full address: ${fullAddress.value}");
       } else {
- CustomSnackBar.show(
-          message:  "Unable to fetch address from location.",
-      type: SnackBarType.error
-      );
+        CustomSnackBar.show(
+          message: "Unable to fetch address from location.",
+          type: SnackBarType.error,
+        );
       }
     } catch (e) {
- CustomSnackBar.show(
-          message:  "Failed to fetch location. Please try again.",
-      type: SnackBarType.error
+      CustomSnackBar.show(
+        message: "Failed to fetch location. Please try again.",
+        type: SnackBarType.error,
       );
     }
   }
-
   // Future<void> submitTask(BuildContext context) async {
   //   try {
   //     final prefs = await SharedPreferences.getInstance();
@@ -901,20 +1125,77 @@ class PostTaskController extends GetxController {
   }
 
 
+ //  void navigateToLocationScreen() async {
+ //    // final emergencyServiceController = Get.find<EmergencyServiceController>();
+ //    final emergencyServiceController = Get.put(EmergencyServiceController());
+ //
+ //    final result = await Get.to(
+ //          () => LocationSelectionScreen(
+ //        onLocationSelected: (Map<String, dynamic> locationData) {
+ //          userLocation.value = locationData['address'] ?? 'Select Location';
+ //          addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
+ //          emergencyServiceController.googleAddressController.text = locationData['address'] ?? 'Select Location';
+ //          emergencyServiceController.latitude.value=locationData['latitude']??"";
+ //          emergencyServiceController.longitude.value=locationData['longitude']??"";
+ //          debugPrint(
+ //            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']}), location data: $locationData",
+ //          );
+ //        },
+ //      ),
+ //    );
+ //    if (result != null && result is Map<String, dynamic>) {
+ //      String newAddress = result['address'] ?? 'Select Location';
+ //      double latitude = result['latitude'] ?? 0.0;
+ //      double longitude = result['longitude'] ?? 0.0;
+ //      String? addressId = result['addressId'];
+ //      bwDebug("address: $newAddress\n latitude : $latitude\n longitude: $longitude",tag: "builtPostTask");
+ //      if (newAddress != 'Select Location' && latitude != 0.0 && longitude != 0.0) {
+ //        await updateLocationOnServer(newAddress, latitude, longitude);
+ //        if (addressId != null) {
+ //          final prefs = await SharedPreferences.getInstance();
+ //          await prefs.setString('selected_address_id', addressId);
+ //        }
+ //        await fetchLocation();
+ //        emergencyServiceController.googleAddressController.text = newAddress;
+ //        emergencyServiceController.latitude.value=latitude;
+ //        emergencyServiceController.longitude.value=longitude;
+ //        bwDebug("address: ${emergencyServiceController.googleAddressController.text}"
+ //            "\n latitude : ${emergencyServiceController.latitude.value}"
+ //            "\n longitude: ${emergencyServiceController.longitude.value}",tag: "builtPostTask");
+ //
+ //
+ //      } else {
+ //        debugPrint("❌ Invalid location data received: $result");
+ // CustomSnackBar.show(
+ //          message:  "Invalid location data. Please try again.",
+ //      type: SnackBarType.error
+ //      );
+ //      }
+ //    }
+ //  }
   void navigateToLocationScreen() async {
-    // final emergencyServiceController = Get.find<EmergencyServiceController>();
     final emergencyServiceController = Get.put(EmergencyServiceController());
-
     final result = await Get.to(
           () => LocationSelectionScreen(
         onLocationSelected: (Map<String, dynamic> locationData) {
           userLocation.value = locationData['address'] ?? 'Select Location';
-          addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
-          emergencyServiceController.googleAddressController.text = locationData['address'] ?? 'Select Location';
-          emergencyServiceController.latitude.value=locationData['latitude']??"";
-          emergencyServiceController.longitude.value=locationData['longitude']??"";
+          addressController.text = locationData['address'] ?? 'Select Location';
+          emergencyServiceController.googleAddressController.text =
+              locationData['address'] ?? 'Select Location';
+          emergencyServiceController.latitude.value =
+              locationData['latitude'] ?? "";
+          emergencyServiceController.longitude.value =
+              locationData['longitude'] ?? "";
+          late = locationData['latitude'] ?? "";
+          long = locationData['longitude'] ?? "";
+          addre = locationData['address'] ?? 'Select Location';
+          selectedHouseNo.value = locationData['houseno']?.toString() ?? "";
+          selectedStreet.value = locationData['street']?.toString() ?? "";
+          selectedArea.value = locationData['area']?.toString() ?? "";
+          selectedPinCode.value = locationData['pincode']?.toString() ?? "";
+          updateFullAddress();
           debugPrint(
-            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']}), location data: $locationData",
+            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']}), full address: ${fullAddress.value}",
           );
         },
       ),
@@ -924,28 +1205,36 @@ class PostTaskController extends GetxController {
       double latitude = result['latitude'] ?? 0.0;
       double longitude = result['longitude'] ?? 0.0;
       String? addressId = result['addressId'];
-      bwDebug("address: $newAddress\n latitude : $latitude\n longitude: $longitude",tag: "builtPostTask");
+      selectedHouseNo.value = result['houseno']?.toString() ?? "";
+      selectedStreet.value = result['street']?.toString() ?? "";
+      selectedArea.value = result['area']?.toString() ?? "";
+      selectedPinCode.value = result['pincode']?.toString() ?? "";
       if (newAddress != 'Select Location' && latitude != 0.0 && longitude != 0.0) {
         await updateLocationOnServer(newAddress, latitude, longitude);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("selected_house_no", selectedHouseNo.value);
+        await prefs.setString("selected_street", selectedStreet.value);
+        await prefs.setString("selected_area", selectedArea.value);
+        await prefs.setString("selected_pin_code", selectedPinCode.value);
         if (addressId != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('selected_address_id', addressId);
+          await prefs.setString("selected_address_id", addressId);
         }
         await fetchLocation();
         emergencyServiceController.googleAddressController.text = newAddress;
-        emergencyServiceController.latitude.value=latitude;
-        emergencyServiceController.longitude.value=longitude;
-        bwDebug("address: ${emergencyServiceController.googleAddressController.text}"
-            "\n latitude : ${emergencyServiceController.latitude.value}"
-            "\n longitude: ${emergencyServiceController.longitude.value}",tag: "builtPostTask");
-
-
+        emergencyServiceController.latitude.value = latitude;
+        emergencyServiceController.longitude.value = longitude;
+        updateFullAddress();
+        debugPrint(
+            "address: ${emergencyServiceController.googleAddressController.text}"
+                "\n latitude: ${emergencyServiceController.latitude.value}"
+                "\n longitude: ${emergencyServiceController.longitude.value}"
+                "\n full address: ${fullAddress.value}");
       } else {
         debugPrint("❌ Invalid location data received: $result");
- CustomSnackBar.show(
-          message:  "Invalid location data. Please try again.",
-      type: SnackBarType.error
-      );
+        CustomSnackBar.show(
+          message: "Invalid location data. Please try again.",
+          type: SnackBarType.error,
+        );
       }
     }
   }
