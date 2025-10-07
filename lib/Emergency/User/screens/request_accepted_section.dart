@@ -31,7 +31,7 @@ class RequestAcceptedSection extends StatefulWidget {
 
 class _RequestAcceptedSectionState extends State<RequestAcceptedSection> {
   final RequestController controller = Get.put(RequestController());
-
+  bool _isChatLoading = false; // Add this as a field in your State class
   // final workController = Get.find<WorkDetailController>();
   final workController = Get.find<WorkDetailController>();
 
@@ -719,7 +719,9 @@ final tag="RequestAcceptedSection";
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
                                   child: GestureDetector(
-                                    onTap: ()  async {
+                                    onTap: _isChatLoading
+                                        ? null  // Disable tap while loading
+                                        : ()  async {
                                       final receiverId =  item?.id != null && item?.id != null
                                           ? item?.id.toString() ?? 'Unknown'
                                           : 'Unknown';
@@ -728,7 +730,22 @@ final tag="RequestAcceptedSection";
                                           : 'Unknown';
                                       print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullNamed");
                                       if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                        await _startOrFetchConversation(context, receiverId);
+                                        // await _startOrFetchConversation(context, receiverId);
+                                        try {
+                                          await _startOrFetchConversation(context, receiverId);
+                                        } catch (e) {
+                                          print("Abhi:- Error starting conversation: $e");
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error starting chat')),
+                                          );
+                                        } finally {
+                                          if (mounted) {  // Check if widget is still mounted
+                                            setState(() {
+                                              _isChatLoading = false;  // Re-enable button
+                                            });
+                                          }
+                                        }
+
                                       } else {
                                         print("Abhi:- Error: Invalid receiver ID");
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -736,7 +753,7 @@ final tag="RequestAcceptedSection";
                                         );
                                       }
                                     },
-                                    child: CircleAvatar(
+                                    child: /*CircleAvatar(
                                       radius: 16,
                                       backgroundColor: Colors.grey.shade300,
                                       child: IconButton(
@@ -744,6 +761,24 @@ final tag="RequestAcceptedSection";
                                         icon: const Icon(Icons.message,
                                             color: Colors.green, size: 18),
                                         onPressed: () {},
+                                      ),
+                                    ),*/
+                                    CircleAvatar(
+                                      radius: 14,
+                                      backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                      child: _isChatLoading
+                                          ? SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                        ),
+                                      )
+                                          : Icon(
+                                        Icons.message,
+                                        color: Colors.green,
+                                        size: 18,
                                       ),
                                     ),
                                   ),

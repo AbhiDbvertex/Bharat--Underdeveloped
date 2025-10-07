@@ -13,7 +13,7 @@ import '../../../Widgets/address_map_class.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
-import '../../../testingfile.dart';
+// import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
@@ -71,7 +71,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
     _scrollController.dispose();
     super.dispose();
   }
-
+  bool _isChatLoading = false; // Add this as a field in your State class
   String? getcategoryId;
   List<String> getsubCategoryIds = [];
   String? workerName;
@@ -1101,18 +1101,18 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.grey.shade200,
-                                    ),
-                                    child: const Icon(
-                                      Icons.call,
-                                      size: 16,
-                                      color: Colors.green,
-                                    ),
-                                  ),
+                                  // Container(
+                                  //   padding: const EdgeInsets.all(6),
+                                  //   decoration: BoxDecoration(
+                                  //     shape: BoxShape.circle,
+                                  //     color: Colors.grey.shade200,
+                                  //   ),
+                                  //   child: const Icon(
+                                  //     Icons.call,
+                                  //     size: 16,
+                                  //     color: Colors.green,
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                               const SizedBox(height: 5),
@@ -1129,68 +1129,64 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                     ),
                                   ),
                                   // InkWell(
-                                  //     onTap: () async {
-                                  //       final receiverId = order != null && order!['user_id'] != null
-                                  //           ? order!['user_id']['_id']?.toString() ?? 'Unknown'
-                                  //           : 'Unknown';
-                                  //       final fullName = order != null && order!['user_id'] != null
-                                  //           ?  order!['user_id']['full_name'] ?? 'Unknown'
-                                  //           : 'Unknown';
-                                  //       print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                                  //   onTap: _isChatLoading
+                                  //       ? null  // Disable tap while loading
+                                  //       : () async {
+                                  //     print("Abhi:- tap user chat button");
+                                  //     final receiverId = order != null && order!['user_id'] != null
+                                  //         ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
+                                  //         : 'Unknown';
+                                  //     print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                  //     final fullName = order != null && order?['service_provider_id'] != null
+                                  //         ? order?['service_provider_id']?['full_name'] ?? 'Unknown'
+                                  //         : 'Unknown';
+                                  //     print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
                                   //
-                                  //       if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                  //     if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                  //       setState(() {
+                                  //         _isChatLoading = true;  // Disable button immediately
+                                  //       });
+                                  //
+                                  //       try {
                                   //         await _startOrFetchConversation(context, receiverId);
-                                  //       } else {
-                                  //         print("Abhi:- Error: Invalid receiver ID");
+                                  //       } catch (e) {
+                                  //         print("Abhi:- Error starting conversation: $e");
                                   //         ScaffoldMessenger.of(context).showSnackBar(
-                                  //           SnackBar(content: Text('Error: Invalid receiver ID')),
+                                  //           SnackBar(content: Text('Error starting chat')),
                                   //         );
+                                  //       } finally {
+                                  //         if (mounted) {  // Check if widget is still mounted
+                                  //           setState(() {
+                                  //             _isChatLoading = false;  // Re-enable button
+                                  //           });
+                                  //         }
                                   //       }
-                                  //     },
-                                  //   child: Container(
-                                  //     padding: const EdgeInsets.all(6),
-                                  //     decoration: BoxDecoration(
-                                  //       shape: BoxShape.circle,
-                                  //       color: Colors.grey.shade300,
-                                  //     ),
-                                  //     child: const Icon(
+                                  //     } else {
+                                  //       print("Abhi:- Error: Invalid receiver ID");
+                                  //       ScaffoldMessenger.of(context).showSnackBar(
+                                  //         SnackBar(content: Text('Error: Invalid receiver ID')),
+                                  //       );
+                                  //     }
+                                  //   },
+                                  //   child: CircleAvatar(
+                                  //     radius: 14,
+                                  //     backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                  //     child: _isChatLoading
+                                  //         ? SizedBox(
+                                  //       width: 18,
+                                  //       height: 18,
+                                  //       child: CircularProgressIndicator(
+                                  //         strokeWidth: 2,
+                                  //         valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                  //       ),
+                                  //     )
+                                  //         : Icon(
                                   //       Icons.message,
-                                  //       size: 16,
                                   //       color: Colors.green,
+                                  //       size: 18,
                                   //     ),
                                   //   ),
                                   // ),
-                                  InkWell(
-                                    onTap: () async {
-                                      print("Abhi:- tap user chat button");
-                                      final receiverId = order != null && order!['user_id'] != null
-                                          ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
-                                          : 'Unknown';
-                                      print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
-                                      final fullName = order != null && order?['service_provider_id'] != null
-                                          ?  order?['service_provider_id']?['full_name'] ?? 'Unknown'
-                                          : 'Unknown';
-                                      print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-
-                                      if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                        await _startOrFetchConversation(context, receiverId);
-                                      } else {
-                                        print("Abhi:- Error: Invalid receiver ID");
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Error: Invalid receiver ID')),
-                                        );
-                                      }
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 14,
-                                      backgroundColor: Colors.grey[300],
-                                      child: Icon(
-                                        Icons.message,
-                                        color: Colors.green,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                               const Spacer(),
@@ -1213,16 +1209,96 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                     ),
                                   );
                                 },
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Text(
-                                    "View Profile",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 13,
-                                      color: Colors.green.shade700,
-                                      fontWeight: FontWeight.w700,
+                                child: Row(
+                                  // mainAxisAlignment: MainAxisAlignment,
+                                  children: [
+                                    InkWell(
+                                      onTap: _isChatLoading
+                                          ? null  // Disable tap while loading
+                                          : () async {
+                                        print("Abhi:- tap user chat button");
+                                        final receiverId = order != null && order!['user_id'] != null
+                                            ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
+                                            : 'Unknown';
+                                        print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                        final fullName = order != null && order?['service_provider_id'] != null
+                                            ? order?['service_provider_id']?['full_name'] ?? 'Unknown'
+                                            : 'Unknown';
+                                        print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                                        if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                          setState(() {
+                                            _isChatLoading = true;  // Disable button immediately
+                                          });
+
+                                          try {
+                                            await _startOrFetchConversation(context, receiverId);
+                                          } catch (e) {
+                                            print("Abhi:- Error starting conversation: $e");
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Error starting chat')),
+                                            );
+                                          } finally {
+                                            if (mounted) {  // Check if widget is still mounted
+                                              setState(() {
+                                                _isChatLoading = false;  // Re-enable button
+                                              });
+                                            }
+                                          }
+                                        } else {
+                                          print("Abhi:- Error: Invalid receiver ID");
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error: Invalid receiver ID')),
+                                          );
+                                        }
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                        child: _isChatLoading
+                                            ? SizedBox(
+                                          width: 2,
+                                          height: 2,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                          ),
+                                        )
+                                            : Icon(
+                                          Icons.message,
+                                          color: Colors.green,
+                                          size: 30,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey.shade200,
+                                      ),
+                                      child: const Icon(
+                                        Icons.call,
+                                        size: 30,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Text(
+                                        "View Profile",
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 13,
+                                          color: Colors.green.shade700,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -1249,7 +1325,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                       elevation: 3,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       child: Container(
-                        height: 120,
+                        height: 140,
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -1290,18 +1366,18 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.all(6),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.grey.shade200,
-                                        ),
-                                        child: const Icon(
-                                          Icons.call,
-                                          size: 16,
-                                          color: Colors.green,
-                                        ),
-                                      ),
+                                      // Container(
+                                      //   padding: const EdgeInsets.all(6),
+                                      //   decoration: BoxDecoration(
+                                      //     shape: BoxShape.circle,
+                                      //     color: Colors.grey.shade200,
+                                      //   ),
+                                      //   child: const Icon(
+                                      //     Icons.call,
+                                      //     size: 16,
+                                      //     color: Colors.green,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                   const SizedBox(height: 5),
@@ -1309,7 +1385,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          "Project Fees - ₹${order!['platform_fee'] ?? '200'}/-", // Platform fee same rakha
+                                          "Project Fees - ₹${order?['platform_fee'] ?? '200'}/-", // Platform fee same rakha
                                           style: GoogleFonts.roboto(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
@@ -1317,51 +1393,143 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                           ),
                                         ),
                                       ),
-                                      // Container(
-                                      //   padding: const EdgeInsets.all(6),
-                                      //   decoration: BoxDecoration(
-                                      //     shape: BoxShape.circle,
-                                      //     color: Colors.grey.shade300,
-                                      //   ),
-                                      //   child: const Icon(
-                                      //     Icons.message,
-                                      //     size: 16,
-                                      //     color: Colors.green,
-                                      //   ),
+                                      // InkWell(
+                                      //   onTap: _isChatLoading
+                                      //       ? null  // Disable tap while loading
+                                      //       : () async {
+                                      //     print("Abhi:- tap user chat button");
+                                      //     final receiverId = pendingProviderData != null && pendingProviderData['_id'] != null
+                                      //         ?  pendingProviderData['_id']?.toString() ?? 'Unknown'
+                                      //         : 'Unknown';
+                                      //     print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                      //     final fullName = order != null && pendingProviderData['_id'] != null
+                                      //         ?  pendingProviderData['full_name'] ?? 'Unknown'
+                                      //         : 'Unknown';
+                                      //     print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+                                      //
+                                      //     if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                      //       setState(() {
+                                      //         _isChatLoading = true;  // Disable button immediately
+                                      //       });
+                                      //       // await _startOrFetchConversation(context, receiverId);
+                                      //       try {
+                                      //         await _startOrFetchConversation(context, receiverId);
+                                      //       } catch (e) {
+                                      //         print("Abhi:- Error starting conversation: $e");
+                                      //         ScaffoldMessenger.of(context).showSnackBar(
+                                      //           SnackBar(content: Text('Error starting chat')),
+                                      //         );
+                                      //       }finally {
+                                      //         if (mounted) {  // Check if widget is still mounted
+                                      //           setState(() {
+                                      //             _isChatLoading = false;  // Re-enable button
+                                      //           });
+                                      //         }
+                                      //       }
+                                      //     } else {
+                                      //       print("Abhi:- Error: Invalid receiver ID");
+                                      //       ScaffoldMessenger.of(context).showSnackBar(
+                                      //         SnackBar(content: Text('Error: Invalid receiver ID')),
+                                      //       );
+                                      //     }
+                                      //   },
+                                      //   child:  CircleAvatar(
+                                      //     radius: 14,
+                                      //     backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                      //     child: _isChatLoading
+                                      //         ? SizedBox(
+                                      //       width: 18,
+                                      //       height: 18,
+                                      //       child: CircularProgressIndicator(
+                                      //         strokeWidth: 2,
+                                      //         valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                      //       ),
+                                      //     )
+                                      //         : Icon(
+                                      //       Icons.message,
+                                      //       color: Colors.green,
+                                      //       size: 18,
+                                      //     ),),
                                       // ),
-                                      InkWell(
-                                        onTap: () async {
-                                          print("Abhi:- tap user chat button");
-                                          final receiverId = pendingProviderData != null && pendingProviderData['_id'] != null
-                                              ?  pendingProviderData['_id']?.toString() ?? 'Unknown'
-                                              : 'Unknown';
-                                          print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
-                                          final fullName = order != null && pendingProviderData['_id'] != null
-                                              ?  pendingProviderData['full_name'] ?? 'Unknown'
-                                              : 'Unknown';
-                                          print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
-
-                                          if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                            await _startOrFetchConversation(context, receiverId);
-                                          } else {
-                                            print("Abhi:- Error: Invalid receiver ID");
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Error: Invalid receiver ID')),
-                                            );
-                                          }
-                                        },
-                                        child: CircleAvatar(
-                                          radius: 14,
-                                          backgroundColor: Colors.grey[300],
-                                          child: Icon(
-                                            Icons.message,
-                                            color: Colors.green,
-                                            size: 18,
-                                          ),
-                                        ),
-                                      ),
                                     ],
                                   ),
+                                 Row(
+                                   children: [
+                                     InkWell(
+                                       onTap: _isChatLoading
+                                           ? null  // Disable tap while loading
+                                           : () async {
+                                         print("Abhi:- tap user chat button");
+                                         final receiverId = pendingProviderData != null && pendingProviderData['_id'] != null
+                                             ?  pendingProviderData['_id']?.toString() ?? 'Unknown'
+                                             : 'Unknown';
+                                         print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
+                                         final fullName = order != null && pendingProviderData['_id'] != null
+                                             ?  pendingProviderData['full_name'] ?? 'Unknown'
+                                             : 'Unknown';
+                                         print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+
+                                         if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                           setState(() {
+                                             _isChatLoading = true;  // Disable button immediately
+                                           });
+                                           // await _startOrFetchConversation(context, receiverId);
+                                           try {
+                                             await _startOrFetchConversation(context, receiverId);
+                                           } catch (e) {
+                                             print("Abhi:- Error starting conversation: $e");
+                                             ScaffoldMessenger.of(context).showSnackBar(
+                                               SnackBar(content: Text('Error starting chat')),
+                                             );
+                                           }finally {
+                                             if (mounted) {  // Check if widget is still mounted
+                                               setState(() {
+                                                 _isChatLoading = false;  // Re-enable button
+                                               });
+                                             }
+                                           }
+                                         } else {
+                                           print("Abhi:- Error: Invalid receiver ID");
+                                           ScaffoldMessenger.of(context).showSnackBar(
+                                             SnackBar(content: Text('Error: Invalid receiver ID')),
+                                           );
+                                         }
+                                       },
+                                       child:  CircleAvatar(
+                                         radius: 20,
+                                         backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                         child: _isChatLoading
+                                             ? SizedBox(
+                                           width: 18,
+                                           height: 18,
+                                           child: CircularProgressIndicator(
+                                             strokeWidth: 2,
+                                             valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                           ),
+                                         )
+                                             : Icon(
+                                           Icons.message,
+                                           color: Colors.green,
+                                           size: 26,
+                                         ),),
+                                     ),
+                                     SizedBox(
+                                       width: 15,
+                                     ),
+                                     Container(
+                                       padding: const EdgeInsets.all(6),
+                                       decoration: BoxDecoration(
+                                         shape: BoxShape.circle,
+                                         color: Colors.grey.shade200,
+                                       ),
+                                       child: const Icon(
+                                         Icons.call,
+                                         size: 27,
+                                         color: Colors.green,
+                                       ),
+                                     ),
+                                   ],
+                                 ),
                                   const Spacer(),
                                   InkWell(
                                     onTap: () {
@@ -1766,37 +1934,37 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        _scrollToListView();
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade700,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Send offer",
-                            style: GoogleFonts.roboto(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     _scrollToListView();
+                    //   },
+                    //   child: Container(
+                    //     width: double.infinity,
+                    //     height: 50,
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.green.shade700,
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       boxShadow: [
+                    //         BoxShadow(
+                    //           color: Colors.grey.withOpacity(0.1),
+                    //           spreadRadius: 1,
+                    //           blurRadius: 6,
+                    //           offset: const Offset(0, 2),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     child: Center(
+                    //       child: Text(
+                    //         "Send offer",
+                    //         style: GoogleFonts.roboto(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Colors.white,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     const SizedBox(height: 10),
                     Container(
                       width: double.infinity,
@@ -1913,7 +2081,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
-              else if (order!['hire_status'] == 'pending')
+              else if (order!['hire_status'] == 'pending' /*&& order?['offer_history']['status'] == "rejected"*/)
                 ListView.builder(
                   key: _listViewKey,
                   shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le

@@ -16,6 +16,7 @@ import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfile
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
 import '../../Emergency/User/controllers/emergency_service_controller.dart';
+import '../../Emergency/User/screens/work_detail.dart';
 import '../../utility/custom_snack_bar.dart';
 
 class PostTaskController extends GetxController {
@@ -43,6 +44,7 @@ class PostTaskController extends GetxController {
   var late;
   var long;
   var addre;
+  var emergencyOrderId = "".obs;
 
   @override
   void onInit() {
@@ -740,78 +742,6 @@ class PostTaskController extends GetxController {
     }
   }
 
-  // Future<void> submitTask(BuildContext context) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token') ?? '';
-  //
-  //     String formattedDeadline = selectedDate.value != null
-  //         ? "${selectedDate.value!.year}-${selectedDate.value!.month.toString().padLeft(2, '0')}-${selectedDate.value!.day.toString().padLeft(2, '0')}"
-  //         : "2025-08-01";
-  //
-  //     List<String> base64Images = [];
-  //     for (var image in selectedImages) {
-  //       final bytes = await image.readAsBytes();
-  //       final mimeType = mime.lookupMimeType(image.path) ?? 'image/jpeg';
-  //       base64Images.add("data:$mimeType;base64,${base64Encode(bytes)}");
-  //     }
-  //
-  //     String addressToSend = addressController.text.trim().isNotEmpty
-  //         ? addressController.text.trim()
-  //         : userLocation.value.trim();
-  //     if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
-  //       showSnackbar("Error", "Please provide a valid address.", context: context);
-  //       return;
-  //     }
-  //
-  //     final body = {
-  //       "title": titleController.text.trim(),
-  //       "category_id": selectedCategoryId.value,
-  //       "sub_category_ids": selectedSubCategoryIds.join(','),
-  //       "address": addressToSend,
-  //       "google_address": googleAddressController.text.trim(),
-  //       "description": descriptionController.text.trim(),
-  //       "cost": costController.text.trim(),
-  //       "deadline": formattedDeadline,
-  //       if (base64Images.isNotEmpty) "images": base64Images,
-  //     };
-  //
-  //     print("📩 Sending task with address: $addressToSend");
-  //
-  //     final response = await http.post(
-  //       Uri.parse("https://api.thebharatworks.com/api/bidding-order/create"),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: jsonEncode(body),
-  //     );
-  //
-  //     print("📡 Post Task response: ${response.body}");
-  //     print("📡 Post Task status: ${response.statusCode}");
-  //
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       showSnackbar("Success", "Task posted successfully.", context: context);
-  //       resetForm(); // Reset form after successful submission
-  //       // Add a slight delay to ensure snackbar is visible
-  //       await Future.delayed(const Duration(seconds: 1));
-  //       Get.delete<PostTaskController>(); // Delete controller before navigation
-  //       Get.back();
-  //     } else if (response.statusCode == 401) {
-  //       showSnackbar("Error", " CustomSnackBar.show(
-//           message:  "Session expired. Please log in again.",
-//       type: SnackBarType.error
-//       );
-// ", context: context);
-  //       Get.offAllNamed('/login');
-  //     } else {
-  //       showSnackbar("Error", "Failed to post task. Please try again.", context: context);
-  //     }
-  //   } catch (e) {
-  //     showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
-  //   }
-  // }
-
   Future<void> submitTask(BuildContext context) async {
     isLoading.value=true;
     try {
@@ -864,7 +794,8 @@ class PostTaskController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // showSnackbar("Success", "Task posted successfully.", context: context);
-        Get.back();
+        // Get.back();
+
         Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
         resetForm();
 
@@ -899,6 +830,66 @@ class PostTaskController extends GetxController {
       isLoading.value=false;
     }
   }
+
+  Future<void> getAllbidding(BuildContext context, int passIndex) async {
+    const url = 'https://api.thebharatworks.com/api/emergency-order/getAllEmergencyOrdersByRole';
+    isLoading.value = true;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      var responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Abhi:- get emergency response in payment : ${response.statusCode}");
+        print("Abhi:- get emergency response in payment : ${response.body}");
+        List<dynamic> orders = responseData['data'] ?? [];
+
+        if (orders.isEmpty) {
+          print("Abhi:- No orders found");
+          isLoading.value = false;
+          return;
+        }
+
+        orders.sort((a, b) => DateTime.parse(b['createdAt'])
+            .compareTo(DateTime.parse(a['createdAt'])));
+
+        var latestbiddingOrderId = orders.first['_id'];
+        emergencyOrderId.value = latestbiddingOrderId;
+
+        print("Latest Order ID emergency: $latestbiddingOrderId");
+
+        int count = 0;
+        Navigator.of(context).popUntil((route) => count++ == 2);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => WorkDetailPage(
+              latestbiddingOrderId,
+              passIndex: passIndex,
+              isUser: true,
+            ),
+          ),
+        );
+      } else {
+        print("Abhi:- Error ${response.statusCode}: ${response.body}");
+      }
+    } catch (e) {
+      print("Abhi:- getAllEmergency Exception: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 
 
   void navigateToLocationScreen() async {

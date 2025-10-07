@@ -21,7 +21,7 @@ import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
-import '../../../testingfile.dart';
+// import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
@@ -49,6 +49,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   List<dynamic> filteredRelatedWorkers = [];
   List<dynamic>? getBuddingOderByIdResponseDatalist;
   late Razorpay _razorpay;
+  bool _isChatLoading = false; // Add this as a field in your State class
   String? selectedBidderId; // New variable add kar
   @override
   void initState() {
@@ -2032,13 +2033,30 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               top: 8.0),
                                                                           child:
                                                                               GestureDetector(
-                                                                            onTap:
+                                                                                onTap: _isChatLoading
+                                                                                    ? null  // Disable tap while loading
+                                                                                    :
                                                                                 () async {
                                                                               final receiverId = bidderId != null && bidderId != null ? bidderId?.toString() ?? 'Unknown' : 'Unknown';
                                                                               final fullNamed = bidderId != null && bidderId != null ? fullName ?? 'Unknown' : 'Unknown';
                                                                               print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullNamed");
                                                                               if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                                                                await _startOrFetchConversation(context, receiverId);
+                                                                                // await _startOrFetchConversation(context, receiverId);
+
+                                                                                try {
+                                                                                  await _startOrFetchConversation(context, receiverId);
+                                                                                } catch (e) {
+                                                                                  print("Abhi:- Error starting conversation: $e");
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    SnackBar(content: Text('Error starting chat')),
+                                                                                  );
+                                                                                } finally {
+                                                                                  if (mounted) {  // Check if widget is still mounted
+                                                                                    setState(() {
+                                                                                      _isChatLoading = false;  // Re-enable button
+                                                                                    });
+                                                                                  }
+                                                                                }
                                                                               } else {
                                                                                 print("Abhi:- Error: Invalid receiver ID");
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -2047,7 +2065,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               }
                                                                             },
                                                                             child:
-                                                                                CircleAvatar(
+                                                                                /*CircleAvatar(
                                                                               radius: 13,
                                                                               backgroundColor: Colors.grey.shade300,
                                                                               child: Icon(
@@ -2055,8 +2073,27 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                                 size: 18,
                                                                                 color: Colors.green.shade600,
                                                                               ),
+                                                                            ),*/
+                                                                            CircleAvatar(
+                                                                              radius: 14,
+                                                                              backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                                                              child: _isChatLoading
+                                                                                  ? SizedBox(
+                                                                                width: 18,
+                                                                                height: 18,
+                                                                                child: CircularProgressIndicator(
+                                                                                  strokeWidth: 2,
+                                                                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                                                                ),
+                                                                              )
+                                                                                  : Icon(
+                                                                                Icons.message,
+                                                                                color: Colors.green,
+                                                                                size: 18,
+                                                                              ),
                                                                             ),
-                                                                          ),
+
+                                                                              ),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -2465,8 +2502,9 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               8.0),
                                                                       child:
                                                                           GestureDetector(
-                                                                        onTap:
-                                                                            () async {
+                                                                            onTap: _isChatLoading
+                                                                                ? null  // Disable tap while loading
+                                                                                :  () async {
                                                                           final receiverId = workerId != null && workerId != null
                                                                               ? workerId?.toString() ?? 'Unknown'
                                                                               : 'Unknown';
@@ -2477,8 +2515,25 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                               "Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullNamed");
                                                                           if (receiverId != 'Unknown' &&
                                                                               receiverId.isNotEmpty) {
-                                                                            await _startOrFetchConversation(context,
-                                                                                receiverId);
+                                                                            // await _startOrFetchConversation(context,
+                                                                            //     receiverId);
+                                                                            setState(() {
+                                                                              _isChatLoading = true;  // Disable button immediately
+                                                                            });
+                                                                            try {
+                                                                              await _startOrFetchConversation(context, receiverId);
+                                                                            } catch (e) {
+                                                                              print("Abhi:- Error starting conversation: $e");
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(content: Text('Error starting chat')),
+                                                                              );
+                                                                            } finally {
+                                                                              if (mounted) {  // Check if widget is still mounted
+                                                                                setState(() {
+                                                                                  _isChatLoading = false;  // Re-enable button
+                                                                                });
+                                                                              }
+                                                                            }
                                                                           } else {
                                                                             print("Abhi:- Error: Invalid receiver ID");
                                                                             ScaffoldMessenger.of(context).showSnackBar(
@@ -2487,7 +2542,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                           }
                                                                         },
                                                                         child:
-                                                                            CircleAvatar(
+                                                                            /*CircleAvatar(
                                                                           radius:
                                                                               13,
                                                                           backgroundColor: Colors
@@ -2501,8 +2556,27 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                             color:
                                                                                 Colors.green.shade600,
                                                                           ),
+                                                                        ),*/
+
+                                                                        CircleAvatar(
+                                                                          radius: 14,
+                                                                          backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                                                          child: _isChatLoading
+                                                                              ? SizedBox(
+                                                                            width: 18,
+                                                                            height: 18,
+                                                                            child: CircularProgressIndicator(
+                                                                              strokeWidth: 2,
+                                                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                                                            ),
+                                                                          )
+                                                                              : Icon(
+                                                                            Icons.message,
+                                                                            color: Colors.green,
+                                                                            size: 18,
+                                                                          ),
                                                                         ),
-                                                                      ),
+                                                                          ),
                                                                     ),
                                                                   ],
                                                                 ),

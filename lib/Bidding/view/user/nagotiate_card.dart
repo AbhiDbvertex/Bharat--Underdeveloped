@@ -40,6 +40,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
   String? razorpayOrderId; // New variable to store orderId
   int? platformFee; // Corrected variable to store platform fee amount (int type)
   late Razorpay _razorpay;
+  String? serviceProviderId;
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
     final String url =
         'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.oderId}';
     print("Abhi:- getNegotiation url: $url");
+    print("Abhi:- getNegotiation bidding orderId: ${widget.oderId}");
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -106,7 +108,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
     print("Abhi:- postNegotiate url: $url");
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},\n"
+    bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},\n"
     "service providerId : ${widget.workerId}, "
     "\n userId: ${widget.UserId}.\n"
     "mount: $amount, \n"
@@ -174,16 +176,24 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- AcceptNegotiation statusCode: ${response.statusCode}");
         print("Abhi:- AcceptNegotiation response: ${response.body}");
-        Get.back(result: true);
-        Get.back(result: true);
-        Get.back(result: true);
-        Get.snackbar(
-          "Success",
-          responseData['message'],
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        print("Abhi:- AcceptNegotiation serviceProviderId: ${responseData['negotiation']?['service_provider']}");
+
+        setState(() {
+          serviceProviderId = responseData['negotiation']?['service_provider'];
+        });
+
+        // Get.back(result: true);
+        // Get.back(result: true);
+        // Get.back(result: true);
+        // Get.snackbar(
+        //   "Success",
+        //   responseData['message'],
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
+        print("Abhi:- accepted Negocation assassin serviceProviderId : ${serviceProviderId}");
+        print("Abhi:- accepted Negocation : ${responseData['message']}");
         // Removed Get.back() from here to avoid extra navigation
       } else {
         print("Abhi:- else AcceptNegotiation statusCode: ${response.statusCode}");
@@ -217,10 +227,11 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
         print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
-        setState(() {
-          razorpayOrderId = responseData['orderId']; // Store orderId
-          platformFee = responseData['amount']; // Store platform fee amount (assuming it's int)
-        });
+        print("Abhi:- ");
+        // setState(() {
+        //   razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+        //   platformFee = responseData['total_cost']; // Store platform fee amount (assuming it's int)
+        // });
         print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
         // Do not open Razorpay here; it will be opened from dialog's Pay button
       } else {
@@ -237,6 +248,7 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/verifyPlatformFeePayment';
     print("Abhi:- verifaibiddingPlateformFee url: $url");
+    print("Abhi:- verifaibiddingPlateformFee response razerpay paymentId : ${paymentId} razerpay OrderId ${orderId}");
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -250,7 +262,8 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
         },
         body: jsonEncode({
           "razorpay_order_id": orderId,
-          "razorpay_payment_id": paymentId,
+          // "razorpay_payment_id": paymentId,
+          "serviceProviderId": serviceProviderId
         }),
       );
 
@@ -259,6 +272,9 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
         print("Abhi:- verifaibiddingPlateformFee statusCode: ${response.statusCode}");
         print("Abhi:- verifaibiddingPlateformFee response: ${response.body}");
         // Verify success hone ke baad AcceptNegotiation call karo
+        // Get.back(result: true);
+        // Get.back(result: true);
+        // Get.back(result: true);
         await AcceptNegotiation();
       } else {
         print("Abhi:- else verifaibiddingPlateformFee statusCode: ${response.statusCode}");
@@ -536,32 +552,6 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
                 ),
               ),
             ] else ...[
-              /*GestureDetector(
-                onTap: getCurrentBiddingAmmount == null ?  () async {
-                  setState(() {
-                    isAccepting = true;
-                    isNegotiating = false;
-                  });
-                  await CreatebiddingPlateformfee(); // Pehle API call karo to get platformFee and orderId
-                  showTotalDialog(context, platformFee); // Fir dialog open with platformFee
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: height * 0.018),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(width * 0.02),
-                    color: Colors.green.shade700,
-                  ),
-                  child: Text(
-                    "Accepted & Amount",
-                    style: GoogleFonts.roboto(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: width * 0.03,
-                    ),
-                  ),
-                ),
-              ),*/
               GestureDetector(
                 onTap: (
                     getCurrentBiddingAmmount == null || getCurrentBiddingAmmount.toString().isEmpty)
@@ -571,6 +561,7 @@ bwDebug(" orderId: ${widget.oderId}\n bidding offerId: ${widget.biddingOfferId},
                     isAccepting = true;
                     isNegotiating = false;
                   });
+                  await AcceptNegotiation();
                   await CreatebiddingPlateformfee(); // Pehle API call karo to get platformFee and orderId
                   showTotalDialog(context, platformFee); // Fir dialog open with platformFee
                 },

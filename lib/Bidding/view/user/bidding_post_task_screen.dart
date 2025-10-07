@@ -301,7 +301,6 @@ class PostTaskScreen extends StatelessWidget {
         maxLines: maxLines,
         decoration: _inputDecoration(hint),
         textCapitalization: TextCapitalization.words,
-
         inputFormatters: inputFormatters ??
             [
               FilteringTextInputFormatter.allow(

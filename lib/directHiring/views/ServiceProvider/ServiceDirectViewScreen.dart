@@ -46,7 +46,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
   ScaffoldMessengerState? _scaffoldMessenger;
   bool _isProcessing = false;
   bool _isOrderAccepted = false;
-
+  bool _isChatLoading = false; // Add this as a field in your State class
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -1123,7 +1123,9 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                         SizedBox(width: 30),
                                         //           this code is currect added by Abhishek
                                         InkWell(
-                                          onTap: () async {
+                                          onTap: _isChatLoading
+                                              ? null  // Disable tap while loading
+                                              : () async {
                                             final receiverId = order != null && order!['user_id'] != null
                                                 ? order!['user_id']['_id']?.toString() ?? 'Unknown'
                                                 : 'Unknown';
@@ -1133,7 +1135,25 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                             print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
 
                                             if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                              await _startOrFetchConversation(context, receiverId);
+                                              // await _startOrFetchConversation(context, receiverId);
+
+                                              setState(() {
+                                                _isChatLoading = true;  // Disable button immediately
+                                              });
+                                              try {
+                                                await _startOrFetchConversation(context, receiverId);
+                                              } catch (e) {
+                                                print("Abhi:- Error starting conversation: $e");
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Error starting chat')),
+                                                );
+                                              } finally {
+                                                if (mounted) {  // Check if widget is still mounted
+                                                  setState(() {
+                                                    _isChatLoading = false;  // Re-enable button
+                                                  });
+                                                }
+                                              }
                                             } else {
                                               print("Abhi:- Error: Invalid receiver ID");
                                               ScaffoldMessenger.of(context).showSnackBar(
@@ -1141,7 +1161,7 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                               );
                                             }
                                           },
-                                          child: CircleAvatar(
+                                          child: /*CircleAvatar(
                                             radius: 20,
                                             backgroundColor: Colors.grey[300],
                                             child: Icon(
@@ -1149,7 +1169,26 @@ class _ServiceDirectViewScreenState extends State<ServiceDirectViewScreen> {
                                               color: Colors.green,
                                               size: 24,
                                             ),
+                                          ),*/
+                                          CircleAvatar(
+                                            radius: 14,
+                                            backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                            child: _isChatLoading
+                                                ? SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                              ),
+                                            )
+                                                : Icon(
+                                              Icons.message,
+                                              color: Colors.green,
+                                              size: 18,
+                                            ),
                                           ),
+
                                         ),
                                         SizedBox(height: 6),
                                         // GestureDetector(

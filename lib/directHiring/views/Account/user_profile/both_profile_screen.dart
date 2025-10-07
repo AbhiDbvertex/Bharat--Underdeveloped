@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1161,16 +1162,88 @@ class _SellerScreenState extends State<SellerScreen> {
                       ),
                     ),
                   ),
+                  // CarouselSlider(
+                  //   options: CarouselOptions(
+                  //     height: 160,
+                  //     autoPlay: true,
+                  //     enlargeCenterPage: true,
+                  //     aspectRatio: 16 / 9,
+                  //     autoPlayInterval: const Duration(seconds: 3),
+                  //     autoPlayAnimationDuration:
+                  //     const Duration(milliseconds: 800),
+                  //     viewportFraction: 0.8,
+                  //   ),
+                  //   items: (_showReviews
+                  //       ? (profile?.hisWork?.isNotEmpty ?? false)
+                  //       ? profile!.hisWork!
+                  //       : ['assets/images/d_png/No_Image_Available.jpg']
+                  //       : (profile?.customerReview?.isNotEmpty ?? false)
+                  //       ? profile!.customerReview!
+                  //       : [
+                  //     'assets/images/d_png/No_Image_Available.jpg'
+                  //   ])
+                  //       .map((imageUrl) {
+                  //     return Builder(
+                  //       builder: (BuildContext context) {
+                  //         return GestureDetector(
+                  //           onTap: imageUrl.startsWith('assets/')
+                  //               ? null
+                  //               : () {
+                  //             Get.to(() => FullImageScreen(
+                  //               imageUrl: imageUrl,
+                  //             )); /*_showReviews
+                  //                 ? GalleryScreen(images: profile?.hisWork ?? [], serviceProviderId: profile?.id ?? "")
+                  //                 : ReviewImagesScreen(images: profile?.customerReview ?? []));*/
+                  //           },
+                  //           child: Container(
+                  //             width: MediaQuery.of(context).size.width,
+                  //             margin:
+                  //             const EdgeInsets.symmetric(horizontal: 5.0),
+                  //             decoration: BoxDecoration(
+                  //                 borderRadius: BorderRadius.circular(8)),
+                  //             child: ClipRRect(
+                  //               borderRadius: BorderRadius.circular(8),
+                  //               child: imageUrl.startsWith('assets/')
+                  //                   ? Image.asset(imageUrl, fit: BoxFit.cover)
+                  //                   : Image.network(
+                  //                 imageUrl,
+                  //                 fit: BoxFit.cover,
+                  //                 errorBuilder:
+                  //                     (context, error, stackTrace) =>
+                  //                     Image.asset(
+                  //                       'assets/images/d_png/No_Image_Available.jpg',
+                  //                       fit: BoxFit.cover,
+                  //                     ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         );
+                  //       },
+                  //     );
+                  //   }).toList(),
+                  // ),
                   CarouselSlider(
                     options: CarouselOptions(
                       height: 160,
-                      autoPlay: true,
+                      autoPlay: (_showReviews
+                          ? (profile?.hisWork?.isNotEmpty ?? false)
+                          ? profile!.hisWork!.length > 1
+                          : false
+                          : (profile?.customerReview?.isNotEmpty ?? false)
+                          ? profile!.customerReview!.length > 1
+                          : false),
                       enlargeCenterPage: true,
                       aspectRatio: 16 / 9,
                       autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration:
-                      const Duration(milliseconds: 800),
+                      autoPlayAnimationDuration: const Duration(milliseconds: 800),
                       viewportFraction: 0.8,
+                      enableInfiniteScroll: (_showReviews
+                          ? (profile?.hisWork?.isNotEmpty ?? false)
+                          ? profile!.hisWork!.length > 1
+                          : false
+                          : (profile?.customerReview?.isNotEmpty ?? false)
+                          ? profile!.customerReview!.length > 1
+                          : false),
                     ),
                     items: (_showReviews
                         ? (profile?.hisWork?.isNotEmpty ?? false)
@@ -1178,9 +1251,7 @@ class _SellerScreenState extends State<SellerScreen> {
                         : ['assets/images/d_png/No_Image_Available.jpg']
                         : (profile?.customerReview?.isNotEmpty ?? false)
                         ? profile!.customerReview!
-                        : [
-                      'assets/images/d_png/No_Image_Available.jpg'
-                    ])
+                        : ['assets/images/d_png/No_Image_Available.jpg'])
                         .map((imageUrl) {
                       return Builder(
                         builder: (BuildContext context) {
@@ -1190,29 +1261,29 @@ class _SellerScreenState extends State<SellerScreen> {
                                 : () {
                               Get.to(() => FullImageScreen(
                                 imageUrl: imageUrl,
-                              )); /*_showReviews
-                                  ? GalleryScreen(images: profile?.hisWork ?? [], serviceProviderId: profile?.id ?? "")
-                                  : ReviewImagesScreen(images: profile?.customerReview ?? []));*/
+                              ));
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width,
-                              margin:
-                              const EdgeInsets.symmetric(horizontal: 5.0),
+                              margin: const EdgeInsets.symmetric(horizontal: 5.0),
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8)),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: imageUrl.startsWith('assets/')
                                     ? Image.asset(imageUrl, fit: BoxFit.cover)
-                                    : Image.network(
-                                  imageUrl,
+                                    : CachedNetworkImage(
+                                  imageUrl: imageUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                      Image.asset(
-                                        'assets/images/d_png/No_Image_Available.jpg',
-                                        fit: BoxFit.cover,
-                                      ),
+                                  placeholder: (context, url) => Image.asset(
+                                    'assets/images/d_png/No_Image_Available.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
+                                  errorWidget: (context, url, error) => Image.asset(
+                                    'assets/images/d_png/No_Image_Available.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
