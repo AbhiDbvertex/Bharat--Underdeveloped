@@ -202,7 +202,46 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                         ),
                       ),
                       SizedBox(height: .04.toWidthPercent()),
-        
+                      _buildTitle("Full Address"),
+                      Obx(
+                            () => InkWell(
+                          onTap: postTaskController.navigateToLocationScreen, // Make tappable
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade400),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  postTaskController.fullAddress.value.isNotEmpty
+                                      ? postTaskController.fullAddress.value
+                                      : "No address found",
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 14,
+                                    color: Colors.black45,
+
+                                  ),
+                                ),
+                                // const SizedBox(height: 4),
+                                // Text(
+                                //   controller.fullAddress.value,
+                                //   style: GoogleFonts.roboto(
+                                //     fontSize: 14,
+                                //     color: Colors.black87,
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       _buildTitle("Detailed Address (Landmark) *"),
                       customTextField(
                           hint: "Enter address",
