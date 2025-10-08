@@ -574,28 +574,28 @@ class _HireScreenState extends State<HireScreen> {
               const SizedBox(height: 6),
               buildDescriptionField(),
               const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  buildLabel("Location *"),
-                ],
-              ),
-              const SizedBox(height: 6),
-              GestureDetector(
-                onTap: controller.navigateToLocationScreen,
-                child: TextFormField(
-                  enabled: false,
-                  controller: controller.addressController,
-                  style: const TextStyle(fontSize: 16, color: Colors.green),
-                  decoration: _inputDecoration(controller.userLocation.value).copyWith(
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.my_location, color: AppColors.primaryGreen),
-                      onPressed: controller.getCurrentLocation,
-                    ),
-                  ),
-                  validator: (val) => val == null || val.isEmpty || val == 'Select Location' ? "Please enter a valid address" : null,
-                ),
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     buildLabel("Location *"),
+              //   ],
+              // ),
+              // const SizedBox(height: 6),
+              // GestureDetector(
+              //   onTap: controller.navigateToLocationScreen,
+              //   child: TextFormField(
+              //     enabled: false,
+              //     controller: controller.addressController,
+              //     style: const TextStyle(fontSize: 16, color: Colors.green),
+              //     decoration: _inputDecoration(controller.userLocation.value).copyWith(
+              //       suffixIcon: IconButton(
+              //         icon: const Icon(Icons.my_location, color: AppColors.primaryGreen),
+              //         onPressed: controller.getCurrentLocation,
+              //       ),
+              //     ),
+              //     validator: (val) => val == null || val.isEmpty || val == 'Select Location' ? "Please enter a valid address" : null,
+              //   ),
+              // ),
               const SizedBox(height: 14),
               buildLabel("Full Address"),
               Obx(
@@ -608,6 +608,7 @@ class _HireScreenState extends State<HireScreen> {
                       horizontal: 12,
                     ),
                     decoration: BoxDecoration(
+                      color:  Colors.grey[100],
                       border: Border.all(color: Colors.grey.shade400),
                       borderRadius: BorderRadius.circular(10),
                     ),

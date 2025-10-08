@@ -1,6 +1,18 @@
 import '../userModel/UserViewWorkerDetailsModel.dart';
 import 'ServiceProfileModel.dart';
+class Document {
+  final String? documentName;
+  final List<String>? images;
 
+  Document({this.documentName, this.images});
+
+  factory Document.fromJson(Map<String, dynamic> json) {
+    return Document(
+      documentName: json['documentName']?.toString(),
+      images: (json['images'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+    );
+  }
+}
 class ServiceProviderProfileModel {
   final String? id;
   final String? phone;
@@ -33,9 +45,10 @@ class ServiceProviderProfileModel {
   final int? totalReview;
   final String? rating;
   final BankDetail? bankDetail;
-  final String? documents;// ✅ MISSING FIELD ADDED
+  // final String? documents;// ✅ MISSING FIELD ADDED
   final BusinessAddress? businessAddress;
   final bool? isShop;
+  final List<Document>? documents; // Changed from String? to List<Document>?
   final List<String>? businessImage;
 
   ServiceProviderProfileModel({
@@ -108,15 +121,25 @@ class ServiceProviderProfileModel {
               ?.map((e) => e.toString())
               .toList() ??
           [],
+      // subEmergencyCategoryIds:
+      //     (json['emergencySubcategory_ids'] as List<dynamic>?)
+      //         ?.map((e) => e.toString())
+      //         .toList() ??
+      //     [],
+      // subEmergencyCategoryNames:
+      //     (json['emergencySubcategory_names'] as List<dynamic>?)
+      //         ?.map((e) => e.toString())
+      //         .toList() ??
+      //     [],
       subEmergencyCategoryIds:
-          (json['emergencySubcategory_ids'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
+      (json['emergencysubcategory_ids'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ??
           [],
       subEmergencyCategoryNames:
-          (json['emergencySubcategory_names'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
+      (json['emergencySubcategory_names'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ??
           [],
       skill: json['skill']?.toString(),
       profilePic: json['profilePic']?.toString(),
@@ -141,7 +164,8 @@ class ServiceProviderProfileModel {
           json['bankdetail'] != null
               ? BankDetail.fromJson(json['bankdetail'])
               : null,
-      documents: json['documents']?.toString(),
+      // documents: json['documents']?.toString(),
+      documents: (json['documents'] as List<dynamic>?)?.map((e) => Document.fromJson(e)).toList() ?? [],
       businessAddress: json['businessAddress'] != null
           ? BusinessAddress.fromJson(json['businessAddress'])
           : null,

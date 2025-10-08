@@ -543,13 +543,18 @@ class _SellerScreenState extends State<SellerScreen> {
                                             ?.subCategoryIds
                                             ?.map((e) => e.toString())
                                             .toList(),
+                                        // subEmergencyCategoryIds: profile
+                                        //     ?.subEmergencyCategoryIds
+                                        //     ?.map((e) => e.toString())
+                                        //     .toList(),
                                         subEmergencyCategoryIds: profile
                                             ?.subEmergencyCategoryIds
                                             ?.map((e) => e.toString())
                                             .toList(),
 
-                                        documentUrl: profile?.documents,
-
+                                        // documentUrl: profile?.documents,
+                                        documents: profile?.documents, // Pass documents
+                                        businessImage: profile?.businessImage,
                                       ),
                                 ),
                               );
@@ -1391,9 +1396,88 @@ class _SellerScreenState extends State<SellerScreen> {
     );
   }
 
+  // Widget _buildDocumentCard() {
+  //   return Container(
+  //     height: 160,
+  //     width: double.infinity,
+  //     margin: const EdgeInsets.symmetric(horizontal: 16),
+  //     padding: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       border: Border.all(color: Colors.grey.shade300),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const SizedBox(height: 5),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text("Document",
+  //                 style: GoogleFonts.roboto(
+  //                     fontWeight: FontWeight.bold, fontSize: 16)),
+  //            /* profile?.verificationStatus == 'pending'
+  //                 ?*/ Container(
+  //               width: 100,
+  //               decoration: BoxDecoration(
+  //                   border: Border.all(color: Colors.green, width: 2),
+  //                   borderRadius: BorderRadius.circular(10)),
+  //               child: Center(
+  //                   child: Text("Verified",
+  //                       style: TextStyle(
+  //                           color: Colors.green.shade700,
+  //                           fontWeight: FontWeight.w600))),
+  //             )
+  //             /*    : SizedBox(),*/
+  //           ],
+  //         ),
+  //         const SizedBox(height: 15),
+  //         Row(
+  //           children: [
+  //             SvgPicture.asset("assets/svg_images/adharicon.svg"),
+  //             const SizedBox(width: 20),
+  //             Text("Valid Id Proof",
+  //                 style: GoogleFonts.roboto(
+  //                     fontWeight: FontWeight.w400, fontSize: 14)),
+  //             const SizedBox(width: 50),
+  //             if (profile?.documents != null && profile!.documents!.isNotEmpty)
+  //               InkWell(
+  //                 onTap: () {
+  //                   Get.to(FullImageScreen(imageUrl: profile?.documents ?? ""));
+  //                 },
+  //                 child: ClipRRect(
+  //                   borderRadius: BorderRadius.circular(6),
+  //                   child: Image.network(
+  //                     profile!.documents!,
+  //                     height: 90,
+  //                     width: 105,
+  //                     fit: BoxFit.cover,
+  //                     errorBuilder: (_, __, ___) => Image.asset(
+  //                       'assets/images/d_png/No_Image_Available.jpg',
+  //                       height: 90,
+  //                       width: 105,
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               )
+  //             else
+  //               Text(
+  //                 "(Not uploaded)",
+  //                 style: TextStyle(
+  //                     color: Colors.grey.shade600,
+  //                     fontStyle: FontStyle.italic,
+  //                     fontSize: 12),
+  //               ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildDocumentCard() {
     return Container(
-      height: 160,
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(12),
@@ -1409,69 +1493,119 @@ class _SellerScreenState extends State<SellerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Document",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-             /* profile?.verificationStatus == 'pending'
-                  ?*/ Container(
+              Text(
+                "Documents",
+                style: GoogleFonts.roboto(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Container(
                 width: 100,
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2),
-                    borderRadius: BorderRadius.circular(10)),
+                  border: Border.all(color: Colors.green, width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Center(
-                    child: Text("Verified",
-                        style: TextStyle(
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.w600))),
-              )
-              /*    : SizedBox(),*/
+                  child: Text(
+                    profile?.verificationStatus == 'verified' ? "Verified" : "Pending",
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 15),
-          Row(
-            children: [
-              SvgPicture.asset("assets/svg_images/adharicon.svg"),
-              const SizedBox(width: 20),
-              Text("Valid Id Proof",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w400, fontSize: 14)),
-              const SizedBox(width: 50),
-              if (profile?.documents != null && profile!.documents!.isNotEmpty)
-                InkWell(
-                  onTap: () {
-                    Get.to(FullImageScreen(imageUrl: profile?.documents ?? ""));
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      profile!.documents!,
-                      height: 90,
-                      width: 105,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        'assets/images/d_png/No_Image_Available.jpg',
-                        height: 90,
-                        width: 105,
-                        fit: BoxFit.cover,
+          if (profile?.documents != null && profile!.documents!.isNotEmpty)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: profile!.documents!.length,
+              itemBuilder: (context, index) {
+                final document = profile!.documents![index];
+                if (document.images == null || document.images!.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      document.documentName ?? "Unnamed Document",
+                      style: GoogleFonts.roboto(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                     ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: document.images!.length,
+                        itemBuilder: (context, imgIndex) {
+                          final imageUrl = document.images![imgIndex];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(() => FullImageScreen(imageUrl: imageUrl));
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  height: 90,
+                                  width: 105,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) => Image.asset(
+                                    'assets/images/d_png/No_Image_Available.jpg',
+                                    height: 90,
+                                    width: 105,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              },
+            )
+          else
+            Row(
+              children: [
+                SvgPicture.asset("assets/svg_images/adharicon.svg"),
+                const SizedBox(width: 20),
+                Text(
+                  "Valid Id Proof",
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
                   ),
-                )
-              else
+                ),
+                const SizedBox(width: 50),
                 Text(
                   "(Not uploaded)",
                   style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12),
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
                 ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );
   }
-
   Widget _buildAddAsapPersonTile(BuildContext context) {
     return /*profile?.verificationStatus == 'pending'
         ?*/ Container(

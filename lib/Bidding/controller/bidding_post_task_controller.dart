@@ -26,6 +26,7 @@ class PostTaskController extends GetxController {
   final dateController = TextEditingController();
   final titleController = TextEditingController();
   final addressController = TextEditingController();
+  // final googleAddressController = TextEditingController();
   final googleAddressController = TextEditingController();
   final descriptionController = TextEditingController();
   final costController = TextEditingController();
@@ -125,7 +126,8 @@ class PostTaskController extends GetxController {
       fullAddress.value =
       "${selectedHouseNo.value}, ${selectedStreet.value}, ${selectedArea.value}, ${selectedPinCode.value}";
     } else {
-      fullAddress.value = "No detailed address available";
+      fullAddress.value = ""
+          "Detailed address Not available";
     }
   }
 
@@ -1076,7 +1078,8 @@ class PostTaskController extends GetxController {
       request.fields['category_id'] = selectedCategoryId.value.toString();
       request.fields['sub_category_ids'] = selectedSubCategoryIds.join(',');
       request.fields['address'] = addressToSend;
-      request.fields['google_address'] = googleAddressController.text.trim();
+      // request.fields['google_address'] = googleAddressController.text.trim();
+      request.fields['google_address'] = fullAddress.value;
       request.fields['description'] = descriptionController.text.trim();
       request.fields['cost'] = costController.text.trim();
       request.fields['deadline'] = formattedDeadline;

@@ -166,7 +166,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildTitle("Google Address (GPS) *"),
+                          // _buildTitle("Google Address (GPS) *"),
                           // InkWell(
                           //   onTap: postTaskController.navigateToLocationScreen,
                           //   child: Container(
@@ -187,20 +187,20 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       ),
                       //customTextField(hint: "Abc gali 145 banglow no. Indore"),
                       // _googleLocationField(controller.googleAddressController,postTaskController),
-                      GestureDetector(
-                       onTap: postTaskController.navigateToLocationScreen,
-                        child: TextFormField(
-                          onTap: postTaskController.navigateToLocationScreen,
-                          style: TextStyle(color: Colors.green),
-                          enabled: false,
-                          maxLines: 1,
-                          controller: controller.googleAddressController,
-                          // decoration: _inputDecoration("Location", icon: Icons.my_location,),
-                          decoration: _inputDecoration("Location", icon: Icons.my_location),
-
-                          validator: (val) => val == null || val.isEmpty ? "Required field" : null,
-                        ),
-                      ),
+                      // GestureDetector(
+                      //  onTap: postTaskController.navigateToLocationScreen,
+                      //   child: TextFormField(
+                      //     onTap: postTaskController.navigateToLocationScreen,
+                      //     style: TextStyle(color: Colors.green),
+                      //     enabled: false,
+                      //     maxLines: 1,
+                      //     controller: controller.googleAddressController,
+                      //     // decoration: _inputDecoration("Location", icon: Icons.my_location,),
+                      //     decoration: _inputDecoration("Location", icon: Icons.my_location),
+                      //
+                      //     validator: (val) => val == null || val.isEmpty ? "Required field" : null,
+                      //   ),
+                      // ),
                       SizedBox(height: .04.toWidthPercent()),
                       _buildTitle("Full Address"),
                       Obx(
@@ -242,10 +242,10 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           ),
                         ),
                       ),
-                      _buildTitle("Detailed Address (Landmark) *"),
-                      customTextField(
-                          hint: "Enter address",
-                          controller: controller.detailedAddressController),
+                      // _buildTitle("Detailed Address (Landmark) *"),
+                      // customTextField(
+                      //     hint: "Enter address",
+                      //     controller: controller.detailedAddressController),
                       SizedBox(height: .04.toWidthPercent()),
         
                       _buildTitle("Contact *"),

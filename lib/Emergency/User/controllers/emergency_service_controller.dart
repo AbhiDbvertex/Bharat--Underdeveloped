@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../Bidding/controller/bidding_post_task_controller.dart';
 import '../../../directHiring/views/Account/PaymentSuccessScreen.dart';
 import '../screens/emergency_services.dart';
 
@@ -42,6 +43,7 @@ class EmergencyServiceController extends GetxController {
   var taskFee = 0.obs;
   var latitude = RxnDouble();
   var longitude = RxnDouble();
+  final postTaskController = Get.put(PostTaskController(), permanent: false);
   /// ------------------ INIT -------------------
   @override
   void onInit() {
@@ -254,8 +256,8 @@ class EmergencyServiceController extends GetxController {
     // validation
     if (selectedCategoryId.value.isEmpty ||
         selectedSubCategoryIds.isEmpty ||
-        googleAddressController.text.isEmpty ||
-        detailedAddressController.text.isEmpty ||
+        // googleAddressController.text.isEmpty ||
+        // detailedAddressController.text.isEmpty ||
         contactController.text.isEmpty ||
         selectedDateTime.value == null /*||
         images.isEmpty*/) {
@@ -275,7 +277,9 @@ class EmergencyServiceController extends GetxController {
     request.fields['sub_category_ids']=selectedSubCategoryIds.value.join(',');
 
     request.fields['google_address'] = googleAddressController.text;
-    request.fields['detailed_address'] = detailedAddressController.text;
+    // request.fields['detailed_address'] = detailedAddressController.text;
+    // request.fields['google_address'] = "Google Address";
+    request.fields['detailed_address'] =postTaskController.fullAddress.value;
     request.fields['contact'] = contactController.text;
     request.fields['deadline'] = selectedDateTime.value!.toIso8601String();
     request.fields['latitude'] = latitude.value?.toString() ?? '';
