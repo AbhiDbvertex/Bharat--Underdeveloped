@@ -823,14 +823,14 @@ class _WorkDetailPageState extends State<SpWorkDetail> {
                             ),
                           ),
 
-                          const SizedBox(height: 4),
-                          Text(
-                            controller.detailedAddress.value,
-                            style: GoogleFonts.roboto(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          // const SizedBox(height: 4),
+                          // Text(
+                          //   controller.detailedAddress.value,
+                          //   style: GoogleFonts.roboto(
+                          //     fontSize: 16,
+                          //     fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),
 
                           const SizedBox(height: 10),
 

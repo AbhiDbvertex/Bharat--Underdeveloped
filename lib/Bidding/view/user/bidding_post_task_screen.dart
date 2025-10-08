@@ -92,43 +92,43 @@ class PostTaskScreen extends StatelessWidget {
                   ),
                   _buildLabel("Sub Category (Multiple selection)"),
                   _subcategorySelector(controller),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildLabel("Location"),
-                      InkWell(
-                        onTap: controller.navigateToLocationScreen,
-                        child: Container(
-                          width: width * 0.35,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Change location",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextFormField(
-                    enabled: false,
-                    controller: controller.addressController,
-                    decoration: _inputDecoration(controller.userLocation.value)
-                        .copyWith(
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.my_location),
-                        onPressed: controller.getCurrentLocation,
-                      ),
-                    ),
-                    validator: (val) =>
-                        val == null || val.isEmpty || val == 'Select Location'
-                            ? "Please enter a valid address"
-                            : null,
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     _buildLabel("Location"),
+                  //     InkWell(
+                  //       onTap: controller.navigateToLocationScreen,
+                  //       child: Container(
+                  //         width: width * 0.35,
+                  //         decoration: BoxDecoration(
+                  //           color: AppColors.primaryGreen,
+                  //           borderRadius: BorderRadius.circular(5),
+                  //         ),
+                  //         child: const Center(
+                  //           child: Text(
+                  //             "Change location",
+                  //             style: TextStyle(color: Colors.white),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  // TextFormField(
+                  //   enabled: false,
+                  //   controller: controller.addressController,
+                  //   decoration: _inputDecoration(controller.userLocation.value)
+                  //       .copyWith(
+                  //     suffixIcon: IconButton(
+                  //       icon: const Icon(Icons.my_location),
+                  //       onPressed: controller.getCurrentLocation,
+                  //     ),
+                  //   ),
+                  //   validator: (val) =>
+                  //       val == null || val.isEmpty || val == 'Select Location'
+                  //           ? "Please enter a valid address"
+                  //           : null,
+                  // ),
               _buildLabel("Full Address"),
               Obx(
                     () => InkWell(
@@ -169,8 +169,8 @@ class PostTaskScreen extends StatelessWidget {
                   ),
                 ),
               ),
-                  _buildLabel("Google Location"),
-                  _googleLocationField(controller),
+                  // _buildLabel("Google Location"),
+                  // _googleLocationField(controller),
                   _buildLabel("Description"),
                   _buildTextField(
                     controller.descriptionController,

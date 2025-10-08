@@ -1796,7 +1796,7 @@ class _WorkerMyHireScreenState extends State<WorkerMyHireScreen>
         if (mounted) _showSnackBar("Failed to fetch direct orders: ${res.statusCode}");
       }
     } catch (e) {
-      print("❌ API Exception: $e");
+      print("d❌ API Exception: $e");
       if (mounted) _showSnackBar("Something went wrong: $e");
     } finally {
       if (mounted) setState(() => isLoading = false);

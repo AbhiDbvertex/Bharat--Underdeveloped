@@ -761,6 +761,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
+import '../../../chat/view_chat_image_screen.dart';
 import '../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../Account/service_provider_profile/EditProfileScreen.dart';
 import '../Account/service_provider_profile/HisWorkScreen.dart';
@@ -1274,9 +1275,70 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
     );
   }
 
+  // Widget _buildDocumentCard() {
+  //   return Container(
+  //     height: 160,
+  //     width: double.infinity,
+  //     margin: const EdgeInsets.symmetric(horizontal: 16),
+  //     padding: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       border: Border.all(color: Colors.grey.shade300),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const SizedBox(height: 5),
+  //         Text(
+  //           "Document",
+  //           style: GoogleFonts.roboto(
+  //             fontWeight: FontWeight.bold,
+  //             fontSize: 16,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 15),
+  //         Row(
+  //           children: [
+  //             Image.asset('assets/images/line2.png', height: 24),
+  //             const SizedBox(width: 20),
+  //             Text(
+  //               "Valid Id Proof",
+  //               style: GoogleFonts.roboto(
+  //                 fontWeight: FontWeight.w400,
+  //                 fontSize: 14,
+  //               ),
+  //             ),
+  //             const SizedBox(width: 50),
+  //             if (profile?.documents != null && profile!.documents!.isNotEmpty)
+  //               ClipRRect(
+  //                 borderRadius: BorderRadius.circular(6),
+  //                 child: Image.network(
+  //                   cleanImageUrl(profile!.documents),
+  //                   height: 80,
+  //                   width: 80,
+  //                   fit: BoxFit.cover,
+  //                   errorBuilder: (_, __, ___) => const Icon(
+  //                     Icons.image_not_supported_outlined,
+  //                     size: 50,
+  //                     color: Colors.grey,
+  //                   ),
+  //                 ),
+  //               )
+  //             else
+  //               const Icon(
+  //                 Icons.image_not_supported_outlined,
+  //                 size: 50,
+  //                 color: Colors.grey,
+  //               ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildDocumentCard() {
     return Container(
-      height: 160,
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(12),
@@ -1289,54 +1351,125 @@ class _ViewServiceProviderProfileScreenState extends State<ViewServiceProviderPr
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 5),
-          Text(
-            "Document",
-            style: GoogleFonts.roboto(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 15),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.asset('assets/images/line2.png', height: 24),
-              const SizedBox(width: 20),
               Text(
-                "Valid Id Proof",
+                "Documents",
                 style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              const SizedBox(width: 50),
-              if (profile?.documents != null && profile!.documents!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.network(
-                    cleanImageUrl(profile!.documents),
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.image_not_supported_outlined,
-                      size: 50,
-                      color: Colors.grey,
+              Container(
+                width: 100,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    profile?.verificationStatus == 'verified' ? "Verified" : "Pending",
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                )
-              else
-                const Icon(
-                  Icons.image_not_supported_outlined,
-                  size: 50,
-                  color: Colors.grey,
                 ),
+              ),
             ],
           ),
+          const SizedBox(height: 15),
+          if (profile?.documents != null && profile!.documents!.isNotEmpty)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: profile!.documents!.length,
+              itemBuilder: (context, index) {
+                final document = profile!.documents![index];
+                if (document.images == null || document.images!.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      document.documentName ?? "Unnamed Document",
+                      style: GoogleFonts.roboto(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: document.images!.length,
+                        itemBuilder: (context, imgIndex) {
+                          final imageUrl = cleanImageUrl(document.images![imgIndex]);
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => FullImageScreen(imageUrl: imageUrl),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.network(
+                                  imageUrl,
+                                  height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.image_not_supported_outlined,
+                                      size: 50,
+                                      color: Colors.grey,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              },
+            )
+          else
+            Row(
+              children: [
+                Image.asset('assets/images/line2.png', height: 24),
+                const SizedBox(width: 20),
+                Text(
+                  "Valid Id Proof",
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 50),
+                const Text(
+                  "(Not uploaded)",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
-
   // Widget _buildAddAsapPersonTile(BuildContext context) {
   //   return Container(
   //     margin: const EdgeInsets.symmetric(horizontal: 16),

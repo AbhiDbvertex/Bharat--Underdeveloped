@@ -5,6 +5,7 @@ import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -886,7 +887,7 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                       //     ),
                       //   ],
                       // ),
-                      Column(
+                     /* Column(
                         children: [
                           Align(
                             alignment: Alignment.topRight,
@@ -925,6 +926,49 @@ class _RoleEditProfileScreenState extends State<RoleEditProfileScreen> {
                               suffixIcon: const Icon(Icons.map),
                             ),
                           ),
+                          const SizedBox(width: 10),
+
+                        ],
+                      ),*/
+                      Column(
+                        children: [
+                          Obx(
+                                () => GestureDetector(
+                              onTap: postTaskController.navigateToLocationScreen,
+                              child: AbsorbPointer( // Disable direct typing
+                                child: TextFormField(
+                                  minLines: 1,
+                                  maxLines: null,
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    labelText: "Shop Address",
+                                    hintText: 'Select location from map',
+                                    suffixIcon: const Icon(Icons.map, color: Colors.grey),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(color: Colors.grey.shade400),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(color: Colors.grey.shade400),
+                                    ),
+                                  ),
+                                  controller: TextEditingController(
+                                    text: postTaskController.fullAddress.value.isNotEmpty
+                                        ? postTaskController.fullAddress.value
+                                        : "No address found",
+                                  ),
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
                           const SizedBox(width: 10),
 
                         ],

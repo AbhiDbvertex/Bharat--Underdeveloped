@@ -785,7 +785,8 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   final price = item['service_payment']?['amount']?.toString() ?? "0";
                   final buddingOderId = item['_id'] ?? "0";
                   final buddingprojectid = item['project_id'] ?? "0";
-                  final address = item['google_address'] ?? "No Address";
+                  // final address = item['google_address'] ?? "No Address";
+                  final address = item['address'] ?? "No Address";
                   final latitude = item['latitude'] ?? 0.0;
                   final longitude = item['longitude'] ?? 0.0;
                   final description = item['description'] ?? "No description";

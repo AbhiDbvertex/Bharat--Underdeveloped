@@ -2999,7 +2999,7 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
     );
   }
 
-  String? getFirstDocumentImage(List<Document>? documents) {
+  String? getFirstDocumentImage( documents) {
     if (documents == null || documents.isEmpty) {
       return null;
     }
