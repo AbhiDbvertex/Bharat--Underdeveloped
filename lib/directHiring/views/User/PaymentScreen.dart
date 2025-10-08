@@ -177,8 +177,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
         );
       } else {
-        print(
-            "Abhi:- else direct-hire Mark as Complete error :- ${response.body}");
+        print("Abhi:- else direct-hire Mark as Complete error :- ${response.body}");
 
         CustomSnackBar.show(
             message: "Failed to mark as complete: ${response.body}",
@@ -212,7 +211,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'Content-Type': 'application/json',
         },
       );
-
       var responseData = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Abhi:- postPaymentRequest response : ${response.body}");
@@ -322,7 +320,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           Row(
                             children: [
                               Icon(Icons.warning,color: Colors.amber,),
-                              Text("Info. Complete 5 successful online\norders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,)
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Expanded(child: Text("Info. Complete 5 successful online orders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,))
                             ],
                           ),
                           Row(
@@ -414,7 +415,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         _amount.isNotEmpty &&
                                         double.tryParse(_amount) != null &&
                                         double.tryParse(_amount)! > 0)
-                                    ? () => _showPaymentDialog()
+                                    ? () => _selectedPayment == 'cod' ? submitPayment() : _showPaymentDialog()
                                     : null,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../Widgets/AppColors.dart';
+import '../../../testingfile.dart';
 import '../../models/userModel/subCategoriesModel.dart';
 import 'HireScreen.dart';
 import 'UserViewWorkerDetails.dart';
@@ -121,8 +122,11 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 5),
-            child: Image.asset('assets/images/filter.png'),
-          )
+            // child: Image.asset('assets/images/filter.png',s,),
+            child: Icon(Icons.filter_alt_sharp,size: 27,),
+          ),SizedBox(width: 8,),
+          Icon(Icons.sort,size: 29,),
+          SizedBox(width: 8,)
         ],
         systemOverlayStyle:  SystemUiOverlayStyle(
           statusBarColor: AppColors.primaryGreen,
@@ -207,6 +211,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                             MaterialPageRoute(
                               builder: (_) =>
                                   UserViewWorkerDetails(
+                                    paymentStatus: false,
                                     workerId: worker.id!,
                                     categreyId: widget.categreyId,
                                     subcategreyId:
@@ -268,6 +273,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
+                                        // "sdfsadf ",
                                         worker.fullName ?? "Unknown",
                                         style: GoogleFonts.roboto(
                                           fontWeight: FontWeight.w600,
@@ -323,6 +329,7 @@ class _WorkerlistScreenState extends State<WorkerlistScreen> {
                                             MaterialPageRoute(
                                               builder: (_) =>
                                                   UserViewWorkerDetails(
+                                                    paymentStatus: false,
                                                     workerId: worker.id!,
                                                     categreyId: widget.categreyId,
                                                     subcategreyId:

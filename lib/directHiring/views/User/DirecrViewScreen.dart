@@ -3,17 +3,14 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../Widgets/address_map_class.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
-// import '../../../testingfile.dart';
+import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
@@ -83,7 +80,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
       print("Abhi:- fetchOrderDetail token: $token");
-      print("Abhi:- fetchOrderDetail id ---> : ${widget.id}");
+      print("Abhi:- darect orderid ---> : ${widget.id}");
 
       final response = await http.get(
         Uri.parse(
@@ -1311,7 +1308,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
               )
                   : SizedBox(),
               // this is show only pending time for serviceprovider
-
+    // && order!['offer_history'].any((e) => e['status'] == 'pending')
               order!['hire_status'] == 'pending'
                   ? ListView.builder(
                 shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
@@ -2081,7 +2078,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
-              else if (order!['hire_status'] == 'pending' /*&& order?['offer_history']['status'] == "rejected"*/)
+              else if (order!['hire_status'] == 'pending'  /*&& order!['offer_history'].any((e) => e['status'] == 'pending')*/)
                 ListView.builder(
                   key: _listViewKey,
                   shrinkWrap: true, // Yeh ensure karta hai ki ListView content ke hisaab se height le
@@ -2094,7 +2091,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                         ? "https://api.thebharatworks.com/${worker.hisWork.first.replaceAll("\\", "/")}"
                         : null;
 
-                    return Container(
+                    return order!['offer_history'].any((e) => e['status'] == 'pending') ?  SizedBox(): Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -2221,6 +2218,7 @@ class _DirectViewScreenState extends State<DirectViewScreen> {
                                                     serviceProviderId: worker.id,
                                                   ),*/
                                                   UserViewWorkerDetails(
+                                                    // paymentStatus: false,
                                                     workerId: worker.id!,
                                                     categreyId: widget.categreyId,
                                                     subcategreyId:

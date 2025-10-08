@@ -18,12 +18,13 @@ import '../../../Widgets/AppColors.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
-import '../../../testingfile.dart';
+// import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../../models/ServiceProviderModel/DirectOrder.dart';
 import 'DirecrViewScreen.dart';
+// import 'DirecrViewScreen.dart';
 
 class MyHireScreen extends StatefulWidget {
   final String? categreyId;

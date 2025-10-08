@@ -22,6 +22,7 @@ import '../../../chat/chatScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 // import '../../../testingfile.dart';
+import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
@@ -1135,9 +1136,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           UserViewWorkerDetails(
-                                                        workerId: data?[
-                                                                'service_provider_id']
-                                                            ?['_id'],
+                                                        workerId: data?['service_provider_id']?['_id'],
                                                         hirebuttonhide: "hide",
                                                         UserId: widget.userId,
                                                         hideonly: "hideOnly",

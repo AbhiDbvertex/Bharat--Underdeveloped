@@ -1,1798 +1,1276 @@
-// // import 'dart:convert';
-// // import 'dart:io';
-// // import 'package:flutter/cupertino.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:http/http.dart' as http;
-// // import 'package:image_picker/image_picker.dart';
-// // import 'package:file_picker/file_picker.dart';
-// // import 'package:open_filex/open_filex.dart';
-// // import 'package:path_provider/path_provider.dart';
-// // import 'package:shared_preferences/shared_preferences.dart';
-// // import 'package:flutter/scheduler.dart';
-// // import 'package:url_launcher/url_launcher.dart';
-// // import 'chat/APIServices.dart';
-// // import 'chat/SocketService.dart';
-// // import 'chat/view_chat_image_screen.dart';
-// // import 'package:open_filex/open_filex.dart';
-// //
-// // Future<void> openFileExample(String path) async {
-// //   try {
-// //     final result = await OpenFilex.open(path);
-// //     print("Result: ${result.message}");
-// //   } catch (e) {
-// //     print("Error opening file: $e");
-// //   }
-// // }// In the stream builder use of continue async data flow .
-// //
-// // class StandaloneChatDetailScreen extends StatefulWidget {
-// //   final dynamic initialCurrentChat;
-// //   final String initialUserId;
-// //   final List<dynamic> initialMessages;
-// //   final List<String> initialOnlineUsers;
-// //
-// //   const StandaloneChatDetailScreen({
-// //     Key? key,
-// //     required this.initialCurrentChat,
-// //     required this.initialUserId,
-// //     required this.initialMessages,
-// //     required this.initialOnlineUsers,
-// //   }) : super(key: key);
-// //
-// //   @override
-// //   _StandaloneChatDetailScreenState createState() => _StandaloneChatDetailScreenState();
-// // }
-// //
-// // class _StandaloneChatDetailScreenState extends State<StandaloneChatDetailScreen> {
-// //   late dynamic currentChat;
-// //   late String userId;
-// //   List<dynamic> messages = [];
-// //   List<String> images = [];
-// //   List<String> documents = [];
-// //   List<String> onlineUsers = [];
-// //   final TextEditingController messageController = TextEditingController();
-// //   final ScrollController scrollController = ScrollController();
-// //   final ImagePicker _picker = ImagePicker();
-// //
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //     currentChat = widget.initialCurrentChat;
-// //     userId = widget.initialUserId;
-// //     messages = widget.initialMessages.toList();
-// //     onlineUsers = widget.initialOnlineUsers.toList();
-// //
-// //     // Socket message listener
-// //     SocketService.setMessageCallback((parsedMessage) {
-// //       if (parsedMessage != null && parsedMessage['conversationId'].toString() == currentChat['_id'].toString()) {
-// //         setState(() {
-// //           if (!messages.any((msg) => msg['_id'].toString() == parsedMessage['_id'].toString())) {
-// //             messages.insert(0, parsedMessage);
-// //             print('Abhi:- Received message added to UI: ${parsedMessage['message']}');
-// //           } else {
-// //             print('Abhi:- Message already exists in UI: ${parsedMessage['_id']}');
-// //           }
-// //         });
-// //         _scrollToBottom();
-// //       } else {
-// //         print('Abhi:- Received message from other chat or invalid: $parsedMessage');
-// //       }
-// //     });
-// //     SocketService.listenOnlineUsers((users) {
-// //       setState(() => onlineUsers = users.map((u) => u.toString()).toList());
-// //     });
-// //
-// //     WidgetsBinding.instance.addPostFrameCallback((_) {
-// //       _scrollToBottom();
-// //     });
-// //   }
-// //
-// //   void _scrollToBottom() {
-// //     if (scrollController.hasClients) {
-// //       scrollController.animateTo(
-// //         0,
-// //         duration: Duration(milliseconds: 300),
-// //         curve: Curves.easeOut,
-// //       );
-// //     }
-// //   }
-// //   String getIdAsString(dynamic id) {
-// //     if (id == null) return '';
-// //     if (id is String) return id;
-// //     if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
-// //     print("Abhi:- Warning: Unexpected _id format: $id");
-// //     return id.toString();
-// //   }
-// //   Future<void> _sendMessage() async {
-// //     if (messageController.text.trim().isEmpty && images.isEmpty && documents.isEmpty) {
-// //       print("Abhi:- Error: No message, images, or documents to send");
-// //       if (mounted) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: No message, images, or documents to send')),
-// //         );
-// //       }
-// //       return;
-// //     }
-// //
-// //     String? receiverId;
-// //     try {
-// //       final members = currentChat['members'] as List? ?? [];
-// //       if (members.isEmpty) {
-// //         print("Abhi:- Error: Members list is empty");
-// //         if (mounted) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: No members found in conversation')),
-// //           );
-// //         }
-// //         return;
-// //       }
-// //
-// //       print("Abhi:- Members: $members");
-// //       if (members.first is String) {
-// //         // Case 1: Members are string IDs (from POST /api/chat/conversations)
-// //         receiverId = members.firstWhere(
-// //               (m) => m != userId,
-// //           orElse: () => null,
-// //         );
-// //       } else {
-// //         // Case 2: Members are full user objects (after fetchUserById)
-// //         final matchingMember = members.firstWhere(
-// //               (m) => m['_id'].toString() != userId,
-// //           orElse: () => <String, dynamic>{}, // Return empty Map<String, dynamic>
-// //         );
-// //         receiverId = matchingMember.isNotEmpty ? matchingMember['_id'].toString() : null;
-// //       }
-// //
-// //       if (receiverId == null || receiverId.isEmpty) {
-// //         print("Abhi:- Error: No matching member found for receiverId");
-// //         if (mounted) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Invalid receiver ID')),
-// //           );
-// //         }
-// //         return;
-// //       }
-// //
-// //       print("Abhi:- ReceiverId found: $receiverId");
-// //     } catch (e, stackTrace) {
-// //       print("Abhi:- Error finding receiverId: $e");
-// //       print("Abhi:- Stack trace: $stackTrace");
-// //       if (mounted) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to find receiver ID: $e')),
-// //         );
-// //       }
-// //       return;
-// //     }
-// //
-// //     try {
-// //       dynamic newMsg;
-// //       if (images.isNotEmpty) {
-// //         newMsg = await ApiService.sendImageMessage(
-// //           senderId: userId,
-// //           receiverId: receiverId,
-// //           conversationId: currentChat['_id'].toString(),
-// //           imagePaths: images,
-// //           message: messageController.text.isNotEmpty ? messageController.text : null,
-// //         );
-// //         print('Abhi:- Image message sent successfully: $newMsg');
-// //       } else if (documents.isNotEmpty) {
-// //         newMsg = await ApiService.sendDocumentMessage(
-// //           senderId: userId,
-// //           receiverId: receiverId,
-// //           conversationId: currentChat['_id'].toString(),
-// //           documentPaths: documents,
-// //           message: messageController.text.isNotEmpty ? messageController.text : null,
-// //         );
-// //         print('Abhi:- Document message sent successfully: $newMsg');
-// //       } else {
-// //         final msgData = {
-// //           'senderId': userId,
-// //           'receiverId': receiverId,
-// //           'conversationId': currentChat['_id'].toString(),
-// //           'message': messageController.text,
-// //           'messageType': 'text',
-// //         };
-// //         newMsg = await ApiService.sendTextMessage(msgData);
-// //         print('Abhi:- Text message sent successfully: $newMsg');
-// //       }
-// //
-// //       SocketService.sendMessage(newMsg);
-// //       if (mounted) {
-// //         setState(() {
-// //           if (!messages.any((msg) => msg['_id'].toString() == newMsg['_id'].toString())) {
-// //             messages.insert(0, newMsg);
-// //             print('Abhi:- Message added to UI: ${newMsg['_id']}');
-// //           } else {
-// //             print('Abhi:- Message already exists in UI: ${newMsg['_id']}');
-// //           }
-// //           messageController.clear();
-// //           images.clear();
-// //           documents.clear();
-// //           print('Abhi:- Message fields cleared after sending');
-// //         });
-// //         _scrollToBottom();
-// //       }
-// //     } catch (e, stackTrace) {
-// //       print('Abhi:- Error sending message: $e');
-// //       print('Abhi:- Stack trace: $stackTrace');
-// //       if (mounted) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to send message: $e')),
-// //         );
-// //       }
-// //     }
-// //   }
-// //
-// //   Future<void> _pickImages() async {
-// //     try {
-// //       print("Abhi:- Picking images");
-// //       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-// //       if (pickedFiles != null) {
-// //         if (pickedFiles.length > 5) {
-// //           print("Abhi:- Error: More than 5 images selected");
-// //           SchedulerBinding.instance.addPostFrameCallback((_) {
-// //             ScaffoldMessenger.of(context).showSnackBar(
-// //               SnackBar(content: Text('Error: Maximum 5 images allowed')),
-// //             );
-// //           });
-// //           return;
-// //         }
-// //         setState(() {
-// //           images = pickedFiles.map((file) => file.path).toList();
-// //           print("Abhi:- Images picked successfully: $images");
-// //         });
-// //       } else {
-// //         print("Abhi:- No images selected");
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Exception in pickImages: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while picking images: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _pickDocuments() async {
-// //     try {
-// //       print("Abhi:- Picking documents");
-// //       FilePickerResult? result = await FilePicker.platform.pickFiles(
-// //         allowMultiple: true,
-// //         type: FileType.custom,
-// //         allowedExtensions: ['pdf', 'doc', 'docx'],
-// //       );
-// //       if (result != null && result.files.length <= 5) {
-// //         setState(() {
-// //           documents = result.files.map((file) => file.path!).toList();
-// //           print("Abhi:- Documents picked successfully: $documents");
-// //         });
-// //       } else if (result != null && result.files.length > 5) {
-// //         print("Abhi:- Error: More than 5 documents selected");
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Maximum 5 documents allowed')),
-// //           );
-// //         });
-// //       } else {
-// //         print("Abhi:- No documents selected");
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Exception in pickDocuments: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while picking documents: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   String _formatTime(String createdAt) {
-// //     try {
-// //       final DateTime dateTime = DateTime.parse(createdAt).toLocal();
-// //       final now = DateTime.now().toLocal();
-// //       final today = DateTime(now.year, now.month, now.day);
-// //       final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-// //       final difference = now.difference(dateTime).inDays;
-// //
-// //       if (difference == 0) {
-// //         return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-// //       } else if (difference == 1) {
-// //         return "Yesterday ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-// //       } else {
-// //         return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Error formatting time: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while formatting time: $e')),
-// //         );
-// //       });
-// //       return "Invalid time";
-// //     }
-// //   }
-// //
-// //   // -----------   Opne document  ---------------      //
-// //   Future<void> openDocumentFromUrl(BuildContext context, String url) async {
-// //     try {
-// //       final uri = Uri.parse(url);
-// //       final response = await http.get(uri);
-// //       if (response.statusCode != 200) {
-// //         throw Exception('Failed to download file: ${response.statusCode}');
-// //       }
-// //
-// //       final bytes = response.bodyBytes;
-// //       final tempDir = await getTemporaryDirectory();
-// //       final fileName = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : 'file.pdf';
-// //       final file = File('${tempDir.path}/$fileName');
-// //
-// //       await file.writeAsBytes(bytes, flush: true);
-// //
-// //       // Open local file
-// //       await OpenFilex.open(file.path);
-// //     } catch (e) {
-// //       print("Abhi:- Error opening document URL: $url");
-// //       print("Abhi:- Exception: $e");
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         SnackBar(content: Text('Could not open document: $e')),
-// //       );
-// //     }
-// //   }
-// //
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return WillPopScope(
-// //       onWillPop: () async {
-// //         print("Abhi:- Back pressed in StandaloneChatDetailScreen");
-// //         SocketService.disconnect();
-// //         return true;
-// //       },
-// //       child: ChatDetailScreen(
-// //         currentChat: currentChat,
-// //         userId: userId,
-// //         messages: messages,
-// //         onlineUsers: onlineUsers,
-// //         scrollController: scrollController,
-// //         messageController: messageController,
-// //         images: images,
-// //         documents: documents,
-// //         onBack: () {
-// //           print("Abhi:- onBack called in ChatDetailScreen");
-// //           SocketService.disconnect();
-// //           Navigator.pop(context);
-// //         },
-// //         onSendMessage: _sendMessage,
-// //         onPickImages: _pickImages,
-// //         onPickDocuments: _pickDocuments,
-// //         formatTime: _formatTime,
-// //       ),
-// //     );
-// //   }
-// //
-// //   @override
-// //   void dispose() {
-// //     print("Abhi:- Disposing StandaloneChatDetailScreen");
-// //     SocketService.removeMessageCallback();
-// //     SocketService.disconnect();
-// //     scrollController.dispose();
-// //     messageController.dispose();
-// //     super.dispose();
-// //   }
-// // }
-// //
-// // class ChatDetailScreen extends StatelessWidget {
-// //   final dynamic currentChat;
-// //   final String userId;
-// //   final List<dynamic> messages;
-// //   final List<dynamic> onlineUsers;
-// //   final ScrollController scrollController;
-// //   final TextEditingController messageController;
-// //   final List<String> images;
-// //   final List<String> documents;
-// //   final VoidCallback onBack;
-// //   final VoidCallback onSendMessage;
-// //   final VoidCallback onPickImages;
-// //   final VoidCallback onPickDocuments;
-// //   final String Function(String) formatTime;
-// //
-// //   const ChatDetailScreen({
-// //     Key? key,
-// //     required this.currentChat,
-// //     required this.userId,
-// //     required this.messages,
-// //     required this.onlineUsers,
-// //     required this.scrollController,
-// //     required this.messageController,
-// //     required this.images,
-// //     required this.documents,
-// //     required this.onBack,
-// //     required this.onSendMessage,
-// //     required this.onPickImages,
-// //     required this.onPickDocuments,
-// //     required this.formatTime,
-// //   }) : super(key: key);
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     print("Abhi:- Building ChatDetailScreen, conversationId: ${currentChat['_id']}");
-// //     final members = (currentChat['members'] as List?) ?? [];
-// //     dynamic otherUser;
-// //
-// //     // Handle other user selection with robust type checking
-// //     try {
-// //       if (members.isEmpty) {
-// //         print("Abhi:- Warning: Members list is empty for conversation ${currentChat['_id']}");
-// //         otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Warning: No members found in conversation')),
-// //           );
-// //         });
-// //       } else {
-// //         otherUser = members.firstWhere(
-// //               (m) {
-// //             final memberId = m['_id']?.toString();
-// //             print("Abhi:- Comparing memberId: $memberId with userId: $userId");
-// //             return memberId != null && memberId != userId;
-// //           },
-// //           orElse: () {
-// //             print("Abhi:- No matching member found, using default");
-// //             return {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-// //           },
-// //         );
-// //         print("Abhi:- Other user found: ${otherUser['_id']}, name: ${otherUser['full_name']}");
-// //       }
-// //     } catch (e, stackTrace) {
-// //       print("Abhi:- Error finding other user in members: $e");
-// //       print("Abhi:- Stack trace: $stackTrace");
-// //       otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to load chat user: $e')),
-// //         );
-// //       });
-// //     }
-// //
-// //     final isOnline = otherUser['_id'] != '' && onlineUsers.contains(otherUser['_id'].toString());
-// //
-// //     return WillPopScope(
-// //       onWillPop: () async {
-// //         print("Abhi:- Back pressed in ChatDetailScreen");
-// //         onBack();
-// //         return false;
-// //       },
-// //       child: Scaffold(
-// //         backgroundColor: Colors.grey[50],
-// //         appBar: AppBar(
-// //           backgroundColor: Colors.white,
-// //           elevation: 1,
-// //           leading: IconButton(
-// //             icon: Icon(Icons.arrow_back, color: Colors.black),
-// //             onPressed: () {
-// //               print("Abhi:- Back button pressed in ChatDetailScreen");
-// //               onBack();
-// //             },
-// //           ),
-// //           title: Row(
-// //             children: [
-// //               Stack(
-// //                 children: [
-// //                   CircleAvatar(
-// //                     radius: 20,
-// //                     backgroundColor: Colors.grey[300],
-// //                     backgroundImage: otherUser['profile_pic'] != null
-// //                         ? NetworkImage(otherUser['profile_pic'])
-// //                         : null,
-// //                     child: otherUser['profile_pic'] == null
-// //                         ? Icon(Icons.person, color: Colors.grey[600], size: 20)
-// //                         : null,
-// //                   ),
-// //                   if (isOnline)
-// //                     Positioned(
-// //                       right: 0,
-// //                       bottom: 0,
-// //                       child: Container(
-// //                         width: 12,
-// //                         height: 12,
-// //                         decoration: BoxDecoration(
-// //                           color: Colors.green,
-// //                           shape: BoxShape.circle,
-// //                           border: Border.all(color: Colors.white, width: 2),
-// //                         ),
-// //                       ),
-// //                     ),
-// //                 ],
-// //               ),
-// //               SizedBox(width: 12),
-// //               Expanded(
-// //                 child: Text(
-// //                   otherUser['full_name'] ?? 'Unknown',
-// //                   style: TextStyle(
-// //                     color: Colors.black,
-// //                     fontSize: 18,
-// //                     fontWeight: FontWeight.w600,
-// //                   ),
-// //                 ),
-// //               ),
-// //             ],
-// //           ),
-// //           actions: [
-// //             IconButton(
-// //               icon: Icon(Icons.phone, color: Colors.black),
-// //               onPressed: () {
-// //                 print("Abhi:- Phone button pressed in ChatDetailScreen");
-// //               },
-// //             ),
-// //             IconButton(
-// //               icon: Icon(Icons.more_vert, color: Colors.black),
-// //               onPressed: () {
-// //                 print("Abhi:- More options button pressed in ChatDetailScreen");
-// //               },
-// //             ),
-// //           ],
-// //         ),
-// //         body: Column(
-// //           children: [
-// //             Expanded(
-// //               child: ListView.builder(
-// //                 controller: scrollController,
-// //                 reverse: true,
-// //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //                 itemCount: messages.length,
-// //                 itemBuilder: (ctx, idx) {
-// //                   final msg = messages[idx];
-// //                   final isMe = msg['senderId']?.toString() == userId;
-// //
-// //                   print("Abhi:- Rendering message: ${msg['_id']}, isMe: $isMe, type: ${msg['messageType']}");
-// //                   return Container(
-// //                     margin: EdgeInsets.symmetric(vertical: 2),
-// //                     child: Row(
-// //                       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-// //                       children: [
-// //                         Container(
-// //                           constraints: BoxConstraints(
-// //                             maxWidth: MediaQuery.of(context).size.width * 0.75,
-// //                           ),
-// //                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-// //                           decoration: BoxDecoration(
-// //                             color: isMe ? Colors.green[600] : Colors.white,
-// //                             borderRadius: BorderRadius.only(
-// //                               topLeft: Radius.circular(20),
-// //                               topRight: Radius.circular(20),
-// //                               bottomLeft: Radius.circular(isMe ? 20 : 5),
-// //                               bottomRight: Radius.circular(isMe ? 5 : 20),
-// //                             ),
-// //                             boxShadow: [
-// //                               BoxShadow(
-// //                                 color: Colors.black.withOpacity(0.1),
-// //                                 blurRadius: 5,
-// //                                 offset: Offset(0, 2),
-// //                               ),
-// //                             ],
-// //                           ),
-// //                           child: /*Column(
-// //                             crossAxisAlignment: CrossAxisAlignment.start,
-// //                             children: [
-// //                               if (msg['messageType'] == 'image' && msg['image'] != null)
-// //                                 ...(msg['image'] as List).map<Widget>((imgUrl) => Container(
-// //                                   margin: EdgeInsets.only(bottom: 8),
-// //                                   child: InkWell(
-// //                                    onTap: (){
-// //                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>FullImageScreen(imageUrl: 'https://api.thebharatworks.com/$imgUrl',)));
-// //                                    },
-// //                                     child: ClipRRect(
-// //                                       borderRadius: BorderRadius.circular(10),
-// //                                       child: Image.network(
-// //                                         'https://api.thebharatworks.com/$imgUrl',
-// //                                         width: 200,
-// //                                         height: 200,
-// //                                         fit: BoxFit.cover,
-// //                                         errorBuilder: (context, error, stackTrace) {
-// //                                           print("Abhi:- Error loading image: $error");
-// //                                           // SchedulerBinding.instance.addPostFrameCallback((_) {
-// //                                           //   ScaffoldMessenger.of(context).showSnackBar(
-// //                                           //     SnackBar(content: Text('Error loading image: $error')),
-// //                                           //   );
-// //                                           // });
-// //                                           return Container(
-// //                                             width: 200,
-// //                                             height: 200,
-// //                                             color: Colors.grey[300],
-// //                                             child: Icon(Icons.error),
-// //                                           );
-// //                                         },
-// //                                       ),
-// //                                     ),
-// //                                   ),
-// //                                 )),
-// //                               if (msg['messageType'] == 'image' && msg['image'] != null)
-// //                                 ...(msg['image'] as List).map<Widget>((docUrl) => Container(
-// //                                   margin: EdgeInsets.only(bottom: 8),
-// //                                   padding: EdgeInsets.all(8),
-// //                                   decoration: BoxDecoration(
-// //                                     color: Colors.grey[100],
-// //                                     borderRadius: BorderRadius.circular(8),
-// //                                   ),
-// //                                   child: Row(
-// //                                     mainAxisSize: MainAxisSize.min,
-// //                                     children: [
-// //                                       Icon(Icons.insert_drive_file, size: 20),
-// //                                       SizedBox(width: 8),
-// //                                       Text(
-// //                                         docUrl.split('/').last,
-// //                                         style: TextStyle(fontSize: 12),
-// //                                       ),
-// //                                     ],
-// //                                   ),
-// //                                 )),
-// //                               if (msg['message'] != null && msg['message'].isNotEmpty)
-// //                                 Text(
-// //                                   msg['message'],
-// //                                   style: TextStyle(
-// //                                     color: isMe ? Colors.white : Colors.black87,
-// //                                     fontSize: 16,
-// //                                   ),
-// //                                 ),
-// //                               SizedBox(height: 4),
-// //                               Row(
-// //                                 mainAxisSize: MainAxisSize.min,
-// //                                 mainAxisAlignment: MainAxisAlignment.end,
-// //                                 children: [
-// //                                   Text(
-// //                                     formatTime(msg['createdAt']),
-// //                                     style: TextStyle(
-// //                                       fontSize: 11,
-// //                                       color: isMe ? Colors.white70 : Colors.grey[600],
-// //                                     ),
-// //                                   ),
-// //                                 ],
-// //                               ),
-// //                             ],
-// //                           ),*/
-// //                           Column(
-// //                             crossAxisAlignment: CrossAxisAlignment.start,
-// //                             children: [
-// //                               if (msg['messageType'] == 'image' && msg['image'] != null)
-// //                                 ...(msg['image'] as List).map<Widget>((fileUrl) {
-// //                                   final fullUrl = 'https://api.thebharatworks.com/$fileUrl';
-// //                                   final fileName = fileUrl.split('/').last.toLowerCase();
-// //
-// //                                   // check extension
-// //                                   final isImage = fileName.endsWith('.jpg') ||
-// //                                       fileName.endsWith('.jpeg') ||
-// //                                       fileName.endsWith('.png') ||
-// //                                       fileName.endsWith('.gif') ||
-// //                                       fileName.endsWith('.webp');
-// //
-// //                                   if (isImage) {
-// //                                     // ---------- IMAGE UI ----------
-// //                                     return Container(
-// //                                       margin: EdgeInsets.only(bottom: 8),
-// //                                       child: InkWell(
-// //                                         onTap: () {
-// //                                           Navigator.push(
-// //                                             context,
-// //                                             MaterialPageRoute(
-// //                                               builder: (context) => FullImageScreen(imageUrl: fullUrl),
-// //                                             ),
-// //                                           );
-// //                                         },
-// //                                         child: ClipRRect(
-// //                                           borderRadius: BorderRadius.circular(10),
-// //                                           child: Image.network(
-// //                                             fullUrl,
-// //                                             width: 200,
-// //                                             height: 200,
-// //                                             fit: BoxFit.cover,
-// //                                             errorBuilder: (context, error, stackTrace) {
-// //                                               print("Abhi:- Error loading image: $error");
-// //                                               SchedulerBinding.instance.addPostFrameCallback((_) {
-// //                                                 ScaffoldMessenger.of(context).showSnackBar(
-// //                                                   SnackBar(content: Text('Error loading image: $error')),
-// //                                                 );
-// //                                               });
-// //                                               return Container(
-// //                                                 width: 200,
-// //                                                 height: 200,
-// //                                                 color: Colors.grey[300],
-// //                                                 child: Icon(Icons.error),
-// //                                               );
-// //                                             },
-// //                                           ),
-// //                                         ),
-// //                                       ),
-// //                                     );
-// //                                   } else {
-// //                                     // ---------- DOCUMENT UI ----------
-// //                                     return Container(
-// //                                       margin: EdgeInsets.only(bottom: 8),
-// //                                       padding: EdgeInsets.all(8),
-// //                                       decoration: BoxDecoration(
-// //                                         color: Colors.grey[100],
-// //                                         borderRadius: BorderRadius.circular(8),
-// //                                       ),
-// //                                       child: InkWell(
-// //                                         // onTap: () async {
-// //                                         //   if (await canLaunchUrl(Uri.parse(fullUrl))) {
-// //                                         //     await launchUrl(Uri.parse(fullUrl));
-// //                                         //   }
-// //                                         // },
-// //                                         child: Row(
-// //                                           mainAxisSize: MainAxisSize.min,
-// //                                           children: [
-// //                                             Icon(Icons.insert_drive_file, size: 20),
-// //                                             SizedBox(width: 8),
-// //                                             Expanded(
-// //                                               child: Text(
-// //                                                 fileName,
-// //                                                 style: TextStyle(fontSize: 12),
-// //                                                 overflow: TextOverflow.ellipsis,
-// //                                               ),
-// //                                             ),
-// //                                           ],
-// //                                         ),
-// //                                       ),
-// //                                     );
-// //                                   }
-// //                                 }),
-// //
-// //                               // ---------- TEXT MESSAGE ----------
-// //                               if (msg['message'] != null && msg['message'].isNotEmpty)
-// //                                 Text(
-// //                                   msg['message'],
-// //                                   style: TextStyle(
-// //                                     color: isMe ? Colors.white : Colors.black87,
-// //                                     fontSize: 16,
-// //                                   ),
-// //                                 ),
-// //
-// //                               SizedBox(height: 4),
-// //
-// //                               // ---------- TIME ----------
-// //                               Row(
-// //                                 mainAxisSize: MainAxisSize.min,
-// //                                 mainAxisAlignment: MainAxisAlignment.end,
-// //                                 children: [
-// //                                   Text(
-// //                                     formatTime(msg['createdAt']),
-// //                                     style: TextStyle(
-// //                                       fontSize: 11,
-// //                                       color: isMe ? Colors.white70 : Colors.grey[600],
-// //                                     ),
-// //                                   ),
-// //                                 ],
-// //                               ),
-// //                             ],
-// //                           )
-// //
-// //                         ),
-// //                       ],
-// //                     ),
-// //                   );
-// //                 },
-// //               ),
-// //             ),
-// //             if (images.isNotEmpty || documents.isNotEmpty)
-// //               Container(
-// //                 height: 80,
-// //                 color: Colors.white,
-// //                 child: ListView.builder(
-// //                   scrollDirection: Axis.horizontal,
-// //                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //                   itemCount: images.length + documents.length,
-// //                   itemBuilder: (context, index) {
-// //                     if (index < images.length) {
-// //                       print("Abhi:- Rendering selected image: ${images[index]}");
-// //                       return Container(
-// //                         margin: EdgeInsets.only(right: 8),
-// //                         width: 60,
-// //                         height: 60,
-// //                         decoration: BoxDecoration(
-// //                           borderRadius: BorderRadius.circular(8),
-// //                           border: Border.all(color: Colors.grey[300]!),
-// //                         ),
-// //                         child: ClipRRect(
-// //                           borderRadius: BorderRadius.circular(8),
-// //                           child: Image.file(
-// //                             File(images[index]),
-// //                             fit: BoxFit.cover,
-// //                             errorBuilder: (context, error, stackTrace) {
-// //                               print("Abhi:- Error loading selected image: $error");
-// //                               SchedulerBinding.instance.addPostFrameCallback((_) {
-// //                                 ScaffoldMessenger.of(context).showSnackBar(
-// //                                   SnackBar(content: Text('Error loading selected image: $error')),
-// //                                 );
-// //                               });
-// //                               return Container(
-// //                                 width: 60,
-// //                                 height: 60,
-// //                                 color: Colors.grey[300],
-// //                                 child: Icon(Icons.error),
-// //                               );
-// //                             },
-// //                           ),
-// //                         ),
-// //                       );
-// //                     } else {
-// //                       final docIndex = index - images.length;
-// //                       print("Abhi:- Rendering selected document: ${documents[docIndex]}");
-// //                       return Container(
-// //                         margin: EdgeInsets.only(right: 8),
-// //                         width: 60,
-// //                         height: 60,
-// //                         decoration: BoxDecoration(
-// //                           color: Colors.grey[100],
-// //                           borderRadius: BorderRadius.circular(8),
-// //                           border: Border.all(color: Colors.grey[300]!),
-// //                         ),
-// //                         child: Column(
-// //                           mainAxisAlignment: MainAxisAlignment.center,
-// //                           children: [
-// //                             Icon(Icons.insert_drive_file, size: 24),
-// //                             Text(
-// //                               documents[docIndex].split('/').last.substring(
-// //                                 0,
-// //                                 documents[docIndex].split('/').last.length > 8
-// //                                     ? 8
-// //                                     : documents[docIndex].split('/').last.length,
-// //                               ),
-// //                               style: TextStyle(fontSize: 8),
-// //                               textAlign: TextAlign.center,
-// //                             ),
-// //                           ],
-// //                         ),
-// //                       );
-// //                     }
-// //                   },
-// //                 ),
-// //               ),
-// //             Container(
-// //               decoration: BoxDecoration(
-// //                 color: Colors.white,
-// //                 boxShadow: [
-// //                   BoxShadow(
-// //                     color: Colors.black.withOpacity(0.1),
-// //                     blurRadius: 10,
-// //                     offset: Offset(0, -2),
-// //                   ),
-// //                 ],
-// //               ),
-// //               child: SafeArea(
-// //                 child: Padding(
-// //                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //                   child: Row(
-// //                     children: [
-// //                       IconButton(
-// //                         onPressed: () {
-// //                           print("Abhi:- Document picker button pressed");
-// //                           onPickDocuments();
-// //                         },
-// //                         icon: Icon(Icons.attach_file, color: Colors.grey[600]),
-// //                       ),
-// //                       Expanded(
-// //                         child: Container(
-// //                           decoration: BoxDecoration(
-// //                             color: Colors.grey[100],
-// //                             borderRadius: BorderRadius.circular(25),
-// //                           ),
-// //                           child: Row(
-// //                             children: [
-// //                               Expanded(
-// //                                 child: TextField(
-// //                                   controller: messageController,
-// //                                   decoration: InputDecoration(
-// //                                     hintText: 'Write a message',
-// //                                     hintStyle: TextStyle(color: Colors.grey[600]),
-// //                                     border: InputBorder.none,
-// //                                     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-// //                                   ),
-// //                                   maxLines: null,
-// //                                   onChanged: (value) {
-// //                                     print("Abhi:- Message input changed: $value");
-// //                                   },
-// //                                 ),
-// //                               ),
-// //                               IconButton(
-// //                                 onPressed: () {
-// //                                   print("Abhi:- Image picker button pressed");
-// //                                   onPickImages();
-// //                                 },
-// //                                 icon: Icon(Icons.image, color: Colors.grey[600]),
-// //                               ),
-// //                             ],
-// //                           ),
-// //                         ),
-// //                       ),
-// //                       SizedBox(width: 8),
-// //                       Container(
-// //                         decoration: BoxDecoration(
-// //                           color: Colors.green[600],
-// //                           shape: BoxShape.circle,
-// //                         ),
-// //                         child: IconButton(
-// //                           onPressed: () {
-// //                             print("Abhi:- Send message button pressed");
-// //                             onSendMessage();
-// //                           },
-// //                           icon: Icon(Icons.send, color: Colors.white),
-// //                         ),
-// //                       ),
-// //                     ],
-// //                   ),
-// //                 ),
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
-// //
-// // class ChatScreen extends StatefulWidget {
-// //   final String initialReceiverId;
-// //
-// //   const ChatScreen({Key? key, required this.initialReceiverId}) : super(key: key);
-// //
-// //   @override
-// //   _ChatScreenState createState() => _ChatScreenState();
-// // }
-// //
-// // class _ChatScreenState extends State<ChatScreen> {
-// //   String userId = "";
-// //   String? fullName;
-// //   List<dynamic> conversations = [];
-// //   dynamic currentChat;
-// //   List<dynamic> messages = [];
-// //   final TextEditingController _messageController = TextEditingController();
-// //   final TextEditingController _receiverIdController = TextEditingController();
-// //   List<String> images = [];
-// //   List<String> documents = [];
-// //   List<dynamic?> onlineUsers = [];
-// //   String receiverId = '';
-// //   final ScrollController _detailScrollController = ScrollController();
-// //   final ImagePicker _picker = ImagePicker();
-// //   bool showChatDetail = false;
-// //   bool isLoading = false;
-// //
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //     print("Abhi:- ChatScreen initState called, initialReceiverId: ${widget.initialReceiverId}");
-// //     _fetchProfileFromAPI().then((_) {
-// //       print("Abhi:- Profile fetched, userId: $userId");
-// //       _initSocket();
-// //       _fetchConversations();
-// //
-// //       if (widget.initialReceiverId.isNotEmpty) {
-// //         setState(() {
-// //           receiverId = widget.initialReceiverId;
-// //           print("Abhi:- Setting receiverId: $receiverId");
-// //         });
-// //         _startConversation();
-// //       }
-// //     });
-// //   }
-// //
-// //   Future<void> _fetchProfileFromAPI() async {
-// //     try {
-// //       final prefs = await SharedPreferences.getInstance();
-// //       final token = prefs.getString('token');
-// //       if (token == null) {
-// //         print("Abhi:- Error: No token found, skipping profile fetch");
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: No token found, please log in again')),
-// //           );
-// //         });
-// //         return;
-// //       }
-// //
-// //       print("Abhi:- Fetching user profile with token: $token");
-// //       final response = await http.get(
-// //         Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
-// //         headers: {
-// //           'Authorization': 'Bearer $token',
-// //           'Content-Type': 'application/json',
-// //         },
-// //       );
-// //
-// //       print("Abhi:- Profile API response: Status=${response.statusCode}, Body=${response.body}");
-// //       if (response.statusCode == 200) {
-// //         final body = json.decode(response.body);
-// //         if (body['status'] == true) {
-// //           final data = body['data'];
-// //           setState(() {
-// //             fullName = data['full_name'] ?? 'Your Name';
-// //             userId = data['_id']?.toString() ?? '';
-// //           });
-// //           print("Abhi:- Profile fetched successfully: fullName=$fullName, userId=$userId");
-// //         } else {
-// //           final error = body['message'] ?? 'Failed to fetch profile';
-// //           print("Abhi:- Error fetching profile: $error");
-// //           SchedulerBinding.instance.addPostFrameCallback((_) {
-// //             ScaffoldMessenger.of(context).showSnackBar(
-// //               SnackBar(content: Text('Error: Failed to fetch profile: $error')),
-// //             );
-// //           });
-// //         }
-// //       } else {
-// //         print("Abhi:- Error fetching profile: Status=${response.statusCode}, Body=${response.body}");
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Server error, profile fetch failed: Status ${response.statusCode}')),
-// //           );
-// //         });
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Exception in fetchProfileFromAPI: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while fetching profile: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   void _initSocket() {
-// //     print('Abhi:- Initializing socket for userId: $userId');
-// //     SocketService.connect(userId);
-// //     SocketService.setMessageCallback((parsedMessage) {
-// //       print('Abhi:- New message via socket: $parsedMessage');
-// //       if (parsedMessage != null && parsedMessage['conversationId'] != null) {
-// //         if (currentChat != null &&
-// //             parsedMessage['conversationId'].toString() == currentChat['_id'].toString()) {
-// //           setState(() {
-// //             if (!messages.any((msg) => msg['_id'].toString() == parsedMessage['_id'].toString())) {
-// //               messages.insert(0, parsedMessage);
-// //               print('Abhi:- Received message added to UI: ${parsedMessage['message']}');
-// //             } else {
-// //               print('Abhi:- Message already exists in UI: ${parsedMessage['_id']}');
-// //             }
-// //           });
-// //           _scrollToBottom();
-// //         } else {
-// //           print('Abhi:- Message from other chat: ${parsedMessage['conversationId']}');
-// //           _fetchConversations();
-// //           SchedulerBinding.instance.addPostFrameCallback((_) {
-// //             ScaffoldMessenger.of(context).showSnackBar(
-// //               SnackBar(content: Text('New message in another chat: ${parsedMessage['conversationId']}')),
-// //             );
-// //           });
-// //         }
-// //       } else {
-// //         print('Abhi:- Error: Invalid message data from socket: $parsedMessage');
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Invalid message data received from socket')),
-// //           );
-// //         });
-// //       }
-// //     });
-// //     SocketService.listenOnlineUsers((users) {
-// //       print('Abhi:- Online Users: $users');
-// //       setState(() => onlineUsers = users.map((u) => u.toString()).toList());
-// //     });
-// //   }
-// //
-// //   Future<void> _fetchConversations() async {
-// //     try {
-// //       setState(() => isLoading = true);
-// //       print("Abhi:- Starting fetchConversations for userId: $userId");
-// //       final convs = await ApiService.fetchConversations(userId);
-// //       setState(() {
-// //         conversations = convs;
-// //         isLoading = false;
-// //       });
-// //       print("Abhi:- Conversations fetched successfully: ${convs.length} conversations");
-// //       print("Abhi:- Conversations: $convs");
-// //     } catch (e) {
-// //       print('Abhi:- Error fetching conversations: $e');
-// //       setState(() => isLoading = false);
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to fetch conversations: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _fetchMessages() async {
-// //     if (currentChat == null) {
-// //       print("Abhi:- Error: currentChat is null, cannot fetch messages");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: No conversation selected to fetch messages')),
-// //         );
-// //       });
-// //       return;
-// //     }
-// //     try {
-// //       print("Abhi:- Fetching messages for conversation: ${currentChat['_id']}");
-// //       final msgs = await ApiService.fetchMessages(currentChat['_id'].toString());
-// //       setState(() {
-// //         messages = msgs.toList();
-// //         messages.sort((a, b) => DateTime.parse(b['createdAt']).compareTo(DateTime.parse(a['createdAt'])));
-// //         print("Abhi:- Messages fetched successfully: ${messages.length} messages");
-// //       });
-// //       WidgetsBinding.instance.addPostFrameCallback((_) {
-// //         _scrollToBottom();
-// //       });
-// //     } catch (e) {
-// //       print('Abhi:- Error fetching messages: $e');
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to fetch messages: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _startConversation() async {
-// //     if (receiverId.isEmpty) {
-// //       print("Abhi:- Error: receiverId is empty");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Please enter a valid Receiver ID')),
-// //         );
-// //       });
-// //       return;
-// //     }
-// //     if (userId.isEmpty) {
-// //       print("Abhi:- Error: userId is empty");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: User ID not available, please try again')),
-// //         );
-// //       });
-// //       return;
-// //     }
-// //     if (receiverId == userId) {
-// //       print("Abhi:- Error: Cannot start conversation with self, senderId=$userId, receiverId=$receiverId");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Cannot start a conversation with yourself')),
-// //         );
-// //       });
-// //       return;
-// //     }
-// //
-// //     try {
-// //       setState(() => isLoading = true);
-// //       print("Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
-// //       print("Abhi:- Current conversations: $conversations");
-// //       final existingConv = conversations.firstWhere(
-// //             (conv) {
-// //           final members = conv['members'] as List?;
-// //           if (members == null) {
-// //             print("Abhi:- Error: Members list is null for conversation ${conv['_id']}");
-// //             return false;
-// //           }
-// //           print("Abhi:- Checking conversation ${conv['_id']} members: $members");
-// //           return members.any((m) => m['_id'].toString() == receiverId) &&
-// //               members.any((m) => m['_id'].toString() == userId);
-// //         },
-// //         orElse: () => null,
-// //       );
-// //
-// //       if (existingConv != null) {
-// //         print("Abhi:- Existing conversation found: ${existingConv['_id']}");
-// //         setState(() {
-// //           currentChat = existingConv;
-// //           showChatDetail = true;
-// //           isLoading = false;
-// //           print("Abhi:- Setting showChatDetail to true for existing conversation: ${existingConv['_id']}");
-// //         });
-// //         await _fetchMessages();
-// //       } else {
-// //         print("Abhi:- No existing conversation found, starting new with receiverId: $receiverId");
-// //         final newConv = await ApiService.startConversation(userId, receiverId);
-// //         setState(() {
-// //           conversations.add(newConv);
-// //           currentChat = newConv;
-// //           showChatDetail = true;
-// //           isLoading = false;
-// //           print("Abhi:- Setting showChatDetail to true for new conversation: ${newConv['_id']}");
-// //         });
-// //         await _fetchMessages();
-// //       }
-// //     } catch (e) {
-// //       print('Abhi:- Error starting conversation: $e');
-// //       setState(() => isLoading = false);
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Failed to start conversation: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _pickImages() async {
-// //     try {
-// //       print("Abhi:- Picking images");
-// //       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-// //       if (pickedFiles != null) {
-// //         if (pickedFiles.length > 5) {
-// //           print("Abhi:- Error: More than 5 images selected");
-// //           SchedulerBinding.instance.addPostFrameCallback((_) {
-// //             ScaffoldMessenger.of(context).showSnackBar(
-// //               SnackBar(content: Text('Error: Maximum 5 images allowed')),
-// //             );
-// //           });
-// //           return;
-// //         }
-// //         setState(() {
-// //           images = pickedFiles.map((file) => file.path).toList();
-// //           print("Abhi:- Images picked successfully: $images");
-// //         });
-// //       } else {
-// //         print("Abhi:- No images selected");
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Exception in pickImages: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while picking images: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _pickDocuments() async {
-// //     try {
-// //       print("Abhi:- Picking documents");
-// //       FilePickerResult? result = await FilePicker.platform.pickFiles(
-// //         allowMultiple: true,
-// //         type: FileType.custom,
-// //         allowedExtensions: ['pdf', 'doc', 'docx'],
-// //       );
-// //       if (result != null && result.files.length <= 5) {
-// //         setState(() {
-// //           documents = result.files.map((file) => file.path!).toList();
-// //           print("Abhi:- Documents picked successfully: $documents");
-// //         });
-// //       } else if (result != null && result.files.length > 5) {
-// //         print("Abhi:- Error: More than 5 documents selected");
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Maximum 5 documents allowed')),
-// //           );
-// //         });
-// //       } else {
-// //         print("Abhi:- No documents selected");
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Exception in pickDocuments: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while picking documents: $e')),
-// //         );
-// //       });
-// //     }
-// //   }
-// //
-// //   Future<void> _sendMessage() async {
-// //     if (_messageController.text.trim().isEmpty && images.isEmpty && documents.isEmpty) {
-// //       print("Abhi:- Error: No message, images, or documents to send");
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         SnackBar(content: Text('Error: No message, images, or documents to send')),
-// //       );
-// //       return;
-// //     }
-// //
-// //     dynamic receiverId;
-// //     /*if (currentChat['members'][0] is String) {
-// //       print("Abhi:- Members are IDs, finding receiverId as string");
-// //       receiverId = currentChat['members'].firstWhere(
-// //             (m) => m != userId,
-// //         orElse: () => null,
-// //       );
-// //     } else {
-// //       print("Abhi:- Members are maps, finding receiverId");
-// //       final matchingMember = currentChat['members'].firstWhere(
-// //             (m) => m['_id'].toString() != userId,
-// //         orElse: () => {}, // Fixed: Empty map return
-// //       );
-// //       receiverId = matchingMember['_id'];
-// //     }*/
-// //     // if (currentChat['members'][0] is String) {
-// //     //   print("Abhi:- Members are IDs, finding receiverId as string");
-// //     //   receiverId = currentChat['members'].firstWhere(
-// //     //         (m) => m != "68d388ada1131cc2e4be05ff",
-// //     //     orElse: () => "68d388ada1131cc2e4be05ff", // ✅ return empty string instead of null
-// //     //   );
-// //     //   if (receiverId.isEmpty) receiverId = null; // ✅ handle invalid case
-// //     // } else {
-// //     //   print("Abhi:- Members are maps, finding receiverId");
-// //     //   final matchingMember = currentChat['members'].firstWhere(
-// //     //         (m) => m['_id'].toString() != "68d388ada1131cc2e4be05ff",
-// //     //     orElse: () => {}, // ✅ empty map return
-// //     //   );
-// //     //   receiverId = matchingMember.isNotEmpty ? matchingMember['_id'] : null;
-// //     // }
-// //     if (currentChat['members'][0] is String) {
-// //       print("Abhi:- Members are IDs, finding receiverId as string");
-// //       receiverId = currentChat['members'].firstWhere(
-// //             (m) => m != userId,  // <--- yahan userId daal
-// //         orElse: () => null,   // <--- null kar, hardcoded nahi
-// //       );
-// //     } else {
-// //       print("Abhi:- Members are maps, finding receiverId");
-// //       final matchingMember = currentChat['members'].firstWhere(
-// //             (m) => m['_id'].toString() != userId,  // <--- yahan userId daal
-// //         orElse: () => {},
-// //       );
-// //       receiverId = matchingMember.isNotEmpty ? matchingMember['_id'].toString() : null;
-// //     }
-// //     if (receiverId == null) {
-// //       print("Abhi:- Error: Invalid receiver ID");
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         SnackBar(content: Text('Error: Invalid receiver ID')),
-// //       );
-// //       return;
-// //     }
-// //
-// //     try {
-// //       dynamic newMsg;
-// //       if (images.isNotEmpty) {
-// //         newMsg = await ApiService.sendImageMessage(
-// //           senderId: userId,
-// //           receiverId: receiverId.toString(),
-// //           conversationId: currentChat['_id'].toString(),
-// //           imagePaths: images,
-// //           message: _messageController.text.isNotEmpty ? _messageController.text : null,
-// //         );
-// //         print('Abhi:- Image message sent successfully: $newMsg');
-// //       } else if (documents.isNotEmpty) {
-// //         newMsg = await ApiService.sendDocumentMessage(
-// //           senderId: userId,
-// //           receiverId: receiverId.toString(),
-// //           conversationId: currentChat['_id'].toString(),
-// //           documentPaths: documents,
-// //           message: _messageController.text.isNotEmpty ? _messageController.text : null,
-// //         );
-// //         print('Abhi:- Document message sent successfully: $newMsg');
-// //       } else {
-// //         final msgData = {
-// //           'senderId': userId,
-// //           'receiverId': receiverId.toString(),
-// //           'conversationId': currentChat['_id'].toString(),
-// //           'message': _messageController.text,
-// //           'messageType': 'text',
-// //         };
-// //         newMsg = await ApiService.sendTextMessage(msgData);
-// //         print('Abhi:- Text message sent successfully: $newMsg');
-// //       }
-// //
-// //       SocketService.sendMessage(newMsg);
-// //       setState(() {
-// //         if (!messages.any((msg) => msg['_id'].toString() == newMsg['_id'].toString())) {
-// //           messages.insert(0, newMsg);
-// //           print('Abhi:- Message added to UI: ${newMsg['_id']}');
-// //         } else {
-// //           print('Abhi:- Message already exists in UI: ${newMsg['_id']}');
-// //         }
-// //         _messageController.clear();
-// //         images.clear();
-// //         documents.clear();
-// //         print('Abhi:- Message fields cleared after sending');
-// //       });
-// //       _scrollToBottom();
-// //     } catch (e) {
-// //       print('Abhi:- Error sending message: $e');
-// //       ScaffoldMessenger.of(context).showSnackBar(
-// //         SnackBar(content: Text('Error: Failed to send message: $e')),
-// //       );
-// //     }
-// //   }
-// //
-// //   void _scrollToBottom() {
-// //     const maxRetries = 5;
-// //     int retryCount = 0;
-// //
-// //     void attemptScroll() {
-// //       if (_detailScrollController.hasClients) {
-// //         _detailScrollController.jumpTo(0);
-// //         print("Abhi:- Scrolled to bottom of messages");
-// //       } else if (retryCount < maxRetries) {
-// //         print("Abhi:- Scroll controller not ready, retrying (${retryCount + 1}/$maxRetries)");
-// //         retryCount++;
-// //         Future.delayed(Duration(milliseconds: 100), attemptScroll);
-// //       } else {
-// //         print("Abhi:- Scroll controller failed to initialize after $maxRetries retries");
-// //         SchedulerBinding.instance.addPostFrameCallback((_) {
-// //           ScaffoldMessenger.of(context).showSnackBar(
-// //             SnackBar(content: Text('Error: Failed to scroll to bottom of messages')),
-// //           );
-// //         });
-// //       }
-// //     }
-// //
-// //     attemptScroll();
-// //   }
-// //
-// //   String _formatTime(String createdAt) {
-// //     try {
-// //       final DateTime dateTime = DateTime.parse(createdAt).toLocal();
-// //       final now = DateTime.now().toLocal();
-// //       final today = DateTime(now.year, now.month, now.day);
-// //       final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-// //       final difference = now.difference(dateTime).inDays;
-// //
-// //       if (difference == 0) {
-// //         return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-// //       } else if (difference == 1) {
-// //         return "Yesterday ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-// //       } else {
-// //         return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
-// //       }
-// //     } catch (e) {
-// //       print("Abhi:- Error formatting time: $e");
-// //       SchedulerBinding.instance.addPostFrameCallback((_) {
-// //         ScaffoldMessenger.of(context).showSnackBar(
-// //           SnackBar(content: Text('Error: Exception while formatting time: $e')),
-// //         );
-// //       });
-// //       return "Invalid time";
-// //     }
-// //   }
-// //
-// //   @override
-// //   void dispose() {
-// //     print("Abhi:- Disposing ChatScreen");
-// //     SocketService.removeMessageCallback();
-// //     SocketService.disconnect();
-// //     _detailScrollController.dispose();
-// //     _messageController.dispose();
-// //     _receiverIdController.dispose();
-// //     super.dispose();
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     print("Abhi:- Building ChatScreen, showChatDetail: $showChatDetail, currentChat: ${currentChat?['_id'] ?? 'null'}");
-// //     if (isLoading) {
-// //       print("Abhi:- Showing loading indicator");
-// //       return Scaffold(
-// //         body: Center(child: CircularProgressIndicator()),
-// //       );
-// //     }
-// //     if (showChatDetail && currentChat != null) {
-// //       print("Abhi:- Rendering ChatDetailScreen for conversation: ${currentChat['_id']}");
-// //       return ChatDetailScreen(
-// //         currentChat: currentChat,
-// //         userId: userId,
-// //         messages: messages,
-// //         onlineUsers: onlineUsers,
-// //         scrollController: _detailScrollController,
-// //         messageController: _messageController,
-// //         images: images,
-// //         documents: documents,
-// //         onBack: () {
-// //           setState(() {
-// //             showChatDetail = false;
-// //             currentChat = null;
-// //             messages.clear();
-// //             print("Abhi:- Back from ChatDetailScreen, resetting state");
-// //           });
-// //         },
-// //         onSendMessage: _sendMessage,
-// //         onPickImages: _pickImages,
-// //         onPickDocuments: _pickDocuments,
-// //         formatTime: _formatTime,
-// //       );
-// //     }
-// //     print("Abhi:- Rendering ChatListScreen");
-// //     return ChatListScreen(
-// //       conversations: conversations,
-// //       userId: userId,
-// //       onlineUsers: onlineUsers,
-// //       receiverIdController: _receiverIdController,
-// //       onReceiverIdChanged: (val) {
-// //         receiverId = val;
-// //         print("Abhi:- Receiver ID changed: $val");
-// //       },
-// //       onStartConversation: () {
-// //         print("Abhi:- Start conversation triggered from ChatListScreen");
-// //         _startConversation();
-// //       },
-// //       onConversationTap: (conv) {
-// //         setState(() {
-// //           currentChat = conv;
-// //           showChatDetail = true;
-// //           print("Abhi:- Tapped conversation, setting showChatDetail to true: ${conv['_id']}");
-// //         });
-// //         _fetchMessages();
-// //       },
-// //     );
-// //   }
-// // }
-// //
-// // class ChatListScreen extends StatefulWidget {
-// //   final List<dynamic> conversations;
-// //   final String userId;
-// //   final List<dynamic> onlineUsers;
-// //   final TextEditingController receiverIdController;
-// //   final Function(String) onReceiverIdChanged;
-// //   final VoidCallback onStartConversation;
-// //   final Function(dynamic) onConversationTap;
-// //
-// //   const ChatListScreen({
-// //     Key? key,
-// //     required this.conversations,
-// //     required this.userId,
-// //     required this.onlineUsers,
-// //     required this.receiverIdController,
-// //     required this.onReceiverIdChanged,
-// //     required this.onStartConversation,
-// //     required this.onConversationTap,
-// //   }) : super(key: key);
-// //
-// //   @override
-// //   _ChatListScreenState createState() => _ChatListScreenState();
-// // }
-// //
-// // class _ChatListScreenState extends State<ChatListScreen> {
-// //   final ScrollController _listScrollController = ScrollController();
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     print("Abhi:- Building ChatListScreen, conversations count: ${widget.conversations.length}");
-// //     return Scaffold(
-// //       backgroundColor: Colors.white,
-// //       appBar: AppBar(
-// //         backgroundColor: Colors.white,
-// //         elevation: 0,
-// //         title: Text(
-// //           'Chat',
-// //           style: TextStyle(
-// //             color: Colors.black,
-// //             fontSize: 24,
-// //             fontWeight: FontWeight.w600,
-// //           ),
-// //         ),
-// //         centerTitle: true,
-// //       ),
-// //       body: Column(
-// //         children: [
-// //           Container(
-// //             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-// //             child: Row(
-// //               children: [
-// //                 Expanded(
-// //                   child: Container(
-// //                     decoration: BoxDecoration(
-// //                       color: Colors.grey[100],
-// //                       borderRadius: BorderRadius.circular(10),
-// //                     ),
-// //                     child: TextField(
-// //                       controller: widget.receiverIdController,
-// //                       onChanged: widget.onReceiverIdChanged,
-// //                       decoration: InputDecoration(
-// //                         hintText: 'Enter User ID to start chat',
-// //                         hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
-// //                         border: InputBorder.none,
-// //                         contentPadding:
-// //                         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-// //                       ),
-// //                     ),
-// //                   ),
-// //                 ),
-// //                 SizedBox(width: 8),
-// //                 Container(
-// //                   decoration: BoxDecoration(
-// //                     color: Colors.green[600],
-// //                     borderRadius: BorderRadius.circular(10),
-// //                   ),
-// //                   child: IconButton(
-// //                     onPressed: () {
-// //                       print("Abhi:- Start conversation button pressed in ChatListScreen");
-// //                       widget.onStartConversation();
-// //                     },
-// //                     icon: Icon(Icons.add_comment, color: Colors.white),
-// //                     iconSize: 20,
-// //                   ),
-// //                 ),
-// //               ],
-// //             ),
-// //           ),
-// //           Expanded(
-// //             child: ListView.builder(
-// //               controller: _listScrollController,
-// //               padding: EdgeInsets.symmetric(vertical: 8),
-// //               itemCount: widget.conversations.length,
-// //               itemBuilder: (ctx, idx) {
-// //                 final conv = widget.conversations[idx];
-// //                 final members = (conv['members'] as List?) ?? [];
-// //                 dynamic otherUser;
-// //                 try {
-// //                   otherUser = members.firstWhere(
-// //                         (m) => m['_id'].toString() != widget.userId,
-// //                     orElse: () => {'full_name': 'Unknown', '_id': '', 'profile_pic': null},
-// //                   );
-// //                   print("Abhi:- Rendering conversation: ${conv['_id']}, otherUser: ${otherUser['full_name']}, otherUserId: ${otherUser['_id']}");
-// //                 } catch (e) {
-// //                   print("Abhi:- Error finding other user in ChatListScreen for conversation ${conv['_id']}: $e");
-// //                   otherUser = {'full_name': 'Unknown', '_id': '', 'profile_pic': null};
-// //                   SchedulerBinding.instance.addPostFrameCallback((_) {
-// //                     print("Abhi:- get exception with post frame callback $e");
-// //                     // ScaffoldMessenger.of(context).showSnackBar(
-// //                     //   SnackBar(content: Text('Error: Failed to load chat user in list: $e')),
-// //                     // );
-// //                   });
-// //                 }
-// //                 final isOnline = widget.onlineUsers.contains(otherUser['_id'].toString());
-// //
-// //                 return Container(
-// //                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-// //                   child: ListTile(
-// //                     contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-// //                     leading: Stack(
-// //                       children: [
-// //                         CircleAvatar(
-// //                           radius: 28,
-// //                           backgroundColor: Colors.grey[300],
-// //                           backgroundImage: otherUser['profile_pic'] != null
-// //                               ? NetworkImage(otherUser['profile_pic'])
-// //                               : null,
-// //                           child: otherUser['profile_pic'] == null
-// //                               ? Icon(Icons.person, color: Colors.grey[600], size: 30)
-// //                               : null,
-// //                         ),
-// //                         if (isOnline)
-// //                           Positioned(
-// //                             right: 2,
-// //                             bottom: 2,
-// //                             child: Container(
-// //                               width: 14,
-// //                               height: 14,
-// //                               decoration: BoxDecoration(
-// //                                 color: Colors.green,
-// //                                 shape: BoxShape.circle,
-// //                                 border: Border.all(color: Colors.white, width: 2),
-// //                               ),
-// //                             ),
-// //                           ),
-// //                       ],
-// //                     ),
-// //                     title: Text(
-// //                       '${otherUser['full_name'] ?? 'Unknown'}',
-// //                       style: TextStyle(
-// //                         fontWeight: FontWeight.w600,
-// //                         fontSize: 16,
-// //                       ),
-// //                     ),
-// //                     subtitle: Text(
-// //                       conv['lastMessage'] ?? 'Tap to start conversation',
-// //                       style: TextStyle(
-// //                         color: Colors.grey[600],
-// //                         fontSize: 14,
-// //                       ),
-// //                       maxLines: 1,
-// //                       overflow: TextOverflow.ellipsis,
-// //                     ),
-// //                     onTap: () {
-// //                       print("Abhi:- Conversation tapped: ${conv['_id']}");
-// //                       widget.onConversationTap(conv);
-// //                     },
-// //                   ),
-// //                 );
-// //               },
-// //             ),
-// //           ),
-// //         ],
-// //       ),
-// //     );
-// //   }
-// //
-// //   @override
-// //   void dispose() {
-// //     print("Abhi:- Disposing ChatListScreen");
-// //     _listScrollController.dispose();
-// //     super.dispose();
-// //   }
-// // }
+// import 'dart:convert';
+// import 'dart:io';
+// import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
+// import 'package:developer/Emergency/utils/logger.dart';
+// import 'package:developer/Emergency/utils/size_ratio.dart';
+// import 'package:flutter/gestures.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:get/get.dart';
+// import 'package:google_fonts/google_fonts.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:image_picker/image_picker.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../../Bidding/Models/bidding_order.dart';
+// import '../../../Bidding/view/user/nagotiate_card.dart';
+// import '../../../chat/APIServices.dart';
+// import '../../../chat/SocketService.dart';
+// import '../../../chat/chatScreen.dart';
+// import '../../../testingfile.dart';
+// import '../../../utility/custom_snack_bar.dart';
+// import 'directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
+// import 'directHiring/models/userModel/UserViewWorkerDetailsModel.dart';
+// import 'directHiring/views/User/HireScreen.dart';
+// import 'directHiring/views/comm/view_images_screen.dart';
 //
-// bool _isChatLoading = false; // Add this as a field in your State class
+// class UserViewWorkerDetails extends StatefulWidget {
+//   final categreyId;
+//   final subcategreyId;
+//   final String workerId;
+//   final String? hirebuttonhide;
+//   final String? hideonly;
+//   final oderId;
+//   final biddingOfferId;
+//   final UserId;
 //
-// InkWell(
-// onTap: _isChatLoading
-// ? null  // Disable tap while loading
-// : () async {
-// print("Abhi:- tap user chat button");
-// final receiverId = order != null && order!['user_id'] != null
-//     ? order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'
-//     : 'Unknown';
-// print("Abhi:- tap user chat print resiverId ${order?['service_provider_id']?['_id']?.toString() ?? 'Unknown'}");
-// final fullName = order != null && order?['service_provider_id'] != null
-//     ? order?['service_provider_id']?['full_name'] ?? 'Unknown'
-//     : 'Unknown';
-// print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullName");
+//   const UserViewWorkerDetails({
+//     super.key,
+//     required this.workerId,
+//     this.categreyId,
+//     this.subcategreyId,
+//     this.hirebuttonhide,
+//     this.oderId,
+//     this.biddingOfferId,
+//     this.UserId,
+//     this.hideonly,
+//   });
 //
-// if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-//
-//   setState(() {
-// _isChatLoading = true;  // Disable button immediately
-// });
-// try {
-// await _startOrFetchConversation(context, receiverId);
-// } catch (e) {
-// print("Abhi:- Error starting conversation: $e");
-// ScaffoldMessenger.of(context).showSnackBar(
-// SnackBar(content: Text('Error starting chat')),
-// );
-// } finally {
-// if (mounted) {  // Check if widget is still mounted
-// setState(() {
-// _isChatLoading = false;  // Re-enable button
-// });
-// }
+//   @override
+//   State<UserViewWorkerDetails> createState() => _UserViewWorkerDetailsState();
 // }
 //
-// } else {
-// print("Abhi:- Error: Invalid receiver ID");
-// ScaffoldMessenger.of(context).showSnackBar(
-// SnackBar(content: Text('Error: Invalid receiver ID')),
-// );
+// class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
+//   bool _showReviews = true;
+//   bool _showAllSubCategories = false;
+//   bool _showAllEmergencySubCategories = false;
+//   bool isHisWork = true;
+//   File? _pickedImage;
+//   ServiceProviderDetailModel? workerData;
+//   bool isLoading = true;
+//   bool _isSwitched = false;
+//   String userLocation = "Select Location";
+//   ServiceProviderProfileModel? profile;
+//   List<BiddingOrder> biddingOrders = [];
+//   final ScrollController _scrollController = ScrollController();
+//   final GlobalKey _customerReviewsKey = GlobalKey(); // Customer Reviews ke liye key
+//   int? allratingReview;
+//   String? rating;
+//   @override
+//   void initState() {
+//     bwDebug(
+//         ".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
+//             ".subcategreyId: ${widget.subcategreyId},"
+//             ".hirebuttonhide: ${widget.hirebuttonhide},."
+//             "oderId: ${widget.oderId},"
+//             ".biddingOfferId: ${widget.biddingOfferId},"
+//             ".UserId: ${widget.UserId},"
+//             ".hideonly: ${widget.hideonly},",
+//         tag: "UserViewWorkDetail");
+//     super.initState();
+//     fetchWorkerDetails();
+//   }
+//
+//   @override
+//   void dispose() {
+//     _scrollController.dispose(); // NEW
+//     super.dispose();
+//   }
+//
+//   Future<void> _pickImage() async {
+//     final pickedFile = await ImagePicker().pickImage(
+//       source: ImageSource.gallery,
+//       imageQuality: 80,
+//     );
+//     if (pickedFile != null) {
+//       setState(() {
+//         _pickedImage = File(pickedFile.path);
+//       });
+//     }
+//   }
+//
+//   Future<void> fetchWorkerDetails() async {
+//     print("Abhi:- serive providerId :- ${widget.workerId}");
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token');
+//
+//       if (token == null) {
+//         CustomSnackBar.show(
+//             message: "No auth token found", type: SnackBarType.warning);
+//
+//         return;
+//       }
+//
+//       print("Abhi:- worker details screen :-- workerId  : ${widget.workerId}");
+//
+//       final response = await http.get(
+//         Uri.parse(
+//             "https://api.thebharatworks.com/api/user/getServiceProvider/${widget.workerId}"),
+//         headers: {'Authorization': 'Bearer $token'},
+//       );
+//
+//       print("API Response: ${response.body}"); // Debug ke liye
+//
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         final allReview = data['data']?['totalReviews'];
+//         final allReting = data['data']?['avgRating'];
+//         print("Abhi:- get total review : ${allReview} rating : ${allReting}");
+//         if (data['success'] == true && data['data'] != null) {
+//           setState(() {
+//             allratingReview = allReview ?? "0"; // agar null ho to empty list assign kar
+//             rating = allReting;
+//             workerData = ServiceProviderDetailModel.fromJson(data['data']);
+//             isLoading = false;
+//           });
+//         } else {
+//           CustomSnackBar.show(
+//               message: "Worker data not found", type: SnackBarType.error);
+//         }
+//       } else {
+//         throw Exception("Failed to load worker details");
+//       }
+//     } catch (e) {
+//       bwDebug("error : $e");
+//       CustomSnackBar.show(
+//           message: "Error loading worker details", type: SnackBarType.error);
+//     }
+//   }
+//
+//   ///--------------       Added chat code ------------------///
+//   bool _isChatLoading = false; // Add this as a field in your State class
+//   Future<Map<String, dynamic>> fetchUserById(
+//       String userId, String token) async {
+//     try {
+//       print("Abhi:- Fetching user by ID: $userId");
+//       final response = await http.get(
+//         Uri.parse('https://api.thebharatworks.com/api/user/getUser/$userId'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Content-Type': 'application/json',
+//           'Accept': 'application/json',
+//         },
+//       );
+//       print(
+//           "Abhi:- User fetch API response: ${response.statusCode}, Body=${response.body}");
+//       if (response.statusCode == 200) {
+//         final body = json.decode(response.body);
+//         if (body['success'] == true) {
+//           final user = body['user'];
+//           user['_id'] = getIdAsString(user['_id']); // Ensure _id is string
+//           return user;
+//         } else {
+//           throw Exception(body['message'] ?? 'Failed to fetch user');
+//         }
+//       } else {
+//         throw Exception('Server error: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       print("Abhi:- Error fetching user by ID: $e");
+//       return {'full_name': 'Unknown', '_id': userId, 'profile_pic': null};
+//     }
+//   }
+//
+//   String getIdAsString(dynamic id) {
+//     if (id == null) return '';
+//     if (id is String) return id;
+//     if (id is Map && id.containsKey('\$oid')) return id['\$oid'].toString();
+//     print("Abhi:- Warning: Unexpected _id format: $id");
+//     return id.toString();
+//   }
+//
+// // Yeh function InkWell ke onTap mein call hota hai
+//   Future<void> _startOrFetchConversation(
+//       BuildContext context, String receiverId) async {
+//     try {
+//       // Step 1: User ID fetch karo
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token');
+//       if (token == null) {
+//         print("Abhi:- Error: No token found");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: No token found, please log in again')),
+//         );
+//         return;
+//       }
+//
+//       // Step 2: User profile fetch karo
+//       final response = await http.get(
+//         Uri.parse('https://api.thebharatworks.com/api/user/getUserProfileData'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Content-Type': 'application/json',
+//           'Accept': 'application/json',
+//         },
+//       );
+//
+//       if (response.statusCode != 200) {
+//         print("Abhi:- Error fetching profile: Status=${response.statusCode}");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: Failed to fetch user profile')),
+//         );
+//         return;
+//       }
+//
+//       final body = json.decode(response.body);
+//       if (body['status'] != true) {
+//         print("Abhi:- Error fetching profile: ${body['message']}");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//               content:
+//               Text('Error: Failed to fetch profile: ${body['message']}')),
+//         );
+//         return;
+//       }
+//
+//       final userId = getIdAsString(body['data']['_id']);
+//       if (userId.isEmpty) {
+//         print("Abhi:- Error: User ID is empty");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Error: User ID not available')),
+//         );
+//         return;
+//       }
+//
+//       // Step 3: Check if conversation exists
+//       print(
+//           "Abhi:- Checking for existing conversation with receiverId: $receiverId, userId: $userId");
+//       final convs = await ApiService.fetchConversations(userId);
+//       dynamic currentChat = convs.firstWhere(
+//             (conv) {
+//           final members = conv['members'] as List? ?? [];
+//           if (members.isEmpty) return false;
+//           if (members[0] is String) {
+//             return members.contains(receiverId) && members.contains(userId);
+//           } else {
+//             return members.any((m) => getIdAsString(m['_id']) == receiverId) &&
+//                 members.any((m) => getIdAsString(m['_id']) == userId);
+//           }
+//         },
+//         orElse: () => null,
+//       );
+//
+//       // Step 4: Agar conversation nahi hai, toh nayi conversation start karo
+//       if (currentChat == null) {
+//         print(
+//             "Abhi:- No existing conversation, starting new with receiverId: $receiverId");
+//         currentChat = await ApiService.startConversation(userId, receiverId);
+//       }
+//
+//       // Step 5: Agar members strings hain, toh full user details fetch karo
+//       if (currentChat['members'].isNotEmpty &&
+//           currentChat['members'][0] is String) {
+//         print("Abhi:- New conversation, fetching user details for members");
+//         final otherId = currentChat['members'].firstWhere((id) => id != userId);
+//         final otherUserData = await fetchUserById(otherId, token);
+//         final senderUserData = await fetchUserById(userId, token);
+//         currentChat['members'] = [senderUserData, otherUserData];
+//         print(
+//             "Abhi:- Updated members with full details: ${currentChat['members']}");
+//       }
+//
+//       // Step 6: Messages fetch karo
+//       final messages =
+//       await ApiService.fetchMessages(getIdAsString(currentChat['_id']));
+//       messages.sort((a, b) => DateTime.parse(b['createdAt'])
+//           .compareTo(DateTime.parse(a['createdAt'])));
+//
+//       // Step 7: Socket initialize karo
+//       SocketService.connect(userId);
+//       final onlineUsers = <String>[];
+//       SocketService.listenOnlineUsers((users) {
+//         onlineUsers.clear();
+//         onlineUsers.addAll(users.map((u) => getIdAsString(u)));
+//       });
+//
+//       // Step 8: ChatDetailScreen push karo
+//       Navigator.push(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => StandaloneChatDetailScreen(
+//             initialCurrentChat: currentChat,
+//             initialUserId: userId,
+//             initialMessages: messages,
+//             initialOnlineUsers: onlineUsers,
+//           ),
+//         ),
+//       ).then((_) {
+//         SocketService.disconnect();
+//       });
+//     } catch (e, stackTrace) {
+//       print("Abhi:- Error starting conversation: $e");
+//       print("Abhi:- Stack trace: $stackTrace");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error: Failed to start conversation: $e')),
+//       );
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final height = MediaQuery.of(context).size.height;
+//     final width = MediaQuery.of(context).size.width;
+//     if (isLoading) {
+//       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+//
+//     return Scaffold(
+//       // backgroundColor: Colors.grey[100],
+//       appBar: AppBar(
+//         elevation: 0,
+//         backgroundColor: Color(0xFF9DF89D),
+//         centerTitle: true,
+//         title: const Text("Worker Details",
+//             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+//         leading: const BackButton(color: Colors.black),
+//         actions: [],
+//         systemOverlayStyle: SystemUiOverlayStyle(
+//           statusBarColor: Color(0xFF9DF89D),
+//           statusBarIconBrightness: Brightness.dark,
+//         ),
+//
+//       ),
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           controller: _scrollController,
+//           child: ConstrainedBox(
+//             constraints: BoxConstraints(
+//               minHeight: MediaQuery.of(context).size.height,
+//             ),
+//             child: Column(
+//               children: [
+//                 Padding(
+//                   padding: const EdgeInsets.all(8.0),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       GestureDetector(
+//                         onTap: _isChatLoading
+//                             ? null  // Disable tap while loading
+//                             : () async {
+//                           final receiverId =
+//                               widget.workerId?.toString() ?? 'Unknown';
+//                           final fullName = workerData?.fullName ?? 'Unknown';
+//
+//                           if (receiverId != 'Unknown' &&
+//                               receiverId.isNotEmpty) {
+//                             // await _startOrFetchConversation(context, receiverId);
+//                             setState(() {
+//                               _isChatLoading = true;  // Disable button immediately
+//                             });
+//                             try {
+//                               await _startOrFetchConversation(context, receiverId);
+//                             } catch (e) {
+//                               print("Abhi:- Error starting conversation: $e");
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                 SnackBar(content: Text('Error starting chat')),
+//                               );
+//                             } finally {
+//                               if (mounted) {  // Check if widget is still mounted
+//                                 setState(() {
+//                                   _isChatLoading = false;  // Re-enable button
+//                                 });
+//                               }
+//                             }
+//
+//                           } else {
+//                             CustomSnackBar.show(
+//                                 message: "Invalid receiver ID",
+//                                 type: SnackBarType.error);
+//                           }
+//                         },
+//                         child: _isChatLoading
+//                             ? SizedBox(
+//                           width: 18,
+//                           height: 18,
+//                           child: CircularProgressIndicator(
+//                             strokeWidth: 2,
+//                             valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+//                           ),
+//                         )
+//                             : Container(
+//                           height: 30,
+//                           width: 85,
+//                           padding: const EdgeInsets.all(5),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(8),
+//                             border: Border.all(
+//                               color:  _isChatLoading ? Colors.grey : Colors.grey,
+//                               width: 1.5,
+//                             ),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Icon(Icons.message,
+//                                   color: Colors.green, size: 14),
+//                               const SizedBox(width: 5),
+//                               Text(
+//                                 'Message',
+//                                 style: GoogleFonts.roboto(
+//                                   fontSize: 12,
+//                                   fontWeight: FontWeight.w500,
+//                                   color: Colors.green.shade700,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//
+//                       // Profile Image
+//                       GestureDetector(
+//                         onTap: () {
+//                           if (workerData?.profilePic != null &&
+//                               workerData!.profilePic!.isNotEmpty) {
+//                             Navigator.push(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) => ViewImage(
+//                                     imageUrl: workerData!.profilePic!),
+//                               ),
+//                             );
+//                           } else {
+//                             CustomSnackBar.show(
+//                                 message: "No profile image available",
+//                                 type: SnackBarType.info);
+//                           }
+//                         },
+//                         child: CircleAvatar(
+//                           radius: 50,
+//                           backgroundColor: Colors.grey.shade300,
+//                           backgroundImage: workerData?.profilePic != null &&
+//                               workerData!.profilePic!.isNotEmpty
+//                               ? NetworkImage(workerData!.profilePic!)
+//                               : null,
+//                           child: workerData?.profilePic == null ||
+//                               workerData!.profilePic!.isEmpty
+//                               ? const Icon(Icons.person,
+//                               size: 50, color: Colors.white)
+//                               : null,
+//                         ),
+//                       ),
+//
+//                       // Call Button
+//                       GestureDetector(
+//                         onTap: () {
+//
+//                         },
+//                         child: Container(
+//                           height: 30,
+//                           width: 85,
+//                           padding: const EdgeInsets.all(5),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(8),
+//                             border: Border.all(
+//                               color: Colors.green.shade700,
+//                               width: 1.5,
+//                             ),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Icon(Icons.call,
+//                                   color: Colors.green.shade700, size: 17),
+//                               const SizedBox(width: 5),
+//                               Text(
+//                                 'Call',
+//                                 style: GoogleFonts.roboto(
+//                                   fontSize: 12,
+//                                   fontWeight: FontWeight.w500,
+//                                   color: Colors.green.shade700,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//
+//                 const SizedBox(height: 8),
+//                 Text(
+//                   workerData?.fullName ?? '',
+//                   style: GoogleFonts.roboto(
+//                     fontSize: 16,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 4),
+//                 Center(
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       Icon(
+//                         Icons.location_on,
+//                         size: 17,
+//                         color: Colors.green.shade700,
+//                       ),
+//                       const SizedBox(width: 4),
+//                       Flexible(
+//                         // ya Expanded bhi use kar sakti hai, but Flexible zyada flexible hai
+//                         child: Text(
+//                           workerData?.location?["address"] ??
+//                               "Location not available",
+//                           style: GoogleFonts.roboto(
+//                             fontSize: 13,
+//                             color: Colors.black,
+//                             fontWeight: FontWeight.w700,
+//                           ),
+//                           maxLines: 1,
+//                           overflow: TextOverflow
+//                               .ellipsis, // overflow handle karne ke liye
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//
+//                 const SizedBox(height: 10),
+//                 // Row(                      //            On this role add scroll
+//                 //   mainAxisAlignment: MainAxisAlignment.center,
+//                 //   children: [
+//                 //     Text(
+//                 //       "${workerData?.totalReview ?? 0} Reviews",
+//                 //       style: GoogleFonts.roboto(
+//                 //           fontSize: 13, fontWeight: FontWeight.bold),
+//                 //     ),
+//                 //     const SizedBox(width: 4),
+//                 //     Row(
+//                 //       children: [
+//                 //         Text(
+//                 //           '(${workerData?.rating ?? 0.0} ',
+//                 //           style: GoogleFonts.roboto(
+//                 //               fontSize: 13, fontWeight: FontWeight.bold),
+//                 //         ),
+//                 //         Icon(Icons.star, color: Colors.amber, size: 14),
+//                 //         Text(
+//                 //           ')',
+//                 //           style: GoogleFonts.roboto(
+//                 //               fontSize: 13, fontWeight: FontWeight.bold),
+//                 //         ),
+//                 //       ],
+//                 //     ),
+//                 //   ],
+//                 // ),
+//                 GestureDetector(
+//                   onTap: () {
+//                     // Scroll to Customer Reviews section
+//                     final RenderBox? renderBox = _customerReviewsKey.currentContext?.findRenderObject() as RenderBox?;
+//                     if (renderBox != null) {
+//                       final offset = renderBox.localToGlobal(Offset.zero).dy;
+//                       _scrollController.animateTo(
+//                         offset - MediaQuery.of(context).padding.top, // Status bar ke liye adjust
+//                         duration: Duration(milliseconds: 500),
+//                         curve: Curves.easeInOut,
+//                       );
+//                     }
+//                   },
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       Text(
+//                         "${rating ?? 0} Reviews",
+//                         style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
+//                       ),
+//                       const SizedBox(width: 4),
+//                       Row(
+//                         children: [
+//                           Text(
+//                             '(${allratingReview ?? 0.0} ',
+//                             style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
+//                           ),
+//                           Icon(Icons.star, color: Colors.amber, size: 14),
+//                           Text(
+//                             ')',
+//                             style: GoogleFonts.roboto(fontSize: 13, fontWeight: FontWeight.bold),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//                 _buildProfileCard(),
+//                 const SizedBox(height: 16),
+//                 // _buildTabButtons(),
+//                 Container(
+//                   decoration: const BoxDecoration(
+//                     color: Color(0xffeaffea),
+//                     borderRadius:
+//                     BorderRadius.vertical(bottom: Radius.circular(14)),
+//                   ),
+//                   child: Padding(
+//                     padding: const EdgeInsets.all(8.0),
+//                     child: Column(
+//                       children: [
+//                         CarouselSlider(
+//                           options: CarouselOptions(
+//                             height: 160,
+//                             autoPlay: (_showReviews
+//                                 ? (workerData?.hisWork?.isNotEmpty ?? false)
+//                                 ? workerData!.hisWork!.length > 1
+//                                 : false
+//                                 : (workerData?.customerReview?.isNotEmpty ?? false)
+//                                 ? workerData!.customerReview!.length > 1
+//                                 : false),
+//                             enlargeCenterPage: true,
+//                             aspectRatio: 16 / 9,
+//                             autoPlayInterval: const Duration(seconds: 3),
+//                             autoPlayAnimationDuration: const Duration(milliseconds: 800),
+//                             viewportFraction: 0.8,
+//                             enableInfiniteScroll: (_showReviews
+//                                 ? (workerData?.hisWork?.isNotEmpty ?? false)
+//                                 ? workerData!.hisWork!.length > 1
+//                                 : false
+//                                 : (workerData?.customerReview?.isNotEmpty ?? false)
+//                                 ? workerData!.customerReview!.length > 1
+//                                 : false),
+//                           ),
+//                           items: (_showReviews
+//                               ? (workerData?.hisWork?.isNotEmpty ?? false)
+//                               ? workerData!.hisWork!
+//                               : ['assets/images/d_png/No_Image_Available.jpg']
+//                               : (workerData?.customerReview?.isNotEmpty ?? false)
+//                               ? workerData!.customerReview!
+//                               : ['assets/images/d_png/No_Image_Available.jpg'])
+//                               .map((imageUrl) {
+//                             return Builder(
+//                               builder: (BuildContext context) {
+//                                 return GestureDetector(
+//                                   onTap: imageUrl.startsWith('assets/')
+//                                       ? null
+//                                       : () {
+//                                     Get.to(() => ViewImage(
+//                                       imageUrl: imageUrl,
+//                                       title: "His Work",
+//                                     ));
+//                                   },
+//                                   child: Container(
+//                                     width: MediaQuery.of(context).size.width,
+//                                     margin: const EdgeInsets.symmetric(horizontal: 5.0),
+//                                     decoration: BoxDecoration(
+//                                       borderRadius: BorderRadius.circular(8),
+//                                     ),
+//                                     child: ClipRRect(
+//                                       borderRadius: BorderRadius.circular(8),
+//                                       child: imageUrl.startsWith('assets/')
+//                                           ? Image.asset(imageUrl, fit: BoxFit.cover)
+//                                           : CachedNetworkImage(
+//                                         imageUrl: imageUrl,
+//                                         fit: BoxFit.cover,
+//                                         placeholder: (context, url) => Image.asset(
+//                                           'assets/images/d_png/No_Image_Available.jpg',
+//                                           fit: BoxFit.cover,
+//                                         ),
+//                                         errorWidget: (context, url, error) => Image.asset(
+//                                           'assets/images/d_png/No_Image_Available.jpg',
+//                                           fit: BoxFit.cover,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 );
+//                               },
+//                             );
+//                           }).toList(),
+//                         ),
+//                         const SizedBox(height: 20),
+//                         Padding(
+//                           padding: const EdgeInsets.symmetric(horizontal: 16),
+//                           child: _buildTabButtons(),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 10),
+//
+//                 // About My Skills
+//                 Padding(
+//                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//                   child: Container(
+//                     width: double.infinity,
+//                     padding: const EdgeInsets.all(12),
+//                     decoration: BoxDecoration(
+//                       color: Colors.white,
+//                       borderRadius: BorderRadius.circular(10),
+//                       boxShadow: [
+//                         BoxShadow(
+//                           color: Colors.black12,
+//                           blurRadius: 4,
+//                           offset: Offset(0, 2),
+//                         ),
+//                       ],
+//                     ),
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Text(
+//                           "About My Skills",
+//                           style: GoogleFonts.roboto(
+//                             fontSize: 14,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                         const SizedBox(height: 10),
+//                         Container(
+//                           width: double.infinity,
+//                           padding: const EdgeInsets.all(10),
+//                           decoration: BoxDecoration(
+//                             border: Border.all(
+//                               color: Colors.green.shade700,
+//                               width: 1,
+//                             ),
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                           child: Text(
+//                             workerData?.skill ?? "No skill info",
+//                             style: GoogleFonts.roboto(fontSize: 14),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 16),
+//                 Padding(
+//                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//                   child: LayoutBuilder(
+//                     builder: (context, constraints) {
+//                       final validImages = workerData?.documents
+//                           ?.where((doc) =>
+//                       doc.images != null && doc.images!.isNotEmpty)
+//                           .expand((doc) => doc.images!)
+//                           .toList() ??
+//                           [];
+//                       return Container(
+//                         height: validImages.isEmpty ? 151.2 : null,
+//                         // Use original height for empty case, else auto-size
+//                         width: constraints.maxWidth,
+//                         padding: const EdgeInsets.all(12),
+//                         decoration: BoxDecoration(
+//                           color: Colors.white,
+//                           borderRadius: BorderRadius.circular(10),
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: Colors.black12,
+//                               blurRadius: 4,
+//                               offset: Offset(0, 2),
+//                             ),
+//                           ],
+//                         ),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Row(
+//                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                               children: [
+//                                 Text(
+//                                   "Document",
+//                                   style: GoogleFonts.roboto(
+//                                     fontSize: 14,
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
+//                                 Container(
+//                                   width: 82,
+//                                   decoration: BoxDecoration(
+//                                     borderRadius: BorderRadius.circular(5),
+//                                     border: Border.all(
+//                                         color: Colors.green, width: 2),
+//                                   ),
+//                                   child: Center(
+//                                     child: Text(
+//                                       "Verified",
+//                                       style: TextStyle(
+//                                         color: Colors.green.shade700,
+//                                         fontWeight: FontWeight.w600,
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                             const SizedBox(height: 10),
+//                             Row(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Image.asset(
+//                                   'assets/images/line2.png',
+//                                   height: 20,
+//                                   width: 20,
+//                                 ),
+//                                 const SizedBox(width: 5),
+//                                 Text(
+//                                   "Valid Id Proof",
+//                                   style: GoogleFonts.roboto(
+//                                     color: Colors.black,
+//                                     fontSize: 13,
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                             const SizedBox(height: 10),
+//                             SizedBox(
+//                               height: validImages.isEmpty ? null : 72,
+//                               // Image height when images exist
+//                               child: validImages.isEmpty
+//                                   ? Center(
+//                                 child: Text(
+//                                   "No documents",
+//                                   style: GoogleFonts.roboto(fontSize: 13),
+//                                 ),
+//                               )
+//                                   : ListView.builder(
+//                                 scrollDirection: Axis.horizontal,
+//                                 itemCount: validImages.length,
+//                                 itemBuilder: (context, index) {
+//                                   final imageUrl = validImages[index];
+//                                   bwDebug(" image url: $imageUrl");
+//                                   return Padding(
+//                                     padding:
+//                                     const EdgeInsets.only(right: 8.0),
+//                                     child: InkWell(
+//                                       onTap: () {
+//                                         Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                             builder: (context) =>
+//                                                 ViewImage(
+//                                                   imageUrl: imageUrl,
+//                                                   title: "Document",
+//                                                 ),
+//                                           ),
+//                                         );
+//                                       },
+//                                       child: Image.network(
+//                                         imageUrl,
+//                                         height: 72,
+//                                         width: 100,
+//                                         fit: BoxFit.cover,
+//                                         errorBuilder:
+//                                             (context, error, stackTrace) {
+//                                           return Image.asset(
+//                                             'assets/images/d_png/No_Image_Available.jpg',
+//                                             height: 72,
+//                                             width: 100,
+//                                             fit: BoxFit.cover,
+//                                           );
+//                                         },
+//                                       ),
+//                                     ),
+//                                   );
+//                                 },
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+//                 // Reviews
+//                 Padding(
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 16.0,
+//                     vertical: 10,
+//                   ),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     key: _customerReviewsKey, // GlobalKey add kiya
+//                     children: [
+//                       Text(
+//                         "Customer Reviews",
+//                         style: GoogleFonts.roboto(
+//                           fontSize: 14,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 10),
+//                       _buildCustomerReviews(),
+//                     ],
+//                   ),
+//                 ),
+//
+//                 // Hire Button / Negotiation
+//                 widget.hirebuttonhide == 'hide'
+//                     ? NegotiationCardUser(
+//                   key: ValueKey('negotiationCardKey'),
+//                   // GlobalKey conflict fix
+//                   workerId: widget.workerId,
+//                   biddingOfferId: widget.biddingOfferId,
+//                   oderId: widget.oderId,
+//                   UserId: widget.UserId,
+//                 )
+//                     : const SizedBox(),
+//                 const SizedBox(height: 40),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//       bottomNavigationBar:   widget.hideonly == 'hideOnly'
+//           ? const SizedBox()
+//           : GestureDetector(
+//         onTap: () {
+//           if (widget.workerId != null &&
+//               widget.workerId!.isNotEmpty) {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (_) => HireScreen(
+//                   firstProviderId: widget.workerId ?? "",
+//                   categreyId: widget.categreyId,
+//                   subcategreyId: widget.subcategreyId,
+//                 ),
+//               ),
+//             );
+//           }
+//         },
+//         child: Padding(
+//           padding: const EdgeInsets.all(15.0),
+//           child: Container(
+//             height: 45,
+//             //width: double.infinity,
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(15),
+//               color: Colors.green,
+//             ),
+//             child: Center(
+//               child: Text(
+//                 "Hire",
+//                 style: GoogleFonts.roboto(
+//                   fontSize: 16,
+//                   fontWeight: FontWeight.w500,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildProfileCard() {
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: Container(
+//         width: double.infinity,
+//         margin: const EdgeInsets.all(1),
+//         decoration: BoxDecoration(
+//           color: const Color(0xFF9DF89D),
+//           borderRadius: BorderRadius.circular(14),
+//         ),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           children: [
+//             Padding(
+//               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+//               child: RichText(
+//                 text: TextSpan(
+//                   style: GoogleFonts.poppins(fontSize: 11),
+//                   children: [
+//                     TextSpan(
+//                       text: "Category: ",
+//                       style: GoogleFonts.roboto(
+//                         color: Colors.green.shade800,
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 13,
+//                       ),
+//                     ),
+//                     TextSpan(
+//                       text: workerData?.categoryName ?? 'N/A',
+//                       style: const TextStyle(
+//                         color: Colors.black,
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 12,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 4),
+//             Padding(
+//               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+//               child: RichText(
+//                 text: TextSpan(
+//                   style: GoogleFonts.poppins(fontSize: 11),
+//                   children: _buildCategoryTextSpans(
+//                     workerData?.subcategoryNames ?? [],
+//                     _showAllSubCategories,
+//                         () {
+//                       setState(() {
+//                         _showAllSubCategories = !_showAllSubCategories;
+//                       });
+//                     },
+//                     "Sub-Category",
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 4),
+//             /*      (profile?.subEmergencyCategoryNames != null &&
+//                     profile!.subEmergencyCategoryNames!.isNotEmpty)? */
+//             Padding(
+//               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+//               child: RichText(
+//                 text: TextSpan(
+//                   style: GoogleFonts.poppins(fontSize: 11),
+//                   children: _buildCategoryTextSpans(
+//                     workerData?.emergencySubcategoryNames ?? [],
+//                     _showAllEmergencySubCategories,
+//                         () {
+//                       setState(() {
+//                         _showAllEmergencySubCategories =
+//                         !_showAllEmergencySubCategories;
+//                       });
+//                     },
+//                     "Emergency Sub-Category",
+//                   ),
+//                 ),
+//               ),
+//             ) /*:SizedBox()*/,
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildTabButtons() {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         _tabButton("His Work", _showReviews, () {
+//           setState(() => _showReviews = true);
+//         }),
+//         const SizedBox(width: 10),
+//         _tabButton("Customer Review", !_showReviews, () {
+//           setState(() => _showReviews = false);
+//         }),
+//       ],
+//     );
+//   }
+//
+//   Widget _tabButton(String title, bool selected, VoidCallback onTap) {
+//     return Expanded(
+//       child: GestureDetector(
+//         onTap: onTap,
+//         child: Container(
+//           height: 35,
+//           alignment: Alignment.center,
+//           decoration: BoxDecoration(
+//             color: selected ? Colors.green.shade700 : const Color(0xFFC3FBD8),
+//             borderRadius: BorderRadius.circular(10),
+//             border: Border.all(color: Colors.green.shade700),
+//           ),
+//           child: Text(
+//             title,
+//             style: GoogleFonts.poppins(
+//               fontWeight: FontWeight.w500,
+//               color: selected ? Colors.white : Colors.green.shade800,
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildCustomerReviews() {
+//     if ((workerData?.rateAndReviews?.isEmpty ?? true)) {
+//       return const Padding(
+//         padding: EdgeInsets.all(16),
+//         child: Text("No reviews available yet."),
+//       );
+//     }
+//
+//     return Column(
+//       children: workerData!.rateAndReviews!.map((review) {
+//         return Card(
+//           margin: const EdgeInsets.symmetric(vertical: 6),
+//           child: Padding(
+//             padding: const EdgeInsets.all(12),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Row(
+//                   children: List.generate(
+//                     review.rating.round(),
+//                         (index) => const Icon(
+//                       Icons.star,
+//                       color: Colors.amber,
+//                       size: 18,
+//                     ),
+//                   ),
+//                 ),
+//                 Text(review.review),
+//                 const SizedBox(height: 6),
+//                 if (review.images.isNotEmpty)
+//                   SizedBox(
+//                     height: 50,
+//                     child: ListView(
+//                       scrollDirection: Axis.horizontal,
+//                       children: review.images.map((img) {
+//                         return Padding(
+//                           padding: const EdgeInsets.only(right: 6),
+//                           child: Image.network(
+//                             img,
+//                             width: 50,
+//                             height: 50,
+//                             fit: BoxFit.cover,
+//                             errorBuilder: (context, error, stackTrace) {
+//                               return Container(
+//                                 width: 50,
+//                                 height: 50,
+//                                 color: Colors.grey[300],
+//                                 child: const Icon(Icons.image_not_supported,
+//                                     color: Colors.grey),
+//                               );
+//                             },
+//                           ),
+//                         );
+//                       }).toList(),
+//                     ),
+//                   )
+//                 else
+//                   Padding(
+//                     padding: const EdgeInsets.only(right: 6),
+//                     child: Image.asset(
+//                       'assets/images/d_png/No_Image_Available.jpg',
+//                       width: 50,
+//                       height: 50,
+//                       fit: BoxFit.cover,
+//                     ),
+//                   ),
+//               ],
+//             ),
+//           ),
+//         );
+//       }).toList(),
+//     );
+//   }
+//
+//   String? getFirstDocumentImage(List<Document>? documents) {
+//     if (documents == null || documents.isEmpty) {
+//       return null;
+//     }
+//     final firstDocument = documents.first;
+//     if (firstDocument.images != null && firstDocument.images!.isNotEmpty) {
+//       return firstDocument.images!.first;
+//     }
+//     return null;
+//   }
+//
+//   List<TextSpan> _buildCategoryTextSpans(
+//       List<String> names,
+//       bool showAll,
+//       VoidCallback toggleShowAll,
+//       String categoryType,
+//       ) {
+//     if (names.isEmpty) {
+//       return [
+//         TextSpan(
+//           text: "$categoryType: ",
+//           style: GoogleFonts.roboto(
+//             color: Colors.green.shade800,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 13,
+//           ),
+//         ),
+//         const TextSpan(
+//           text: 'N/A',
+//           style: TextStyle(
+//             color: Colors.black,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 12,
+//           ),
+//         ),
+//       ];
+//     }
+//
+//     const maxVisible = 3;
+//     final visibleNames = showAll ? names : names.take(maxVisible).toList();
+//     final moreCount = names.length - maxVisible;
+//
+//     List<TextSpan> spans = [
+//       TextSpan(
+//         text: "$categoryType: ",
+//         style: GoogleFonts.roboto(
+//           color: Colors.green.shade800,
+//           fontWeight: FontWeight.bold,
+//           fontSize: 13,
+//         ),
+//       ),
+//       TextSpan(
+//         text: visibleNames.join(', '),
+//         style: const TextStyle(
+//           color: Colors.black,
+//           fontWeight: FontWeight.bold,
+//           fontSize: 12,
+//         ),
+//       ),
+//     ];
+//
+//     if (moreCount > 0 && !showAll) {
+//       spans.add(
+//         TextSpan(
+//           text: " +$moreCount more",
+//           style: const TextStyle(
+//             color: Colors.blue,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 12,
+//           ),
+//           recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+//         ),
+//       );
+//     } else if (showAll && names.length > maxVisible) {
+//       spans.add(
+//         TextSpan(
+//           text: " Hide",
+//           style: const TextStyle(
+//             color: Colors.blue,
+//             fontWeight: FontWeight.bold,
+//             fontSize: 12,
+//           ),
+//           recognizer: TapGestureRecognizer()..onTap = toggleShowAll,
+//         ),
+//       );
+//     }
+//
+//     return spans;
+//   }
 // }
-// },
-// child:
 //
-// CircleAvatar(
-// radius: 14,
-// backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
-// child: _isChatLoading
-// ? SizedBox(
-// width: 18,
-// height: 18,
-// child: CircularProgressIndicator(
-// strokeWidth: 2,
-// valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-// ),
-// )
-// : Icon(
-// Icons.message,
-// color: Colors.green,
-// size: 18,
-// ),
-// ),
-//
-//
-// ),
-// ],
-// ),
-// const Spacer(),
-// InkWell(
-// onTap: () {
-// Navigator.push(
-// context,
-// MaterialPageRoute(
-// builder: (context) => /*ViewServiceProviderProfileScreen(
-//                                         serviceProviderId: order!['service_provider_id']?['_id'] ?? '',
-//                                       ),*/
-// UserViewWorkerDetails(
-// workerId: order?['service_provider_id']?['_id'] ?? '',
-// categreyId: widget.categreyId,
-// subcategreyId:
-// widget.subcategreyId,
-// hirebuttonhide: "hideOnly",
-// hideonly: 'hideOnly',
-// ),
-// ),
-// );
-// },
-// child: Align(
-// alignment: Alignment.bottomRight,
-// child: Text(
-// "View Profile",
-// style: GoogleFonts.roboto(
-// fontSize: 13,
-// color: Colors.green.shade700,
-// fontWeight: FontWeight.w700,
-// ),
-// ),
-// ),
-// ),
-//
+// class BottomCurveClipper extends CustomClipper<Path> {
+//   @override
+//   Path getClip(Size size) {
+//     return Path()
+//       ..lineTo(0, size.height - 40)
+//       ..quadraticBezierTo(
+//         size.width / 2,
+//         size.height,
+//         size.width,
+//         size.height - 30,
+//       )
+//       ..lineTo(size.width, 0)
+//       ..close();
+//   }
+//   @override
+//   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+// }

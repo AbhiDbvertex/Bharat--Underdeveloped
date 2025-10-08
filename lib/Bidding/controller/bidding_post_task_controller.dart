@@ -1096,7 +1096,7 @@ class PostTaskController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // showSnackbar("Success", "Task posted successfully.", context: context);
-        // Get.back();
+        Get.back();
 
         Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
         resetForm();
