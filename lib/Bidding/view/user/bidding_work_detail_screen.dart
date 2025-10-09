@@ -21,8 +21,6 @@ import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
-// import '../../../testingfile.dart';
-import '../../../testingfile.dart';
 import '../../../utility/custom_snack_bar.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
@@ -164,6 +162,39 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
       print("Abhi:- Filtered Bidders: $filteredBidders");
       print("Abhi:- Filtered Related Workers: $filteredRelatedWorkers");
     });
+  }
+
+  Future<void> AcceptBiddingOrder (BidderId) async {
+    final String url =
+        "https://api.thebharatworks.com/api/bidding-order/acceptBiddingOrder";
+    print("Abhi:- getAllBidders url: $url");
+    print("Abhi:- getAllBidders service providerId: ${widget.serviceProviderId} orderId : ${widget.buddingOderId}");
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "order_id":widget.buddingOderId,
+          "service_provider_id":BidderId,
+        })
+      );
+
+      var responseData = jsonDecode(response.body);
+      if(response.statusCode == 200 || response.statusCode == 201){
+        print("Abhi:- accept bidding order response ${response.statusCode}");
+        print("Abhi:- accept bidding order response ${response.body}");
+      }else{
+        print("Abhi:- accept bidding order else statusCode : ${response.statusCode} response : ${response.body}");
+      }
+    }catch(e){
+      print("Abhi:- accept bidding order Expception : $e");
+    }
   }
 
   //     abhishek add new api code
@@ -512,10 +543,50 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
 
   int? platformFee;
 
+  // Future<void> CreatebiddingPlateformfee() async {
+  //   final String url =
+  //       'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
+  //   print("Abhi:- CreatebiddingPlateformfee url: $url");
+  //
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token') ?? '';
+  //
+  //   try {
+  //     var response = await http.post(
+  //       Uri.parse(url),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+  //
+  //     var responseData = jsonDecode(response.body);
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       print(
+  //           "Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+  //       print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
+  //       setState(() {
+  //         razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+  //         platformFee = responseData['total_cost']; // Store platform fee amount (assuming it's int)
+  //       });
+  //       print(
+  //           "Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+  //       // Do not open Razorpay here; it will be opened from dialog's Pay button
+  //     } else {
+  //       print(
+  //           "Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+  //       print(
+  //           "Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+  //     }
+  //   } catch (e) {
+  //     print("Abhi:- CreatebiddingPlateformfee Exception: $e");
+  //   }
+  // }
   Future<void> CreatebiddingPlateformfee() async {
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
     print("Abhi:- CreatebiddingPlateformfee url: $url");
+    print("Abhi:- CreatebiddingPlateformfee url: ${widget.buddingOderId}");
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -531,22 +602,18 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
 
       var responseData = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print(
-            "Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+        print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
         print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
+        print("Abhi:- ");
         setState(() {
-          razorpayOrderId = responseData['orderId']; // Store orderId
-          platformFee = responseData[
-              'amount']; // Store platform fee amount (assuming it's int)
+          razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+          platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
         });
-        print(
-            "Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
         // Do not open Razorpay here; it will be opened from dialog's Pay button
       } else {
-        print(
-            "Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
-        print(
-            "Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+        print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+        print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
       }
     } catch (e) {
       print("Abhi:- CreatebiddingPlateformfee Exception: $e");
@@ -727,6 +794,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     print("Abhi:- buddingOderId is: ${widget.buddingOderId}");
+    print("Abhi:- buddingOderId serviceProviderId: ${widget.serviceProviderId}");
 
     final data = getBuddingOderByIdResponseData?['data'];
 
@@ -1796,34 +1864,12 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                     ['rating']
                                                                 ?.toString() ??
                                                             '0';
-                                                        final bidderId =
-                                                            bidder?['provider_id']
-                                                                        ?['_id']
-                                                                    ?.toString() ??
-                                                                '';
-                                                        final biddingofferId =
-                                                            bidder?['_id']
-                                                                    ?.toString() ??
-                                                                '';
-                                                        final OderId = bidder?[
-                                                                    'order_id']
-                                                                ?.toString() ??
-                                                            '';
-                                                        final bidAmount = bidder?[
-                                                                'bid_amount'] ??
-                                                            '0';
-                                                        final location = bidder?[
-                                                                            'provider_id']
-                                                                        [
-                                                                        'location']
-                                                                    ['address']
-                                                                ?.toString() ??
-                                                            'N/A';
-                                                        final profilePic =
-                                                            bidder?['provider_id']
-                                                                    [
-                                                                    'profile_pic']
-                                                                ?.toString();
+                                                        final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
+                                                        final biddingofferId = bidder?['_id']?.toString() ??'';
+                                                        final OderId = bidder?['order_id']?.toString() ?? '';
+                                                        final bidAmount = bidder?['bid_amount'] ?? '0';
+                                                        final location = bidder?['provider_id']['location']['address']?.toString() ?? 'N/A';
+                                                        final profilePic = bidder?['provider_id']['profile_pic']?.toString();
 
                                                         print(
                                                             "Abhi:- bidder id in bidder list : $bidderId");
@@ -2165,34 +2211,36 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                             //   // showTotalDialog(context, index, bidAmount, platformFee, bidderId);  // Extra bidderId pass kar
                                                                             //
                                                                             //   showTotalDialog(context,index,bidAmount,platformFee);
-                                                                            // },
-                                                                            onTap:
-                                                                                () async {
-                                                                              final bidder = getBuddingOderByIdResponseDatalist?[index];
-                                                                              final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
-                                                                              selectedBidderId = bidderId; // Store kar
-                                                                              await CreatebiddingPlateformfee();
-                                                                              showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
-                                                                            },
-                                                                            child:
+                                                                            // }, 
+                                                                                onTap: 
+                                                                                    () async {
+                                                                                  final bidder = getBuddingOderByIdResponseDatalist?[index];
+                                                                                  final bidderId = bidder?['provider_id']?['_id']?.toString() ?? '';
+                                                                                  selectedBidderId = bidderId; // Store kar
+                                                                                  print("Abhi:-print bidderId ${bidderId}");
+                                                                                   await AcceptBiddingOrder (bidder?['provider_id']?['_id']?.toString() ?? '');
+                                                                                   await CreatebiddingPlateformfee();
+                                                                                   showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
+                                                                                 }, 
+                                                                                child: 
                                                                                 Container(
-                                                                              height: 32,
-                                                                              constraints: BoxConstraints(
-                                                                                maxWidth: width * 0.2,
-                                                                              ),
-                                                                              decoration: BoxDecoration(
-                                                                                color: Colors.green.shade700,
-                                                                                borderRadius: BorderRadius.circular(8),
-                                                                              ),
-                                                                              child: Center(
-                                                                                child: Text(
-                                                                                  "Accept",
-                                                                                  style: TextStyle(
-                                                                                    fontSize: width * 0.032,
-                                                                                    color: Colors.white,
-                                                                                  ),
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                  maxLines: 1,
+                                                                                  height: 32, 
+                                                                                  constraints: BoxConstraints(
+                                                                                    maxWidth: width * 0.2,
+                                                                              ), 
+                                                                                  decoration: BoxDecoration(
+                                                                                    color: Colors.green.shade700, 
+                                                                                    borderRadius: BorderRadius.circular(8),
+                                                                                  ), 
+                                                                                  child: Center(
+                                                                                    child: Text(
+                                                                                      "Accept", 
+                                                                                      style: TextStyle(
+                                                                                        fontSize: width * 0.032, 
+                                                                                        color: Colors.white,
+                                                                                      ), 
+                                                                                      overflow: TextOverflow.ellipsis, 
+                                                                                      maxLines: 1,
                                                                                 ),
                                                                               ),
                                                                             ),
@@ -2690,10 +2738,15 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             ? SizedBox(height: height * 0.04)
                             : SizedBox(),
                         data?['hire_status'] == 'accepted'
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Text("Remaining Amount : ${data?['service_payment']?['remaining_amount']}",style: TextStyle(color: Colors.green[600],fontWeight: FontWeight.w600),),
+                            ): SizedBox(),
+                        data?['hire_status'] == 'accepted'
                             ? BiddingPaymentScreen(
+                          RemainingAmount: data?['service_payment']?['remaining_amount'],
                                 orderId: widget.buddingOderId ?? "",
-                                paymentHistory: data?['service_payment']
-                                    ?['payment_history'],
+                                paymentHistory: data?['service_payment']?['payment_history'],
                                 orderProviderId: data?['service_provider_id']
                                     ?['_id'],
                               )

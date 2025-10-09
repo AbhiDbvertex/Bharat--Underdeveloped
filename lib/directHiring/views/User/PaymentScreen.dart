@@ -13,6 +13,7 @@ import '../../../utility/custom_snack_bar.dart';
 import '../../Consent/ApiEndpoint.dart';
 import '../../Consent/app_constants.dart';
 import '../ServiceProvider/ServiceDisputeScreen.dart';
+import 'DirecrViewScreen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String orderId;
@@ -250,530 +251,504 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     print("Abhi:- getOrderId postPaymentRequest ${widget.orderId}");
-    return Container(
-      // padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Payment",
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (!_showForm)
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _showForm = true;
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        "Create",
-                        style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Card(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: (){
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Container(
+        // padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (_showForm)
-                    Container(
+                  Text(
+                    "Payment",
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (!_showForm)
+                    Padding(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.warning,color: Colors.amber,),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(child: Text("Info. Complete 5 successful online orders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,))
-                            ],
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _showForm = true;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _descriptionController,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter description',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _description = value;
-                                    });
-                                  },//a,y,a,d,s,s,t,m,m,u,a,n
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              SizedBox(
-                                width: 100,
-                                child: TextField(
-                                  maxLength: 6,
-                                  controller: _amountController,
-                                  keyboardType: TextInputType.number,
-                                  // inputFormatters: [
-                                   // Allows decimals up to 2 places. For integers only, use:
-                                   //  FilteringTextInputFormatter.digitsOnly
-                                  //   FilteringTextInputFormatter.allow(
-                                  //       RegExp(r'^\d*\.?\d{0,2}$')),
-                                  // ],
-                                inputFormatters: [
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),],
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter amount',
-                                    counterText: '',
-                                    prefixText: '₹',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _amount = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
+                        ),
+                        child: Text(
+                          "Create",
+                          style: GoogleFonts.roboto(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Radio<String>(
-                                value: 'cod',
-                                groupValue: _selectedPayment,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedPayment = value!;
-                                  });
-                                },
-                              ),
-                              const Text('Cod'),
-                              const SizedBox(width: 20),
-                              Radio<String>(
-                                value: 'online',
-                                groupValue: _selectedPayment,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedPayment = value!;
-                                  });
-                                },
-                              ),
-                              const Text('Online'),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: (_description.isNotEmpty &&
-                                        _amount.isNotEmpty &&
-                                        double.tryParse(_amount) != null &&
-                                        double.tryParse(_amount)! > 0)
-                                    ? () => _selectedPayment == 'cod' ? submitPayment() : _showPaymentDialog()
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Submit",
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _showForm = false;
-                                    _descriptionController.clear();
-                                    _amountController.clear();
-                                    _description = '';
-                                    _amount = '';
-                                    _selectedPayment = 'cod';
-                                  });
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.green,
-                                  side: const BorderSide(color: Colors.green),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Cancel",
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 14,
-                                    color: Colors.green.shade700,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  if (_payments.isNotEmpty) ...[
-                    ..._payments.asMap().entries.map((entry) {
-                      int i = entry.key;
-                      var payment = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 3),
+                ],
+              ),
+            ),
+            Card(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_showForm)
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                           children: [
-                            /*  Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
+                              children: [
+                                Icon(Icons.warning,color: Colors.amber,),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(child: Text("Info. Complete 5 successful online orders to enable COD",style: TextStyle(color: Colors.amber),maxLines: 2,))
+                              ],
+                            ),
+                            Row(
                               children: [
                                 Expanded(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: GoogleFonts.roboto(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500,
+                                  child: TextField(
+                                    controller: _descriptionController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter description',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      children: [
-                                        TextSpan(text: "${i + 1}. ${toTitleCase(payment['description'])} "),
-                                        TextSpan(
-                                          text: " ${toTitleCase(payment['status'] ?? 'UNKNOWN')}",
-                                          style: const TextStyle(color: Colors.green),
-                                        ),
-                                      ],
+                                      contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
                                     ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _description = value;
+                                      });
+                                    },//a,y,a,d,s,s,t,m,m,u,a,n
                                   ),
                                 ),
-                                Text(
-                                  "₹${payment['amount']}/-",
-                                  style: GoogleFonts.roboto(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextField(
+                                    maxLength: 6,
+                                    controller: _amountController,
+                                    keyboardType: TextInputType.number,
+                                    // inputFormatters: [
+                                     // Allows decimals up to 2 places. For integers only, use:
+                                     //  FilteringTextInputFormatter.digitsOnly
+                                    //   FilteringTextInputFormatter.allow(
+                                    //       RegExp(r'^\d*\.?\d{0,2}$')),
+                                    // ],
+                                  inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),],
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter amount',
+                                      counterText: '',
+                                      prefixText: '₹',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _amount = value;
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                payment['release_status'] == 'release'
-                                    ? const SizedBox()
-                                    : GestureDetector(
-                                  onTap: () {
-                                    postPaymentRequest(payment['_id'] ?? '');
-                                    print("Abhi:- payment releaseId : ${payment['_id']}");
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'cod',
+                                  groupValue: _selectedPayment,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedPayment = value!;
+                                    });
                                   },
-                                  child: Container(
-                                    height: 26,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      borderRadius: BorderRadius.circular(5),
+                                ),
+                                const Text('Cod'),
+                                const SizedBox(width: 20),
+                                Radio<String>(
+                                  value: 'online',
+                                  groupValue: _selectedPayment,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedPayment = value!;
+                                    });
+                                  },
+                                ),
+                                const Text('Online'),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: (_description.isNotEmpty &&
+                                          _amount.isNotEmpty &&
+                                          double.tryParse(_amount) != null &&
+                                          double.tryParse(_amount)! > 0)
+                                      ? () => _selectedPayment == 'cod' ? submitPayment() : _showPaymentDialog()
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Center(
-                                      child: Text(
-                                        "Pay",
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 13,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
+                                  ),
+                                  child: Text(
+                                    "Submit",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                OutlinedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _showForm = false;
+                                      _descriptionController.clear();
+                                      _amountController.clear();
+                                      _description = '';
+                                      _amount = '';
+                                      _selectedPayment = 'cod';
+                                    });
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.green,
+                                    side: const BorderSide(color: Colors.green),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Cancel",
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14,
+                                      color: Colors.green.shade700,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
                               ],
-                            ),*/
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex:1,
-                                  child: Text(
-                                    "${i + 1}.",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 13,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (_payments.isNotEmpty) ...[
+                      ..._payments.asMap().entries.map((entry) {
+                        int i = entry.key;
+                        var payment = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
+                          child: Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      "${i + 1}.",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 13,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: 5, //
-                                  child: Text(
-                                    "${toTitleCase(payment['description'])}",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 13,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
+                                  Expanded(
+                                    flex: 5, //
+                                    child: Text(
+                                      "${toTitleCase(payment['description'])}",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 13,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                // Status column
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    toTitleCase(payment['release_status'] ==
-                                            "release_requested"
-                                        ? "Requested"
-                                        : payment['release_status'] ??
-                                            'Pending'),
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14,
-                                      // color: getColor(payment['release_status']),
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w600,
+                                  // Status column
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      toTitleCase(payment['release_status'] ==
+                                              "release_requested"
+                                          ? "Requested"
+                                          : payment['release_status'] ??
+                                              'Pending'),
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        // color: getColor(payment['release_status']),
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
-                                ),
 
-                                // Amount column
-                                Expanded(
-                                  flex: 3,
-                                  child: Text(
-                                    "₹${payment['amount']}/-",
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
+                                  // Amount column
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      "₹${payment['amount']}/-",
+                                      style: GoogleFonts.roboto(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                ),
 
-                                // Button column
-                                Expanded(
-                                  flex: 1,
-                                  child: payment['release_status'] ==
-                                              'release_requested' ||
-                                          payment['release_status'] ==
-                                              'released'
-                                      ? const SizedBox(
-                                          width: 36) // empty placeholder
-                                      : GestureDetector(
-                                          onTap: isLoading == true
-                                              ? null
-                                              : () async {
-                                                  await postPaymentRequest(
-                                                      payment['_id'] ?? '');
-                                                  print(
-                                                      "Abhi:- payment releaseId : ${payment['_id']}");
-                                                },
-                                          child: Container(
-                                            height: 26,
-                                            width: 40,
-                                            decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius:
-                                                  BorderRadius.circular(7),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                "Pay",
-                                                style: GoogleFonts.roboto(
-                                                  fontSize: 13,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
+                                  // Button column
+                                  Expanded(
+                                    flex: 1,
+                                    child: payment['release_status'] ==
+                                                'release_requested' ||
+                                            payment['release_status'] ==
+                                                'released'
+                                        ? const SizedBox(
+                                            width: 36) // empty placeholder
+                                        : GestureDetector(
+                                            onTap: isLoading == true
+                                                ? null
+                                                : () async {
+                                                    await postPaymentRequest(
+                                                        payment['_id'] ?? '');
+                                                    print(
+                                                        "Abhi:- payment releaseId : ${payment['_id']}");
+                                                  },
+                                            child: Container(
+                                              height: 26,
+                                              width: 40,
+                                              decoration: BoxDecoration(
+                                                color: Colors.green,
+                                                borderRadius:
+                                                    BorderRadius.circular(7),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "Pay",
+                                                  style: GoogleFonts.roboto(
+                                                    fontSize: 13,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                          ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ] else
+                      const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Text(
+                          "No payments yet",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
-                      );
-                    }).toList(),
-                  ] else
-                    const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Text(
-                        "No payments yet",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Image.asset('assets/images/warning.png', height: 60),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Warning Message",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    "Make payments only through the app,\nit’s safer and more secure.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.yellow.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
+            const SizedBox(height: 24),
+            widget.status == 'completed'
+                ? Center(
+              child: Container(
+                height: 35,
+                width: 300,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle_outline, color: Colors.green),
+                    Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
+                  ],
+                ),
+              ),
+            ) : widget.status == 'cancelledDispute' ? Center(
+              child: Container(
+                height: 40,
+                width: double.infinity,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.red),
+                    Flexible(
+                      child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
+                        style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                    ),
+                  ],
+                ),
+              ),
+            ) : widget.status == 'cancelled' ? Center(
+              child: Container(
+                height: 35,
+                width: 250,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.red),
+                    Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                  ],
+                ),
+              ),
+            ) :
+            Column(
               children: [
-                Image.asset('assets/images/warning.png', height: 60),
-                const SizedBox(height: 8),
-                const Text(
-                  "Warning Message",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ServiceDisputeScreen(
+                          flowType: 'direct',
+                          orderId: widget.orderId,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "Cancel Task and Create Dispute",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  "Make payments only through the app,\nit’s safer and more secure.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
-                ),
+                const SizedBox(height: 12),
+                // widget.paymentHistory != null ? ElevatedButton(
+                //   onPressed: () {
+                //     marCompleteDarectHire();
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.green,
+                //     minimumSize: const Size.fromHeight(48),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //   ),
+                //   child: const Text(
+                //     "Mark as Complete",
+                //     style: TextStyle(color: Colors.white, fontSize: 16),
+                //   ),
+                // ) : SizedBox(),
+                // TextButton(onPressed: (){
+                //   print("widget.paymentHistory : ${widget.paymentHistory}");
+                //   print("widget.paymentHistory : ${widget.paymentHistory}");
+                // }, child: Text("Print list")),
+                ElevatedButton(
+                  onPressed: /*(widget.paymentHistory != null && widget.paymentHistory!.isNotEmpty)
+                      ?*/ () {
+                    marCompleteDarectHire();
+                  },
+                      /*: null,*/ // Disabled if null or empty
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: /*(widget.paymentHistory != null && widget.paymentHistory!.isNotEmpty)
+                        ?*/ Colors.green,
+                        /*:Colors.grey,*/  // 👈 Grey if no data
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "Mark as Complete",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
               ],
             ),
-          ),
-          const SizedBox(height: 24),
-          widget.status == 'completed'
-              ? Center(
-            child: Container(
-              height: 35,
-              width: 300,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.green)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle_outline, color: Colors.green),
-                  Text("  This order has been completed.",style: TextStyle(color: Colors.green,fontWeight: FontWeight.w600),),
-                ],
-              ),
-            ),
-          ) : widget.status == 'cancelledDispute' ? Center(
-            child: Container(
-              height: 40,
-              width: double.infinity,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.warning_amber, color: Colors.red),
-                  Flexible(
-                    child: Text("The order has been cancelled due to a dispute", textAlign: TextAlign.center,maxLines: 2,
-                      style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                  ),
-                ],
-              ),
-            ),
-          ) : widget.status == 'cancelled' ? Center(
-            child: Container(
-              height: 35,
-              width: 250,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.warning_amber, color: Colors.red),
-                  Text("This order is cancelled",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
-                ],
-              ),
-            ),
-          ) :
-          Column(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ServiceDisputeScreen(
-                        flowType: 'direct',
-                        orderId: widget.orderId,
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "Cancel Task and Create Dispute",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  marCompleteDarectHire();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "Mark as Complete",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-        ],
+            // In this point add mark complete
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
@@ -1108,6 +1083,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
           await savePaymentsToStorage();
           await loadPaymentsFromStorage();
+          // if (widget.paymentHistory != null) {
+          //   setState(() {
+          //     _payments.addAll(widget.paymentHistory!.map((payment) => {
+          //       'description':
+          //       payment['description']?.toString() ?? 'No description',
+          //       'amount': payment['amount']?.toString() ?? '0',
+          //       'status': payment['status']?.toString() ?? 'UNKNOWN',
+          //       'method': payment['method']?.toString() ?? 'cod',
+          //       '_id': payment['_id']?.toString() ?? '',
+          //       'release_status': payment['release_status']?.toString() ?? ""
+          //     }));
+          //   });
+          // }
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DirectViewScreen(id: widget.orderId,)));
           CustomSnackBar.show(
               message: "Payment completed successfully",
               type: SnackBarType.success);

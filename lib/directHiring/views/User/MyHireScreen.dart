@@ -818,6 +818,7 @@ class _MyHireScreenState extends State<MyHireScreen> {
                   print("Abhi:- get bidding oderId status : $status");
                   print("Abhi:- get bidding images : $imageUrl");
                   print("Abhi:- get bidding userId : $userId");
+                  print("Abhi:- get bidding service providerId : $serviceProviderId");
 
                   return Card(
                     elevation: 2,

@@ -228,10 +228,10 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
         print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
         print("Abhi:- ");
-        // setState(() {
-        //   razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
-        //   platformFee = responseData['total_cost']; // Store platform fee amount (assuming it's int)
-        // });
+        setState(() {
+          razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+          platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
+        });
         print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
         // Do not open Razorpay here; it will be opened from dialog's Pay button
       } else {
@@ -262,7 +262,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         },
         body: jsonEncode({
           "razorpay_order_id": orderId,
-          // "razorpay_payment_id": paymentId,
+          "razorpay_payment_id": paymentId,
           "serviceProviderId": serviceProviderId
         }),
       );
@@ -272,9 +272,9 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         print("Abhi:- verifaibiddingPlateformFee statusCode: ${response.statusCode}");
         print("Abhi:- verifaibiddingPlateformFee response: ${response.body}");
         // Verify success hone ke baad AcceptNegotiation call karo
-        // Get.back(result: true);
-        // Get.back(result: true);
-        // Get.back(result: true);
+        Get.back(result: true);
+        Get.back(result: true);
+        Get.back(result: true);
         await AcceptNegotiation();
       } else {
         print("Abhi:- else verifaibiddingPlateformFee statusCode: ${response.statusCode}");

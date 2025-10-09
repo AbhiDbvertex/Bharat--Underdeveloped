@@ -887,12 +887,14 @@ class BiddingPaymentScreen extends StatefulWidget {
   final String orderId;
   final orderProviderId;
   final List<dynamic>? paymentHistory;
+  final RemainingAmount;
 
   const BiddingPaymentScreen({
     super.key,
     required this.orderId,
     this.paymentHistory,
     this.orderProviderId,
+    this.RemainingAmount,
   });
 
   @override
@@ -1096,7 +1098,7 @@ class _BiddingPaymentScreenState extends State<BiddingPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     print(
-        "Abhi:- getOderId postPaymentRequest oderId : ${widget.orderId} , providerId : ${widget.orderProviderId}");
+        "Abhi:- getOderId postPaymentRequest oderId : ${widget.orderId} , providerId : ${widget.orderProviderId} , remainingAmount : ${widget.RemainingAmount}");
     // Validation for enabling/disabling the Submit button
     bool isFormValid = _description.isNotEmpty &&
         _amount.isNotEmpty &&

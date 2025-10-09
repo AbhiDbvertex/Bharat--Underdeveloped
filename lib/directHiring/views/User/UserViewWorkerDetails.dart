@@ -3142,12 +3142,12 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
         ),
         title: Center(
           child: const Text(
-            "Chat alert",
+            "Call alert",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         content: const Text(
-          "You haven’t paid the platform fee yet. Please complete the payment to access the chat feature.",
+          "You haven’t paid the platform fee yet. Please complete the payment to access the call feature.",
           style: TextStyle(fontSize: 15),
         ),
         actions: [

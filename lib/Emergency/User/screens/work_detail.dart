@@ -484,6 +484,7 @@ class WorkDetailPage extends StatefulWidget {
 class _WorkDetailPageState extends State<WorkDetailPage> {
   final tag = "WorkDetailPage";
   late WorkDetailController controller;
+  // platformoptimagation , paltformchanale
 
   @override
   void initState() {
@@ -505,14 +506,14 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // if (widget.passIndex == 2) {
-        //   // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 2,)),
-        //   );
-        //   return false; // default back ko cancel karo
-        // }
+        if (widget.passIndex == 2) {
+          // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 2,)),
+          );
+          return false; // default back ko cancel karo
+        }
         return true; // normal back chalega
       },
       child: Scaffold(

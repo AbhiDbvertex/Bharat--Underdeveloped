@@ -173,12 +173,14 @@ class PostTaskScreen extends StatelessWidget {
                   // _googleLocationField(controller),
                   _buildLabel("Description"),
                   _buildTextField(
+                    maxlangth: 250,
                     controller.descriptionController,
                     "Describe your task",
                     maxLines: 4,
                   ),
                   _buildLabel("Cost"),
                   _buildTextField(
+                    maxlangth: 7,
                     controller.costController,
                     "Enter cost in INR",
                     keyboardType: TextInputType.number,
@@ -330,6 +332,7 @@ class PostTaskScreen extends StatelessWidget {
     TextEditingController controller,
     String hint, {
     int maxLines = 1,
+        int? maxlangth,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
         List<TextInputFormatter>? inputFormatters,
@@ -337,6 +340,7 @@ class PostTaskScreen extends StatelessWidget {
   }) =>
       TextFormField(
         controller: controller,
+        maxLength: maxlangth,
         keyboardType: keyboardType,
         maxLines: maxLines,
         decoration: _inputDecoration(hint),

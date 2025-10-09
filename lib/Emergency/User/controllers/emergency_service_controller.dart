@@ -366,15 +366,13 @@ class EmergencyServiceController extends GetxController {
             // categreyId: widget.categreyId,
             // subcategreyId: widget.subcategreyId,
             // providerId: widget.providerId,
-            passIndex: 3,                        //     this code is currectd you replace only 3 to 2
+            passIndex: 2,                        //     this code is currectd you replace only 3 to 2
           ),
         ),
       );
     } else {
-
-      bwDebug("❌ Verification Failed: /*${decoded['message']}*/");
+      bwDebug("Verification Failed: /*${decoded['message']}*/");
       CustomSnackBar.show(
-
           message: "Verification Failed",
           type: SnackBarType.error
       );
