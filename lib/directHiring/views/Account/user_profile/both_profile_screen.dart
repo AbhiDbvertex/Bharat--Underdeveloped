@@ -37,6 +37,7 @@ class SellerScreen extends StatefulWidget {
 }
 
 class _SellerScreenState extends State<SellerScreen> {
+  bool _showAllDocuments = false;
   bool _showAllSubCategories = false;
   bool _showAllEmergencySubCategories = false;
   bool _isSwitched = false;
@@ -344,9 +345,9 @@ class _SellerScreenState extends State<SellerScreen> {
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
       );
       print("Full API Response: ${response.body}");
+      final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
         print("Data: $data");
 
         if (data['status'] == true) {
@@ -555,6 +556,7 @@ class _SellerScreenState extends State<SellerScreen> {
                                         // documentUrl: profile?.documents,
                                         documents: profile?.documents, // Pass documents
                                         businessImage: profile?.businessImage,
+                                        isShop: profile?.isShop,
                                       ),
                                 ),
                               );
@@ -740,7 +742,8 @@ class _SellerScreenState extends State<SellerScreen> {
                 onPressed: () async {
                   Navigator.of(context).pop();
                   Get.off(() => RoleEditProfileScreen(
-                      updateBothrequest: true, role: profile?.role));
+                      updateBothrequest: true, role: profile?.role)
+                  );
                 },
               ),
             ),
@@ -1147,12 +1150,16 @@ class _SellerScreenState extends State<SellerScreen> {
                       alignment: Alignment.topRight,
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(
+                       final result=  Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => GalleryScreen(
                                       images: profile?.hisWork ?? [],
                                       serviceProviderId: profile?.id ?? "")));
+                      bwDebug("result=========: $result");
+                       if(result==true){
+                         fetchProfile();
+                       }
                         },
                         child: Container(
                           width: 120,
@@ -1476,7 +1483,141 @@ class _SellerScreenState extends State<SellerScreen> {
   //     ),
   //   );
   // }
+  // Widget _buildDocumentCard() {
+  //   return Container(
+  //     width: double.infinity,
+  //     margin: const EdgeInsets.symmetric(horizontal: 16),
+  //     padding: const EdgeInsets.all(12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       border: Border.all(color: Colors.grey.shade300),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const SizedBox(height: 5),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             Text(
+  //               "Documents",
+  //               style: GoogleFonts.roboto(
+  //                 fontWeight: FontWeight.bold,
+  //                 fontSize: 16,
+  //               ),
+  //             ),
+  //             Container(
+  //               width: 100,
+  //               decoration: BoxDecoration(
+  //                 border: Border.all(color: Colors.green, width: 2),
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //               child: Center(
+  //                 child: Text(
+  //                   profile?.verificationStatus == 'verified' ? "Verified" : "Pending",
+  //                   style: TextStyle(
+  //                     color: Colors.green.shade700,
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 15),
+  //         if (profile?.documents != null && profile!.documents!.isNotEmpty)
+  //           ListView.builder(
+  //             shrinkWrap: true,
+  //             physics: const NeverScrollableScrollPhysics(),
+  //             itemCount: profile!.documents!.length,
+  //             itemBuilder: (context, index) {
+  //               final document = profile!.documents![index];
+  //               if (document.images == null || document.images!.isEmpty) return const SizedBox.shrink();
+  //               return Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     document.documentName ?? "Unnamed Document",
+  //                     style: GoogleFonts.roboto(
+  //                       fontWeight: FontWeight.w600,
+  //                       fontSize: 14,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 5),
+  //                   SizedBox(
+  //                     height: 100,
+  //                     child: ListView.builder(
+  //                       scrollDirection: Axis.horizontal,
+  //                       itemCount: document.images!.length,
+  //                       itemBuilder: (context, imgIndex) {
+  //                         final imageUrl = document.images![imgIndex];
+  //                         return Padding(
+  //                           padding: const EdgeInsets.only(right: 8.0),
+  //                           child: InkWell(
+  //                             onTap: () {
+  //                               Get.to(() => FullImageScreen(imageUrl: imageUrl));
+  //                             },
+  //                             child: ClipRRect(
+  //                               borderRadius: BorderRadius.circular(6),
+  //                               child: CachedNetworkImage(
+  //                                 imageUrl: imageUrl,
+  //                                 height: 90,
+  //                                 width: 105,
+  //                                 fit: BoxFit.cover,
+  //                                 placeholder: (context, url) => const Center(
+  //                                   child: CircularProgressIndicator(),
+  //                                 ),
+  //                                 errorWidget: (context, url, error) => Image.asset(
+  //                                   'assets/images/d_png/No_Image_Available.jpg',
+  //                                   height: 90,
+  //                                   width: 105,
+  //                                   fit: BoxFit.cover,
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 10),
+  //                 ],
+  //               );
+  //             },
+  //           )
+  //         else
+  //           Row(
+  //             children: [
+  //               SvgPicture.asset("assets/svg_images/adharicon.svg"),
+  //               const SizedBox(width: 20),
+  //               Text(
+  //                 "Valid Id Proof",
+  //                 style: GoogleFonts.roboto(
+  //                   fontWeight: FontWeight.w400,
+  //                   fontSize: 14,
+  //                 ),
+  //               ),
+  //               const SizedBox(width: 50),
+  //               Text(
+  //                 "(Not uploaded)",
+  //                 style: TextStyle(
+  //                   color: Colors.grey.shade600,
+  //                   fontStyle: FontStyle.italic,
+  //                   fontSize: 12,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildDocumentCard() {
+    final documents = profile?.documents ?? [];
+    final visibleDocuments = _showAllDocuments ? documents : documents.take(2).toList();
+    final hasMoreDocuments = documents.length > 2;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -1519,23 +1660,23 @@ class _SellerScreenState extends State<SellerScreen> {
             ],
           ),
           const SizedBox(height: 15),
-          if (profile?.documents != null && profile!.documents!.isNotEmpty)
+          if (documents.isNotEmpty)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: profile!.documents!.length,
+              itemCount: visibleDocuments.length,
               itemBuilder: (context, index) {
-                final document = profile!.documents![index];
+                final document = visibleDocuments[index];
                 if (document.images == null || document.images!.isEmpty) return const SizedBox.shrink();
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      document.documentName ?? "Unnamed Document",
-                      style: GoogleFonts.roboto(
+                      '${(document.documentName ?? "Unnamed Document")[0].toUpperCase()}${(document.documentName ?? "Unnamed Document").substring(1)}',                      style: GoogleFonts.roboto(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
+
                     ),
                     const SizedBox(height: 5),
                     SizedBox(
@@ -1601,6 +1742,27 @@ class _SellerScreenState extends State<SellerScreen> {
                   ),
                 ),
               ],
+            ),
+          if (hasMoreDocuments)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _showAllDocuments = !_showAllDocuments;
+                    });
+                  },
+                  child: Text(
+                    _showAllDocuments ? "See Less" : "See More",
+                    style: const TextStyle(
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
             ),
         ],
       ),
