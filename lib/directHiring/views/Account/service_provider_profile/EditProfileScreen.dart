@@ -2962,8 +2962,9 @@
 // //     }
 // //   }
 
+/**/
 
- import 'dart:async';
+ /*import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:developer/Emergency/utils/logger.dart';
@@ -4258,4 +4259,1627 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       return;
     }
-}}
+}}*/
+
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:developer/Emergency/utils/logger.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import '../../../../Bidding/controller/bidding_post_task_controller.dart';
+import '../../../../Emergency/User/controllers/emergency_service_controller.dart';
+import '../../../../Widgets/AppColors.dart';
+import '../../../../utility/custom_snack_bar.dart';
+import '../../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
+import '../../comm/view_images_screen.dart';
+
+class EditProfileScreen extends StatefulWidget {
+  final String? fullName;
+  final String? skill;
+  final String? categoryId;
+  final List<String>? subCategoryIds;
+  final List<String>? subEmergencyCategoryIds;
+  final List<Document>? documents; // Changed from documentUrl to documents
+  final String? gender;
+  final String? age;
+  final List<String>? businessImage;// Added
+  final bool ? isShop;
+
+
+  const EditProfileScreen({
+    super.key,
+    this.fullName,
+    this.skill,
+    this.categoryId,
+    this.subCategoryIds,
+    this.subEmergencyCategoryIds,
+    this.documents,
+    this.gender,
+    this.age,
+    this.businessImage,
+    this.isShop,
+  });
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  // String? uploadedDocUrl; // Removed
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController customDocNameController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  List<File> selectedImages = [];
+  List<String> businessImages = []; // Changed from File? to List<String>
+  final TextEditingController skillController = TextEditingController();
+  bool isLoading = false;
+  bool _showAllDocuments = false; // New state for documents
+  String? selectedCategory;
+  List<String> selectedSubCategories = [];
+  List<String> selectedSubEmergencyCategories = [];
+  List<Map<String, String>> categories = [];
+  List<Map<String, String>> subcategories = [];
+  List<Map<String, String>> subEmergencyCategories = [];
+  String? selectedDocumentType;
+  final Map<String, String> _errorTexts = {};
+  String? _selectedGender;
+  String? _shopVisitChoice = "no";
+  LatLng? _selectedLocation;
+  final emergencyServiceController = Get.put(EmergencyServiceController());
+  final postTaskController = Get.put(PostTaskController(), permanent: false);
+
+  final List<Map<String, String>> documentTypes = [
+    {'id': 'pancard', 'name': 'PAN Card'},
+    {'id': 'driving', 'name': 'Driving License'},
+    {'id': 'aadhar', 'name': 'Aadhaar Card'},
+    {'id': 'passport', 'name': 'Passport'},
+    {'id': 'govtId', 'name': 'or any Govt.ID'},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    fullNameController.text = widget.fullName ?? '';
+    ageController.text = widget.age?.toString() ?? '';
+    _selectedGender = widget.gender ?? '';
+    skillController.text = widget.skill ?? '';
+_shopVisitChoice=widget.isShop==true?'yes':'no';
+    selectedSubCategories = widget.subCategoryIds ?? [];
+    selectedSubEmergencyCategories = widget.subEmergencyCategoryIds ?? []; // Fixed typo
+    businessImages = widget.businessImage ?? []; // Initialize with JSON data
+    // uploadedDocUrl = widget.documentUrl; // Removed
+    bwDebug("Initial Data - isShop? ${widget.isShop} , CategoryId: ${widget.categoryId}, SubCategories: $selectedSubCategories, SubEmergencyCategories: $selectedSubEmergencyCategories", tag: "EditProfileScreen");
+    fetchCategories().then((_) {
+      bool isValidCategory = categories.any((cat) => cat['id'] == widget.categoryId);
+      setState(() {
+        selectedCategory = isValidCategory ? widget.categoryId : null;
+      });
+      if (selectedCategory != null) {
+        fetchSubCategories(selectedCategory!);
+        fetchSubEmergencyCategories(selectedCategory!);
+      }
+    });
+
+    SharedPreferences.getInstance().then((prefs) {
+      String? savedLocation = prefs.getString('selected_location') ?? prefs.getString('address');
+      double? savedLatitude = prefs.getDouble('user_latitude');
+      double? savedLongitude = prefs.getDouble('user_longitude');
+
+      if (savedLocation != null && savedLocation != 'Select Location') {
+        setState(() {
+          emergencyServiceController.googleAddressController.text = savedLocation;
+          emergencyServiceController.latitude.value = savedLatitude;
+          emergencyServiceController.longitude.value = savedLongitude;
+          _selectedLocation = LatLng(savedLatitude ?? 0.0, savedLongitude ?? 0.0);
+          bwDebug("📍 Pre-populated googleAddressController with: $savedLocation");
+        });
+      } else {
+        bwDebug("📍 No valid saved location found");
+      }
+    });
+  }
+
+  Future<void> fetchSubCategories(String categoryId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final res = await http.get(
+      Uri.parse('https://api.thebharatworks.com/api/subcategories/$categoryId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    bwDebug("Sub  Categories API Response: Status=${res.statusCode}, Body=${res.body}", tag: "EditProfileScreen");
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      setState(() {
+        subcategories = List<Map<String, String>>.from(
+          data['data'].map(
+                (sub) => {
+              'id': sub['_id'].toString(),
+              'name': sub['name'].toString(),
+            },
+          ),
+        );
+        // Retain only valid selectedSubCategories
+        selectedSubCategories = selectedSubCategories
+            .where((id) => subcategories.any((sub) => sub['id'] == id))
+            .toList();
+        bwDebug("Sub  Categories: $subcategories", tag: "EditProfileScreen");
+        bwDebug("Selected Sub  Categories: $selectedSubCategories", tag: "EditProfileScreen");
+
+      });
+    }
+  }
+
+  // Future<void> fetchSubEmergencyCategories(String categoryId) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token') ?? '';
+  //
+  //   final res = await http.get(
+  //     Uri.parse('https://api.thebharatworks.com/api/emergency/subcategories/$categoryId'),
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+  //
+  //   if (res.statusCode == 200) {
+  //     final data = jsonDecode(res.body);
+  //     setState(() {
+  //       subEmergencyCategories = List<Map<String, String>>.from(
+  //         data['data'].map(
+  //               (sub) => {
+  //             'id': sub['_id'].toString(),
+  //             'name': sub['name'].toString(),
+  //           },
+  //         ),
+  //       );
+  //       // Retain only valid selectedSubEmergencyCategories
+  //       selectedSubEmergencyCategories = selectedSubEmergencyCategories
+  //           .where((id) => subEmergencyCategories.any((sub) => sub['id'] == id))
+  //           .toList();
+  //     });
+  //   }
+  // }
+  Future<void> fetchSubEmergencyCategories(String categoryId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    try {
+      bwDebug("Fetching Sub Emergency Categories for categoryId: $categoryId", tag: "EditProfileScreen");
+      final res = await http.get(
+        Uri.parse('https://api.thebharatworks.com/api/emergency/subcategories/$categoryId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      bwDebug("Sub Emergency Categories API Response: Status=${res.statusCode}, Body=${res.body}", tag: "EditProfileScreen");
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        // if (data['status'] == true && data['data'] != null) { // Changed 'success' to 'status'
+        setState(() {
+          subEmergencyCategories = List<Map<String, String>>.from(
+            data['data'].map(
+                  (sub) => {
+                'id': sub['_id']?.toString() ?? '',
+                'name': sub['name']?.toString() ?? '',
+              },
+            ),
+          );
+          // Retain only valid selectedSubEmergencyCategories
+          selectedSubEmergencyCategories = selectedSubEmergencyCategories
+              .where((id) => subEmergencyCategories.any((sub) => sub['id'] == id))
+              .toList();
+          bwDebug("Sub Emergency Categories: $subEmergencyCategories", tag: "EditProfileScreen");
+          bwDebug("Selected Sub Emergency Categories: $selectedSubEmergencyCategories", tag: "EditProfileScreen");
+        });
+        // } else {
+        //   bwDebug("No valid data in Sub Emergency Categories response: ${data['message']}", tag: "EditProfileScreen");
+        // }
+      } else {
+        bwDebug("Failed to fetch Sub Emergency Categories: Status=${res.statusCode}, Body=${res.body}", tag: "EditProfileScreen");
+      }
+    } catch (e) {
+      bwDebug("Error fetching Sub Emergency Categories: $e", tag: "EditProfileScreen");
+    }
+  }
+  Future<void> pickBusinessImage() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickBusinessImage(true);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickBusinessImage(false);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickBusinessImage(bool fromCamera) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+          source: fromCamera ? ImageSource.camera : ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          businessImages = [image.path]; // Replace with new image
+        });
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Error selecting image: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        icon: const Icon(Icons.error, color: Colors.white),
+        margin: const EdgeInsets.all(10),
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+
+  void deleteBusinessImage(String imagePath) {
+    setState(() {
+      businessImages.remove(imagePath);
+    });
+  }
+
+  // Future<void> pickImages({required bool fromCamera}) async {
+  //   try {
+  //     int currentCount = selectedImages.length +
+  //         (widget.documents?.fold<int>(0, (sum, doc) => sum + doc.images!.length) ?? 0);
+  //     if (currentCount >= 2) {
+  //       Get.snackbar(
+  //         'Warning',
+  //         'You can select only 2 documents total',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.red,
+  //         colorText: Colors.white,
+  //         icon: const Icon(Icons.warning, color: Colors.white),
+  //         margin: const EdgeInsets.all(10),
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //       return;
+  //     }
+  //
+  //     if (fromCamera) {
+  //       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+  //       if (image != null) {
+  //         if (currentCount + 1 > 2) {
+  //           Get.snackbar(
+  //             'Warning',
+  //             'You can select only 2 documents total',
+  //             snackPosition: SnackPosition.BOTTOM,
+  //             backgroundColor: Colors.red,
+  //             colorText: Colors.white,
+  //             icon: const Icon(Icons.warning, color: Colors.white),
+  //             margin: const EdgeInsets.all(10),
+  //             duration: const Duration(seconds: 3),
+  //           );
+  //           return;
+  //         }
+  //         setState(() {
+  //           selectedImages.add(File(image.path));
+  //         });
+  //       }
+  //     } else {
+  //       final List<XFile> images = await _picker.pickMultiImage();
+  //       if (images.isEmpty) return;
+  //       if (currentCount + images.length > 2) {
+  //         Get.snackbar(
+  //           'Warning',
+  //           'You can select only 2 documents total',
+  //           snackPosition: SnackPosition.BOTTOM,
+  //           backgroundColor: Colors.red,
+  //           colorText: Colors.white,
+  //           icon: const Icon(Icons.warning, color: Colors.white),
+  //           margin: const EdgeInsets.all(10),
+  //           duration: const Duration(seconds: 3),
+  //         );
+  //         return;
+  //       }
+  //       setState(() {
+  //         selectedImages.addAll(images.map((img) => File(img.path)));
+  //       });
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       'Error',
+  //       'Error selecting images: $e',
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       icon: const Icon(Icons.error, color: Colors.white),
+  //       margin: const EdgeInsets.all(10),
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //   }
+  // }
+  Future<void> pickImages({required bool fromCamera}) async {
+    try {
+      if (selectedImages.length >= 1) {
+        Get.snackbar(
+          'Warning',
+          'You can select max 1 new documents',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          icon: const Icon(Icons.warning, color: Colors.white),
+          margin: const EdgeInsets.all(10),
+          duration: const Duration(seconds: 3),
+        );
+        return;
+      }
+
+      if (fromCamera) {
+        final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+        if (image != null && selectedImages.length < 1) {
+          setState(() {
+            selectedImages.add(File(image.path));
+          });
+        }
+      } else {
+        final List<XFile> images = await _picker.pickMultiImage();
+        if (images.isNotEmpty) {
+          final toAdd = images.take(1 - selectedImages.length).toList();
+          setState(() {
+            selectedImages.addAll(toAdd.map((img) => File(img.path)));
+          });
+          if (toAdd.length < images.length) {
+            // Get.snackbar('Info', 'Added ${toAdd.length} images (max 1 new)');
+            CustomSnackBar.show(message: "Added ${toAdd.length} images (max 1 new)",type: SnackBarType.info);
+
+          }
+        }
+      }
+    }
+    catch (e) {
+      Get.snackbar(
+        'Error',
+        'Error selecting images: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        icon: const Icon(Icons.error, color: Colors.white),
+        margin: const EdgeInsets.all(10),
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+  void deleteDocument(File file) {
+    setState(() {
+      selectedImages.remove(file);
+    });
+  }
+
+  // Future<void> onSavePressed() async {
+  //
+  //   if (selectedCategory == null ||
+  //       selectedSubCategories.isEmpty ||
+  //       selectedSubEmergencyCategories.isEmpty ||
+  //       skillController.text.isEmpty ||
+  //       fullNameController.text.isEmpty ||
+  //       ageController.text.isEmpty ||
+  //       _selectedGender == null ||
+  //       selectedDocumentType == null ||
+  //       (selectedImages.isEmpty && (widget.documents?.isEmpty ?? true)) ||
+  //       (_shopVisitChoice == 'yes' &&
+  //           (emergencyServiceController.googleAddressController.text.isEmpty ||
+  //               _selectedLocation == null)) ||
+  //       (selectedDocumentType == 'govtId' &&
+  //           customDocNameController.text.isEmpty)) {
+  //     if (!mounted) return;
+  //     Get.snackbar(
+  //       'Error',
+  //       selectedDocumentType == 'govtId' && customDocNameController.text.isEmpty
+  //           ? 'Please enter the custom document name'
+  //           : 'Please fill all fields, upload at least one document, and select a location if shop visit is enabled',
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       icon: const Icon(Icons.warning, color: Colors.white),
+  //       margin: const EdgeInsets.all(10),
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //     return;
+  //   }
+  //
+  //   if (int.tryParse(ageController.text.trim()) == null ||
+  //       int.parse(ageController.text.trim()) < 18) {
+  //     Get.snackbar(
+  //       'Error',
+  //       'Invalid age, You must be at least 18 years old',
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       icon: const Icon(Icons.error, color: Colors.white),
+  //       margin: const EdgeInsets.all(10),
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //     return;
+  //   }
+  //
+  //   setState(() => isLoading = true);
+  //
+  //   try {
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString('token') ?? '';
+  //
+  //     var request = http.MultipartRequest(
+  //       'PUT',
+  //       Uri.parse('https://api.thebharatworks.com/api/user/updateUserDetails'),
+  //     );
+  //
+  //     request.headers['Authorization'] = 'Bearer $token';
+  //
+  //     for (var file in selectedImages) {
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath('documents', file.path),
+  //       );
+  //     }
+  //
+  //     for (var image in businessImages.where((img) => !img.startsWith('http'))) {
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath('businessImage', image),
+  //       );
+  //     }
+  //
+  //     request.fields['category_id'] = selectedCategory!;
+  //     request.fields['subcategory_ids'] = jsonEncode(selectedSubCategories);
+  //     request.fields['emergencySubcategory_ids'] = jsonEncode(selectedSubEmergencyCategories);
+  //     request.fields['skill'] = skillController.text.trim();
+  //     request.fields['full_name'] = fullNameController.text.trim();
+  //     request.fields['age'] = ageController.text.trim();
+  //     request.fields['gender'] = _selectedGender!;
+  //     request.fields['documentName'] = selectedDocumentType == 'govtId'
+  //         ? customDocNameController.text.trim()
+  //         : selectedDocumentType!;
+  //     request.fields['isShop'] = _shopVisitChoice == 'yes' ? 'true' : 'false';
+  //
+  //     if (_shopVisitChoice == 'yes' && _selectedLocation != null) {
+  //       request.fields['businessAddress'] = jsonEncode({
+  //         "address": emergencyServiceController.googleAddressController.text,
+  //         "latitude": emergencyServiceController.latitude.value?.toString() ?? '',
+  //         "longitude": emergencyServiceController.longitude.value?.toString() ?? '',
+  //       });
+  //     }
+  //
+  //     var streamedResponse = await request.send().timeout(
+  //       const Duration(seconds: 20),
+  //       onTimeout: () => throw TimeoutException("Request timed out"),
+  //     );
+  //
+  //     final res = await http.Response.fromStream(streamedResponse);
+  //
+  //     if (!mounted) return;
+  //
+  //     if (res.statusCode == 200 || res.statusCode == 201) {
+  //       Get.snackbar(
+  //         'Success',
+  //         'Profile updated successfully',
+  //         snackPosition: SnackPosition.TOP,
+  //         backgroundColor: Colors.green,
+  //         colorText: Colors.white,
+  //         icon: const Icon(Icons.check_circle, color: Colors.white),
+  //         margin: const EdgeInsets.all(10),
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //       await Future.delayed(const Duration(milliseconds: 500));
+  //       if (mounted) Navigator.pop(context, true);
+  //     } else {
+  //       Get.snackbar(
+  //         'Error',
+  //         'Failed: ${res.body}',
+  //         snackPosition: SnackPosition.TOP,
+  //         backgroundColor: Colors.red,
+  //         colorText: Colors.white,
+  //         icon: const Icon(Icons.error, color: Colors.white),
+  //         margin: const EdgeInsets.all(10),
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print("Abhi:- update serviceprovider profile $e");
+  //     Get.snackbar(
+  //       'Error',
+  //       'Error: $e',
+  //       snackPosition: SnackPosition.TOP,
+  //       backgroundColor: Colors.red,
+  //       colorText: Colors.white,
+  //       icon: const Icon(Icons.error, color: Colors.white),
+  //       margin: const EdgeInsets.all(10),
+  //       duration: const Duration(seconds: 3),
+  //     );
+  //   } finally {
+  //     if (mounted) setState(() => isLoading = false);
+  //   }
+  // }
+  Future<void> onSavePressed() async {
+    String? errorMessage;
+
+    // Common validations
+    if (selectedCategory == null) {
+      errorMessage = 'Please select category';
+    } else if (selectedSubCategories.isEmpty) {
+      errorMessage = 'Please select at least one sub category';
+    } else if (selectedSubEmergencyCategories.isEmpty) {
+      errorMessage = 'Please select at least one emergency sub category';
+    } else if (skillController.text.trim().isEmpty) {
+      errorMessage = 'Please enter skills';
+    } else if (fullNameController.text.trim().isEmpty) {
+      errorMessage = 'Please enter full name';
+    }  else if (fullNameController.text.length<3) {
+      errorMessage = 'Please enter valid full name(at least 3 character';
+    }else if (ageController.text.trim().isEmpty || int.tryParse(ageController.text.trim()) == null || int.parse(ageController.text.trim()) < 18) {
+      errorMessage = 'Please enter valid age (at least 18)';
+    } else if (_selectedGender == null) {
+      errorMessage = 'Please select gender';
+    } else if (_shopVisitChoice == 'yes' && (emergencyServiceController.googleAddressController.text.isEmpty || _selectedLocation == null)) {
+      errorMessage = 'Please select shop address';
+    } else if ((widget.documents?.isEmpty ?? true) && selectedImages.isEmpty) {
+      errorMessage = 'Please upload at least one document';
+    } else if ((widget.documents?.isEmpty ?? true) && selectedDocumentType == null) {
+      errorMessage = 'Please select document type';
+    } else if ((widget.documents?.isEmpty ?? true) && selectedDocumentType == 'govtId' && customDocNameController.text.trim().isEmpty) {
+      errorMessage = 'Please enter custom document name';
+    }
+
+    if (errorMessage != null) {
+      if (!mounted) return;
+      CustomSnackBar.show(
+        message: errorMessage,
+        type: SnackBarType.error,
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('https://api.thebharatworks.com/api/user/updateUserDetails'),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      for (var file in selectedImages) {
+        request.files.add(
+          await http.MultipartFile.fromPath('documents', file.path),
+        );
+      }
+
+      for (var image in businessImages.where((img) => !img.startsWith('http'))) {
+        request.files.add(
+          await http.MultipartFile.fromPath('businessImage', image),
+        );
+      }
+
+      request.fields['category_id'] = selectedCategory!;
+      request.fields['subcategory_ids'] = jsonEncode(selectedSubCategories);
+      request.fields['emergencySubcategory_ids'] = jsonEncode(selectedSubEmergencyCategories);
+      request.fields['skill'] = skillController.text.trim();
+      request.fields['full_name'] = fullNameController.text.trim();
+      request.fields['age'] = ageController.text.trim();
+      request.fields['gender'] = _selectedGender!;
+      request.fields['documentName'] = selectedDocumentType == 'govtId'
+          ? customDocNameController.text.trim()
+          : selectedDocumentType??"";
+      request.fields['isShop'] = _shopVisitChoice == 'yes' ? 'true' : 'false';
+
+      if (_shopVisitChoice == 'yes' && _selectedLocation != null) {
+        request.fields['businessAddress'] = jsonEncode({
+          "address": emergencyServiceController.googleAddressController.text,
+          "latitude": emergencyServiceController.latitude.value?.toString() ?? '',
+          "longitude": emergencyServiceController.longitude.value?.toString() ?? '',
+        });
+      }
+
+      var streamedResponse = await request.send().timeout(
+        const Duration(seconds: 20),
+        onTimeout: () => throw TimeoutException("Request timed out"),
+      );
+
+      final res = await http.Response.fromStream(streamedResponse);
+
+      if (!mounted) return;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        CustomSnackBar.show(
+          message: 'Profile updated successfully',
+          type: SnackBarType.success,
+        );
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) Navigator.pop(context, true);
+      } else {
+        CustomSnackBar.show(
+          message: 'Failed: ${res.body}',
+          type: SnackBarType.error,
+        );
+      }
+    } catch (e) {
+      print("Abhi:- update serviceprovider profile $e");
+      CustomSnackBar.show(
+        message: 'Error: $e',
+        type: SnackBarType.error,
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+  Widget buildBusinessImageUpload() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade400),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: pickBusinessImage,
+              icon: const Icon(Icons.add_a_photo, color: Colors.white),
+              label: const Text('Upload Business Image'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: businessImages.map((image) {
+              return Stack(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ViewImage(
+                            imageUrl: image,
+                            title: "Business Image",
+                          ),
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: image.startsWith('http')
+                          ? /*Image.network(
+                        image,
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 100,
+                            width: 100,
+                            color: Colors.grey[300],
+                            child:   Image.asset(
+                              'assets/images/d_png/No_Image_Available.jpg',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      )*/
+              CachedNetworkImage(
+              imageUrl: image,
+              height: 100,
+              width: 100,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Image.asset(
+              'assets/images/d_png/No_Image_Available.jpg',
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+              ),
+              )
+                          : Image.file(
+                        File(image),
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 100,
+                            width: 100,
+                            color: Colors.grey[300],
+                            child:   Image.asset(
+                              'assets/images/d_png/No_Image_Available.jpg',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () => deleteBusinessImage(image),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black54,
+                        ),
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(Icons.close, color: Colors.white, size: 18),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDocumentUpload() {
+    final documents = widget.documents ?? [];
+    final visibleDocuments = _showAllDocuments ? documents : documents.take(2).toList();
+    final hasMoreDocuments = documents.length > 1;
+    // bool canAddMore = (selectedImages.length +
+    //     (widget.documents?.fold<int>(0, (sum, doc) => sum + doc.images!.length) ?? 0)) <
+    //     2;
+    bool canAddMore = selectedImages.length < 2;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade400),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: canAddMore ? pickDocument : null,
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Upload Document'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: canAddMore ? Colors.green[700] : Colors.grey,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (selectedImages.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              "New Document: ${selectedDocumentType == 'govtId'
+                  ? customDocNameController.text.trim()
+                  : documentTypes.firstWhere((d) => d['id'] == selectedDocumentType)['name']}",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 5),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: selectedImages.length,
+                itemBuilder: (context, index) {
+                  final file = selectedImages[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Stack(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ViewImage(
+                                  imageUrl: file.path,
+                                  title: "Image",
+                                ),
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.file(
+                              file,
+                              height: 90,
+                              width: 105,
+                              fit: BoxFit.cover,
+
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 90,
+                                  width: 105,
+                                  color: Colors.grey[300],
+                                  child:   Image.asset(
+                                    'assets/images/d_png/No_Image_Available.jpg',
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => deleteDocument(file),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black54,
+                              ),
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(Icons.close, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          if (documents.isNotEmpty) ...[
+            // const Text(
+            //   "Existing Documents",
+            //   style: TextStyle(fontWeight: FontWeight.bold),
+            // ),
+            // const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: visibleDocuments.length,
+              itemBuilder: (context, index) {
+                final document = visibleDocuments[index];
+                if (document.images == null || document.images!.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${(document.documentName ?? "Unnamed Document")[0].toUpperCase()}${(document.documentName ?? "Unnamed Document").substring(1)}',                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: document.images!.length,
+                        itemBuilder: (context, imgIndex) {
+                          final imageUrl = document.images![imgIndex];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ViewImage(
+                                      imageUrl: imageUrl,
+                                      title: "Document",
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.network(
+                                  imageUrl,
+                                  height: 90,
+                                  width: 105,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      height: 90,
+                                      width: 105,
+                                      color: Colors.grey[300],
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 90,
+                                      width: 105,
+                                      color: Colors.grey[300],
+                                      child:  Image.asset(
+                                        'assets/images/d_png/No_Image_Available.jpg',
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              },
+            ),
+            if (hasMoreDocuments)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showAllDocuments = !_showAllDocuments;
+                      });
+                    },
+                    child: Text(
+                      _showAllDocuments ? "See Less" : "See More",
+                      style: const TextStyle(
+                        color: AppColors.primaryGreen,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          "User Update Profile",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        leading: const BackButton(color: Colors.black),
+        actions: [],
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: AppColors.primaryGreen,
+          statusBarIconBrightness: Brightness.light,
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  buildBusinessImageUpload(),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    controller: fullNameController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: "Full Name",
+                      hintText: 'Enter Full Name',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    controller: ageController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                    decoration: InputDecoration(
+                      labelText: "Age",
+                      hintText: 'Enter your age',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  buildGenderRadio(),
+                  const SizedBox(height: 15),
+                  buildShopVisitRadio(),
+                  const SizedBox(height: 15),
+                  if (_shopVisitChoice == 'yes')
+                    Obx(
+                          () => GestureDetector(
+                        onTap: postTaskController.navigateToLocationScreen,
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            minLines: 1,
+                            maxLines: null,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              labelText: "Shop Address",
+                              hintText: 'Select location from map',
+                              suffixIcon: const Icon(Icons.map, color: Colors.grey),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: Colors.grey.shade400),
+                              ),
+                            ),
+                            controller: TextEditingController(
+                              text: postTaskController.fullAddress.value.isNotEmpty
+                                  ? postTaskController.fullAddress.value
+                                  : "No address found",
+                            ),
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 15),
+                  buildSimpleDropdown(
+                    hint: 'Select Category',
+                    value: selectedCategory,
+                    items: categories,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedCategory = val;
+                        selectedSubCategories.clear();
+                        selectedSubEmergencyCategories.clear();
+                        subcategories = [];
+                        subEmergencyCategories = [];
+                      });
+                      if (val != null) {
+                        fetchSubCategories(val);
+                        fetchSubEmergencyCategories(val);
+                      }
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      if (selectedCategory != null) {
+                        showSubcategoryDialog();
+                      } else {
+                        Get.snackbar(
+                          'Warning',
+                          'Please select category first',
+                          snackPosition: SnackPosition.TOP,
+                          backgroundColor: Colors.orange,
+                          colorText: Colors.white,
+                          icon: const Icon(Icons.warning, color: Colors.white),
+                          margin: const EdgeInsets.all(10),
+                          duration: const Duration(seconds: 3),
+                        );
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 12,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: Text(
+                        selectedSubCategories.isEmpty
+                            ? 'Select Subcategories'
+                            : subcategories
+                            .where((sub) => selectedSubCategories.contains(sub['id']))
+                            .map((sub) => sub['name'])
+                            .join(', '),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      if (selectedCategory != null) {
+                        showSubEmergencyCategoryDialog();
+                      } else {
+                        Get.snackbar(
+                          'Warning',
+                          'Please select category first',
+                          snackPosition: SnackPosition.TOP,
+                          backgroundColor: Colors.orange,
+                          colorText: Colors.white,
+                          icon: const Icon(Icons.warning, color: Colors.white),
+                          margin: const EdgeInsets.all(10),
+                          duration: const Duration(seconds: 3),
+                        );
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 12,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: Text(
+                        selectedSubEmergencyCategories.isEmpty
+                            ? 'Select Emergency Subcategories'
+                            : subEmergencyCategories
+                            .where((sub) => selectedSubEmergencyCategories.contains(sub['id']))
+                            .map((sub) => sub['name'])
+                            .join(', '),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: skillController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[a-z,0-9\./ ]')),
+                    ],
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      labelText: "Skills",
+                      hintText: 'Enter Skills',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "Note: Please upload your valid document (PAN Card, Driving Licence, Aadhaar Card, etc.)",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 12),
+                  buildSimpleDropdown(
+                    hint: 'Select Document Type',
+                    value: selectedDocumentType,
+                    items: documentTypes,
+                    onChanged: (val) {
+                      setState(() {
+                        selectedDocumentType = val;
+                        customDocNameController.clear();
+                      });
+                    },
+                  ),
+                  if (selectedDocumentType == 'govtId') ...[
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: customDocNameController,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: "Custom Document Name",
+                        hintText: 'Enter document name (e.g., Voter ID)',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  buildDocumentUpload(),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: isLoading ? null : onSavePressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[800],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 130,
+                        vertical: 16,
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    )
+                        : const Text(
+                      "UPDATE",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildGenderRadio() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Select Your Gender"),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Radio<String>(
+              value: 'male',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Male'),
+            Radio<String>(
+              value: 'female',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Female'),
+            Radio<String>(
+              value: 'other',
+              groupValue: _selectedGender,
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                  _errorTexts.remove('gender');
+                });
+              },
+            ),
+            const Text('Other'),
+          ],
+        ),
+        if (_errorTexts['gender'] != null)
+          Text(
+            _errorTexts['gender']!,
+            style: const TextStyle(color: AppColors.red, fontSize: 11),
+          ),
+      ],
+    );
+  }
+
+  Widget buildShopVisitRadio() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Do you have any shop ?"),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Radio<String>(
+              value: 'yes',
+              groupValue: _shopVisitChoice,
+              onChanged: (value) {
+                setState(() {
+                  _shopVisitChoice = value;
+                });
+              },
+            ),
+            const Text('Yes'),
+            Radio<String>(
+              value: 'no',
+              groupValue: _shopVisitChoice,
+              onChanged: (value) {
+                setState(() {
+                  _shopVisitChoice = value;
+                  emergencyServiceController.googleAddressController.clear();
+                  _selectedLocation = null;
+                  emergencyServiceController.latitude.value = null;
+                  emergencyServiceController.longitude.value = null;
+                });
+              },
+            ),
+            const Text('No'),
+          ],
+        ),
+      ],
+    );
+  }
+  Future<void> fetchCategories() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final res = await http.get(
+      Uri.parse('https://api.thebharatworks.com/api/work-category'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      print("Fetched Categories: ${data['data']}");
+      setState(() {
+        categories = List<Map<String, String>>.from(
+          data['data'].map(
+                (cat) =>
+            {
+              'id': cat['_id'].toString(),
+              'name': cat['name'].toString(),
+            },
+          ),
+        );
+        print("Processed Categories IDs: ${categories.map((c) => c['id'])
+            .toList()}");
+      });
+    } else {
+      print("Failed to fetch categories: ${res.statusCode} - ${res.body}");
+    }
+  }
+  Widget buildSimpleDropdown({
+    required String? value,
+    required String hint,
+    required List<Map<String, String>> items,
+    required void Function(String?) onChanged,
+  }) {
+    String? validValue =
+    items.any((item) => item['id'] == value) ? value : null;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade400),
+      ),
+      child: DropdownButtonFormField<String>(
+        value: validValue,
+        isExpanded: true,
+        decoration: const InputDecoration(border: InputBorder.none),
+        hint: Text(hint, style: const TextStyle(color: Colors.grey)),
+        items: items
+            .map(
+              (item) =>
+              DropdownMenuItem(
+                value: item['id'],
+                child: Text(item['name'] ?? ''),
+              ),
+        )
+            .toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+  void showSubcategoryDialog() {
+    List<String> tempSelected = List.from(selectedSubCategories);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Select Subcategories"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: subcategories.length,
+                  itemBuilder: (context, index) {
+                    final sub = subcategories[index];
+                    final subId = sub['id']!;
+                    return CheckboxListTile(
+                      title: Text(sub['name'] ?? ''),
+                      value: tempSelected.contains(subId),
+                      onChanged: (bool? value) {
+                        setDialogState(() {
+                          if (value == true) {
+                            tempSelected.add(subId);
+                          } else {
+                            tempSelected.remove(subId);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedSubCategories = tempSelected;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Done"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  void showSubEmergencyCategoryDialog() {
+    List<String> tempSelected = List.from(selectedSubEmergencyCategories);
+    bwDebug("Opening Sub Emergency Category Dialog with categories: $subEmergencyCategories", tag: "EditProfileScreen");
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Select Emergency Subcategories"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: subEmergencyCategories.length,
+                  itemBuilder: (context, index) {
+                    final sub = subEmergencyCategories[index];
+                    final subId = sub['id']!;
+                    return CheckboxListTile(
+                      title: Text(sub['name'] ?? ''),
+                      value: tempSelected.contains(subId),
+                      onChanged: (bool? value) {
+                        setDialogState(() {
+                          if (value == true) {
+                            tempSelected.add(subId);
+                          } else {
+                            tempSelected.remove(subId);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedSubEmergencyCategories = tempSelected;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Done"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+  Future<void> pickDocument() async {
+    if (selectedDocumentType == null) {
+      CustomSnackBar.show(
+        message: 'Please select document type first',
+        type: SnackBarType.error,
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  pickImages(fromCamera: true);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  pickImages(fromCamera: false);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

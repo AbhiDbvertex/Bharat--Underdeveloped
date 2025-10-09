@@ -2502,6 +2502,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
+import '../../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../auth/RoleSelectionScreen.dart';
 import '../service_provider_profile/EditProfileScreen.dart';
 import '../service_provider_profile/ServiceProviderProfileScreen.dart';
@@ -2530,6 +2531,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? phone;
   String? selectedGender;
   bool isRoleSwitching = false;
+  String? skill; // Added
+  String? categoryId; // Added
+  List<String>? subCategoryIds; // Added
+  List<String>? emergencySubCategoryIds; // Added
+  List<String>? businessImage; // Added
+  bool? isShop; // Added
+  List<Document>? documents; // Added
+
   late TextEditingController aboutController;
   final GetXRoleController roleController = Get.put(GetXRoleController()); // Updated to GetXRoleController
   @override
@@ -2696,7 +2705,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final data = body['data'];
           final userAge = data['age']?.toString() ?? '';
           final userGender = (data['gender'] ?? '').toString().toLowerCase();
-
+          final userSkill = data['skill'] ?? '';
+          final userCategoryId = data['category_id'] ?? '';
+          final userSubCategoryIds = List<String>.from(data['subcategory_ids'] ?? []);
+          final userEmergencySubCategoryIds = List<String>.from(data['emergencysubcategory_ids'] ?? []);
+          final userBusinessImage = List<String>.from(data['businessImage'] ?? []);
+          final userIsShop = data['isShop'] ?? false;
+          final userDocuments = (data['documents'] as List<dynamic>?)
+              ?.map((doc) => Document.fromJson(doc))
+              .toList() ??
+              [];
           setState(() {
             fullName = data['full_name'] ?? 'Your Name';
             age = userAge;
@@ -2709,6 +2727,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             requestStatus = data['requestStatus'] ?? '';
             verificationStatus = data['verificationStatus'] ?? '';
             aboutController.text = aboutUs!;
+            skill = userSkill; // Added
+            categoryId = userCategoryId; // Added
+            subCategoryIds = userSubCategoryIds; // Added
+            emergencySubCategoryIds = userEmergencySubCategoryIds; // Added
+            businessImage = userBusinessImage; // Added
+            isShop = userIsShop; // Added
+            documents = userDocuments; // Added
           });
 
           print("Abhi:- User Profile Fetched - Age: $userAge, Gender: $userGender, VerificationStatus: $verificationStatus");
@@ -3370,7 +3395,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       // await switchRoleRequest();
                                     }
                                     Navigator.of(context).pop();
-                                    Get.off(() => RoleEditProfileScreen(updateBothrequest: true,));
+                                    Get.off(() => RoleEditProfileScreen(updateBothrequest: true,
+                                        fullName: fullName,
+                                        age:age,
+                                        gender:gender,
+                                        isShop:isShop,
+                                        categoryId: categoryId,
+                                        subCategoryIds:subCategoryIds,
+                                        emergencySubCategoryIds:emergencySubCategoryIds,
+                                        skill:skill,
+                                        businessImage:businessImage,
+                                        documents:documents
+
+                                    ));
 
                                   },
                                 ),

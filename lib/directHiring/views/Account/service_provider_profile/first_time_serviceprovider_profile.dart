@@ -1003,6 +1003,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../Widgets/AppColors.dart';
 import '../../../../utility/custom_snack_bar.dart';
+import '../../../models/ServiceProviderModel/ServiceProviderProfileModel.dart';
 import '../../auth/RoleSelectionScreen.dart';
 import '../service_provider_profile/EditProfileScreen.dart';
 import '../service_provider_profile/ServiceProviderProfileScreen.dart';
@@ -1032,6 +1033,14 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
   String? aboutUs = '';
   String? phone;
   String? selectedGender;
+  String? skill; // Added
+  String? categoryId; // Added
+  List<String>? subCategoryIds; // Added
+  List<String>? emergencySubCategoryIds; // Added
+  List<String>? businessImage; // Added
+  bool? isShop; // Added
+  List<Document>? documents; // Added
+
   late TextEditingController aboutController;
   final GetXRoleController roleController = Get.put(GetXRoleController());
   @override
@@ -1084,6 +1093,17 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
           final userAge = data['age']?.toString() ?? '';
           final userGender = (data['gender'] ?? '').toString().toLowerCase();
 
+
+          final userSkill = data['skill'] ?? '';
+          final userCategoryId = data['category_id'] ?? '';
+          final userSubCategoryIds = List<String>.from(data['subcategory_ids'] ?? []);
+          final userEmergencySubCategoryIds = List<String>.from(data['emergencysubcategory_ids'] ?? []);
+          final userBusinessImage = List<String>.from(data['businessImage'] ?? []);
+          final userIsShop = data['isShop'] ?? false;
+          final userDocuments = (data['documents'] as List<dynamic>?)
+              ?.map((doc) => Document.fromJson(doc))
+              .toList() ??
+              [];
           setState(() {
             fullName = data['full_name'] ?? 'Your Name';
             age = userAge;
@@ -1098,6 +1118,13 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
             category_name = data['category_name'] ?? '';
             rejectionReason = data['rejectionReason'] ?? '';
             aboutController.text = aboutUs!;
+            skill = userSkill; // Added
+            categoryId = userCategoryId; // Added
+            subCategoryIds = userSubCategoryIds; // Added
+            emergencySubCategoryIds = userEmergencySubCategoryIds; // Added
+            businessImage = userBusinessImage; // Added
+            isShop = userIsShop; // Added
+            documents = userDocuments; // Added
           });
 
           print("Abhi:- User Profile Fetched - Age: $userAge, Gender: $userGender, VerifiedStatus: $verifiedSataus, Category: $category_name, RejectionReason: $rejectionReason");
@@ -1663,7 +1690,19 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
-                                Get.off(() => RoleEditProfileScreen(updateBothrequest: true,comeEditScreen: "editScreen",));
+                                Get.off(() => RoleEditProfileScreen(updateBothrequest: true,
+                                  comeEditScreen: "editScreen",
+                                  fullName: fullName,
+                                  age:age,
+                                  gender:gender,
+                                  isShop:isShop,
+                                  categoryId: categoryId,
+                                  subCategoryIds:subCategoryIds,
+                                    emergencySubCategoryIds:emergencySubCategoryIds,
+                                  skill:skill,
+                                  businessImage:businessImage,
+                                  documents:documents
+                                ));
                               },
                             ),
                           ),
@@ -1729,7 +1768,20 @@ class _FirstTimeServiceProviderProfileScreenState extends State<FirstTimeService
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: () async {
-                                Get.off(() => RoleEditProfileScreen(updateBothrequest: true,comeEditScreen: "editScreen",));
+                                Get.off(() => RoleEditProfileScreen(updateBothrequest: true,
+                                  comeEditScreen: "editScreen",
+                                    fullName: fullName,
+                                    age:age,
+                                    gender:gender,
+                                    isShop:isShop,
+                                    categoryId: categoryId,
+                                    subCategoryIds:subCategoryIds,
+                                    emergencySubCategoryIds:emergencySubCategoryIds,
+                                    skill:skill,
+                                    businessImage:businessImage,
+                                    documents:documents
+
+                                ));
                               },
                             ),
                           ),
