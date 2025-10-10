@@ -38,6 +38,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
   var getCurrentBiddingAmmount;
   var getCurrentBiddingId;
   String? razorpayOrderId; // New variable to store orderId
+  String? CreatePlatformfeemessage;
   int? platformFee; // Corrected variable to store platform fee amount (int type)
   late Razorpay _razorpay;
   String? serviceProviderId;
@@ -192,6 +193,8 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         //   colorText: Colors.white,
         //   snackPosition: SnackPosition.BOTTOM,
         // );
+        // showTotalDialog(context, platformFee);
+        await CreatebiddingPlateformfee();
         print("Abhi:- accepted Negocation assassin serviceProviderId : ${serviceProviderId}");
         print("Abhi:- accepted Negocation : ${responseData['message']}");
         // Removed Get.back() from here to avoid extra navigation
@@ -230,13 +233,27 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         print("Abhi:- ");
         setState(() {
           razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+
           platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
         });
-        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee createplatformfeemessage : ${CreatePlatformfeemessage}");
         // Do not open Razorpay here; it will be opened from dialog's Pay button
       } else {
+        setState(() {
+          CreatePlatformfeemessage =  responseData['message'];
+        });
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee createplatformfeemessage : ${CreatePlatformfeemessage}");
         print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
         print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+        if(CreatePlatformfeemessage == 'Platform fee is greater than 10% advance amount!') {
+          Get.snackbar(
+              "Success",
+              responseData['message'],
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+        }
       }
     } catch (e) {
       print("Abhi:- CreatebiddingPlateformfee Exception: $e");
@@ -433,6 +450,165 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
       },
     );
   }
+  // void showTotalDialog(BuildContext context, int? platformFee) {
+  //   int fee = platformFee ?? 0;
+  //   int totalAmount = (getCurrentBiddingAmmount ?? 0);
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return Dialog(
+  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.center,
+  //             children: [
+  //               const Text("Payment Confirmation", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+  //               const SizedBox(height: 16),
+  //               Image.asset(BharatAssets.payConfLogo2),
+  //               const SizedBox(height: 24),
+  //               Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text("Date", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+  //                       Text(DateFormat("dd-MM-yy").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text("Time", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+  //                       Text(DateFormat("hh:mm a").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text("Amount", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+  //                       Text("₹$totalAmount", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text("Platform fees", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+  //                       Text("₹$fee", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 16),
+  //                   Image.asset(BharatAssets.payLine),
+  //                   const SizedBox(height: 20),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text("Total", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
+  //                       Text("₹$totalAmount/-", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 20),
+  //               Divider(height: 4, color: Colors.green),
+  //               const SizedBox(height: 20),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   InkWell(
+  //                     onTap: () {
+  //                       // Check for platform fee condition
+  //                       double minFee = totalAmount * 0.10;
+  //
+  //                       if (platformFee == null || razorpayOrderId == null) {
+  //                         Get.snackbar(
+  //                           "Error",
+  //                           "Platform fee or order ID not available",
+  //                           backgroundColor: Colors.red,
+  //                           colorText: Colors.white,
+  //                         );
+  //                         return;
+  //                       }
+  //
+  //                       if (fee < minFee) {
+  //                         Get.snackbar(
+  //                           "Invalid Fee",
+  //                           "Platform fee must be at least 10% of total amount!",
+  //                           backgroundColor: Colors.orange,
+  //                           colorText: Colors.white,
+  //                         );
+  //                         return;
+  //                       }
+  //
+  //                       var options = {
+  //                         'key': 'rzp_test_R7z5O0bqmRXuiH',
+  //                         'amount': totalAmount * 100,
+  //                         'name': 'The Bharat Work',
+  //                         'description': 'Payment for Order',
+  //                         'prefill': {
+  //                           'contact': '9876543210',
+  //                           'email': 'test@razorpay.com',
+  //                         },
+  //                         'external': {
+  //                           'wallets': ['paytm']
+  //                         }
+  //                       };
+  //
+  //                       try {
+  //                         _razorpay.open(options);
+  //                         Navigator.pop(context);
+  //                       } catch (e) {
+  //                         debugPrint('Razorpay Error: $e');
+  //                       }
+  //                     },
+  //                     child: Container(
+  //                       height: 35,
+  //                       width: MediaQuery.of(context).size.width * 0.28,
+  //                       alignment: Alignment.center,
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         color: const Color(0xff228B22),
+  //                       ),
+  //                       child: const Text(
+  //                         "Pay",
+  //                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   InkWell(
+  //                     onTap: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                     child: Container(
+  //                       height: 35,
+  //                       width: MediaQuery.of(context).size.width * 0.28,
+  //                       alignment: Alignment.center,
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(8),
+  //                         border: Border.all(color: Colors.green, width: 1.5),
+  //                       ),
+  //                       child: const Text(
+  //                         "Cancel",
+  //                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.green),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -562,8 +738,12 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                     isNegotiating = false;
                   });
                   await AcceptNegotiation();
-                  await CreatebiddingPlateformfee(); // Pehle API call karo to get platformFee and orderId
-                  showTotalDialog(context, platformFee); // Fir dialog open with platformFee
+                  // await CreatebiddingPlateformfee(); // Pehle API call karo to get platformFee and orderId
+                  // CreatePlatformfeemessage == 'Platform fee is greater than 10% advance amount!' ? showTotalDialog(context, platformFee) :SizedBox() ; // Fir dialog open with platformFee
+                  if (CreatePlatformfeemessage != 'Platform fee is greater than 10% advance amount!') {
+                    showTotalDialog(context, platformFee);
+                  }
+
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: height * 0.018),

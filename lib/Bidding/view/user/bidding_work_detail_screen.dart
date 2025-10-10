@@ -50,11 +50,17 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   late Razorpay _razorpay;
   bool _isChatLoading = false; // Add this as a field in your State class
   String? selectedBidderId; // New variable add kar
+  String? CreatePlatformfeemessage;
   @override
   void initState() {
     bwDebug("order id ${widget.buddingOderId}",
         tag: "Bidding workdetail screen");
     super.initState();
+
+    // if(getBuddingOderByIdResponseData?['hire_status'] == 'accepted' && getBuddingOderByIdResponseData?['platform_fee_paid'] == false) {
+    //   showTotalDialog(context, 0, bidAmount, platformFee);
+    // }
+
     getBuddingOderById();
     getAllBidders();
     _searchController.addListener(_filterLists);
@@ -73,6 +79,8 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     super.dispose();
   }
 
+
+
   Future<void> verifaibiddingPlateformFee(
       String paymentId, String orderId, serviceProviderId) async {
     final String url =
@@ -81,6 +89,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
+    print("Abhi:- verifaibiddingPlatformFee paymentId : $paymentId orderId : $orderId serviceproviderId : $serviceProviderId}");
 
     try {
       var response = await http.post(
@@ -123,7 +132,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     print("Abhi:- Payment Success: ${response.paymentId}");
     // verifaibiddingPlateformFee(response.paymentId!, razorpayOrderId!,); // Call verify
     verifaibiddingPlateformFee(response.paymentId!, razorpayOrderId!,
-        selectedBidderId!); // Ab teesra arg: selectedBidderId
+        /*selectedBidderId!*/widget.serviceProviderId); // Ab teesra arg: selectedBidderId
     CustomSnackBar.show(
         message: "Transaction completed!", type: SnackBarType.success);
     Get.back(); // Close dialog
@@ -530,6 +539,8 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     }
   }
 
+
+
   Future<void> openMap(double lat, double lng) async {
     final Uri googleMapUrl =
         Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
@@ -547,6 +558,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   //   final String url =
   //       'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
   //   print("Abhi:- CreatebiddingPlateformfee url: $url");
+  //   print("Abhi:- CreatebiddingPlateformfee url: ${widget.buddingOderId}");
   //
   //   final prefs = await SharedPreferences.getInstance();
   //   final token = prefs.getString('token') ?? '';
@@ -562,26 +574,24 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   //
   //     var responseData = jsonDecode(response.body);
   //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       print(
-  //           "Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+  //       print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
   //       print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
+  //       print("Abhi:- ");
   //       setState(() {
   //         razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
-  //         platformFee = responseData['total_cost']; // Store platform fee amount (assuming it's int)
+  //         platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
   //       });
-  //       print(
-  //           "Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+  //       print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
   //       // Do not open Razorpay here; it will be opened from dialog's Pay button
   //     } else {
-  //       print(
-  //           "Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
-  //       print(
-  //           "Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+  //       print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
+  //       print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
   //     }
   //   } catch (e) {
   //     print("Abhi:- CreatebiddingPlateformfee Exception: $e");
   //   }
   // }
+
   Future<void> CreatebiddingPlateformfee() async {
     final String url =
         'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
@@ -607,13 +617,27 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
         print("Abhi:- ");
         setState(() {
           razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
+
           platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
         });
-        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee createplatformfeemessage : ${CreatePlatformfeemessage}");
         // Do not open Razorpay here; it will be opened from dialog's Pay button
       } else {
+        setState(() {
+          CreatePlatformfeemessage =  responseData['message'];
+        });
+        print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee createplatformfeemessage : ${CreatePlatformfeemessage}");
         print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
         print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
+        if(CreatePlatformfeemessage == 'Platform fee is greater than 10% advance amount!') {
+          Get.snackbar(
+            "Success",
+            responseData['message'],
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
       }
     } catch (e) {
       print("Abhi:- CreatebiddingPlateformfee Exception: $e");
@@ -858,50 +882,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                       children: [
                         Container(
                           color: Colors.grey,
-                          child: /*CarouselSlider(
-                            options: CarouselOptions(
-                              height: height * 0.25,
-                              enlargeCenterPage: true,
-                              // autoPlay: imageUrls.isNotEmpty,
-                              autoPlay: imageUrls.length > 1,
-                              viewportFraction: 0.85,
-                              scrollPhysics: imageUrls.length > 1
-                                  ? const BouncingScrollPhysics()
-                                  : const NeverScrollableScrollPhysics(),
-                            ),
-                            items: imageUrls.isNotEmpty
-                                ? imageUrls
-                                    .map((url) => Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            image: DecorationImage(
-                                              image: NetworkImage(url.trim()),
-                                              // fit: BoxFit.cover,
-                                              onError:
-                                                  (exception, stackTrace) =>
-                                                      Image.asset(
-                                                'assets/images/Bid.png',
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ))
-                                    .toList()
-                                : [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        image: const DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/Bid.png'),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                          ),*/
-                          CarouselSlider(
+                          child: CarouselSlider(
                             options: CarouselOptions(
                               height: height * 0.25,
                               enlargeCenterPage: true,
@@ -938,7 +919,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               ),
                             ],
                           ),
-                        ),
+                        ),//
                         SizedBox(height: height * 0.015),
                         Padding(
                           padding:
@@ -964,7 +945,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                       //           'N/A',
                                       //     ),
                                       //   ),
-                                      // );
+                                      // ); //
 
                                       openMap(data?['latitude'] ?? 0.0,
                                           data?['longitude'] ?? 0.0);
@@ -993,10 +974,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                             data?['address'] ?? "",
                                             style: GoogleFonts.roboto(
                                               color: Colors.white,
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.03,
+                                              fontSize: MediaQuery.of(context).size.width * 0.03,
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -1089,13 +1067,13 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                             ],
                           ),
                         ),
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == true
                             ? SizedBox(
                                 height: height * 0.03,
                               )
                             : SizedBox(),
                         //             This is accepted time show this fileds
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == true
                             ? Card(
                                 color: Colors.white,
                                 shape: RoundedRectangleBorder(
@@ -1346,11 +1324,11 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                 ),
                               )
                             : SizedBox(),
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == true
                             ? const SizedBox(height: 20)
                             : SizedBox(),
 
-                        data?['hire_status'] == 'accepted' &&
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == true &&
                                 assignedWorker?['name'] != null
                             ? Card(
                                 shape: RoundedRectangleBorder(
@@ -1657,7 +1635,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                               )
                             : SizedBox(),
 
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted'  && data?['platform_fee_paid'] == true
                             ? SizedBox()
                             : SizedBox(height: height * 0.02),
                         data?['hire_status'] == 'pending'
@@ -2220,8 +2198,11 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                                                                   print("Abhi:-print bidderId ${bidderId}");
                                                                                    await AcceptBiddingOrder (bidder?['provider_id']?['_id']?.toString() ?? '');
                                                                                    await CreatebiddingPlateformfee();
-                                                                                   showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
-                                                                                 }, 
+                                                                                   // showTotalDialog(context, index, bidAmount, platformFee); // BidderId ab nahi pass, class level par hai
+                                                                                  if (CreatePlatformfeemessage != 'Platform fee is greater than 10% advance amount!') {
+                                                                                    showTotalDialog(context, index, bidAmount, platformFee);
+                                                                                  }
+                                                                                    },
                                                                                 child: 
                                                                                 Container(
                                                                                   height: 32, 
@@ -2737,12 +2718,12 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                         data?['hire_status'] == 'pending'
                             ? SizedBox(height: height * 0.04)
                             : SizedBox(),
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted'  && data?['platform_fee_paid'] == true
                             ? Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text("Remaining Amount : ${data?['service_payment']?['remaining_amount']}",style: TextStyle(color: Colors.green[600],fontWeight: FontWeight.w600),),
                             ): SizedBox(),
-                        data?['hire_status'] == 'accepted'
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == true
                             ? BiddingPaymentScreen(
                           RemainingAmount: data?['service_payment']?['remaining_amount'],
                                 orderId: widget.buddingOderId ?? "",
@@ -2751,6 +2732,30 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
                                     ?['_id'],
                               )
                             : SizedBox(),
+                        data?['hire_status'] == 'accepted' && data?['platform_fee_paid'] == false
+                            ?  Padding(padding: EdgeInsets.all(12),child:  Card(
+                          elevation: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12)
+                              ),
+                              child: Column(
+                                children: [
+                                  Text("You haven’t completed your payment yet. Please complete the payment by tapping the ‘Pay’ button to unlock and access all app features."),
+                                 Container(
+                                   decoration: BoxDecoration(color: Colors.green[600],borderRadius: BorderRadius.circular(12)),
+                                   child: TextButton(onPressed: () async {
+                                     await AcceptBiddingOrder (data?['service_provider_id']?['_id']?.toString() ?? '');
+                                     await CreatebiddingPlateformfee();
+                                     showTotalDialog(context, 0, data?['service_provider_id']?['_id'], platformFee);
+                                   }, child: Text("Pay",style: TextStyle(fontSize: 18,color: Colors.white),)),
+                                 )
+                                ],
+                              ),),
+                          ),
+                        ),) : SizedBox(),
                         // Container(color: Colors.white,height: )
                       ],
                     ),
@@ -2912,7 +2917,7 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     final bidder = getBuddingOderByIdResponseDatalist?[index];
     final bidAmount = bidder?['bid_amount']?.toString() ?? '0';
     int bidAmountValue = int.tryParse(bidAmount) ?? 0;
-    int totalAmount = bidAmountValue + fee;
+    int totalAmount = bidAmountValue /*+ fee*/;
 
     showDialog(
       context: context,

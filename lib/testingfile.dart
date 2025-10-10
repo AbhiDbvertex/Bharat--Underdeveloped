@@ -1274,3 +1274,27 @@
 //   @override
 //   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 // }
+//       Fuck off
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class BidTest extends StatefulWidget {
+  const BidTest({Key? key}) : super(key: key);
+
+  @override
+  State<BidTest> createState() => _BidTestState();
+}
+
+class _BidTestState extends State<BidTest> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Text('Submit')
+        ],
+      ),
+    );
+  }
+}
