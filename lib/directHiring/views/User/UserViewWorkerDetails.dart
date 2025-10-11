@@ -1776,6 +1776,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Bidding/Models/bidding_order.dart';
 import '../../../Bidding/view/user/nagotiate_card.dart';
+import '../../../Emergency/User/controllers/request_accepted_controller.dart';
+import '../../../Emergency/User/controllers/work_detail_controller.dart';
+import '../../../Emergency/User/screens/PaymentConformation.dart';
 import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
@@ -1796,6 +1799,9 @@ class UserViewWorkerDetails extends StatefulWidget {
   final biddingOfferId;
   final UserId;
   final paymentStatus;
+  final from;
+  final plateFormFee;
+  final razorOrderIdPlatform;
 
   const UserViewWorkerDetails({
     super.key,
@@ -1808,6 +1814,9 @@ class UserViewWorkerDetails extends StatefulWidget {
     this.UserId,
     this.hideonly,
     this.paymentStatus,
+    this.from,
+    this.plateFormFee,
+    this.razorOrderIdPlatform,
   });
 
   @override
@@ -1815,6 +1824,8 @@ class UserViewWorkerDetails extends StatefulWidget {
 }
 
 class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
+  final RequestController controller = Get.put(RequestController());
+
   bool _showReviews = true;
   bool _showAllSubCategories = false;
   bool _showAllEmergencySubCategories = false;
@@ -1832,11 +1843,12 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
   String? rating;
   @override
   void initState() {
+
     bwDebug(
         ".categreyId: ${widget.categreyId},workerId: ${widget.workerId},"
             ".subcategreyId: ${widget.subcategreyId},"
             ".hirebuttonhide: ${widget.hirebuttonhide},."
-            "oderId: ${widget.oderId},"
+            "orderId: ${widget.oderId},"
             ".biddingOfferId: ${widget.biddingOfferId},"
             ".UserId: ${widget.UserId},"
             ".hideonly: ${widget.hideonly},",
@@ -2756,22 +2768,43 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
           ),
         ),
       ),
-      bottomNavigationBar:   widget.hideonly == 'hideOnly'
+  /*    bottomNavigationBar:   widget.hideonly == 'hideOnly'
           ? const SizedBox()
           : GestureDetector(
-        onTap: () {
+        onTap: () async {
           if (widget.workerId != null &&
               widget.workerId!.isNotEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => HireScreen(
-                  firstProviderId: widget.workerId ?? "",
-                  categreyId: widget.categreyId,
-                  subcategreyId: widget.subcategreyId,
+            if(widget.from =='emergency'){
+              bwDebug("yash");
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) =>  PaymentConformationScreen(
+              //     platformAmount: widget.plateFormFee,
+              //     razorOrderIdPlatform: widget.razorOrderIdPlatform,
+              //     serviceProviderId: widget.workerId,
+              //     orderId: widget.oderId,
+              //     // orderId:orderId,
+              //     // amount:amount,
+              //     //   responseModel:responseModel
+              //   )),
+              // );
+              await controller.assignEmergencyOrder(orderId:widget.oderId , serviceProviderId: widget.workerId);
+              Get.back();
+              // Get.back();
+
+            }else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      HireScreen(
+                        firstProviderId: widget.workerId ?? "",
+                        categreyId: widget.categreyId,
+                        subcategreyId: widget.subcategreyId,
+                      ),
                 ),
-              ),
-            );
+              );
+            }
           }
         },
         child: Padding(
@@ -2792,6 +2825,186 @@ class _UserViewWorkerDetailsState extends State<UserViewWorkerDetails> {
                   color: Colors.white,
                 ),
               ),
+            ),
+          ),
+        ),
+      ),*/
+      // bottomNavigationBar: widget.hideonly == 'hideOnly'
+      //     ? const SizedBox()
+      //     : GestureDetector(
+      //   onTap: () async {
+      //     if (widget.workerId != null && widget.workerId!.isNotEmpty) {
+      //       if (widget.from == 'emergency') {
+      //         bwDebug("yash");
+      //         try {
+      //           // Show loading (optional, but good UX)
+      //           showDialog(
+      //             context: context,
+      //             barrierDismissible: false,
+      //             builder: (context) => const Center(
+      //               child: CircularProgressIndicator(color: Colors.green),
+      //             ),
+      //           );
+      //
+      //           await controller.assignEmergencyOrder(
+      //             orderId: widget.oderId,
+      //             serviceProviderId: widget.workerId,
+      //           );
+      //
+      //           // Close loading dialog
+      //           if (context.mounted) Navigator.pop(context);
+      //
+      //           // Success: Go back and refresh (controller already refreshes, but ensure)
+      //           if (context.mounted) {
+      //             Get.back(); // Or Navigator.pop(context); if not using GetX routes
+      //             // Optional: Refresh previous screen explicitly if needed
+      //             // Get.find<WorkDetailController>().getEmergencyOrder(widget.oderId);
+      //           }
+      //         } catch (e) {
+      //           // Close loading on error
+      //           if (context.mounted) Navigator.pop(context);
+      //           CustomSnackBar.show(
+      //             message: "Hire failed: $e",
+      //             type: SnackBarType.error,
+      //           );
+      //         }
+      //       } else {
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //             builder: (_) => HireScreen(
+      //               firstProviderId: widget.workerId ?? "",
+      //               categreyId: widget.categreyId,
+      //               subcategreyId: widget.subcategreyId,
+      //             ),
+      //           ),
+      //         );
+      //       }
+      //     }
+      //   },
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(15.0),
+      //     child: Container(
+      //       height: 45,
+      //       decoration: BoxDecoration(
+      //         borderRadius: BorderRadius.circular(15),
+      //         color: Colors.green,
+      //       ),
+      //       child: Center(
+      //         child: Text(
+      //           "Hire",
+      //           style: GoogleFonts.roboto(
+      //             fontSize: 16,
+      //             fontWeight: FontWeight.w500,
+      //             color: Colors.white,
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      bottomNavigationBar: widget.hideonly == 'hideOnly'
+          ? const SizedBox()
+          : GestureDetector(
+        onTap: () async {
+          if (widget.workerId != null && widget.workerId!.isNotEmpty) {
+            if (widget.from == 'emergency') {
+              bwDebug("=== HIRE BUTTON TAPPED ===", tag: "UserViewWorkerDetails");
+              bwDebug("Order ID: ${widget.oderId}, Worker ID: ${widget.workerId}", tag: "UserViewWorkerDetails");
+
+              try {
+                // Show loading dialog
+                bwDebug("Showing loading dialog...", tag: "UserViewWorkerDetails");
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CircularProgressIndicator(color: Colors.green),
+                  ),
+                );
+
+                // Call assign
+                bwDebug("Calling assignEmergencyOrder...", tag: "UserViewWorkerDetails");
+                await controller.assignEmergencyOrder(
+                  orderId: widget.oderId,
+                  serviceProviderId: widget.workerId,
+                );
+                bwDebug("assignEmergencyOrder returned successfully", tag: "UserViewWorkerDetails");
+
+                // Close loading
+                bwDebug("Closing loading dialog...", tag: "UserViewWorkerDetails");
+                if (context.mounted) {
+                  Navigator.pop(context); // Use Navigator.pop for dialog
+                  Navigator.pop(context); // Use Navigator.pop for dialog
+                  bwDebug("Loading dialog closed", tag: "UserViewWorkerDetails");
+                } else {
+                  bwDebug("Context not mounted after assign!", tag: "UserViewWorkerDetails");
+                }
+
+                // Now back to previous screen
+                bwDebug("Attempting Get.back()...", tag: "UserViewWorkerDetails");
+                if (context.mounted) {
+                  Get.back(); // Or Navigator.pop(context); if GetX issue
+                  Get.back(); // Or Navigator.pop(context); if GetX issue
+                  bwDebug("Get.back() called successfully", tag: "UserViewWorkerDetails");
+                } else {
+                  bwDebug("Context not mounted for navigation!", tag: "UserViewWorkerDetails");
+                }
+
+                // Optional: Force refresh on previous (if needed)
+                bwDebug("Refreshing WorkDetailController...", tag: "UserViewWorkerDetails");
+                final workCtrl = Get.find<WorkDetailController>();
+                await workCtrl.getEmergencyOrder(widget.oderId);
+                bwDebug("Refresh complete", tag: "UserViewWorkerDetails");
+
+              } catch (e) {
+                bwDebug("ERROR in hire onTap: $e", tag: "UserViewWorkerDetails");
+                // Close loading on error
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  bwDebug("Loading closed on error", tag: "UserViewWorkerDetails");
+                }
+                CustomSnackBar.show(
+                  message: "Hire failed: $e",
+                  type: SnackBarType.error,
+                );
+              }
+            } else {
+              bwDebug("Non-emergency hire - navigating to HireScreen", tag: "UserViewWorkerDetails");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => HireScreen(
+                    firstProviderId: widget.workerId ?? "",
+                    categreyId: widget.categreyId,
+                    subcategreyId: widget.subcategreyId,
+                  ),
+                ),
+              );
+            }
+          } else {
+            bwDebug("Invalid worker ID - hire skipped", tag: "UserViewWorkerDetails");
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Container(
+            height: 45,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.green,
+            ),
+            child: Center(
+              child: Obx(() => controller.isHiring.value  // Add Obx for loading state
+                  ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                  : Text(
+                "Hire",
+                style: GoogleFonts.roboto(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              )),
             ),
           ),
         ),

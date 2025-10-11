@@ -110,6 +110,7 @@ class EmergencyOrder {
   final num? platformFee;
   final String? razorOrderIdPlatform;
   final ServicePayment? servicePayment;
+  final Commission? commission;
   final String? id;
   final List<dynamic>? acceptedByProviders;
   final String? createdAt;
@@ -134,6 +135,7 @@ class EmergencyOrder {
     this.platformFee,
     this.razorOrderIdPlatform,
     this.servicePayment,
+    this.commission,
     this.id,
     this.acceptedByProviders,
     this.createdAt,
@@ -167,6 +169,9 @@ class EmergencyOrder {
     servicePayment: json['service_payment'] != null
         ? ServicePayment.fromJson(json['service_payment'])
         : null,
+    commission: json['commission'] != null
+        ? Commission.fromJson(json['commission'])
+        : null,
     id: json['_id'],
     acceptedByProviders: json['accepted_by_providers'] != null
         ? List<dynamic>.from(json['accepted_by_providers'])
@@ -194,6 +199,7 @@ class EmergencyOrder {
     'platform_fee': platformFee,
     'razorOrderIdPlatform': razorOrderIdPlatform,
     "service_payment": servicePayment?.toJson(),
+    "commission": commission?.toJson(),
     "_id": id,
     "accepted_by_providers": acceptedByProviders,
     "createdAt": createdAt,
@@ -235,6 +241,38 @@ class ServicePayment {
       "remaining_amount": remainingAmount,
       "total_tax": totalTax,
       "payment_history": paymentHistory,
+    };
+  }
+}
+class Commission {
+  final int? amount;
+  final int? percentage;
+  final String? type;
+  final bool ? isCollected;
+
+  Commission({
+    this.amount,
+    this.percentage,
+    this.type,
+    this.isCollected,
+  });
+
+  factory Commission.fromJson(Map<String, dynamic> json) {
+    return Commission(
+      amount: json['amount'],
+      percentage: json['percentage'],
+      type: json['remaining_amount'],
+      isCollected: json['total_tax'],
+
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "amount": amount,
+      "percentage": percentage,
+      "type": type,
+      "is_collected": isCollected,
     };
   }
 }

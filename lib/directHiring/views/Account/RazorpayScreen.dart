@@ -255,7 +255,13 @@ class _RazorpayScreenState extends State<RazorpayScreen> {
     }
     if(widget.from =="Emergency"){
 
-      EmergencyServiceController().paymentProcess(context,token,razorpayOrderId: razorpayOrderId,razorPayPaymentId: razorPayPaymentId,razorpaySignatureId: razorpaySignatureId,);
+      EmergencyServiceController().paymentProcess(context, token,
+        razorpayOrderId: razorpayOrderId,
+        razorPayPaymentId: razorPayPaymentId,
+        razorpaySignatureId: razorpaySignatureId,
+          passIndex: widget.passIndex,
+        orderId: widget.orderId,
+      );
     }else if(widget.from =="emergencyWorkDetail"){
 
       final workDetailController = Get.find<WorkDetailController>();

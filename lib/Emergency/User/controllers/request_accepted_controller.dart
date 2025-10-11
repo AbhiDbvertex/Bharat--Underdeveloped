@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../utility/custom_snack_bar.dart';
 import '../../utils/ApiUrl.dart';
 import '../../utils/logger.dart';
 import '../models/request_accepted_model.dart';
@@ -150,11 +151,21 @@ class RequestController extends GetxController {
           bwDebug(
               "[assignEmergencyOrder] SUCCESS: ${assignOrderResponse.value.message}",
               tag: tag);
+          CustomSnackBar.show(
+            message: assignOrderResponse.value.message ?? 'Provider hired successfully!',
+            type: SnackBarType.success,
+          );
 
+          await workDetailController.getEmergencyOrder(orderId);  // Refresh here only
+          await getRequestAccepted(orderId);
         } else {
           errorMessage.value = assignOrderResponse.value.message;
-        }
 
+          CustomSnackBar.show(
+            message: errorMessage.value,
+            type: SnackBarType.error,
+          );
+        }
       }
       else if (response.statusCode == 400) {
         final data = jsonDecode(response.body);
@@ -175,7 +186,7 @@ class RequestController extends GetxController {
       errorMessage.value = "Exception: $e";
     } finally {
       // workDetailController.isLoading.value = false;
-      await workDetailController.getEmergencyOrder(orderId);
+    //  await workDetailController.getEmergencyOrder(orderId);
     isHiring.value = false;
 
 
