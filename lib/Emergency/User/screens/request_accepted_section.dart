@@ -550,303 +550,327 @@ final tag="RequestAcceptedSection";
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               final ServiceProvider  item = controller.requestAcceptedModel.value!.providers[index];
-              return Card(
-                color: Colors.white,
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Left side image
-                      Column(
-                        children: [
-                          Stack(
-                            children: [
-                              SizedBox(
-                                height: 110,
-                                width: 100,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    item.profilePic,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey.shade300,
-                                        child: const Icon(
-                                          Icons.person,
-                                          size: 40,
-                                          color: Colors.black54,
-                                        ),
-                                      );
-
-                                    },
-                                  ),
-
-                                ),
-                              ),
-
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  color: Colors.black54,
-                                  padding: const EdgeInsets.symmetric(vertical: 2),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    item.view.isNotEmpty ? item.view : "", // ✅ use view
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Right side details
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Row 1: Name, Amount, Call
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                //////////////
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start, // left align text
-
-                                    children: [
-                                      Text(
-                                        item.fullName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "₹${item.amount.toStringAsFixed(2)}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                ///////////
-                                const SizedBox(width: 8),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: CircleAvatar(
-                                    radius: 16,
-                                    backgroundColor: Colors.grey.shade300,
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(Icons.call,
-                                          color: Colors.green, size: 18),
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-
-                            // Row 2: Location + Chat
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                item.location.address.isNotEmpty? Expanded(
-                                  child: InkWell(
-                                    onTap:() async {
-                                      final latitude = item.location.latitude;
-                                      final longitude = item.location.longitude;
-                                      final address = item.location.address;
-                                      //final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
-
-                                      // if (await canLaunch(googleMapsUrl)) {
-                                      // await launch(googleMapsUrl);
-                                      // } else {
-                                      // bwDebug("Could not open the map.");
-                                      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Could not open the map.")));
-                                      // }
-
-                                      bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
-                                      if(!success) {
-                                        // SnackBarHelper.showSnackBar(context, "Could not open the map");
-                                        CustomSnackBar.show(
-
-                                            message:"Could not open the map" ,
-                                            type: SnackBarType.error
-                                        );
-
-                                      }
-                                      },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xffF27773),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        item.location.address,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ):SizedBox(),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  child: GestureDetector(
-                                    onTap: _isChatLoading
-                                        ? null  // Disable tap while loading
-                                        : ()  async {
-                                      final receiverId =  item?.id != null && item?.id != null
-                                          ? item?.id.toString() ?? 'Unknown'
-                                          : 'Unknown';
-                                      final fullNamed = item?.id != null && item?.id != null
-                                          ?   item?.fullName ?? 'Unknown'
-                                          : 'Unknown';
-                                      print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullNamed");
-                                      if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
-                                        // await _startOrFetchConversation(context, receiverId);
-                                        try {
-                                          await _startOrFetchConversation(context, receiverId);
-                                        } catch (e) {
-                                          print("Abhi:- Error starting conversation: $e");
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Error starting chat')),
-                                          );
-                                        } finally {
-                                          if (mounted) {  // Check if widget is still mounted
-                                            setState(() {
-                                              _isChatLoading = false;  // Re-enable button
-                                            });
-                                          }
-                                        }
-
-                                      } else {
-                                        print("Abhi:- Error: Invalid receiver ID");
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Error: Invalid receiver ID')),
-                                        );
-                                      }
-                                    },
-                                    child: /*CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor: Colors.grey.shade300,
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        icon: const Icon(Icons.message,
-                                            color: Colors.green, size: 18),
-                                        onPressed: () {},
-                                      ),
-                                    ),*/
-                                    CircleAvatar(
-                                      radius: 14,
-                                      backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
-                                      child: _isChatLoading
-                                          ? SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                                        ),
-                                      )
-                                          : Icon(
-                                        Icons.message,
-                                        color: Colors.green,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-
-                            // Row 3: View Profile + Hire
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (
-                                            context,
-                                            ) => /*ViewServiceProviderProfileScreen(
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (
+                          context,
+                          ) => /*ViewServiceProviderProfileScreen(
                                           serviceProviderId:
                                           item.providersId ??
                                               '',
                                         ),*/
-                                            UserViewWorkerDetails(
-                                              workerId: item.providersId,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: AppColors.primaryGreen,
-                                    padding: EdgeInsets.zero, // 👈 yeh add kar
-                                    minimumSize: Size(0, 0),  // 👈 extra padding hata de
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 👈 button ka hitbox compact ho jayega
-                                    alignment: Alignment.centerLeft, // 👈 text bilkul left se align hoga
-                                  ),
-                                  child: const Text("View Profile"),
-                                ),
-                                Obx(
-                                   () {
-                                    return ElevatedButton(
-                                      onPressed:controller.isHiring.value
-                                          ? null
-                                          : () async {
-                                        bwDebug(" [HIRE BUTTON]: press",tag: tag);
-                                       await controller.assignEmergencyOrder(orderId:widget.orderId , serviceProviderId: item.providersId);
-                                       Get.back();
+                      UserViewWorkerDetails(
+                        workerId: item.providersId,
+                      ),
+                    ),
+                  );
+                },
+                child: Card(
+                  color: Colors.white,
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left side image
+                        Column(
+                          children: [
+                            Stack(
+                              children: [
+                                SizedBox(
+                                  height: 110,
+                                  width: 100,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      item.profilePic,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey.shade300,
+                                          child: const Icon(
+                                            Icons.person,
+                                            size: 40,
+                                            color: Colors.black54,
+                                          ),
+                                        );
+
                                       },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primaryGreen,
-                                        minimumSize: const Size(70, 32),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      child: const Text("Hire",style: TextStyle(color: Colors.white),),
-                                    );
-                                  }
+                                    ),
+
+                                  ),
                                 ),
+
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    color: Colors.black54,
+                                    padding: const EdgeInsets.symmetric(vertical: 2),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      item.view.isNotEmpty ? item.view : "", // ✅ use view
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+
+                        // Right side details
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Row 1: Name, Amount, Call
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  //////////////
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start, // left align text
+
+                                      children: [
+                                        Text(
+                                          item.fullName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "₹${item.amount.toStringAsFixed(2)}",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  ///////////
+                                  const SizedBox(width: 8),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: Colors.grey.shade300,
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(Icons.call,
+                                            color: Colors.green, size: 18),
+                                        onPressed: () {},
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+
+                              // Row 2: Location + Chat
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  item.location.address.isNotEmpty? Expanded(
+                                    child: InkWell(
+                                      onTap:() async {
+                                        final latitude = item.location.latitude;
+                                        final longitude = item.location.longitude;
+                                        final address = item.location.address;
+                                        //final googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
+
+                                        // if (await canLaunch(googleMapsUrl)) {
+                                        // await launch(googleMapsUrl);
+                                        // } else {
+                                        // bwDebug("Could not open the map.");
+                                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Could not open the map.")));
+                                        // }
+
+                                        bool success=await MapLauncher.openMap(latitude: latitude, longitude: longitude,address: address);
+                                        if(!success) {
+                                          // SnackBarHelper.showSnackBar(context, "Could not open the map");
+                                          CustomSnackBar.show(
+
+                                              message:"Could not open the map" ,
+                                              type: SnackBarType.error
+                                          );
+
+                                        }
+                                        },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xffF27773),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          item.location.address,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ):SizedBox(),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: GestureDetector(
+                                      onTap: _isChatLoading
+                                          ? null  // Disable tap while loading
+                                          : ()  async {
+                                        final receiverId =  item?.id != null && item?.id != null
+                                            ? item?.id.toString() ?? 'Unknown'
+                                            : 'Unknown';
+                                        final fullNamed = item?.id != null && item?.id != null
+                                            ?   item?.fullName ?? 'Unknown'
+                                            : 'Unknown';
+                                        print("Abhi:- Attempting to start conversation with receiverId: $receiverId, name: $fullNamed");
+                                        if (receiverId != 'Unknown' && receiverId.isNotEmpty) {
+                                          // await _startOrFetchConversation(context, receiverId);
+                                          try {
+                                            await _startOrFetchConversation(context, receiverId);
+                                          } catch (e) {
+                                            print("Abhi:- Error starting conversation: $e");
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Error starting chat')),
+                                            );
+                                          } finally {
+                                            if (mounted) {  // Check if widget is still mounted
+                                              setState(() {
+                                                _isChatLoading = false;  // Re-enable button
+                                              });
+                                            }
+                                          }
+
+                                        } else {
+                                          print("Abhi:- Error: Invalid receiver ID");
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error: Invalid receiver ID')),
+                                          );
+                                        }
+                                      },
+                                      child: /*CircleAvatar(
+                                        radius: 16,
+                                        backgroundColor: Colors.grey.shade300,
+                                        child: IconButton(
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.message,
+                                              color: Colors.green, size: 18),
+                                          onPressed: () {},
+                                        ),
+                                      ),*/
+                                      CircleAvatar(
+                                        radius: 14,
+                                        backgroundColor: _isChatLoading ? Colors.grey : Colors.grey[300],
+                                        child: _isChatLoading
+                                            ? SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                          ),
+                                        )
+                                            : Icon(
+                                          Icons.message,
+                                          color: Colors.green,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Row 3: View Profile + Hire
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (
+                                              context,
+                                              ) => /*ViewServiceProviderProfileScreen(
+                                            serviceProviderId:
+                                            item.providersId ??
+                                                '',
+                                          ),*/
+                                              UserViewWorkerDetails(
+                                                workerId: item.providersId,
+                                                from: "emergency",
+                                                oderId: widget.orderId,
+
+
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: AppColors.primaryGreen,
+                                      padding: EdgeInsets.zero, // 👈 yeh add kar
+                                      minimumSize: Size(0, 0),  // 👈 extra padding hata de
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 👈 button ka hitbox compact ho jayega
+                                      alignment: Alignment.centerLeft, // 👈 text bilkul left se align hoga
+                                    ),
+                                    child: const Text("View Profile"),
+                                  ),
+                                  Obx(
+                                     () {
+                                      return ElevatedButton(
+                                        onPressed:controller.isHiring.value
+                                            ? null
+                                            : () async {
+                                          bwDebug(" [HIRE BUTTON]: press",tag: tag);
+                                         await controller.assignEmergencyOrder(orderId:widget.orderId , serviceProviderId: item.providersId);
+                                         //Get.back();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primaryGreen,
+                                          minimumSize: const Size(70, 32),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        child: const Text("Hire",style: TextStyle(color: Colors.white),),
+                                      );
+                                    }
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

@@ -147,7 +147,7 @@ class Data {
     serviceProvider = json['service_provider_id'] != null
         ? ServiceProvider.fromJson(json['service_provider_id'])
         : null;
-    platformFeePaid = json['platform_fee_paid'];
+    platformFeePaid = json['platform_fee_paid']??false;
     platformFee = json['platform_fee'];
     razorOrderIdPlatform = json['razorOrderIdPlatform'];
     servicePayment = json['service_payment'] != null

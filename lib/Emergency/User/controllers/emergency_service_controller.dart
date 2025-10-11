@@ -136,11 +136,11 @@ class EmergencyServiceController extends GetxController {
       }
       images.addAll(pickedFiles.map((e) => File(e.path)));
 
-      CustomSnackBar.show(
-
-          message: "${pickedFiles.length} images selected",
-          type: SnackBarType.info
-      );
+      // CustomSnackBar.show(
+      //
+      //     message: "${pickedFiles.length} images selected",
+      //     type: SnackBarType.info
+      // );
 
     }
   }
@@ -251,7 +251,12 @@ class EmergencyServiceController extends GetxController {
     bwDebug("token: $token,\n"
         "address ${googleAddressController.value.text}\n"
         "latitude: ${latitude.value}\n"
-        "longitude: ${longitude.value}",tag: tag);
+        "longitude: ${longitude.value}"
+        "catId : ${selectedCategoryId.value},"
+        "SubCat: ${selectedSubCategoryIds},"
+        "contact: ${contactController.text},"
+        "google address: ${googleAddressController.text},"
+        "detail address: ${detailedAddressController.text}",tag: tag);
 
     // validation
     if (selectedCategoryId.value.isEmpty ||
@@ -277,7 +282,7 @@ class EmergencyServiceController extends GetxController {
     request.fields['sub_category_ids']=selectedSubCategoryIds.value.join(',');
 
     request.fields['google_address'] = googleAddressController.text;
-    // request.fields['detailed_address'] = detailedAddressController.text;
+    // request.fields['detailed_address'] = detailedAddressController.text??"";
     // request.fields['google_address'] = "Google Address";
     request.fields['detailed_address'] =postTaskController.fullAddress.value;
     request.fields['contact'] = contactController.text;
@@ -304,21 +309,31 @@ class EmergencyServiceController extends GetxController {
         bwDebug("✅ Success: $body");
         final jsonResponse = jsonDecode(body);
         final responseModel = EmergencyCreateOrderModel.fromJson(jsonResponse);
-        prefs.setString("emergency_order_response", jsonEncode(responseModel.toJson()));
-        await prefs.setString('razorpay_order_id', responseModel.razorpayOrder?.id ?? '');
-        await prefs.setInt('razorpay_amount', responseModel.razorpayOrder?.amount ?? 0);
 
-        final razorOrder = jsonResponse['razorpay_order'];
-        final orderId = razorOrder['id'];
-        final amount = razorOrder['amount'];
+        // final razorOrder = responseModel.razorpayOrder;
+        // await prefs.setString('razorpay_order_id', razorOrder?.id ?? '');
+        // await prefs.setInt('razorpay_amount', razorOrder?.amount ?? 0);
+        prefs.setString("emergency_order_response", jsonEncode(responseModel.toJson()));
+        // await prefs.setString('razorpay_order_id', responseModel.razorpayOrder?.id ?? '');
+        // await prefs.setInt('razorpay_amount', responseModel.razorpayOrder?.amount ?? 0);
+
+        // final razorOrder = jsonResponse['razorpay_order'];
+        // final orderId = razorOrder['id'];
+        // final amount = razorOrder['amount'];
        // Get.snackbar("Success", "Request submitted successfully!");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) =>  PaymentConformationScreen(
-            // orderId:orderId,
-            // amount:amount,
-              responseModel:responseModel
-          )),
+       //  Navigator.push(
+       //    context,
+       //    MaterialPageRoute(builder: (context) =>  PaymentConformationScreen(
+       //      // orderId:orderId,
+       //      // amount:amount,
+       //        responseModel:responseModel
+       //    )),
+       //  );
+        Get.back();
+        CustomSnackBar.show(
+
+            message:"Emergency order created successfully.",
+            type: SnackBarType.success
         );
       } else {
         bwDebug("❌ Failed: $body");
@@ -339,7 +354,11 @@ class EmergencyServiceController extends GetxController {
     isLoading.value=false;
   }
   Future<void> paymentProcess(BuildContext context,
-      token, {String? razorpayOrderId,String? razorPayPaymentId,String? razorpaySignatureId}) async {
+      token, {String? razorpayOrderId,
+        String? razorPayPaymentId,
+        String? razorpaySignatureId,
+        final String? orderId,
+        final passIndex,}) async {
     bwDebug("[paymentProcess] : ",tag: tag);
     final res = await http.post(
       Uri.parse(
@@ -366,7 +385,8 @@ class EmergencyServiceController extends GetxController {
             // categreyId: widget.categreyId,
             // subcategreyId: widget.subcategreyId,
             // providerId: widget.providerId,
-            passIndex: 2,                        //     this code is currectd you replace only 3 to 2
+            passIndex: passIndex,
+            orderId: orderId,//     this code is currectd you replace only 3 to 2
           ),
         ),
       );

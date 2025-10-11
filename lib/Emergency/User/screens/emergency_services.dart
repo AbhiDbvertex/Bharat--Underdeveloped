@@ -182,6 +182,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                           //       ),
                           //     ),
                           //   ),
+                          //   ),
                           // ),
                         ],
                       ),
@@ -689,6 +690,7 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
             context: context,
             builder: (_) {
               return AlertDialog(
+
                 title: Text(
                   hint,
                   style: fieldHintStyle,

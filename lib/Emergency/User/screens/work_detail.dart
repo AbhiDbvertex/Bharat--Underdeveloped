@@ -457,7 +457,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:developer/Emergency/User/screens/request_accepted_section.dart';
 import 'package:developer/Emergency/User/screens/task_view.dart';
 import 'package:developer/Emergency/utils/logger.dart';
-import 'package:developer/Emergency/utils/size_ratio.dart';
 import 'package:developer/directHiring/views/comm/view_images_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -469,6 +468,7 @@ import '../../../directHiring/views/User/MyHireScreen.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../utils/map_launcher_lat_long.dart';
 import '../controllers/work_detail_controller.dart';
+import 'PaymentConformation.dart';
 
 class WorkDetailPage extends StatefulWidget {
   final data;
@@ -484,6 +484,7 @@ class WorkDetailPage extends StatefulWidget {
 class _WorkDetailPageState extends State<WorkDetailPage> {
   final tag = "WorkDetailPage";
   late WorkDetailController controller;
+
   // platformoptimagation , paltformchanale
 
   @override
@@ -492,7 +493,24 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
     super.initState();
     bwDebug("data : ${widget.data}");
     controller = Get.put(WorkDetailController());
-    controller.getEmergencyOrder(widget.data);
+    // controller.getEmergencyOrder(widget.data);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final orderId = widget.data?.toString() ?? '';
+      if (orderId.isNotEmpty && mounted) {
+        final success = await controller.getEmergencyOrder(orderId);
+        if (!success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to load order – try again!")),
+          );
+        }
+      } else if (mounted) {
+        bwDebug("❌ Invalid data: ${widget.data}", tag: tag);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Invalid order ID – going back")),
+        );
+        Navigator.pop(context);
+      }
+    });
   }
 
   @override
@@ -510,7 +528,10 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 2,)),
+            MaterialPageRoute(
+                builder: (context) => const MyHireScreen(
+                      passIndex: 2,
+                    )),
           );
           return false; // default back ko cancel karo
         }
@@ -523,7 +544,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
           backgroundColor: Colors.white,
           centerTitle: true,
           title: const Text("Work Details",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           leading: const BackButton(color: Colors.black),
           actions: [],
           systemOverlayStyle: SystemUiOverlayStyle(
@@ -635,75 +657,85 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               );
                             }).toList(),
                           ),*/
-                          CarouselSlider(
+                              CarouselSlider(
                             options: CarouselOptions(
                               height: 200,
                               viewportFraction: 1.0,
-                              enableInfiniteScroll: controller.imageUrls.length > 1, // ✅ only if >1
-                              autoPlay: controller.imageUrls.length > 1, // ✅ only if >1
+                              enableInfiniteScroll:
+                                  controller.imageUrls.length > 1,
+                              // ✅ only if >1
+                              autoPlay: controller.imageUrls.length > 1,
+                              // ✅ only if >1
                               autoPlayInterval: const Duration(seconds: 3),
                               scrollPhysics: controller.imageUrls.length > 1
                                   ? const BouncingScrollPhysics()
-                                  : const NeverScrollableScrollPhysics(), // ✅ disable swipe if 1 image
+                                  : const NeverScrollableScrollPhysics(),
+                              // ✅ disable swipe if 1 image
                               onPageChanged: (index, reason) {
                                 controller.currentImageIndex.value = index;
                               },
-                            ),//
+                            ), //
                             items: controller.imageUrls.isNotEmpty
                                 ? controller.imageUrls.map((url) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ViewImage(
-                                        imageUrl: url,
-                                        title: "Product Image",
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ViewImage(
+                                              imageUrl: url,
+                                              title: "Product Image",
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(0),
+                                        child: Image.network(
+                                          url,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Container(
+                                              color: Colors.grey.shade200,
+                                              height: 200,
+                                              child: const Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: AppColors.primaryGreen,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey.shade200,
+                                              height: 200,
+                                              child: const Center(
+                                                child: Icon(Icons.broken_image,
+                                                    size: 50,
+                                                    color: Colors.grey),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  }).toList()
+                                : [
+                                    Container(
+                                      color: Colors.grey.shade200,
+                                      height: 200,
+                                      child: const Center(
+                                        child: Icon(Icons.image,
+                                            size: 50, color: Colors.grey),
                                       ),
                                     ),
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(0),
-                                  child: Image.network(
-                                    url,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Container(
-                                        color: Colors.grey.shade200,
-                                        height: 200,
-                                        child: const Center(
-                                          child: CircularProgressIndicator(
-                                            color: AppColors.primaryGreen,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey.shade200,
-                                        height: 200,
-                                        child: const Center(
-                                          child: Icon(Icons.broken_image,
-                                              size: 50, color: Colors.grey),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              );
-                            }).toList()
-                                : [
-                              Container(
-                                color: Colors.grey.shade200,
-                                height: 200,
-                                child: const Center(
-                                  child: Icon(Icons.image, size: 50, color: Colors.grey),
-                                ),
-                              ),
-                            ],
+                                  ],
                           ),
                         ),
                       ),
@@ -770,7 +802,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                   Obx(
                     () => Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: controller.imageUrls.asMap().entries.map((entry) {
+                      children:
+                          controller.imageUrls.asMap().entries.map((entry) {
                         int idx = entry.key;
                         return Container(
                           width: 8.0,
@@ -805,11 +838,9 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                 longitude: longitude,
                                 address: address);
                             if (!success) {
-
                               CustomSnackBar.show(
-                                  message:"Could not open the map" ,
-                                  type: SnackBarType.error
-                              );
+                                  message: "Could not open the map",
+                                  type: SnackBarType.error);
                             }
                           },
                           child: Container(
@@ -883,7 +914,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                               .split(", ")
                               .map((subName) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 2.0),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -907,8 +939,6 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
 
                         const SizedBox(height: 20),
 
-
-
                         widget.isUser
                             ? controller.hireStatus == "pending"
                                 ? Center(
@@ -917,7 +947,8 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         backgroundColor: Colors.red,
                                         minimumSize: const Size(160, 40),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
                                       onPressed: () async {
@@ -926,11 +957,12 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                         String status = await controller
                                             .cancelEmergencyOrder(orderId);
 
-                                         CustomSnackBar.show(
+                                        CustomSnackBar.show(
                                             message: status,
-                                            type:status=="Order cancelled successfully"?SnackBarType.success: SnackBarType.error
-                                        );
-
+                                            type: status ==
+                                                    "Order cancelled successfully"
+                                                ? SnackBarType.success
+                                                : SnackBarType.error);
 
                                         controller.isLoading.value = false;
                                         // cancel logic
@@ -968,27 +1000,29 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                           ),
                                         ),
                                       )
-                                    :controller.hireStatus == "completed"
-                            ? Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Mark as completed",
-                              style: GoogleFonts.roboto(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        )
-                            : SizedBox()
+                                    : controller.hireStatus == "completed"
+                                        ? Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                "Mark as completed",
+                                                style: GoogleFonts.roboto(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox()
                             : Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -1004,11 +1038,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                           await controller.acceptUserOrder(
                                               controller.orderId.value);
 
-
                                       CustomSnackBar.show(
                                           message: status,
-                                          type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
-                                      );
+                                          type: status == "Something went wrong"
+                                              ? SnackBarType.error
+                                              : SnackBarType.success);
                                       controller.isLoading.value = false;
                                       // accept logic
                                     },
@@ -1032,10 +1066,11 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                                       String status =
                                           await controller.rejectUserOrder(
                                               "6871f5b5ed31367eed8d2210");
-                                    CustomSnackBar.show(
+                                      CustomSnackBar.show(
                                           message: status,
-                                          type: status=="Something went wrong"?SnackBarType.error: SnackBarType.success
-                                      );
+                                          type: status == "Something went wrong"
+                                              ? SnackBarType.error
+                                              : SnackBarType.success);
                                       controller.isLoading.value = false;
                                     },
                                     child: Text(
@@ -1051,32 +1086,101 @@ class _WorkDetailPageState extends State<WorkDetailPage> {
                       ],
                     ),
                   ),
-                  controller.hireStatus != "cancelled" && controller.hireStatus != "assigned" &&
-                          controller.hireStatus != "cancelledDispute" && controller.hireStatus != "completed"
-                      ? RequestAcceptedSection(orderId: controller.orderId.value)
-                      : controller.hireStatus != "assigned" && controller.hireStatus != "completed"&&controller.hireStatus == "cancelledDispute"? Center(
-                        child: Container(
-                          height: 40,
-                          width: double.infinity,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8),border: Border.all(color: Colors.red)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(Icons.warning_amber, color: Colors.red),
-                              Flexible(
-                                child: Text("The order has been cancelled due to a dispute.",
-                                  maxLines: 2,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontWeight: FontWeight.w600,color: Colors.red),),
+                  controller.hireStatus != "cancelled" &&
+                          controller.hireStatus != "assigned" &&
+                          controller.hireStatus != "cancelledDispute" &&
+                          controller.hireStatus != "completed"
+                      ? RequestAcceptedSection(
+                          orderId: controller.orderId.value)
+                      : !controller.platformFeePaid.value
+                          ? Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Card(
+                                elevation: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                            "You haven’t completed your payment yet. Please complete the payment by tapping the ‘Pay’ button to unlock and access all app features."),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.green[600],
+                                              borderRadius:
+                                                  BorderRadius.circular(12)),
+                                          child: TextButton(
+                                              onPressed: () async {
+                                                bwDebug("pay called");
+                                                // await AcceptBiddingOrder (data?['service_provider_id']?['_id']?.toString() ?? '');
+                                                // await CreatebiddingPlateformfee();
+                                                // showTotalDialog(context, 0, data?['service_provider_id']?['_id'], platformFee);
+                                                 Navigator.push(
+                                                   context,
+                                                   MaterialPageRoute(builder: (context) =>  PaymentConformationScreen(
+                                                     platformAmount: controller.plateFormFee.value,
+                                                     razorOrderIdPlatform: controller.razorOrderIdPlatform.value,
+                                                     serviceProviderId: controller.providerId.value,
+                                                     orderId: controller.orderId.value,
+                                                     // orderId:orderId,
+                                                     // amount:amount,
+                                                     //   responseModel:responseModel
+                                                   )),
+                                                 );
+                                              //   Get.back();
+                                              },
+                                              child: Text(
+                                                "Pay",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.white),
+                                              )),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ):SizedBox(),
+                            )
+                          : controller.hireStatus != "assigned" &&
+                                  controller.hireStatus != "completed" &&
+                                  controller.hireStatus == "cancelledDispute"
+                              ? Center(
+                                  child: Container(
+                                    height: 40,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.red)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.warning_amber,
+                                            color: Colors.red),
+                                        Flexible(
+                                          child: Text(
+                                            "The order has been cancelled due to a dispute.",
+                                            maxLines: 2,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
 
                   controller.hireStatus.value == "assigned" &&
-                          controller.providerName.isNotEmpty
+                          controller.providerName.isNotEmpty && controller.platformFeePaid.value
                       ? TaskView(
                           orderId: controller.orderId.value,
                           // providerId:controller.providerId.value,

@@ -752,6 +752,7 @@ class WorkDetailController extends GetxController {
   var hireStatus = "".obs;
   var paymentAmount = 0.obs;
   var plateFormFee = 0.obs;
+  var platformFeePaid = false.obs;
   var currentImageIndex = 0.obs; // Purana variable, ab wapas aa gaya
   var orderId = "".obs;
   var acceptedByProviders = <Map<String, dynamic>>[].obs;
@@ -853,6 +854,7 @@ class WorkDetailController extends GetxController {
         hireStatus.value = dataModel.data?.hireStatus ?? "";
         paymentAmount.value = dataModel.data?.servicePayment?.amount ?? 0;
         plateFormFee.value = dataModel.data?.platformFee ?? 0;
+        platformFeePaid.value = dataModel.data?.platformFeePaid ?? false;
         orderId.value = dataModel.data?.id ?? "";
         razorOrderIdPlatform.value = dataModel.data?.razorOrderIdPlatform ?? "";
         // Update payments list
@@ -867,7 +869,7 @@ class WorkDetailController extends GetxController {
                 .toList() ??
             [];
         apiMessage.value = json["message"] ?? "";
-
+        update();
         result = true;
       } else {
         bwDebug("❌ Error: ${response.statusCode} ${response.body}", tag: tag);
