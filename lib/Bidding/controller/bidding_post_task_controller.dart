@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:developer/Emergency/utils/logger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -14,11 +12,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart' as http_parser;
 import '../../../../Widgets/AppColors.dart';
 import '../../../directHiring/models/ServiceProviderModel/ServiceProviderProfileModel.dart';
-import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../directHiring/views/comm/home_location_screens.dart';
 import '../../Emergency/User/controllers/emergency_service_controller.dart';
 import '../../Emergency/User/screens/work_detail.dart';
 import '../../utility/custom_snack_bar.dart';
+import '../view/user/bidding_work_detail_screen.dart';
 
 class PostTaskController extends GetxController {
 
@@ -30,7 +28,6 @@ class PostTaskController extends GetxController {
   final googleAddressController = TextEditingController();
   final descriptionController = TextEditingController();
   final costController = TextEditingController();
-
   var selectedImages = <File>[].obs;
   var selectedDate = Rxn<DateTime>();
   var selectedCategoryId = Rxn<String>();
@@ -47,7 +44,8 @@ class PostTaskController extends GetxController {
   var long;
   var addre;
 
-  var emergencyOrderId = "".obs;
+  var biddingOrderId = "".obs;
+  Timer? _navigationTimer;
 
 // New variables for full address
   var fullAddress = "".obs;
@@ -77,24 +75,6 @@ class PostTaskController extends GetxController {
     super.onClose();
   }
 
-  // void showSnackbar(String title, String message, {required BuildContext context}) {
-  //   if (context.mounted) {
-  //     SchedulerBinding.instance.addPostFrameCallback((_) {
-  //       Get.snackbar(
-  //         title,
-  //         message,
-  //         snackPosition: SnackPosition.BOTTOM,
-  //         backgroundColor: Colors.black,
-  //         colorText: Colors.white,
-  //         margin: const EdgeInsets.all(10),
-  //         borderRadius: 10,
-  //         duration: const Duration(seconds: 3),
-  //       );
-  //     });
-  //   }
-  // }
-
-  // Method to reset all form fields
   void resetForm() {
     titleController.clear();
     dateController.clear();
@@ -720,46 +700,6 @@ class PostTaskController extends GetxController {
     }
   }
 
- //  Future<void> pickImage() async {
- //    if (selectedImages.length >= 5) {
- // CustomSnackBar.show(
- //          message:"Maximum 5 images allowed.",
- //      type: SnackBarType.error
- //      );
- //      return;
- //    }
- //
- //    final picker = ImagePicker();
- //    final int remaining = 5 - selectedImages.length;
- //
- //    if (remaining == 1) {
- //      final XFile? pickedImage = await picker.pickImage(
- //        source: ImageSource.gallery,
- //        imageQuality: 70,
- //      );
- //      if (pickedImage != null) {
- //        selectedImages.add(File(pickedImage.path));
- //      }
- //    } else {
- //      final List<XFile>? pickedImages = await picker.pickMultiImage(
- //        imageQuality: 70,
- //      );
- //      if (pickedImages != null && pickedImages.isNotEmpty) {
- //        final newImages = pickedImages.map((x) => File(x.path)).toList();
- //        final totalImages = selectedImages.length + newImages.length;
- //        if (totalImages > 5) {
- // CustomSnackBar.show(
- //          message:"Cannot select more than 5 images.",
- //      type: SnackBarType.error
- //      );
- //          selectedImages.addAll(newImages.take(5 - selectedImages.length));
- //        } else {
- //          selectedImages.addAll(newImages);
- //        }
- //      }
- //    }
- //  }
-///////////////////////////////////////////////////////////////////
 
   void showImagePickerOptions() {
     Get.bottomSheet(
@@ -817,76 +757,6 @@ class PostTaskController extends GetxController {
     }
   }
 
-
-  //////////////////////////////////////////////////////////////
-
- //  Future<void> getCurrentLocation() async {
- //    try {
- //      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
- //      if (!serviceEnabled) {
- //        bool opened = await Geolocator.openLocationSettings();
- //        if (!opened) {
- // CustomSnackBar.show(
- //          message:"Please enable location services from settings.",
- //      type: SnackBarType.error
- //      );
- //          return;
- //        }
- //        serviceEnabled = await Geolocator.isLocationServiceEnabled();
- //        if (!serviceEnabled) {
- //          return;
- //        }
- //      }
- //
- //      LocationPermission permission = await Geolocator.checkPermission();
- //      if (permission == LocationPermission.denied) {
- //        permission = await Geolocator.requestPermission();
- //        if (permission == LocationPermission.denied) {
- // CustomSnackBar.show(
- //          message:"Location permission denied.",
- //      type: SnackBarType.error
- //      );
- //          return;
- //        }
- //      }
- //
- //      if (permission == LocationPermission.deniedForever) {
- // CustomSnackBar.show(
- //          message:   "Location permission permanently denied. Please enable from app settings.",
- //      type: SnackBarType.error
- //      );
- //        await Geolocator.openAppSettings();
- //        return;
- //      }
- //
- //      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
- //      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
- //      if (placemarks.isNotEmpty) {
- //        Placemark place = placemarks[0];
- //        String formattedAddress = [
- //          place.street,
- //          place.subLocality,
- //          place.locality,
- //          place.postalCode,
- //          place.administrativeArea,
- //          place.country,
- //        ].where((e) => e != null && e.isNotEmpty).join(', ');
- //
- //        addressController.text = formattedAddress;
- //        userLocation.value = formattedAddress; // Sync userLocation
- //      } else {
- // CustomSnackBar.show(
- //          message:  "Unable to fetch address from location.",
- //      type: SnackBarType.error
- //      );
- //      }
- //    } catch (e) {
- // CustomSnackBar.show(
- //          message:  "Failed to fetch location. Please try again.",
- //      type: SnackBarType.error
- //      );
- //    }
- //  }
   Future<void> getCurrentLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -974,78 +844,6 @@ class PostTaskController extends GetxController {
     }
   }
 
-  // Future<void> submitTask(BuildContext context) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token') ?? '';
-  //
-  //     String formattedDeadline = selectedDate.value != null
-  //         ? "${selectedDate.value!.year}-${selectedDate.value!.month.toString().padLeft(2, '0')}-${selectedDate.value!.day.toString().padLeft(2, '0')}"
-  //         : "2025-08-01";
-  //
-  //     List<String> base64Images = [];
-  //     for (var image in selectedImages) {
-  //       final bytes = await image.readAsBytes();
-  //       final mimeType = mime.lookupMimeType(image.path) ?? 'image/jpeg';
-  //       base64Images.add("data:$mimeType;base64,${base64Encode(bytes)}");
-  //     }
-  //
-  //     String addressToSend = addressController.text.trim().isNotEmpty
-  //         ? addressController.text.trim()
-  //         : userLocation.value.trim();
-  //     if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
-  //       showSnackbar("Error", "Please provide a valid address.", context: context);
-  //       return;
-  //     }
-  //
-  //     final body = {
-  //       "title": titleController.text.trim(),
-  //       "category_id": selectedCategoryId.value,
-  //       "sub_category_ids": selectedSubCategoryIds.join(','),
-  //       "address": addressToSend,
-  //       "google_address": googleAddressController.text.trim(),
-  //       "description": descriptionController.text.trim(),
-  //       "cost": costController.text.trim(),
-  //       "deadline": formattedDeadline,
-  //       if (base64Images.isNotEmpty) "images": base64Images,
-  //     };
-  //
-  //     print("📩 Sending task with address: $addressToSend");
-  //
-  //     final response = await http.post(
-  //       Uri.parse("https://api.thebharatworks.com/api/bidding-order/create"),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: jsonEncode(body),
-  //     );
-  //
-  //     print("📡 Post Task response: ${response.body}");
-  //     print("📡 Post Task status: ${response.statusCode}");
-  //
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       showSnackbar("Success", "Task posted successfully.", context: context);
-  //       resetForm(); // Reset form after successful submission
-  //       // Add a slight delay to ensure snackbar is visible
-  //       await Future.delayed(const Duration(seconds: 1));
-  //       Get.delete<PostTaskController>(); // Delete controller before navigation
-  //       Get.back();
-  //     } else if (response.statusCode == 401) {
-  //       showSnackbar("Error", " CustomSnackBar.show(
-//           message:  "Session expired. Please log in again.",
-//       type: SnackBarType.error
-//       );
-// ", context: context);
-  //       Get.offAllNamed('/login');
-  //     } else {
-  //       showSnackbar("Error", "Failed to post task. Please try again.", context: context);
-  //     }
-  //   } catch (e) {
-  //     showSnackbar("Error", "An error occurred while posting the task. Please try again.", context: context);
-  //   }
-  // }
-
   Future<void> submitTask(BuildContext context) async {
     isLoading.value=true;
     try {
@@ -1060,9 +858,9 @@ class PostTaskController extends GetxController {
           ? addressController.text.trim()
           : userLocation.value.trim();
       if (addressToSend == 'Select Location' || addressToSend.isEmpty) {
- CustomSnackBar.show(
+        CustomSnackBar.show(
           message:  "Please provide a valid address.",
-      type: SnackBarType.error
+            type: SnackBarType.error
       );
         return;
       }
@@ -1099,7 +897,23 @@ class PostTaskController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // showSnackbar("Success", "Task posted successfully.", context: context);
-        Get.back();
+        // Get.back();
+
+        // int count = 0;
+        //
+        //   Navigator.of(context).popUntil((route) {
+        //     return count++ == 4;
+        //   });
+        //   Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => WorkDetailPage(
+        //         ,
+        //         passIndex: 0,
+        //         isUser: true,
+        //       ),
+        //       ));
+
+        getAllbidding(context,0);
 
         Get.snackbar("Success", "Task posted successfully",backgroundColor: Colors.green,colorText: Colors.white,snackPosition:  SnackPosition.BOTTOM);
         resetForm();
@@ -1137,7 +951,7 @@ class PostTaskController extends GetxController {
   }
 
   Future<void> getAllbidding(BuildContext context, int passIndex) async {
-    const url = 'https://api.thebharatworks.com/api/emergency-order/getAllEmergencyOrdersByRole';
+    const url = 'https://api.thebharatworks.com/api/bidding-order/apiGetAllBiddingOrders';
     isLoading.value = true;
 
     try {
@@ -1155,8 +969,8 @@ class PostTaskController extends GetxController {
       var responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Abhi:- get emergency response in payment : ${response.statusCode}");
-        print("Abhi:- get emergency response in payment : ${response.body}");
+        print("Abhi:- getbidding order reesponse in payment : ${response.statusCode}");
+        print("Abhi:- getbidding order reesponse in payment : ${response.body}");
         List<dynamic> orders = responseData['data'] ?? [];
 
         if (orders.isEmpty) {
@@ -1169,82 +983,36 @@ class PostTaskController extends GetxController {
             .compareTo(DateTime.parse(a['createdAt'])));
 
         var latestbiddingOrderId = orders.first['_id'];
-        emergencyOrderId.value = latestbiddingOrderId;
+        biddingOrderId.value = latestbiddingOrderId;
 
         print("Latest Order ID emergency: $latestbiddingOrderId");
 
         int count = 0;
-        Navigator.of(context).popUntil((route) => count++ == 2);
+        Navigator.of(context).popUntil((route) => count++ == 1);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => WorkDetailPage(
-              latestbiddingOrderId,
-              passIndex: passIndex,
-              isUser: true,
+            builder: (_) => BiddingWorkerDetailScreen(
+              // latestbiddingOrderId,
+              passIndex: 0,
+              // isUser: true,
+              // serviceProviderId: ,
+
+              buddingOderId: latestbiddingOrderId,
             ),
           ),
         );
       } else {
         print("Abhi:- Error ${response.statusCode}: ${response.body}");
+        print("Abhi:-Error ${responseData['message']}");
       }
     } catch (e) {
-      print("Abhi:- getAllEmergency Exception: $e");
+      print("Abhi:- getbidding order Exception: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-
-
- //  void navigateToLocationScreen() async {
- //    // final emergencyServiceController = Get.find<EmergencyServiceController>();
- //    final emergencyServiceController = Get.put(EmergencyServiceController());
- //
- //    final result = await Get.to(
- //          () => LocationSelectionScreen(
- //        onLocationSelected: (Map<String, dynamic> locationData) {
- //          userLocation.value = locationData['address'] ?? 'Select Location';
- //          addressController.text = locationData['address'] ?? 'Select Location'; // Sync addressController
- //          emergencyServiceController.googleAddressController.text = locationData['address'] ?? 'Select Location';
- //          emergencyServiceController.latitude.value=locationData['latitude']??"";
- //          emergencyServiceController.longitude.value=locationData['longitude']??"";
- //          debugPrint(
- //            "📍 New location selected: ${locationData['address']} (ID: ${locationData['addressId']}), location data: $locationData",
- //          );
- //        },
- //      ),
- //    );
- //    if (result != null && result is Map<String, dynamic>) {
- //      String newAddress = result['address'] ?? 'Select Location';
- //      double latitude = result['latitude'] ?? 0.0;
- //      double longitude = result['longitude'] ?? 0.0;
- //      String? addressId = result['addressId'];
- //      bwDebug("address: $newAddress\n latitude : $latitude\n longitude: $longitude",tag: "builtPostTask");
- //      if (newAddress != 'Select Location' && latitude != 0.0 && longitude != 0.0) {
- //        await updateLocationOnServer(newAddress, latitude, longitude);
- //        if (addressId != null) {
- //          final prefs = await SharedPreferences.getInstance();
- //          await prefs.setString('selected_address_id', addressId);
- //        }
- //        await fetchLocation();
- //        emergencyServiceController.googleAddressController.text = newAddress;
- //        emergencyServiceController.latitude.value=latitude;
- //        emergencyServiceController.longitude.value=longitude;
- //        bwDebug("address: ${emergencyServiceController.googleAddressController.text}"
- //            "\n latitude : ${emergencyServiceController.latitude.value}"
- //            "\n longitude: ${emergencyServiceController.longitude.value}",tag: "builtPostTask");
- //
- //
- //      } else {
- //        debugPrint("❌ Invalid location data received: $result");
- // CustomSnackBar.show(
- //          message:  "Invalid location data. Please try again.",
- //      type: SnackBarType.error
- //      );
- //      }
- //    }
- //  }
   void navigateToLocationScreen() async {
     final emergencyServiceController = Get.put(EmergencyServiceController());
     final result = await Get.to(

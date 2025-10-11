@@ -6,12 +6,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../Widgets/AppColors.dart';
 import '../../../Emergency/User/controllers/emergency_service_controller.dart';
+import '../../../directHiring/views/User/MyHireScreen.dart';
 import '../../../directHiring/views/auth/MapPickerScreen.dart';
 import '../../../utility/custom_snack_bar.dart';
 import '../../controller/bidding_post_task_controller.dart';
 
-class PostTaskScreen extends StatelessWidget {
-  PostTaskScreen({super.key});
+class PostTaskScreen extends StatefulWidget {
+  final passIndex;
+  PostTaskScreen({super.key, this.passIndex});
+
+  @override
+  State<PostTaskScreen> createState() => _PostTaskScreenState();
+}
+
+class _PostTaskScreenState extends State<PostTaskScreen> {
 
   final emergencyServiceController = Get.put(EmergencyServiceController());
 
@@ -26,8 +34,9 @@ class PostTaskScreen extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         controller.resetForm(); // Reset form before navigating back
-        Get.delete<
-            PostTaskController>(); // Delete controller to ensure fresh instance on re-entry
+        Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance on re-entry
+        FocusScope.of(context).requestFocus(FocusNode());
+      // normal back chalega
         return true; // Allow back navigation
       },
       child: Scaffold(
@@ -269,25 +278,6 @@ class PostTaskScreen extends StatelessWidget {
   }
 
   // Widget _pageHeader(BuildContext context, PostTaskController controller) {
-  //   return Row(
-  //     children: [
-  //       GestureDetector(
-  //         onTap: () {
-  //           controller.resetForm(); // Reset form before navigating back
-  //           Get.delete<PostTaskController>(); // Delete controller to ensure fresh instance
-  //           Get.back();
-  //         },
-  //         child: const Icon(Icons.arrow_back_outlined, color: Colors.black),
-  //       ),
-  //       const SizedBox(width: 86),
-  //       Text(
-  //         "Post new bidding",
-  //         style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.bold),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _googleLocationField(PostTaskController controller) {
     return GestureDetector(
       onTap: () async {

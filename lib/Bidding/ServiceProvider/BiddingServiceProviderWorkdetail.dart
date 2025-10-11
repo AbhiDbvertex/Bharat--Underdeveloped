@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../Emergency/utils/logger.dart';
 import '../../Widgets/AppColors.dart';
 import '../../chat/APIServices.dart';
 import '../../chat/SocketService.dart';
@@ -80,11 +81,13 @@ class _BiddingserviceproviderworkdetailState
   bool hasAlreadyBid = false;
   String? biddingOfferId;
   String? negotiationId;
+  String? byNagotiation;
   String offerPrice = '';
 
   @override
   void initState() {
     super.initState();
+    getNegotiation();
     fetchBiddingOrder().then((_) {
       if (biddingOrder != null && biddingOrder!.categoryId.isNotEmpty) {
         print('✅ Bidding Order Ready: ${biddingOrder!.title}');
@@ -115,6 +118,53 @@ class _BiddingserviceproviderworkdetailState
   var name;
   var imge;
   var address;
+
+  var getCurrentBiddingAmmount;
+  var bygetNegotiation;
+  var getCurrentBiddingId;
+
+  // get latest nagocation
+  // Get Latest Negotiation API
+  Future<void> getNegotiation() async {
+    bwDebug("[get Negotiation call ",tag: "negotiate");
+    final String url =
+        'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.orderId}/service_provider';
+    print("Abhi:- getNegotiation url: $url");
+    print("Abhi:- getNegotiation bidding orderId: ${widget.orderId}");
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    try {
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Abhi:- getNegotiation statusCode: ${response.statusCode}");
+        print("Abhi:- getNegotiation response: ${response.body}");
+        setState(() {
+          // getCurrentBiddingAmmount = responseData?['offer_amount']?.toString() ?? "";
+          getCurrentBiddingAmmount = (responseData != null && responseData['offer_amount'] != null)
+              ? responseData['offer_amount'].toString()
+              : "";
+          getCurrentBiddingId = responseData['_id'];
+          bygetNegotiation = responseData['initiator'];
+        });
+        print('Abhi:- getNegotiation amount: $getCurrentBiddingAmmount id: $getCurrentBiddingId bygetnegotiation : $bygetNegotiation');
+      } else {
+        print("Abhi:- else getNegotiation statusCode: ${response.statusCode}");
+        print("Abhi:- else getNegotiation response: ${response.body}");
+      }
+    } catch (e) {
+      print("Abhi:- getNegotiation Exception: $e");
+    }
+  }
 
   Future<void> openMap(double lat, double lng) async {
     final Uri googleMapUrl =
@@ -480,7 +530,6 @@ class _BiddingserviceproviderworkdetailState
           isLoading = false;
         });
 
-
         CustomSnackBar.show(
             message:  'No token found. Please log in again.' ,
             type: SnackBarType.error
@@ -718,7 +767,7 @@ class _BiddingserviceproviderworkdetailState
         );
         return;
       }
-print("user: ${biddingOrder!.userId?.id}");
+      print("user: ${biddingOrder!.userId?.id}");
       final payload = {
         'order_id': widget.orderId,
         'bidding_offer_id': biddingOfferId,
@@ -749,10 +798,11 @@ print("user: ${biddingOrder!.userId?.id}");
           setState(() {
             isLoading = false;
             negotiationId = jsonData['negotiation']['_id'];
+            byNagotiation = jsonData['negotiation']['initiator'];
             offerPrice = '₹${offerAmount?.toStringAsFixed(2)}';
             print('✅ Setting offerPrice in setState: $offerPrice');
           });
-          print('✅ Negotiation started, negotiationId: $negotiationId');
+          print('✅ Negotiation started, negotiationId: $negotiationId byNagocation : $byNagotiation');
           print('✅ Updated offerPrice: $offerPrice');
 
           CustomSnackBar.show(
@@ -928,8 +978,8 @@ print("user: ${biddingOrder!.userId?.id}");
       }
 
       final response = await http.get(
-        Uri.parse(
-            'https://api.thebharatworks.com/api/negotiations/latest/${widget.orderId}/${biddingOfferId}'),
+        // Uri.parse('https://api.thebharatworks.com/api/negotiations/latest/${widget.orderId}/${biddingOfferId}'),
+        Uri.parse('https://api.thebharatworks.com/api/negotiations/latest/${widget.orderId}'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -943,8 +993,7 @@ print("user: ${biddingOrder!.userId?.id}");
         final jsonData = jsonDecode(response.body);
         if (jsonData['message'] == 'Negotiation found') {
           setState(() {
-            offerPrice =
-                '₹${jsonData['negotiation']['offer_amount'].toStringAsFixed(2)}';
+            offerPrice = '₹${jsonData['negotiation']['offer_amount'].toStringAsFixed(2)}';
             negotiationId = jsonData['negotiation']['_id'];
             print(
                 '✅ Setting offerPrice in fetchLatestNegotiation: $offerPrice');
@@ -1224,48 +1273,7 @@ print("user: ${biddingOrder!.userId?.id}");
                     children: [
                       Container(
                         color: Colors.grey,
-                        child: /*CarouselSlider(
-                          options: CarouselOptions(
-                            height: height * 0.25,
-                            enlargeCenterPage: true,
-                            autoPlay: true,
-                            viewportFraction: 1,
-                          ),
-                          items: biddingOrder!.imageUrls.isNotEmpty
-                              ? biddingOrder!.imageUrls.map((item) {
-                                  print('🖼️ Image: $item');
-                                  return ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(width * 0.025),
-                                    child: Image.network(
-                                      item,
-                                      // fit: BoxFit.cover,
-                                      width: width,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        print(
-                                            'Image error: $item, Error: $error');
-                                        return Image.asset(
-                                          'assets/images/chair.png',
-                                          fit: BoxFit.cover,
-                                          width: width,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                }).toList()
-                              : [
-                                  ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(width * 0.025),
-                                    child: Image.asset(
-                                      'assets/images/chair.png',
-                                      fit: BoxFit.cover,
-                                      width: width,
-                                    ),
-                                  ),
-                                ],
-                        ),*/
-                        CarouselSlider(
+                        child: CarouselSlider(
                           options: CarouselOptions(
                             height: height * 0.25,
                             enlargeCenterPage: true,
@@ -1278,7 +1286,7 @@ print("user: ${biddingOrder!.userId?.id}");
                           ),
                           items: biddingOrder!.imageUrls.isNotEmpty
                               ? biddingOrder!.imageUrls.map((item) {
-                            print('🖼️ Image: $item');
+                            print('Image: $item');
                             return ClipRRect(
                               borderRadius: BorderRadius.circular(width * 0.025),
                               child: Image.network(
@@ -2445,84 +2453,38 @@ print("user: ${biddingOrder!.userId?.id}");
                                                                 height: height *
                                                                     0.005),
                                                             TextField(
-                                                              controller:
-                                                                  durationController,
-                                                              keyboardType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              decoration:
-                                                                  InputDecoration(
-                                                                hintText:
-                                                                    "Enter Duration (in days)",
-                                                                border:
-                                                                    OutlineInputBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(width *
-                                                                              0.02),
-                                                                ),
+                                                              controller: durationController,
+                                                              keyboardType: TextInputType.number,
+                                                              decoration: InputDecoration(
+                                                                hintText: "Enter Duration (in days)",
+                                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(width * 0.02),),
                                                               ),
                                                             ),
-                                                            SizedBox(
-                                                                height: height *
-                                                                    0.015),
+                                                            SizedBox(height: height * 0.015),
                                                             Center(
-                                                              child:
-                                                                  GestureDetector(
+                                                              child: GestureDetector(
                                                                 onTap: () {
-                                                                  String amount =
-                                                                      amountController
-                                                                          .text
-                                                                          .trim();
-                                                                  String
-                                                                      description =
-                                                                      descriptionController
-                                                                          .text
-                                                                          .trim();
-                                                                  String
-                                                                      duration =
-                                                                      durationController
-                                                                          .text
-                                                                          .trim();
-                                                                  submitBid(
-                                                                      amount,
-                                                                      description,
-                                                                      duration);
-                                                                  Navigator.pop(
-                                                                      context);
+                                                                  String amount = amountController.text.trim();
+                                                                  String description = descriptionController.text.trim();
+                                                                  String duration = durationController.text.trim();
+                                                                  submitBid(amount, description, duration);
+                                                                  Navigator.pop(context);
                                                                 },
                                                                 child: Container(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                    horizontal:
-                                                                        width *
-                                                                            0.18,
-                                                                    vertical:
-                                                                        height *
-                                                                            0.012,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: width * 0.18,
+                                                                    vertical: height * 0.012,
                                                                   ),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Colors
-                                                                        .green
-                                                                        .shade700,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            width *
-                                                                                0.02),
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.green.shade700,
+                                                                    borderRadius: BorderRadius.circular(width * 0.02),
                                                                   ),
                                                                   child: Text(
                                                                     "Bid",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          width *
-                                                                              0.04,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
+                                                                    style: TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: width * 0.04,
+                                                                      fontWeight: FontWeight.bold,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -2564,6 +2526,8 @@ print("user: ${biddingOrder!.userId?.id}");
                         SizedBox(height: height * 0.02),
                         NegotiationCard(
                           key: ValueKey(offerPrice),
+                          bygetNegotiation: bygetNegotiation,
+                          latestnagocationAmount: getCurrentBiddingAmmount,
                           width: width,
                           height: height,
                           offerPrice: offerPrice,
@@ -2981,6 +2945,8 @@ print("user: ${biddingOrder!.userId?.id}");
 }
 
 class NegotiationCard extends StatefulWidget {
+  final bygetNegotiation;
+  final latestnagocationAmount;
   final double width;
   final double height;
   final String offerPrice;
@@ -2996,6 +2962,7 @@ class NegotiationCard extends StatefulWidget {
     required this.bidAmount,
     required this.onNegotiate,
     required this.onAccept,
+    this.bygetNegotiation, this.latestnagocationAmount,
   }) : super(key: key);
 
   @override
@@ -3009,16 +2976,14 @@ class _NegotiationCardState extends State<NegotiationCard> {
   @override
   void initState() {
     super.initState();
-    print(
-        '🖼️ NegotiationCard initialized with offerPrice: ${widget.offerPrice}');
+    print('🖼 NegotiationCard initialized with offerPrice: ${widget.offerPrice}');
   }
 
   @override
   void didUpdateWidget(NegotiationCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.offerPrice != widget.offerPrice) {
-      print(
-          '🖼️ NegotiationCard updated with new offerPrice: ${widget.offerPrice}');
+      print('🖼 NegotiationCard updated with new offerPrice: ${widget.offerPrice}');
     }
   }
 
@@ -3030,8 +2995,7 @@ class _NegotiationCardState extends State<NegotiationCard> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        '🖼️ NegotiationCard rebuilding with offerPrice: ${widget.offerPrice}');
+    print('🖼 NegotiationCard rebuilding with offerPrice: ${widget.offerPrice}');
     return Card(
       color: Colors.white,
       child: Container(
@@ -3071,7 +3035,8 @@ class _NegotiationCardState extends State<NegotiationCard> {
                             ),
                           ),
                           Text(
-                            widget.offerPrice,
+                            // widget.offerPrice,
+                            widget.latestnagocationAmount ?? "0",
                             style: TextStyle(
                               color: Colors.green,
                               fontSize: widget.width * 0.04,
@@ -3169,7 +3134,7 @@ class _NegotiationCardState extends State<NegotiationCard> {
               ),
             ],
             SizedBox(height: widget.height * 0.02),
-            GestureDetector(
+            /*widget.bygetNegotiation == 'user' ? */ GestureDetector(
               onTap: widget.onAccept,
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: widget.height * 0.018),
@@ -3187,7 +3152,7 @@ class _NegotiationCardState extends State<NegotiationCard> {
                   ),
                 ),
               ),
-            ),
+            ) /*: SizedBox()*/,
           ],
         ),
       ),

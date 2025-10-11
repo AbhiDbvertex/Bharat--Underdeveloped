@@ -20,17 +20,19 @@ import '../../../chat/APIServices.dart';
 import '../../../chat/SocketService.dart';
 import '../../../chat/chatScreen.dart';
 import '../../../directHiring/views/ServiceProvider/WorkerListViewProfileScreen.dart';
+import '../../../directHiring/views/User/MyHireScreen.dart';
 import '../../../directHiring/views/User/UserViewWorkerDetails.dart';
 import '../../../utility/custom_snack_bar.dart';
 import 'bidding_worker_detail_edit_screen.dart';
 
 class BiddingWorkerDetailScreen extends StatefulWidget {
   final String? buddingOderId;
+  final passIndex;
   final userId;
   final serviceProviderId;
 
   const BiddingWorkerDetailScreen(
-      {super.key, this.buddingOderId, this.userId, this.serviceProviderId});
+      {super.key, this.buddingOderId, this.userId, this.serviceProviderId, this.passIndex});
 
   @override
   State<BiddingWorkerDetailScreen> createState() =>
@@ -539,8 +541,6 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     }
   }
 
-
-
   Future<void> openMap(double lat, double lng) async {
     final Uri googleMapUrl =
         Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng");
@@ -553,44 +553,6 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
   }
 
   int? platformFee;
-
-  // Future<void> CreatebiddingPlateformfee() async {
-  //   final String url =
-  //       'https://api.thebharatworks.com/api/bidding-order/createPlatformFeeOrder/${widget.buddingOderId}';
-  //   print("Abhi:- CreatebiddingPlateformfee url: $url");
-  //   print("Abhi:- CreatebiddingPlateformfee url: ${widget.buddingOderId}");
-  //
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token') ?? '';
-  //
-  //   try {
-  //     var response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {
-  //         'Authorization': 'Bearer $token',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     );
-  //
-  //     var responseData = jsonDecode(response.body);
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       print("Abhi:- CreatebiddingPlateformfee statusCode: ${response.statusCode}");
-  //       print("Abhi:- CreatebiddingPlateformfee response: ${response.body}");
-  //       print("Abhi:- ");
-  //       setState(() {
-  //         razorpayOrderId = responseData['razorpay_order_id']; // Store orderId
-  //         platformFee = responseData['platform_fee']; // Store platform fee amount (assuming it's int)
-  //       });
-  //       print("Abhi:- createbiddingOrder razorpayOrderId: ${razorpayOrderId} platformFee: $platformFee");
-  //       // Do not open Razorpay here; it will be opened from dialog's Pay button
-  //     } else {
-  //       print("Abhi:- else CreatebiddingPlateformfee statusCode: ${response.statusCode}");
-  //       print("Abhi:- else CreatebiddingPlateformfee response: ${response.body}");
-  //     }
-  //   } catch (e) {
-  //     print("Abhi:- CreatebiddingPlateformfee Exception: $e");
-  //   }
-  // }
 
   Future<void> CreatebiddingPlateformfee() async {
     final String url =
@@ -848,9 +810,18 @@ class _BiddingWorkerDetailScreenState extends State<BiddingWorkerDetailScreen> {
     //       Brightness.light, //navigation bar icons' color
     // ));
 
-    return GestureDetector(
-      onTap: () {
+    return WillPopScope(
+      onWillPop: () async {
         FocusScope.of(context).requestFocus(FocusNode());
+        if (widget.passIndex == 0) {
+          // 👇 Agar passIndex == 1 hai to MyHireScreen par jao
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MyHireScreen(passIndex: 0,)),
+          );
+          return false; // default back ko cancel karo
+        }
+        return true; // normal back chalega
       },
       child: Scaffold(
         appBar: AppBar(

@@ -403,93 +403,6 @@ class _MyHireScreenState extends State<MyHireScreen> {
     });
   }
 
-  /*@override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: const Text(
-          "My Hire",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        leading: SizedBox(),
-        actions: [],
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: AppColors.primaryGreen,
-          statusBarIconBrightness: Brightness.light,
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 50,
-            color: Colors.green.shade100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildTabButton("Bidding Tasks", 0),
-                _verticalDivider(),
-                _buildTabButton("Direct Hiring", 1),
-                _verticalDivider(),
-                _buildTabButton("Emergency Tasks", 2),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                hintText: selectedTab == 0
-                    ? 'Search by name'
-                    : selectedTab == 1
-                    ? 'Search by name'
-                    : 'Search by name',
-                prefixIcon: Icon(Icons.search, color: Colors.green),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-              ),
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value.toLowerCase();
-                });
-                _filterData();
-              },
-            ),
-          ),
-          Expanded(
-            child: Builder(
-              builder: (_) {
-                if (isLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (selectedTab == 0) {
-                  return _buildBiddingCard(BudingData);
-                } else if (selectedTab == 1) {
-                  return _buildDirectHiringList();
-                } else {
-                  return _buildEmergencyList();
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -1718,8 +1631,11 @@ class _MyHireScreenState extends State<MyHireScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  darectHiringData.description,
+                  // darectHiringData.description,
+                  "asdfkl jsd klujoweip wioeuweio jfasl;kdf jksdnlfklsd jhsl;hcvsasd ioweufsdjklfsdklfjasd;f[iou oi rusduiof iuosdfj ;jk fio ioeifo usafjkll; djkclak;shdf hioda",
                   style: TextStyle(),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 10),
                 Row(

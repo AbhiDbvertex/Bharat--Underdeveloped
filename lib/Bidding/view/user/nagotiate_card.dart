@@ -36,6 +36,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
   bool isAccepting = false;
   final TextEditingController amountController = TextEditingController();
   var getCurrentBiddingAmmount;
+  var bygetNegotiation;
   var getCurrentBiddingId;
   String? razorpayOrderId; // New variable to store orderId
   String? CreatePlatformfeemessage;
@@ -66,7 +67,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
   Future<void> getNegotiation() async {
     bwDebug("[get Negotiation call ",tag: "negotiate");
     final String url =
-        'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.oderId}';
+        'https://api.thebharatworks.com/api/negotiations/getLatestNegotiation/${widget.oderId}/user';
     print("Abhi:- getNegotiation url: $url");
     print("Abhi:- getNegotiation bidding orderId: ${widget.oderId}");
 
@@ -89,6 +90,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
         setState(() {
           getCurrentBiddingAmmount = responseData['offer_amount'];
           getCurrentBiddingId = responseData['_id'];
+          bygetNegotiation = responseData['initiator'];
         });
         print(
             'Abhi:- getNegotiation amount: $getCurrentBiddingAmmount id: $getCurrentBiddingId');
@@ -450,165 +452,6 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
       },
     );
   }
-  // void showTotalDialog(BuildContext context, int? platformFee) {
-  //   int fee = platformFee ?? 0;
-  //   int totalAmount = (getCurrentBiddingAmmount ?? 0);
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return Dialog(
-  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-  //         child: Padding(
-  //           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             crossAxisAlignment: CrossAxisAlignment.center,
-  //             children: [
-  //               const Text("Payment Confirmation", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
-  //               const SizedBox(height: 16),
-  //               Image.asset(BharatAssets.payConfLogo2),
-  //               const SizedBox(height: 24),
-  //               Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       Text("Date", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-  //                       Text(DateFormat("dd-MM-yy").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 8),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       Text("Time", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-  //                       Text(DateFormat("hh:mm a").format(DateTime.now()), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 8),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       Text("Amount", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-  //                       Text("₹$totalAmount", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 8),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       Text("Platform fees", style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-  //                       Text("₹$fee", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 16),
-  //                   Image.asset(BharatAssets.payLine),
-  //                   const SizedBox(height: 20),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: [
-  //                       Text("Total", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
-  //                       Text("₹$totalAmount/-", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24)),
-  //                     ],
-  //                   ),
-  //                 ],
-  //               ),
-  //               const SizedBox(height: 20),
-  //               Divider(height: 4, color: Colors.green),
-  //               const SizedBox(height: 20),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   InkWell(
-  //                     onTap: () {
-  //                       // Check for platform fee condition
-  //                       double minFee = totalAmount * 0.10;
-  //
-  //                       if (platformFee == null || razorpayOrderId == null) {
-  //                         Get.snackbar(
-  //                           "Error",
-  //                           "Platform fee or order ID not available",
-  //                           backgroundColor: Colors.red,
-  //                           colorText: Colors.white,
-  //                         );
-  //                         return;
-  //                       }
-  //
-  //                       if (fee < minFee) {
-  //                         Get.snackbar(
-  //                           "Invalid Fee",
-  //                           "Platform fee must be at least 10% of total amount!",
-  //                           backgroundColor: Colors.orange,
-  //                           colorText: Colors.white,
-  //                         );
-  //                         return;
-  //                       }
-  //
-  //                       var options = {
-  //                         'key': 'rzp_test_R7z5O0bqmRXuiH',
-  //                         'amount': totalAmount * 100,
-  //                         'name': 'The Bharat Work',
-  //                         'description': 'Payment for Order',
-  //                         'prefill': {
-  //                           'contact': '9876543210',
-  //                           'email': 'test@razorpay.com',
-  //                         },
-  //                         'external': {
-  //                           'wallets': ['paytm']
-  //                         }
-  //                       };
-  //
-  //                       try {
-  //                         _razorpay.open(options);
-  //                         Navigator.pop(context);
-  //                       } catch (e) {
-  //                         debugPrint('Razorpay Error: $e');
-  //                       }
-  //                     },
-  //                     child: Container(
-  //                       height: 35,
-  //                       width: MediaQuery.of(context).size.width * 0.28,
-  //                       alignment: Alignment.center,
-  //                       decoration: BoxDecoration(
-  //                         borderRadius: BorderRadius.circular(8),
-  //                         color: const Color(0xff228B22),
-  //                       ),
-  //                       child: const Text(
-  //                         "Pay",
-  //                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.white),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   InkWell(
-  //                     onTap: () {
-  //                       Navigator.pop(context);
-  //                     },
-  //                     child: Container(
-  //                       height: 35,
-  //                       width: MediaQuery.of(context).size.width * 0.28,
-  //                       alignment: Alignment.center,
-  //                       decoration: BoxDecoration(
-  //                         borderRadius: BorderRadius.circular(8),
-  //                         border: Border.all(color: Colors.green, width: 1.5),
-  //                       ),
-  //                       child: const Text(
-  //                         "Cancel",
-  //                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.green),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
 
   @override
   Widget build(BuildContext context) {
@@ -678,7 +521,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
               ),
             ),
             SizedBox(height: height * 0.02),
-            if (isNegotiating) ...[
+            if (isNegotiating ) ...[
               TextField(
                 controller: amountController,
                 keyboardType: TextInputType.number,
@@ -708,7 +551,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                     print("Abhi:- amount empty hai");
                     return;
                   }
-             await     postNegotiate(amount);
+                  await postNegotiate(amount);
                   setState(() {
                     isNegotiating = false;
                     amountController.clear();
@@ -728,7 +571,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                 ),
               ),
             ] else ...[
-              GestureDetector(
+             /* bygetNegotiation == 'service_provider' ?*/  GestureDetector(
                 onTap: (
                     getCurrentBiddingAmmount == null || getCurrentBiddingAmmount.toString().isEmpty)
                     ? null
@@ -763,7 +606,7 @@ class _NegotiationCardUserState extends State<NegotiationCardUser> {
                     ),
                   ),
                 ),
-              ),
+              ) /*: SizedBox()*/,
             ],
           ],
         ),
